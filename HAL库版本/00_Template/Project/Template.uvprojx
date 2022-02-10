@@ -749,9 +749,9 @@
           <GroupName>System</GroupName>
           <Files>
             <File>
-              <FileName>delay.c</FileName>
+              <FileName>usart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\System\delay\delay.c</FilePath>
+              <FilePath>..\System\usart\usart.c</FilePath>
             </File>
             <File>
               <FileName>sys.c</FileName>
@@ -759,9 +759,9 @@
               <FilePath>..\System\sys\sys.c</FilePath>
             </File>
             <File>
-              <FileName>usart.c</FileName>
+              <FileName>delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\System\usart\usart.c</FilePath>
+              <FilePath>..\System\delay\delay.c</FilePath>
             </File>
           </Files>
         </Group>

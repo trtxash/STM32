@@ -56,3 +56,4 @@
 ..\objects\stm32f1xx_it.o: ..\HalLib\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_pcd_ex.h
 ..\objects\stm32f1xx_it.o: ..\HalLib\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_hcd.h
 ..\objects\stm32f1xx_it.o: ..\HalLib\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_mmc.h
+..\objects\stm32f1xx_it.o: stm32f1xx_it.h
