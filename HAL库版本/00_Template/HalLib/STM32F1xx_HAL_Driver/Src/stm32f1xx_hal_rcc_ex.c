@@ -99,6 +99,7 @@
   */
 HAL_StatusTypeDef HAL_RCCEx_PeriphCLKConfig(RCC_PeriphCLKInitTypeDef  *PeriphClkInit)
 {
+  FlagStatus       pwrclkchanged = RESET;
   uint32_t tickstart = 0U, temp_reg = 0U;
 #if defined(STM32F105xC) || defined(STM32F107xC)
   uint32_t  pllactive = 0U;
@@ -113,7 +114,7 @@ HAL_StatusTypeDef HAL_RCCEx_PeriphCLKConfig(RCC_PeriphCLKInitTypeDef  *PeriphClk
     /* check for RTC Parameters used to output RTCCLK */
     assert_param(IS_RCC_RTCCLKSOURCE(PeriphClkInit->RTCClockSelection));
 
-    FlagStatus       pwrclkchanged = RESET;
+  
 
     /* As soon as function is called to change RTC clock source, activation of the
        power domain is done. */
