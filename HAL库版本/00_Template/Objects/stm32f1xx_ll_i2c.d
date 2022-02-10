@@ -1,2 +1,1 @@
-../objects/stm32f1xx_ll_i2c.o: \
-  ..\HalLib\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_i2c.c
+..\objects\stm32f1xx_ll_i2c.o: ..\HalLib\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_i2c.c

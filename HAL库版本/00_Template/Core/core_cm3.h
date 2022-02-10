@@ -60,7 +60,7 @@
   @{
  */
 
-#include "cmsis_version.h"
+// #include "cmsis_version.h" //
 
 /*  CMSIS CM3 definitions */
 #define __CM3_CMSIS_VERSION_MAIN  (__CM_CMSIS_VERSION_MAIN)              /*!< \deprecated [31:16] CMSIS HAL main version */
