@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "delay.h": "c"
+        "delay.h": "c",
+        "sys.h": "c",
+        "stm32f1xx.h": "c"
     }
 }
