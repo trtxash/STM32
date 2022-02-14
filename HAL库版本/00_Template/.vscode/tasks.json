@@ -16,6 +16,12 @@
             "args": [
                 "clean"
             ]
+        },
+        {
+            "label": "rtt",
+            "type": "shell",
+            "command": "JLinkRTTClient",
+            "args": []
         }
     ]
 }

@@ -130,7 +130,8 @@
                 "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc",
                 "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
                 "${workspaceFolder}/Drivers/CMSIS/Include",
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/RTT",
+                "${workspaceFolder}/User"
             ],
             "defines": [
                 "USE_HAL_DRIVER",
@@ -140,18 +141,9 @@
                 "_UNICODE"
             ],
             "compilerPath": "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin/arm-none-eabi-gcc.exe",
-            "cStandard": "gnu89",
+            "cStandard": "c99",
             "cppStandard": "gnu++98",
-            "intelliSenseMode": "windows-gcc-x64"
-            /*
-            "browse": {
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": "",
-                "path": [
-                    "${workspaceFolder}"
-                ]
-            }
-            */
+            "intelliSenseMode": "windows-gcc-arm64"
         }
     ],
     "version": 4
@@ -170,14 +162,14 @@
         {
             "name": "Cortex Debug", // 配置名称，将会在启动配置的下拉菜单中显示
             "cwd": "${workspaceFolder}", // 调试程序时的工作目录，此为工作区文件夹；改成${fileDirname}可变为文件所在目录
-            "executable": "./bin/executable.elf", //编译出的二进制文件，也就是最终烧录到单片机中的，这里是elf文件。根据芯片的不同，可能产生不同的名称和后缀（例如TI的TM4C123芯片编译出来的名称是"main.axf"）
+            "executable": "${workspaceFolder}/build/Template.elf", // 编译出的二进制文件，也就是最终烧录到单片机中的，这里是elf文件。根据芯片的不同，可能产生不同的名称和后缀（例如TI的TM4C123芯片编译出来的名称是"main.axf"）
             "request": "launch", // 请求配置类型，可以为launch（启动）或attach（附加）
             "type": "cortex-debug", // 配置类型，是cortex-debug类型配置，其实也可以填cppdbg之类的，但是那样我们就得自己配置gdb了，配置起来将会非常麻烦。
             "runToEntryPoint": "main",
             "servertype": "jlink",
-            "device": "STM32F407VE", //使用J-link GDB Server时必须有；其他GBD Server时可选（有可能帮助自动选择SVD文件）。支持的设备见 https://www.segger.com/downloads/supported-devices.php
-            "svdFile": "./STM32F407.svd", //svd文件，有这个文件才能查看寄存器的值，每个单片机都不同。可以在以下地址找到 https://github.com/posborne/cmsis-svd
-            "preLaunchTask": "mingw32-make" // 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应
+            "device": "STM32F103ZE", // 使用J-link GDB Server时必须有；其他GBD Server时可选（有可能帮助自动选择SVD文件）。支持的设备见 https://www.segger.com/downloads/supported-devices.php
+            "svdFile": "./STM32F103.svd", // svd文件，有这个文件才能查看寄存器的值，每个单片机都不同。可以在以下地址找到 https://github.com/posborne/cmsis-svd
+            "preLaunchTask": "build" // 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应
         }
     ]
 }
@@ -204,6 +196,12 @@
             "args": [
                 "clean"
             ]
+        },
+        {
+            "label": "rtt",
+            "type": "shell",
+            "command": "JLinkRTTClient",
+            "args": []
         }
     ]
 }
