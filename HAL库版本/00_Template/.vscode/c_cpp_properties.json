@@ -9,7 +9,8 @@
                 "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
                 "${workspaceFolder}/Drivers/CMSIS/Include",
                 "${workspaceFolder}/RTT",
-                "${workspaceFolder}/User"
+                "${workspaceFolder}/User",
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "USE_HAL_DRIVER",
