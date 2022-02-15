@@ -72,6 +72,7 @@
             5.  "intelliSenseMode"：因为我们用的是gcc所以选gcc-x64
             6.  "browse.path"：源文件搜索路径。据说是用来做代码补全和查找定义的，但是我测试后发现删去也不影响使用，不过还是留着吧。这个路径和includePath不同，browse.path是自动递归所有子目录的。而include.path默认只看本目录。
             7.  Ctrl+S保存c_cpp_properties.json文件，发现左边目录里一个红点都没有了，强迫症舒服了！
+            8.  如果还是有红点和波浪线，检查c_cpp_properties.json文件，检查stm32f1xx_hal_conf.h文件是否禁用了用到的头文件。
     3.  调试
         1.  跳过OpenOCD，如果需要看[这里](https://zhuanlan.zhihu.com/p/61541590)
         2.  给代码中添加源文件和头文件，在C:\Program Files (x86)\SEGGER\JLink\Samples\RTT路径中，有一个Jlink RTT例程源码压缩包，我们把它复制到桌面再解压。然后把压缩包里的整个RTT文件夹复制到你的STM32工程中
@@ -131,7 +132,7 @@
                 "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
                 "${workspaceFolder}/Drivers/CMSIS/Include",
                 "${workspaceFolder}/RTT",
-                "${workspaceFolder}/User"
+                "${workspaceFolder}/User/Inc"
             ],
             "defines": [
                 "USE_HAL_DRIVER",
