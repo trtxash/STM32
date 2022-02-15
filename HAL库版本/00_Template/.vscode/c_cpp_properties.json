@@ -9,8 +9,7 @@
                 "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
                 "${workspaceFolder}/Drivers/CMSIS/Include",
                 "${workspaceFolder}/RTT",
-                "${workspaceFolder}/User",
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/User/Inc"
             ],
             "defines": [
                 "USE_HAL_DRIVER",
@@ -20,9 +19,9 @@
                 "_UNICODE"
             ],
             "compilerPath": "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin/arm-none-eabi-gcc.exe",
-            "cStandard": "gnu89",
-            "cppStandard": "gnu++98",
-            "intelliSenseMode": "windows-gcc-arm"
+            "cStandard": "c99",
+            "cppStandard": "c++98",
+            "intelliSenseMode": "windows-gcc-arm64"
         }
     ],
     "version": 4
