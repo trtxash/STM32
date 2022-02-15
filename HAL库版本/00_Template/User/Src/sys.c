@@ -72,8 +72,22 @@ void INTX_ENABLE(void)
 }
 //设置栈顶地址
 //addr:栈顶地址
+void MSR_MSP(u32 addr) // 下面两个也是一样的功能
+{
+__ASM volatile("MSR MSP, r0");
+__ASM volatile("BX r14");
+}
+/*
+void MSR_MSP(u32 addr)
+{
+  __ASM  MSR MSP, r0                         //set Main Stack value
+  __ASM  BX r14
+}
+*/
+/*
 __asm void MSR_MSP(u32 addr) 
 {
     MSR MSP, r0 			//set Main Stack value
     BX r14
 }
+*/
