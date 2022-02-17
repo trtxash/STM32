@@ -5,7 +5,7 @@
  * 			为学寄存器版本打基础
  * 			建立一个高效的学习模板
  * @author 	TRTX-gamer
- * @version 1.0
+ * @version 1.01
  * @date 	2022年2月17号18点50分
  */
 
