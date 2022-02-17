@@ -23,7 +23,6 @@ void Beep_Init(void)
 	GPIO_InitTypeDef GPIO_InitTure;
 
 	__HAL_RCC_GPIOB_CLK_ENABLE(); // 开启GPIOB时钟
-	__HAL_RCC_GPIOE_CLK_ENABLE(); // 开启GPIOE时钟
 	/*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
 
 	/*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
