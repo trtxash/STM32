@@ -36,7 +36,7 @@ void LED_Init(void)
 	GPIO_InitTure.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
 	GPIO_InitTure.Pin = GPIO_PIN_5;				// 设置GPIOx的5口
 
-	HAL_GPIO_Init(GPIOB, &GPIO_InitTure); // 先在上面三行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
+	HAL_GPIO_Init(GPIOB, &GPIO_InitTure); // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
 	HAL_GPIO_Init(GPIOE, &GPIO_InitTure); // GPIOE管脚初始化
 
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
