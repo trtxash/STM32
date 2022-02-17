@@ -9,26 +9,36 @@
  * @date 	2022年2月17号18点50分
  */
 
-#include "delay.h"
+//#include "delay.h"
 #include "sys.h"
 
 void LED_Init(void);
 
 /**
- * @brief	对函数简要描述
- * @param 	参数说明，以’:’作为参数结束标志；
- * @arg		参数里面可选择参量列举，对于可数情况可进行参量列举，同样以’:’作为参数结束标志；
- * @note  	注释，配合brief一起使用可以达到很好的注释效果；
- * @retval	返回值说明。
+ * @brief	利用HAL库函数进行LED初始化
+ * @param 	none
+ * @arg		none
+ * @note  	先开启GPIO时钟，再利用HAL_GPIO_Init();函数进行管脚初始化，再设置默认初始化后灯灭
+ * @retval	none
  */
 void LED_Init(void)
 {
+	GPIO_InitTypeDef GPIO_InitTure;
 
 	__HAL_RCC_GPIOB_CLK_ENABLE(); // 开启GPIOB时钟
 	__HAL_RCC_GPIOE_CLK_ENABLE(); // 开启GPIOE时钟
 	/*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
 
-	HAL_GPIO_Init();
+	GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP; // 进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数
+	GPIO_InitTure.Pull = GPIO_PULLUP;
+	GPIO_InitTure.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitTure.Pin = GPIO_PIN_5; // 设置GPIOx的5口
+
+	HAL_GPIO_Init(GPIOB, &GPIO_InitTure); // 先在上面三行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
+	HAL_GPIO_Init(GPIOE, &GPIO_InitTure); // GPIOE管脚初始化
+
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET); // PE5置1，默认初始化后灯灭
 }
 
 /**
@@ -36,9 +46,9 @@ void LED_Init(void)
  * @param 	参数说明，以’:’作为参数结束标志；
  * @arg		参数里面可选择参量列举，对于可数情况可进行参量列举，同样以’:’作为参数结束标志；
  * @note  	注释，配合brief一起使用可以达到很好的注释效果；
- * @retval	返回值说明。
+ * @retval	int。
  */
-void main(void)
+int main(void)
 {
 	HAL_Init();						//初始化HAL库
 	Stm32_Clock_Init(RCC_PLL_MUL9); //设置时钟,72M，因为几乎都要用时钟，最先考虑设置时钟,后面再详细学习时钟相关HAL库函数，先用

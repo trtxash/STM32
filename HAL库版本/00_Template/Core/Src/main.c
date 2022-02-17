@@ -33,7 +33,7 @@ void Delay(__IO uint32_t nCount)
  * @note  	注释，配合brief一起使用可以达到很好的注释效果；
  * @retval	返回值说明。
  */
-void main(void)
+int main(void)
 {
 	GPIO_InitTypeDef GPIO_Initure;
 
