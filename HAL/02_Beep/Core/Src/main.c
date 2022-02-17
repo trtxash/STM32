@@ -1,9 +1,9 @@
 /**
- * @file	00_Template
+ * @file	02_Beep
  * @brief 	用于工程模板
  * @author 	TRTX-gamer
- * @version 1.01
- * @date 	2022年2月17号18点42分
+ * @version 1.00
+ * @date 	2022年2月17号22点30分
  */
 
 #include "sys.h"
