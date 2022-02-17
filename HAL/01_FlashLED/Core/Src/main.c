@@ -9,9 +9,9 @@
  * @date 	2022年2月17号18点50分
  */
 
-#include "delay.h"
-#include "sys.h"
-//#include "stm32f1xx.h"
+//#include "delay.h"
+//#include "sys.h"
+#include "stm32f1xx.h"
 
 void LED_Init(void);
 
@@ -52,21 +52,21 @@ void LED_Init(void)
  */
 int main(void)
 {
-	HAL_Init();						//初始化HAL库
-	Stm32_Clock_Init(RCC_PLL_MUL9); //设置时钟,72M，因为几乎都要用时钟，最先考虑设置时钟,后面再详细学习时钟相关HAL库函数，先用
-	LED_Init();						//初始化LED
-	delay_init(72);					//初始化延时函数
+	HAL_Init(); //初始化HAL库
+	// Stm32_Clock_Init(RCC_PLL_MUL9); //设置时钟,72M，因为几乎都要用时钟，最先考虑设置时钟,后面再详细学习时钟相关HAL库函数，先用
+	LED_Init(); //初始化LED
+	// delay_init(72);					//初始化延时函数
 
 	while (1)
 	{
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);
-		// HAL_Delay(499); // 利用HAL_Delay()延迟500ms，这个函数默认加一
-		delay_ms(500); //延时500ms
+		HAL_Delay(499); // 利用HAL_Delay()延迟500ms，这个函数默认加一
+		// delay_ms(500); //延时500ms
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET);
-		// HAL_Delay(499); // 利用HAL_Delay()延迟500ms，这个函数默认加一
-		delay_ms(500); //延时500ms
+		HAL_Delay(499); // 利用HAL_Delay()延迟500ms，这个函数默认加一
+		// delay_ms(500); //延时500ms
 	}
 }
 
