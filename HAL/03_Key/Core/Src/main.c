@@ -110,6 +110,11 @@ uint8_t Key_Scan(uint8_t MODE)
 	{
 		Key_up = 1;
 	}
+	else if (Key_Number == 0) // 支持单次点按
+	{
+		Key_up = 1;
+	}
+
 	if (Key_Number && Key_up != 0) // 按下检测和连按检测
 	{
 		Key_up = 0;			// 记录按下
@@ -153,8 +158,8 @@ int main(void)
 
 	while (1)
 	{
-		HAL_Delay(9);		 // 延迟10ms按键消抖
-		switch (Key_Scan(1)) // 按键扫描
+		HAL_Delay(9);		 // 延迟10ms按键消抖，按下和松开都要
+		switch (Key_Scan(0)) // 按键扫描
 		{
 		case 0:
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);	  // PB5置1，灯灭
@@ -163,36 +168,36 @@ int main(void)
 			break;
 		case 1:
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0，灯亮
-			HAL_Delay(9);										  // 延迟10ms按键消抖
+
 			break;
 		case 2:
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0，灯亮
-			HAL_Delay(9);										  // 延迟10ms按键消抖
+
 			break;
 		case 3:
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0，灯亮
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0，灯亮
-			HAL_Delay(9);										  // 延迟10ms按键消抖
+
 			break;
 		case 4:
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET); // PB8置1，响
-			HAL_Delay(9);										// 延迟10ms按键消抖
+
 			break;
 		case 5:
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0，灯亮
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);	  // PB8置1，响
-			HAL_Delay(9);										  // 延迟10ms按键消抖
+
 			break;
 		case 6:
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0，灯亮
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);	  // PB8置1，响
-			HAL_Delay(9);										  // 延迟10ms按键消抖
+
 			break;
 		case 7:
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0，灯亮
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0，灯亮
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);	  // PB8置1，响
-			HAL_Delay(9);										  // 延迟10ms按键消抖
+
 			break;
 		}
 	}
