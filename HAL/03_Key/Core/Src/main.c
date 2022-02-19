@@ -159,7 +159,7 @@ int main(void)
 	while (1)
 	{
 		HAL_Delay(9);		 // 延迟10ms按键消抖，按下和松开都要
-		switch (Key_Scan(0)) // 按键扫描
+		switch (Key_Scan(1)) // 按键扫描
 		{
 		case 0:
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);	  // PB5置1，灯灭
