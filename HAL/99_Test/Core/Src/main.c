@@ -10,7 +10,7 @@
 #include "delay.h"
 
 void GPIOA_Init(void);
-void PWM_MG90S(u32 nus);
+void PWM_MG90S(u32 nusa, u32 nusb, u32 nusc);
 void Beep_Init(void);
 void LED_Init(void);
 void Key_Init(void);
@@ -34,19 +34,39 @@ void GPIOA_Init(void)
 	GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;	// 推挽输出
 	GPIO_InitTure.Pull = GPIO_PULLUP;			// 上拉
 	GPIO_InitTure.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
-	GPIO_InitTure.Pin = GPIO_PIN_5;				// 设置GPIOx的5口
 
+	GPIO_InitTure.Pin = GPIO_PIN_5;		  // 设置GPIOx的5口
 	HAL_GPIO_Init(GPIOA, &GPIO_InitTure); // 先在上面四行设置GPIOX的模式，上下拉，速度，再对GPIOX管脚初始化
+	GPIO_InitTure.Pin = GPIO_PIN_6;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitTure);
+	GPIO_InitTure.Pin = GPIO_PIN_7;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitTure);
 
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置1，默认初始化后灯灭
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
 }
 
-void PWM_MG90S(u32 nus)
+void PWM_MG90S(u32 nusa, u32 nusb, u32 nusc)
 {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-	delay_us(nus); // 利用delay_us(u32 nus)延迟nus ms
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+	delay_us(nusa); // 利用delay_us(u32 nus)延迟nus ms
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-	delay_us(20000 - nus); // 利用delay_us(u32 nus)延迟
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+	delay_us(20000 - nusa); // 利用delay_us(u32 nus)延迟
+
+	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+	// delay_us(nusb); // 利用delay_us(u32 nus)延迟nus ms
+	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+	// delay_us(20000 - nusb); // 利用delay_us(u32 nus)延迟
+
+	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+	// delay_us(nusc); // 利用delay_us(u32 nus)延迟nus ms
+	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+	// delay_us(20000 - nusc); // 利用delay_us(u32 nus)延迟
 }
 
 /**
@@ -203,7 +223,7 @@ int main(void)
 
 	while (1)
 	{
-		PWM_MG90S(nus);
+		PWM_MG90S(nus, nus, nus);
 
 		// delay_ms(10);		 // 延迟10ms按键消抖，按下和松开都要
 		switch (Key_Scan(1)) // 按键扫描模式
@@ -215,12 +235,12 @@ int main(void)
 			break;
 		case 1:
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0，灯亮
-			nus += 100;
+			nus += 10;
 			// nus = 500;
 			break;
 		case 2:
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0，灯亮
-			nus -= 100;
+			nus -= 10;
 			// nus = 2500;
 			break;
 		case 3:
@@ -248,11 +268,11 @@ int main(void)
 
 		if (nus < 500)
 		{
-			nus += 100;
+			nus += 10;
 		}
 		else if (nus > 2500)
 		{
-			nus -= 100;
+			nus -= 10;
 		}
 	}
 }
