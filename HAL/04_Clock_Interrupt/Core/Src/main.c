@@ -1,5 +1,5 @@
 /**
- * @file	04_Clock
+ * @file	04_Clock_Interrupt
  * @brief 	学习利用HAL库配置STM32
  * @author 	TRTX-gamer
  * @version 1.00
