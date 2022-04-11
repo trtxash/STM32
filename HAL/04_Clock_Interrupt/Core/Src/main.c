@@ -8,7 +8,7 @@
 
 #include "stm32f1xx.h"
 
-void Stm32_CloclInit(uint32_t PLL);
+void Stm32_ClockInit(uint32_t PLL);
 
 /**
  * @brief	Stm32f103时钟配置和初始化
@@ -17,7 +17,7 @@ void Stm32_CloclInit(uint32_t PLL);
  * @note
  * @retval
  */
-void Stm32_CloclInit(uint32_t PLL)
+void Stm32_ClockInit(uint32_t PLL)
 {
 	HAL_StatusTypeDef ret = HAL_OK;
 	RCC_OscInitTypeDef RCC_OscInitStructure; // 结构体命名为RCC_OscInitStructure
@@ -81,11 +81,5 @@ int main(void)
 
 	while (1)
 	{
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET); // PB5置1
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET); // PE5置1
-		Delay(0x7FFFFF);
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0
-		Delay(0x7FFFFF);
 	}
 }

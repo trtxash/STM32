@@ -150,7 +150,7 @@ void Key_Init(void)
 }
 
 /**
- * @brief	按键扫描喊出
+ * @brief	按键扫描输出
  * @param 	MODE;KEY;
  * @arg		MODE = 0为单次扫描， MODE = 1为连续扫描；Keyx为扫描x按键
  * @note
@@ -274,5 +274,7 @@ int main(void)
 		{
 			nus -= 10;
 		}
+
+		
 	}
 }
