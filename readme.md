@@ -52,10 +52,11 @@
     1.  用STM32CubeMX创建工程(不能有中文！)
         1.  安装支持包，主页右边可以安装不同芯片的支持包，例如F1系列，F4系列
         2.  新建项目以后，SYS里选择debug接口，这里选的是SWD，也可以选JTAG
-        3.  先在RCC里选择高速外部时钟（HSE）和低速外部时钟源（LSE），这里选的都是晶振（因为板子上有这两个晶振）。然后选择“时钟配置”，先在左边填好外部晶振的频率，然后在右边填上自己想要的主频，Cube会自动帮你配置锁相环。
+        3.  先在RCC里选择高速外部时钟（HSE）和低速外部时钟源（LSE），这里选的都是晶振（因为板子上有这两个晶振）。然后选择“时钟配置”，先在左边填好外部晶振的频率，然后在右边填上自己想要的主频，Cube会自动帮你配置锁相环。(根据实际板子情况进行配置)
         4.  Toolchain/IDE选择生成makefile即可。前面的项目结构我选的Advanced，你也可以选basic，后面目录结构就不一样了，VSCode的配置要稍微改一下。
         5.  Code Generator界面勾选Generated files全部，点击右上角的GENERATE CODE生成代码。
         6.  .ioc文件和.mxproject文件是STM32Cube的工程文件，Driver里是STM32和ARM CMSIS的库，最好不要修改。Core里面Inc和Src是供用户修改的源码。
+        7.  在文件夹目录下下载相关芯片的[SVD文件](https://github.com/posborne/cmsis-svd)
     2.  配置VS Code
         1.  VS Code搭建所需见，[VS-Code-C](https://github.com/TRTX-gamer/VS-Code-C/blob/main/README.md)
         2.  安装VS Code 插件
@@ -66,7 +67,7 @@
         3. 配置VS Code内置终端，终端界面选择加号右边下箭头，选择默认配置文件，选择为git bash，因为git bash兼容性最好。这是全局设置。
         4.  配置智能感知，其实这个时候我们敲make已经可以编译成功了。但是VS Code的编辑窗口里会给我们亮一堆红点，代码里给我们一堆红色波浪线。这是因为VS Code本身的一个待改进的地方，下面具体解决。还记得我们使用Keil开发时，Project Options里的全局宏定义吗？在通过Makefile组织的项目中，这两个宏是通过gcc的-D参数在编译时添加的。但是，VS Code只是一个编辑器，它检查代码的时候并不会去读makefile，而是只看.h和.c文件，于是stm32f4xx.h中就检测不到那个宏，表现为灰色（认为这个宏没有被定义），于是你就可以看到一大串”xxxx is undefined”之类的报错，其实都是这个原因导致的。但是直接去make的话是没有问题的。因此我们需要在当前目录的.vscode文件夹下创建c_cpp_properties.json配置文件，用来告诉VS Code我们定义了这些宏。随便找到一处红色波浪线，点击并把光标移到那一行，左上角会出现一个黄色小灯泡。点击黄色小灯泡并选择“编辑‘includePath设置’”。直接用c_cpp_properties.json来配置，VS Code自动在当前目录下的.vscode文件夹下生成一个c_cpp_properties.json文件，我的配置在下面给出。这个配置是我研究测试很久得到的，保证没问题，下面详细解释几个重要部分：
             1.  “name”：这是用于标记使用的平台的标签。除了win32还可以选Linux或Mac。也就是说，这个json里“configuration“下可以写三组配置，只要每组配置前面写上不同的平台，即可在不同的操作系统上使用就会自动适配不同的配置，非常方便
-            2.  “includePath”：告诉VS Code该去哪里查找头文件。第一个目录是C语言标准库的目录， 剩下的几个目录直接从Makefile里复制然后稍微修改下即可。"${workspaceFolder}"表示项目文件夹；
+            2.  “includePath”：告诉VS Code该去哪里查找头文件。第一个目录是C语言标准库的目录， 剩下的几个目录直接从Makefile里复制然后稍微修改下即可。"${workspaceFolder}"表示项目文件夹.
             3.  “defines”：全局宏定义，告诉VS Code这些宏都被定义了，只是没写在源码中而已。上述多加的两个宏是makefile里的。
             4.  "compilerPath"：指定编译器的路径。因为有一些宏是编译器自带的，连makefile里都没有，例如__GNUC__。有些教程里会让你在defines里面加上__GNUC__，但是这是没必要的。只要你指定了编译器路径，所有的编译器自带的宏就都导入了VS Code。
             5.  "intelliSenseMode"：因为我们用的是gcc所以选gcc-x64
@@ -100,7 +101,8 @@
             ],
             "defines": [
                 "USE_HAL_DRIVER",
-                "STM32F103xE"  
+                "STM32F103xE"
+                // 根据自己的芯片类型更改，参考Dvice里Include下的文件，名称大概为MX配置后生成的文件名
             ],
             "compilerPath": "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin/arm-none-eabi-gcc.exe",
             "intelliSenseMode": "gcc-x64",
@@ -294,6 +296,7 @@ make distclean
 + [用VS Code开发STM32（三）——调试](https://zhuanlan.zhihu.com/p/61541590)
 + [用VS Code开发STM32（四）——增加SEGGER RTT日志输出支持](https://zhuanlan.zhihu.com/p/163771273)
 + [VS Code 搭建stm32开发环境](https://www.cnblogs.com/silencehuan/p/11815263.html)
++ [MINIF401](https://github.com/WeActTC/MiniSTM32F4x1)
 ---
 
 创于:2022年2月10日16点37分
