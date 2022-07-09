@@ -112,7 +112,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 		HAL_GPIO_Init(GPIOA,&GPIO_Initure);	   	//初始化PA9
 
 		GPIO_Initure.Pin=GPIO_PIN_10;			//PA10
-		GPIO_Initure.Mode=GPIO_MODE_AF_INPUT;	//模式要设置为复用输入模式！	
+		GPIO_Initure.Mode=GPIO_MODE_INPUT;		//模式要设置为复用输入模式！(F401没有复用输入)
 		HAL_GPIO_Init(GPIOA,&GPIO_Initure);	   	//初始化PA10
 		
 #if EN_USART1_RX
