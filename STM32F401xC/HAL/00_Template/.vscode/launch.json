@@ -12,7 +12,7 @@
             "type": "cortex-debug", // 配置类型，是cortex-debug类型配置，其实也可以填cppdbg之类的，但是那样我们就得自己配置gdb了，配置起来将会非常麻烦。
             "runToEntryPoint": "main",
             "servertype": "jlink",
-            "device": "STM32F401", // 使用J-link GDB Server时必须有；其他GBD Server时可选（有可能帮助自动选择SVD文件）。支持的设备见 https://www.segger.com/downloads/supported-devices.php
+            "device": "STM32F401CC", // 使用J-link GDB Server时必须有；其他GBD Server时可选（有可能帮助自动选择SVD文件）。支持的设备见 https://www.segger.com/downloads/supported-devices.php
             "svdFile": "./STM32F401.svd", // svd文件，有这个文件才能查看寄存器的值，每个单片机都不同。可以在以下地址找到 https://github.com/posborne/cmsis-svd
             "preLaunchTask": "build" // 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应
         }
