@@ -10,10 +10,36 @@
  */
 
 //#include "delay.h"
-//#include "sys.h"
+#include "sys.h"
 #include "stm32f4xx.h"
 
 void LED_Init(void);
+
+/**
+ * @brief	LED灯交替闪烁
+ * @param 	none
+ * @arg		none
+ * @note  	初始化函数后利用HAL_GPIO_WritePin和HAL_Delay进行控制LED的亮灭和延迟500ms以达到LED灯交替闪烁
+ * @retval	int
+ */
+int main(void)
+{
+	HAL_Init(); //初始化HAL库
+	// Stm32_Clock_Init(RCC_PLL_MUL9); //设置时钟,72M，因为几乎都要用时钟，最先考虑设置时钟,后面再详细学习时钟相关HAL库函数，先用
+	Stm32_Clock_Init(25, 168, 2, 4);
+	LED_Init(); //初始化LED
+	// delay_init(72);					//初始化延时函数
+
+	while (1)
+	{
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+		HAL_Delay(499); // 利用HAL_Delay()延迟500ms，这个函数默认加一
+		// delay_ms(500); //延时500ms
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+		HAL_Delay(499); // 利用HAL_Delay()延迟500ms，这个函数默认加一
+						// delay_ms(500); //延时500ms
+	}
+}
 
 /**
  * @brief	利用HAL库函数进行LED初始化
@@ -39,32 +65,6 @@ void LED_Init(void)
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
 }
-
-/**
- * @brief	LED灯交替闪烁
- * @param 	none
- * @arg		none
- * @note  	初始化函数后利用HAL_GPIO_WritePin和HAL_Delay进行控制LED的亮灭和延迟500ms以达到LED灯交替闪烁
- * @retval	int
- */
-int main(void)
-{
-	HAL_Init(); //初始化HAL库
-	// Stm32_Clock_Init(RCC_PLL_MUL9); //设置时钟,72M，因为几乎都要用时钟，最先考虑设置时钟,后面再详细学习时钟相关HAL库函数，先用
-	LED_Init(); //初始化LED
-	// delay_init(72);					//初始化延时函数
-
-	while (1)
-	{
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-		HAL_Delay(499); // 利用HAL_Delay()延迟500ms，这个函数默认加一
-		// delay_ms(500); //延时500ms
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-		HAL_Delay(499); // 利用HAL_Delay()延迟500ms，这个函数默认加一
-						// delay_ms(500); //延时500ms
-	}
-}
-
 /*----------------------------下面是正点原子的程序源码--------------------------*/
 /*
 #include "sys.h"
