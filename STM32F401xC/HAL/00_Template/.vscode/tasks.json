@@ -7,7 +7,9 @@
             "label": "build",
             "type": "shell",
             "command": "mingw32-make",
-            "args": []
+            "args": [
+                "-j6"
+            ]
         },
         {
             "label": "clean",
