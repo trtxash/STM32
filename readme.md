@@ -23,7 +23,7 @@
     1.  vs code
     2.  下载并安装 STM32CubeMX ，支持最新的HAL库，工程代码配置与生成工具，支持生成IAR、Keil、STM32CubeIDE、Makefile等工程，这里使用其生成的Makefile工程。
     3.  下载并安装 Git for Windows，该工具集成有精简版的mingw，这里我们使用其bash终端和版本管理均非常有用。
-    4.  下载并安装 [arm-none-eabi-gcc编译器](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)，GUN的arm的通用交叉编译链工具，基本上常用的arm处理器均支持；安装时勾选设置全局环境变量以便于配置；使用离线免安装包时，解压到合适的位置，在系统环境变量添加\bin目录，运行CMD或者Windows PowerShell，测试一下是否可用。命令：arm-none-eabi-gcc -v
+    4.  下载并安装 [arm-none-eabi-gcc编译器](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)，GUN的arm的通用交叉编译链工具，基本上常用的arm处理器均支持；安装时勾选设置全局环境变量以便于配置；使用离线免安装包时，解压到合适的位置，在系统环境变量添加\bin目录，运行CMD或者Windows PowerShell，测试一下是否可用。命令：arm-none-eabi-gcc -v(版本最好选择2021,否则可能出现GDB连接失败)
     5.  下载并安装 mingw，MinGW 的全称是：Minimalist GNU on Windows 。它实际上是将经典的开源 C语言 编译器 GCC 移植到了 Windows 平台下，并且包含了 Win32API 和 MSYS，因此可以将源代码编译生成 Windows 下的可执行程序，又能如同在 Linux 平台下时，使用一些 Windows 不具备的开发工具。一句话来概括：MinGW 就是 GCC 的 Windows 版本 。其安装一般为在线安装，按网上步骤即可。  这里我们主要需要使用其 mingw32-make 功能。
     6.  下载并安装（可选） OpenOCD for Windows，一个开源的片上调试器(Open On-Chip Debugger)。linux可以直接 apt install openocd。
     7.  Jlink、ST-Link驱动（可选），如果使用OpenOCD作为GDB Server，好处是支持各种不同的调试器。但如果你仅使用Jink，不用其他的调试器，那么显然用Jlink自己的GDB Server是更加合适的。SEGGER为jlink提供了各种工具，例如J-Scope，RTT(Real Time Transfer)等。今天的内容就是把RTT Client嵌入到VS Code中。    
@@ -49,7 +49,7 @@
         5. 还有一些代码的修改在后面会写下
     8.  STM32CubeProg 用于stm32下载程序
 2.  配置软件
-    1.  用STM32CubeMX创建工程(不能有中文！)
+    1.  用STM32CubeMX创建工程(不能有中文！比如调试会出错)
         1.  安装支持包，主页右边可以安装不同芯片的支持包，例如F1系列，F4系列
         2.  新建项目以后，SYS里选择debug接口，这里选的是SWD，也可以选JTAG
         3.  先在RCC里选择高速外部时钟（HSE）和低速外部时钟源（LSE），这里选的都是晶振（因为板子上有这两个晶振）。然后选择“时钟配置”，先在左边填好外部晶振的频率，然后在右边填上自己想要的主频，Cube会自动帮你配置锁相环。(根据实际板子情况进行配置)
