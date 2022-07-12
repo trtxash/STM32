@@ -18,7 +18,7 @@
  * @brief	LED灯交替闪烁
  * @param 	none
  * @arg		none
- * @note  	初始化函数后利用HAL_GPIO_WritePin和HAL_Delay进行控制LED的亮灭和延迟500ms以达到LED灯交替闪烁
+ * @note  	初始化函数后利用LED_Reverse以达到LED灯交替闪烁
  * @retval	int
  */
 int main(void)
