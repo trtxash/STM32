@@ -1,9 +1,9 @@
 /**
- * @file	03_Timer
- * @brief 	定时器中断
+ * @file	04_PWM
+ * @brief 	PWM发生器
  * @author 	TRTX-gamer
  * @version 1.00
- * @date 	2022年7月12号19点42分
+ * @date 	2022年7月12号21点37分
  */
 
 #include "delay.h"
