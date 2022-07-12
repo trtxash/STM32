@@ -62,7 +62,7 @@ RTT/SEGGER_RTT.c \
 User/Src/delay.c \
 User/Src/sys.c \
 User/Src/usart.c \
-User/Src/led.c 
+Hardware/Src/led.c 
 
 # ASM sources
 ASM_SOURCES =  \
@@ -125,7 +125,8 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
 -IRTT \
--IUser/Inc 
+-IUser/Inc \
+-IHardware/Inc 
 
 
 # compile gcc flags

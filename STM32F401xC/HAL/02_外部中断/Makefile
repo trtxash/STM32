@@ -125,7 +125,8 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
 -IRTT \
--IUser/Inc 
+-IUser/Inc \
+-IHardware/Inc 
 
 
 # compile gcc flags
