@@ -42,7 +42,7 @@ int main(void)
 			led0pwmval++; // dir==1 led0pwmval递增
 		else
 			led0pwmval--; // dir==0 led0pwmval递减
-		if (led0pwmval > 500)
+		if (led0pwmval > 600)
 			dir = 0; // led0pwmval到达300后，方向为递减
 		if (led0pwmval == 0)
 			dir = 1;					  // led0pwmval递减到0后，方向改为递增

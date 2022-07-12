@@ -47,7 +47,7 @@ void TIM3_Init(u16 arr, u16 psc)
 // Ft=定时器工作频率,单位:Mhz
 void TIM10_PWM_Init(u16 arr, u16 psc)
 {
-    TIM10_Handler.Instance = TIM10;                      //定时器14
+    TIM10_Handler.Instance = TIM10;                      //定时器10
     TIM10_Handler.Init.Prescaler = psc;                  //定时器分频
     TIM10_Handler.Init.CounterMode = TIM_COUNTERMODE_UP; //向上计数模式
     TIM10_Handler.Init.Period = arr;                     //自动重装载值
@@ -81,7 +81,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 {
     GPIO_InitTypeDef GPIO_Initure;
     __HAL_RCC_TIM10_CLK_ENABLE(); //使能定时器10
-    __HAL_RCC_GPIOB_CLK_ENABLE(); //开启GPIOF时钟
+    __HAL_RCC_GPIOB_CLK_ENABLE(); //开启GPIOB时钟
 
     GPIO_Initure.Pin = GPIO_PIN_8;           // PB8
     GPIO_Initure.Mode = GPIO_MODE_AF_PP;     //复用推挽输出
