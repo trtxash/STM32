@@ -1,12 +1,12 @@
 /**
- * @file	01_FlashLED
+ * @file	02_520直流电机
  * @brief 	LED灯交替闪烁
  * 			锻炼使用HAL库，对工程模板有更好的理解
  * 			为学寄存器版本打基础
  * 			建立一个高效的学习模板
  * @author 	TRTX-gamer
- * @version 1.01
- * @date 	2022年2月17号18点50分
+ * @version 1.00
+ * @date 	2022年7月11号19点1分
  */
 
 #include "delay.h"
@@ -14,26 +14,29 @@
 #include "stm32f4xx.h"
 
 void LED_Init(void);
+void LED_Fleg(void);
+void TIM3_PWM_Init(void)
+{
+	HAL_TIM_Base_Start_IT(&htim);
+}
 
 /**
  * @brief	LED灯交替闪烁
  * @param 	none
  * @arg		none
- * @note  	初始化函数后利用HAL_GPIO_WritePin和HAL_Delay进行控制LED的亮灭和延迟500ms以达到LED灯交替闪烁
+ * @note  	初始化函数后利用HAL_GPIO_WritePin和HAL_Delay进行控制LED的亮灭，指示灯，取反
  * @retval	int
  */
 int main(void)
 {
 	HAL_Init(); //初始化HAL库
 	Stm32_Clock_Init(25, 168, 2, 4);
-	delay_init(84);               		//初始化延时函数
-	LED_Init(); //初始化LED
+	delay_init(84); //初始化延时函数
+	LED_Init();		//初始化LED
 
 	while (1)
 	{
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-		delay_ms(500); //延时500ms
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+		LED_Fleg();
 		delay_ms(500); //延时500ms
 	}
 }
@@ -61,4 +64,17 @@ void LED_Init(void)
 	HAL_GPIO_Init(GPIOC, &GPIO_InitTure); // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
+}
+
+/**
+ * @brief	LED灯指示
+ * @param 	none
+ * @arg		none
+ * @note  	初始化函数后利用HAL_GPIO_WritePin和HAL_Delay进行控制LED的亮灭，指示灯，取反
+ * @retval	int
+ */
+void LED_Fleg(void)
+{
+
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)); // GPIOB13取反
 }
