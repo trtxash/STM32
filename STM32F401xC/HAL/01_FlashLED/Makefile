@@ -42,6 +42,7 @@ Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
@@ -60,7 +61,8 @@ RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 User/Src/delay.c \
 User/Src/sys.c \
-User/Src/usart.c 
+User/Src/usart.c \
+User/Src/led.c 
 
 # ASM sources
 ASM_SOURCES =  \

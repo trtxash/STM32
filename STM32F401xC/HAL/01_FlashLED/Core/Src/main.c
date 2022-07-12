@@ -24,7 +24,7 @@
 int main(void)
 {
 	HAL_Init(); //初始化HAL库
-	Stm32_Clock_Init(25, 168, 2, 4);
+	Stm32_Clock_Init(168, 25, 2, 4);
 	delay_init(84); //初始化延时函数
 	LED_Init();		//初始化LED
 
