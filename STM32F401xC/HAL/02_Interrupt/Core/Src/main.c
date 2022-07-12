@@ -9,7 +9,8 @@
 #include "delay.h"
 #include "sys.h"
 #include "led.h"
-#include "key.h"
+// #include "key.h"
+#include "exti.h"
 #include "stm32f4xx.h"
 
 /**
@@ -25,13 +26,14 @@ int main(void)
 	Stm32_Clock_Init(168, 25, 2, 4);
 	delay_init(84); //初始化延时函数
 	LED_Init();		//初始化LED
-	KEY_Init();		//初始化按键
+	// KEY_Init();		//初始化按键
+	EXTI_Init(); //初始化外部中断
 
 	while (1)
 	{
-		if (KEY_Scan(0))
-		{
-			LED_Reverse();
-		}
+		// if (KEY_Scan(0))
+		// {
+		// 	LED_Reverse();
+		// }
 	}
 }

@@ -61,9 +61,10 @@ RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 User/Src/delay.c \
 User/Src/sys.c \
-User/Src/usart.c \
 Hardware/Src/led.c \
-Hardware/Src/key.c 
+Hardware/Src/exti.c 
+# Hardware/Src/key.c 
+# User/Src/usart.c 
 
 # ASM sources
 ASM_SOURCES =  \
