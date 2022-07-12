@@ -11,6 +11,7 @@
 
 #include "delay.h"
 #include "sys.h"
+#include "led.h"
 #include "stm32f4xx.h"
 
 /**
@@ -24,14 +25,12 @@ int main(void)
 {
 	HAL_Init(); //初始化HAL库
 	Stm32_Clock_Init(25, 168, 2, 4);
-	delay_init(84);               		//初始化延时函数
-	LED_Init(); //初始化LED
+	delay_init(84); //初始化延时函数
+	LED_Init();		//初始化LED
 
 	while (1)
 	{
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-		delay_ms(500); //延时500ms
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+		LED_Reverse();
 		delay_ms(500); //延时500ms
 	}
 }

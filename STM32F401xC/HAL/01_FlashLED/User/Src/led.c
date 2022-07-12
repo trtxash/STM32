@@ -1,4 +1,5 @@
 #include "led.h"
+
 /**
  * @brief	利用HAL库函数进行LED初始化
  * @param 	none
@@ -22,4 +23,16 @@ void LED_Init(void)
 	HAL_GPIO_Init(GPIOC, &GPIO_InitTure); // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
+}
+
+/**
+ * @brief	LED灯交替闪烁
+ * @param 	none
+ * @arg		none
+ * @note  	初始化函数后利用HAL_GPIO_xxxx以达到LED灯状态取反
+ * @retval	void
+ */
+void LED_Reverse(void)
+{
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)); // GPIOB13取反
 }
