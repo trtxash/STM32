@@ -68,8 +68,8 @@ void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
     RCC_ClkInitStructure.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
     RCC_ClkInitStructure.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;       //设置系统时钟时钟源为PLL
     RCC_ClkInitStructure.AHBCLKDivider = RCC_SYSCLK_DIV1;              // AHB分频系数为1
-    RCC_ClkInitStructure.APB1CLKDivider = RCC_HCLK_DIV4;               // APB1分频系数为4
-    RCC_ClkInitStructure.APB2CLKDivider = RCC_HCLK_DIV2;               // APB2分频系数为2
+    RCC_ClkInitStructure.APB1CLKDivider = RCC_HCLK_DIV2;               // APB1分频系数为2
+    RCC_ClkInitStructure.APB2CLKDivider = RCC_HCLK_DIV1;               // APB2分频系数为1
     ret = HAL_RCC_ClockConfig(&RCC_ClkInitStructure, FLASH_LATENCY_5); //同时设置FLASH延时周期为5WS，也就是6个CPU周期。
 
     if (ret != HAL_OK)
