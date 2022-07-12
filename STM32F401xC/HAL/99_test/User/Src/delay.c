@@ -1,65 +1,42 @@
 #include "delay.h"
 #include "sys.h"
 ////////////////////////////////////////////////////////////////////////////////// 	 
-//如果需要使用OS,则包括下面的头文件即可. 
+//如果使用ucos,则包括下面的头文件即可.
 #if SYSTEM_SUPPORT_OS
 #include "includes.h"					//ucos 使用	  
 #endif
-//////////////////////////////////////////////////////////////////////////////////	 
+//////////////////////////////////////////////////////////////////////////////////  
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32开发板
-//使用SysTick的普通计数模式对延迟进行管理（适合STM32F10x系列）
+//ALIENTEK STM32F407开发板
+//使用SysTick的普通计数模式对延迟进行管理(支持ucosii/ucosiii)
 //包括delay_us,delay_ms
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
-//创建日期:2019/9/17
-//版本：V1.8
+//创建日期:2017/4/6
+//版本：V1.1
 //版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
+//Copyright(C) 广州市星翼电子科技有限公司 2014-2024
 //All rights reserved
 //********************************************************************************
-//V1.2修改说明
-//修正了中断中调用出现死循环的错误
-//防止延时不准确,采用do while结构!
-//V1.3修改说明
-//增加了对UCOSII延时的支持.
-//如果使用ucosII,delay_init会自动设置SYSTICK的值,使之与ucos的TICKS_PER_SEC对应.
-//delay_ms和delay_us也进行了针对ucos的改造.
-//delay_us可以在ucos下使用,而且准确度很高,更重要的是没有占用额外的定时器.
-//delay_ms在ucos下,可以当成OSTimeDly来用,在未启动ucos时,它采用delay_us实现,从而准确延时
-//可以用来初始化外设,在启动了ucos之后delay_ms根据延时的长短,选择OSTimeDly实现或者delay_us实现.
-//V1.4修改说明 20110929
-//修改了使用ucos,但是ucos未启动的时候,delay_ms中中断无法响应的bug.
-//V1.5修改说明 20120902
-//在delay_us加入ucos上锁，防止由于ucos打断delay_us的执行，可能导致的延时不准。
-//V1.6修改说明 20150109
-//在delay_ms加入OSLockNesting判断。
-//V1.7修改说明 20150319
-//修改OS支持方式,以支持任意OS(不限于UCOSII和UCOSIII,理论上任意OS都可以支持)
-//添加:delay_osrunning/delay_ostickspersec/delay_osintnesting三个宏定义
-//添加:delay_osschedlock/delay_osschedunlock/delay_ostimedly三个函数
-//V1.8修改说明 20150519
-//修正UCOSIII支持时的2个bug：
-//delay_tickspersec改为：delay_ostickspersec
-//delay_intnesting改为：delay_osintnesting
-//////////////////////////////////////////////////////////////////////////////////  
+//修改说明
+////////////////////////////////////////////////////////////////////////////////// 
 
 static u32 fac_us=0;							//us延时倍乘数
 
 #if SYSTEM_SUPPORT_OS		
     static u16 fac_ms=0;				        //ms延时倍乘数,在os下,代表每个节拍的ms数
 #endif
-	
+
 #if SYSTEM_SUPPORT_OS							//如果SYSTEM_SUPPORT_OS定义了,说明要支持OS了(不限于UCOS).
 //当delay_us/delay_ms需要支持OS的时候需要三个与OS相关的宏定义和函数来支持
 //首先是3个宏定义:
-//    delay_osrunning:用于表示OS当前是否正在运行,以决定是否可以使用相关函数
+//delay_osrunning:用于表示OS当前是否正在运行,以决定是否可以使用相关函数
 //delay_ostickspersec:用于表示OS设定的时钟节拍,delay_init将根据这个参数来初始哈systick
-// delay_osintnesting:用于表示OS中断嵌套级别,因为中断里面不可以调度,delay_ms使用该参数来决定如何运行
+//delay_osintnesting:用于表示OS中断嵌套级别,因为中断里面不可以调度,delay_ms使用该参数来决定如何运行
 //然后是3个函数:
-//  delay_osschedlock:用于锁定OS任务调度,禁止调度
+//delay_osschedlock:用于锁定OS任务调度,禁止调度
 //delay_osschedunlock:用于解锁OS任务调度,重新开启调度
-//    delay_ostimedly:用于OS延时,可以引起任务调度.
+//delay_ostimedly:用于OS延时,可以引起任务调度.
 
 //本例程仅作UCOSII和UCOSIII的支持,其他OS,请自行参考着移植
 //支持UCOSII
@@ -80,22 +57,22 @@ static u32 fac_us=0;							//us延时倍乘数
 //us级延时时,关闭任务调度(防止打断us级延迟)
 void delay_osschedlock(void)
 {
-#ifdef CPU_CFG_CRITICAL_METHOD   				//使用UCOSIII
+#ifdef CPU_CFG_CRITICAL_METHOD   			//使用UCOSIII
 	OS_ERR err; 
-	OSSchedLock(&err);							//UCOSIII的方式,禁止调度，防止打断us延时
-#else											//否则UCOSII
-	OSSchedLock();								//UCOSII的方式,禁止调度，防止打断us延时
+	OSSchedLock(&err);						//UCOSIII的方式,禁止调度，防止打断us延时
+#else										//否则UCOSII
+	OSSchedLock();							//UCOSII的方式,禁止调度，防止打断us延时
 #endif
 }
 
 //us级延时时,恢复任务调度
 void delay_osschedunlock(void)
 {	
-#ifdef CPU_CFG_CRITICAL_METHOD   				//使用UCOSIII
+#ifdef CPU_CFG_CRITICAL_METHOD   			//使用UCOSIII
 	OS_ERR err; 
-	OSSchedUnlock(&err);						//UCOSIII的方式,恢复调度
-#else											//否则UCOSII
-	OSSchedUnlock();							//UCOSII的方式,恢复调度
+	OSSchedUnlock(&err);					//UCOSIII的方式,恢复调度
+#else										//否则UCOSII
+	OSSchedUnlock();						//UCOSII的方式,恢复调度
 #endif
 }
 
@@ -105,24 +82,24 @@ void delay_ostimedly(u32 ticks)
 {
 #ifdef CPU_CFG_CRITICAL_METHOD
 	OS_ERR err; 
-	OSTimeDly(ticks,OS_OPT_TIME_PERIODIC,&err);	//UCOSIII延时采用周期模式
+	OSTimeDly(ticks,OS_OPT_TIME_PERIODIC,&err); //UCOSIII延时采用周期模式
 #else
-	OSTimeDly(ticks);							//UCOSII延时
+	OSTimeDly(ticks);						    //UCOSII延时
 #endif 
 }
  
-//systick中断服务函数,使用ucos时用到
+//systick中断服务函数,使用OS时用到
 void SysTick_Handler(void)
 {	
-	if(delay_osrunning==1)						//OS开始跑了,才执行正常的调度处理
+    HAL_IncTick();
+	if(delay_osrunning==1)					//OS开始跑了,才执行正常的调度处理
 	{
-		OSIntEnter();							//进入中断
-		OSTimeTick();       					//调用ucos的时钟服务程序               
-		OSIntExit();       	 					//触发任务切换软中断
+		OSIntEnter();						//进入中断
+		OSTimeTick();       				//调用ucos的时钟服务程序               
+		OSIntExit();       	 				//触发任务切换软中断
 	}
 }
 #endif
-
 			   
 //初始化延迟函数
 //当使用ucos的时候,此函数会初始化ucos的时钟节拍
@@ -138,7 +115,7 @@ void delay_init(u8 SYSCLK)
 #if SYSTEM_SUPPORT_OS 						//如果需要支持OS.
 	reload=SYSCLK;					    //每秒钟的计数次数 单位为K	   
 	reload*=1000000/delay_ostickspersec;	//根据delay_ostickspersec设定溢出时间
-											//reload为24位寄存器,最大值:16777216,在72M下,约合0.233s左右	
+											//reload为24位寄存器,最大值:16777216,在180M下,约合0.745s左右	
 	fac_ms=1000/delay_ostickspersec;		//代表OS可以延时的最少单位	   
 	SysTick->CTRL|=SysTick_CTRL_TICKINT_Msk;//开启SYSTICK中断
 	SysTick->LOAD=reload; 					//每1/OS_TICKS_PER_SEC秒中断一次	
@@ -220,3 +197,39 @@ void delay_ms(u16 nms)
 	for(i=0;i<nms;i++) delay_us(1000);
 }
 #endif
+			 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
