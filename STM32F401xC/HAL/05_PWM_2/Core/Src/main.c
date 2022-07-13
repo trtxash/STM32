@@ -30,10 +30,10 @@ int main(void)
 
 	HAL_Init(); //初始化HAL库
 	Stm32_Clock_Init(168, 25, 2, 4);
-	delay_init(84);					 //初始化延时函数
-	LED_Init();						 //初始化LED
-	TIM3_Init(5000 - 1, 84 - 1);	 //定时器3初始化，周期为500ms
-	TIM10_PWM_Init(500 - 1, 84 - 1); // 84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
+	delay_init(84); //初始化延时函数
+	// LED_Init();						 //初始化LED
+	// TIM3_Init(5000 - 1, 84 - 1);	 //定时器3初始化，周期为500ms
+	TIM5_PWM_Init(500 - 1, 84 - 1); // 84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
 
 	while (1)
 	{
@@ -46,6 +46,6 @@ int main(void)
 			dir = 0; // led0pwmval到达300后，方向为递减
 		if (led0pwmval == 0)
 			dir = 1;					  // led0pwmval递减到0后，方向改为递增
-		TIM_SetTIM10Compare1(led0pwmval); //修改比较值，修改占空比
+		TIM_SetTIM5Compare_1(led0pwmval); //修改比较值，修改占空比
 	}
 }
