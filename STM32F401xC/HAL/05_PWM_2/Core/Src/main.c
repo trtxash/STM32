@@ -1,6 +1,6 @@
 /**
- * @file	04_PWM
- * @brief 	PWM发生器
+ * @file	05_PWM_2
+ * @brief 	两路PWM发生器
  * @author 	TRTX-gamer
  * @version 1.00
  * @date 	2022年7月12号21点37分
@@ -17,10 +17,10 @@
 // static u32 time_psc = 0;
 
 /**
- * @brief	主函数
+ * @brief	主函数,程序入口
  * @param 	none
  * @arg		none
- * @note  	初始化函数后利用定时器来生成PWM
+ * @note  	初始化函数后利用定时器PWM发生器实现两路PWM发生器
  * @retval	int
  */
 int main(void)
