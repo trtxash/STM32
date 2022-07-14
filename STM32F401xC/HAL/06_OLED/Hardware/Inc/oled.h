@@ -5,16 +5,16 @@
 
 //-----------------测试LED端口定义---------------- 
 
-#define LED_ON       HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13, GPIO_PIN_RESET)
-#define LED_OFF      HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13, GPIO_PIN_SET)
+// #define LED_ON       HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13, GPIO_PIN_RESET)
+// #define LED_OFF      HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13, GPIO_PIN_SET)
 
 //-----------------OLED端口定义---------------- 
 
-#define OLED_SCL_Clr() HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5, GPIO_PIN_RESET)//SCL
-#define OLED_SCL_Set() HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5, GPIO_PIN_SET)
+#define OLED_SCL_Clr() HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET)//SCL
+#define OLED_SCL_Set() HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET)
 
-#define OLED_SDA_Clr() HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET)//SDA
-#define OLED_SDA_Set() HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET)
+#define OLED_SDA_Clr() HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14, GPIO_PIN_RESET)//SDA
+#define OLED_SDA_Set() HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14, GPIO_PIN_SET)
 
 #define OLED_RES_Clr() HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2, GPIO_PIN_RESET)//RES
 #define OLED_RES_Set() HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2, GPIO_PIN_SET)

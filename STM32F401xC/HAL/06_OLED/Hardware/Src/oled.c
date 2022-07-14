@@ -1,3 +1,15 @@
+/**
+ * @file	oled.c
+ * @brief 	OLED显示
+ *          GND    电源地
+ *          VCC  接5V或3.3v电源
+ *          D0   接（SCL）,可在oled.h里更改
+ *          D1   接（SDA）,可在oled.h里更改
+ *          RES  PD2（SPI模块改成IIC模块需要接此引脚，IIC模块用户请忽略）
+ * @author 	TRTX-gamer
+ * @version 1.00
+ * @date 	2022年7月14号15点23分
+ */
 #include "oled.h"
 #include "stdlib.h"
 #include "oledfont.h"
@@ -506,32 +518,33 @@ void OLED_ShowPicture(u8 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode)
 // OLED的初始化
 // GND  电源地
 // VCC  接5V或3.3v电源
-// D0   接PA5（SCL）
-// D1   接PA7（SDA）
+// D0   接PA14（SCL）
+// D1   接PA15（SDA）
 // RES  PD2（SPI模块改成IIC模块需要接此引脚，IIC模块用户请忽略）
 void OLED_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
 
 	/* GPIO Ports Clock Enable */
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOC_CLK_ENABLE();
+	// __HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	// __HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 
 	/*Configure GPIO pins : PA4 PA5 PA7 */
-	GPIO_InitStruct.Pin = GPIO_PIN_5 | GPIO_PIN_7;
+	GPIO_InitStruct.Pin = GPIO_PIN_13 | GPIO_PIN_14;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5 | GPIO_PIN_7, GPIO_PIN_SET);
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_SET);
 
-	/*Configure GPIO pin : PC12 */
-	GPIO_InitStruct.Pin = GPIO_PIN_12;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	// /*Configure GPIO pin : PC12 */
+	// GPIO_InitStruct.Pin = GPIO_PIN_13;
+	// GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	// GPIO_InitStruct.Pull = GPIO_PULLUP;
+	// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	// HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 	/*Configure GPIO pin : PD2 */
 	GPIO_InitStruct.Pin = GPIO_PIN_2;

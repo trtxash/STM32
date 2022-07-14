@@ -62,8 +62,7 @@ RTT/SEGGER_RTT.c \
 User/Src/delay.c \
 User/Src/sys.c \
 User/Src/usart.c \
-Hardware/Src/led.c \
-Hardware/src/timer.c 
+Hardware/Src/oled.c 
 
 # ASM sources
 ASM_SOURCES =  \
