@@ -1,8 +1,6 @@
 #ifndef __MOTOR_H__
 #define __MOTOR_H__
-
-#include "bsp.h"
-
+#include "sys.h"
 
 
 #define PS2_SPEEDPULSE_ZERO 1000
@@ -12,7 +10,7 @@
 #define TIRE_SPACE 200
 #define WHEELBASE 185
 
-#define ANGULAR_SPEED_MAX 200//µ¥Î»ÊÇ0.01rad/s
+#define ANGULAR_SPEED_MAX 200//0.01rad/s
 
 void MotorControl_Ps2(uint8_t _Ps2PadXValue,uint8_t  _Ps2PadYValue);
 //void MotorControl(uint8_t _ucAngularDirection, uint16_t _ucAngularSpeed, uint8_t _ucMotionDirection, uint16_t _usMotionSpeed);

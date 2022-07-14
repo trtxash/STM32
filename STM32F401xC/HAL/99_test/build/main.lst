@@ -1,0 +1,192 @@
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccJp1BsA.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.main,"ax",%progbits
+  20              		.align	1
+  21              		.global	main
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	main:
+  27              	.LFB130:
+  28              		.file 1 "Core/Src/main.c"
+   1:Core/Src/main.c **** /**
+   2:Core/Src/main.c ****  * @file	05_PWM_2
+   3:Core/Src/main.c ****  * @brief 	两路PWM发生器
+   4:Core/Src/main.c ****  * @author 	TRTX-gamer
+   5:Core/Src/main.c ****  * @version 1.00
+   6:Core/Src/main.c ****  * @date 	2022年7月12号21点37分
+   7:Core/Src/main.c ****  */
+   8:Core/Src/main.c **** 
+   9:Core/Src/main.c **** #include "delay.h"
+  10:Core/Src/main.c **** #include "sys.h"
+  11:Core/Src/main.c **** #include "led.h"
+  12:Core/Src/main.c **** #include "key.h"
+  13:Core/Src/main.c **** #include "timer.h"
+  14:Core/Src/main.c **** #include "stm32f4xx.h"
+  15:Core/Src/main.c **** 
+  16:Core/Src/main.c **** // static u32 time_frequence = 0;
+  17:Core/Src/main.c **** // static u32 time_arr = 0;
+  18:Core/Src/main.c **** // static u32 time_psc = 0;
+  19:Core/Src/main.c **** 
+  20:Core/Src/main.c **** /**
+  21:Core/Src/main.c ****  * @brief	主函数,程序入口
+  22:Core/Src/main.c ****  * @param 	none
+  23:Core/Src/main.c ****  * @arg		none
+  24:Core/Src/main.c ****  * @note  	初始化函数后利用定时器PWM发生器实现两路PWM发生器
+  25:Core/Src/main.c ****  * @retval	int
+  26:Core/Src/main.c ****  */
+  27:Core/Src/main.c **** int main(void)
+  28:Core/Src/main.c **** {
+  29              		.loc 1 28 1 view -0
+  30              		.cfi_startproc
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccJp1BsA.s 			page 2
+
+
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 10B5     		push	{r4, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 4, -8
+  37              		.cfi_offset 14, -4
+  29:Core/Src/main.c **** 	// u8 dir = 1;
+  30:Core/Src/main.c **** 	u16 pwmval = 250;
+  38              		.loc 1 30 2 view .LVU1
+  39              	.LVL0:
+  31:Core/Src/main.c **** 
+  32:Core/Src/main.c **** 	HAL_Init(); //初始化HAL库
+  40              		.loc 1 32 2 view .LVU2
+  41 0002 FFF7FEFF 		bl	HAL_Init
+  42              	.LVL1:
+  33:Core/Src/main.c **** 	Stm32_Clock_Init(168, 25, 2, 4);
+  43              		.loc 1 33 2 view .LVU3
+  44 0006 0423     		movs	r3, #4
+  45 0008 0222     		movs	r2, #2
+  46 000a 1921     		movs	r1, #25
+  47 000c A820     		movs	r0, #168
+  48 000e FFF7FEFF 		bl	Stm32_Clock_Init
+  49              	.LVL2:
+  34:Core/Src/main.c **** 	delay_init(84); //初始化延时函数
+  50              		.loc 1 34 2 view .LVU4
+  51 0012 5420     		movs	r0, #84
+  52 0014 FFF7FEFF 		bl	delay_init
+  53              	.LVL3:
+  35:Core/Src/main.c **** 	LED_Init();		//初始化LED
+  54              		.loc 1 35 2 view .LVU5
+  55 0018 FFF7FEFF 		bl	LED_Init
+  56              	.LVL4:
+  36:Core/Src/main.c **** 	KEY_Init();		//初始化按键
+  57              		.loc 1 36 2 view .LVU6
+  58 001c FFF7FEFF 		bl	KEY_Init
+  59              	.LVL5:
+  37:Core/Src/main.c **** 	// TIM3_Init(5000 - 1, 84 - 1);	 //定时器3初始化，周期为500ms
+  38:Core/Src/main.c **** 	TIM5_PWM_Init(pwmval - 1, 84 - 1); // 84M/84=1M的计数频率，自动重装载为500，那么PWM
+  60              		.loc 1 38 2 view .LVU7
+  61 0020 5321     		movs	r1, #83
+  62 0022 F920     		movs	r0, #249
+  63 0024 FFF7FEFF 		bl	TIM5_PWM_Init
+  64              	.LVL6:
+  30:Core/Src/main.c **** 
+  65              		.loc 1 30 6 is_stmt 0 view .LVU8
+  66 0028 FA24     		movs	r4, #250
+  67              	.LVL7:
+  68              	.L2:
+  39:Core/Src/main.c **** 
+  40:Core/Src/main.c **** 	while (1)
+  69              		.loc 1 40 2 is_stmt 1 view .LVU9
+  41:Core/Src/main.c **** 	{
+  42:Core/Src/main.c **** 		// delay_ms(10);
+  43:Core/Src/main.c **** 		// if (dir)
+  44:Core/Src/main.c **** 		// 	pwmval++; // dir==1 pwmval递增
+  45:Core/Src/main.c **** 		// else
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccJp1BsA.s 			page 3
+
+
+  46:Core/Src/main.c **** 		// 	pwmval--; // dir==0 pwmval递减
+  47:Core/Src/main.c **** 		// if (pwmval == 200 - 1)
+  48:Core/Src/main.c **** 		// 	dir = 0; // pwmval到达300后，方向为递减
+  49:Core/Src/main.c **** 		// if (pwmval == 0)
+  50:Core/Src/main.c **** 		// 	dir = 1;					  // pwmval递减到0后，方向改为递增
+  51:Core/Src/main.c **** 		if (KEY_Scan(0))
+  70              		.loc 1 51 3 view .LVU10
+  71              		.loc 1 51 7 is_stmt 0 view .LVU11
+  72 002a 0020     		movs	r0, #0
+  73 002c FFF7FEFF 		bl	KEY_Scan
+  74              	.LVL8:
+  75              		.loc 1 51 6 view .LVU12
+  76 0030 0028     		cmp	r0, #0
+  77 0032 FAD0     		beq	.L2
+  52:Core/Src/main.c **** 		{
+  53:Core/Src/main.c **** 			delay_ms(20); // 消抖
+  78              		.loc 1 53 4 is_stmt 1 view .LVU13
+  79 0034 1420     		movs	r0, #20
+  80 0036 FFF7FEFF 		bl	delay_ms
+  81              	.LVL9:
+  54:Core/Src/main.c **** 			LED_Reverse();
+  82              		.loc 1 54 4 view .LVU14
+  83 003a FFF7FEFF 		bl	LED_Reverse
+  84              	.LVL10:
+  55:Core/Src/main.c **** 			pwmval -= 25;		  // pwmval递减10%
+  85              		.loc 1 55 4 view .LVU15
+  86              		.loc 1 55 11 is_stmt 0 view .LVU16
+  87 003e 193C     		subs	r4, r4, #25
+  88              	.LVL11:
+  89              		.loc 1 55 11 view .LVU17
+  90 0040 A4B2     		uxth	r4, r4
+  91              	.LVL12:
+  56:Core/Src/main.c **** 			TIM_SetTIM5Compare_3(pwmval); //修改比较值，修改占空比
+  92              		.loc 1 56 4 is_stmt 1 view .LVU18
+  93 0042 2046     		mov	r0, r4
+  94 0044 FFF7FEFF 		bl	TIM_SetTIM5Compare_3
+  95              	.LVL13:
+  96 0048 EFE7     		b	.L2
+  97              		.cfi_endproc
+  98              	.LFE130:
+ 100              		.text
+ 101              	.Letext0:
+ 102              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 103              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 104              		.file 4 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h"
+ 105              		.file 5 "User/Inc/sys.h"
+ 106              		.file 6 "User/Inc/delay.h"
+ 107              		.file 7 "User/Inc/led.h"
+ 108              		.file 8 "Hardware/Inc/key.h"
+ 109              		.file 9 "Hardware/Inc/timer.h"
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccJp1BsA.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\11655\AppData\Local\Temp\ccJp1BsA.s:20     .text.main:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccJp1BsA.s:26     .text.main:00000000 main
+
+UNDEFINED SYMBOLS
+HAL_Init
+Stm32_Clock_Init
+delay_init
+LED_Init
+KEY_Init
+TIM5_PWM_Init
+KEY_Scan
+delay_ms
+LED_Reverse
+TIM_SetTIM5Compare_3

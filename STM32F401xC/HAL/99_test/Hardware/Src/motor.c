@@ -1,29 +1,31 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : µç»ú¿ØÖÆ
-*	ÎÄ¼şÃû³Æ : moto.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ :
+*	æ¨¡å—åç§° : ç”µæœºæ§åˆ¶
+*	æ–‡ä»¶åç§° : moto.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ :
 *
-*   Copyright (C), 2019-2030, Îäºº¿áµã»úÆ÷ÈË¿Æ¼¼ÓĞÏŞ¹«Ë¾
-*   ÌÔ±¦µêÆÌµØÖ·£ºhttps://shop559826635.taobao.com/
+*   Copyright (C), 2019-2030, æ­¦æ±‰é…·ç‚¹æœºå™¨äººç§‘æŠ€æœ‰é™å…¬å¸
+*   æ·˜å®åº—é“ºåœ°å€ï¼šhttps://shop559826635.taobao.com/
 *********************************************************************************************************
 */
+#include "motor.h"
 
-#include "includes.h"
+#define MOTOR_SUM_2
+// #define MOTOR_SUM_4
 
 extern uint16_t g_WheelSpeed[4];
 
+#ifdef MOTOR_SUM_4 /*4é©±*/
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: MotorControl
-*	¹¦ÄÜËµÃ÷: µç»úÔË¶¯¿ØÖÆ
-*	ĞÎ    ²Î: _ucAngularDirection×ªÏò·½Ïò,_ucAngularSpeed×ªÏòËÙ¶È, _ucMotionDirectionÔË¶¯·½Ïò, _usMotionSpeedÔË¶¯ËÙ¶È
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: MotorControl
+*	åŠŸèƒ½è¯´æ˜: ç”µæœºè¿åŠ¨æ§åˆ¶
+*	å½¢    å‚: _ucAngularDirectionè½¬å‘æ–¹å‘,_ucAngularSpeedè½¬å‘é€Ÿåº¦, _ucMotionDirectionè¿åŠ¨æ–¹å‘, _usMotionSpeedè¿åŠ¨é€Ÿåº¦
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-
 void MotorControl(uint8_t _ucAngularDirection, uint16_t _ucAngularSpeed, uint8_t _ucMotionDirection, uint16_t _usMotionSpeed)
 {
     uint16_t _usMotorA_Speed = 0;
@@ -41,22 +43,21 @@ void MotorControl(uint8_t _ucAngularDirection, uint16_t _ucAngularSpeed, uint8_t
     uint8_t _ucMotorC_Direction = 0;
     uint8_t _ucMotorD_Direction = 0;
 
-    uint16_t _usLinearSpeed = 0; //¸ù¾İ½ÇËÙ¶È¼ÆËãµÄÏßËÙ¶È
+    uint16_t _usLinearSpeed = 0; //æ ¹æ®è§’é€Ÿåº¦è®¡ç®—çš„çº¿é€Ÿåº¦
 
-    if((_ucAngularSpeed == 0) && (_usMotionSpeed == 0))//µ±Éè¶¨µÄ½ÇËÙ¶È»òÕßÔË¶¯ËÙ¶ÈÎª0Ê± ¶ÔPIDµÄÀÛ¼ÆÎó²î½øĞĞÇå0
+    if ((_ucAngularSpeed == 0) && (_usMotionSpeed == 0)) //å½“è®¾å®šçš„è§’é€Ÿåº¦æˆ–è€…è¿åŠ¨é€Ÿåº¦ä¸º0æ—¶ å¯¹PIDçš„ç´¯è®¡è¯¯å·®è¿›è¡Œæ¸…0
     {
         PID_Param_SetZero();
-
     }
 
-    if(_usMotionSpeed >= AUTO_SPEED_MAX)//ĞĞÊ»ËÙ¶ÈÏŞÖÆ
+    if (_usMotionSpeed >= AUTO_SPEED_MAX) //è¡Œé©¶é€Ÿåº¦é™åˆ¶
     {
         _usMotionSpeed = AUTO_SPEED_MAX;
     }
 
-    if(_ucAngularSpeed == 0)//Ö±ÏßĞĞÊ»
+    if (_ucAngularSpeed == 0) //ç›´çº¿è¡Œé©¶
     {
-        if(_ucMotionDirection == 0)
+        if (_ucMotionDirection == 0)
         {
             _ucMotorA_Direction = 0;
             _ucMotorB_Direction = 0;
@@ -75,22 +76,22 @@ void MotorControl(uint8_t _ucAngularDirection, uint16_t _ucAngularSpeed, uint8_t
         _usMotorC_Speed = _usMotionSpeed;
         _usMotorD_Speed = _usMotionSpeed;
     }
-    else//·ÇÖ±ÏßĞĞÊ»
+    else //éç›´çº¿è¡Œé©¶
     {
         _usLinearSpeed = (uint16_t)(_ucAngularSpeed * 0.01 * (TIRE_SPACE * TIRE_SPACE + WHEELBASE * WHEELBASE) / (2 * TIRE_SPACE));
-        
-        if(_ucAngularDirection == 0)//×ó×ªÍä
+
+        if (_ucAngularDirection == 0) //å·¦è½¬å¼¯
         {
-            if(_ucMotionDirection == 0)//Ç°½øÔË¶¯
+            if (_ucMotionDirection == 0) //å‰è¿›è¿åŠ¨
             {
-                _ucMotorC_Direction  = 1;
-                _ucMotorD_Direction = _ucMotorC_Direction;//Í¬Ò»²àÂÖ×ÓÔË¶¯·½ÏòÏàÍ¬
+                _ucMotorC_Direction = 1;
+                _ucMotorD_Direction = _ucMotorC_Direction; //åŒä¸€ä¾§è½®å­è¿åŠ¨æ–¹å‘ç›¸åŒ
 
                 _usMotorC_Speed = _usLinearSpeed + _usMotionSpeed;
 
-                _usMotorD_Speed = _usMotorC_Speed;//Í¬Ò»²àÂÖ×ÓÔË¶¯ËÙ¶ÈÏàµÈ
+                _usMotorD_Speed = _usMotorC_Speed; //åŒä¸€ä¾§è½®å­è¿åŠ¨é€Ÿåº¦ç›¸ç­‰
 
-                if(_usMotionSpeed >= _usLinearSpeed)
+                if (_usMotionSpeed >= _usLinearSpeed)
                 {
                     _ucMotorA_Direction = 0;
                     _ucMotorB_Direction = _ucMotorA_Direction;
@@ -101,20 +102,18 @@ void MotorControl(uint8_t _ucAngularDirection, uint16_t _ucAngularSpeed, uint8_t
                 {
                     _ucMotorA_Direction = 1;
                     _ucMotorB_Direction = _ucMotorA_Direction;
-                    _usMotorA_Speed     = _usLinearSpeed - _usMotionSpeed;
-                    _usMotorB_Speed     = _usMotorA_Speed;
-
+                    _usMotorA_Speed = _usLinearSpeed - _usMotionSpeed;
+                    _usMotorB_Speed = _usMotorA_Speed;
                 }
-
             }
-            else//µ¹³µÔË¶¯
+            else //å€’è½¦è¿åŠ¨
             {
                 _ucMotorC_Direction = 0;
-                _ucMotorD_Direction = _ucMotorC_Direction;//Í¬Ò»²àÂÖ×ÓÔË¶¯·½ÏòÏàÍ¬
+                _ucMotorD_Direction = _ucMotorC_Direction; //åŒä¸€ä¾§è½®å­è¿åŠ¨æ–¹å‘ç›¸åŒ
                 _usMotorC_Speed = _usLinearSpeed + _usMotionSpeed;
-                _usMotorD_Speed = _usMotorC_Speed; //Í¬Ò»²àÂÖ×ÓÔË¶¯ËÙ¶ÈÏàµÈ
+                _usMotorD_Speed = _usMotorC_Speed; //åŒä¸€ä¾§è½®å­è¿åŠ¨é€Ÿåº¦ç›¸ç­‰
 
-                if(_usMotionSpeed >= _usLinearSpeed)
+                if (_usMotionSpeed >= _usLinearSpeed)
                 {
                     _ucMotorA_Direction = 1;
                     _ucMotorB_Direction = _ucMotorA_Direction;
@@ -125,24 +124,20 @@ void MotorControl(uint8_t _ucAngularDirection, uint16_t _ucAngularSpeed, uint8_t
                 {
                     _ucMotorA_Direction = 0;
                     _ucMotorB_Direction = _ucMotorA_Direction;
-                    _usMotorA_Speed     = _usLinearSpeed - _usMotionSpeed;
-                    _usMotorB_Speed     = _usMotorA_Speed;
-
+                    _usMotorA_Speed = _usLinearSpeed - _usMotionSpeed;
+                    _usMotorB_Speed = _usMotorA_Speed;
                 }
-
             }
-
-
         }
-        else//ÓÒ×ªÍä
+        else //å³è½¬å¼¯
         {
-            if(_ucMotionDirection == 0) //Ç°½øÔË¶¯
+            if (_ucMotionDirection == 0) //å‰è¿›è¿åŠ¨
             {
                 _ucMotorA_Direction = 0;
-                _ucMotorB_Direction = _ucMotorA_Direction;//Í¬Ò»²àÂÖ×ÓÔË¶¯·½ÏòÏàÍ¬
-                _usMotorA_Speed =  _usLinearSpeed + _usMotionSpeed;
-                _usMotorB_Speed =  _usMotorA_Speed;//Í¬Ò»²àÂÖ×ÓÔË¶¯ËÙ¶ÈÏàµÈ
-                if(_usMotionSpeed >= _usLinearSpeed)
+                _ucMotorB_Direction = _ucMotorA_Direction; //åŒä¸€ä¾§è½®å­è¿åŠ¨æ–¹å‘ç›¸åŒ
+                _usMotorA_Speed = _usLinearSpeed + _usMotionSpeed;
+                _usMotorB_Speed = _usMotorA_Speed; //åŒä¸€ä¾§è½®å­è¿åŠ¨é€Ÿåº¦ç›¸ç­‰
+                if (_usMotionSpeed >= _usLinearSpeed)
                 {
                     _ucMotorC_Direction = 1;
                     _ucMotorD_Direction = _ucMotorC_Direction;
@@ -155,18 +150,16 @@ void MotorControl(uint8_t _ucAngularDirection, uint16_t _ucAngularSpeed, uint8_t
                     _ucMotorD_Direction = _ucMotorC_Direction;
                     _usMotorC_Speed = _usLinearSpeed - _usMotionSpeed;
                     _usMotorD_Speed = _usMotorC_Speed;
-
                 }
-
             }
-            else//µ¹³µÔË¶¯
+            else //å€’è½¦è¿åŠ¨
             {
                 _ucMotorA_Direction = 1;
-                _ucMotorB_Direction = _ucMotorA_Direction;//Í¬Ò»²àÂÖ×ÓÔË¶¯·½ÏòÏàÍ¬
+                _ucMotorB_Direction = _ucMotorA_Direction; //åŒä¸€ä¾§è½®å­è¿åŠ¨æ–¹å‘ç›¸åŒ
                 _usMotorA_Speed = _usLinearSpeed + _usMotionSpeed;
-                _usMotorB_Speed = _usMotorA_Speed;//Í¬Ò»²àÂÖ×ÓÔË¶¯ËÙ¶ÈÏàµÈ
+                _usMotorB_Speed = _usMotorA_Speed; //åŒä¸€ä¾§è½®å­è¿åŠ¨é€Ÿåº¦ç›¸ç­‰
 
-                if(_usMotionSpeed >= _usLinearSpeed)
+                if (_usMotionSpeed >= _usLinearSpeed)
                 {
                     _ucMotorC_Direction = 0;
                     _ucMotorD_Direction = _ucMotorC_Direction;
@@ -183,110 +176,329 @@ void MotorControl(uint8_t _ucAngularDirection, uint16_t _ucAngularSpeed, uint8_t
             }
         }
     }
-    _usMotorA_PWM = wheelSpeedPidCalc(0, g_WheelSpeed[0],  _usMotorA_Speed);//Ö´ĞĞPID¼ÆËã
-    _usMotorB_PWM = _usMotorA_PWM;//Í¬Ò»²àÂÖ×ÓËÙ¶ÈÏàµÈ
-    _usMotorC_PWM = wheelSpeedPidCalc(2, g_WheelSpeed[2],  _usMotorC_Speed);//Ö´ĞĞPID¼ÆËã
-    _usMotorD_PWM = _usMotorC_PWM; //Í¬Ò»²àÂÖ×ÓËÙ¶ÈÏàµÈ
-		printf("%d   %d   %d  %d   %d   %d   %d  %d   %d   %d   %d  %d\r\n",_usMotorA_Speed,_usMotorB_Speed,_usMotorC_Speed,_usMotorD_Speed,_usMotorA_PWM,_usMotorB_PWM,_usMotorC_PWM,_usMotorD_PWM,g_WheelSpeed[0],g_WheelSpeed[1],g_WheelSpeed[2],g_WheelSpeed[3]);
+    _usMotorA_PWM = wheelSpeedPidCalc(0, g_WheelSpeed[0], _usMotorA_Speed); //æ‰§è¡ŒPIDè®¡ç®—
+    _usMotorB_PWM = _usMotorA_PWM;                                          //åŒä¸€ä¾§è½®å­é€Ÿåº¦ç›¸ç­‰
+    _usMotorC_PWM = wheelSpeedPidCalc(2, g_WheelSpeed[2], _usMotorC_Speed); //æ‰§è¡ŒPIDè®¡ç®—
+    _usMotorD_PWM = _usMotorC_PWM;                                          //åŒä¸€ä¾§è½®å­é€Ÿåº¦ç›¸ç­‰
+    printf("%d   %d   %d  %d   %d   %d   %d  %d   %d   %d   %d  %d\r\n", _usMotorA_Speed, _usMotorB_Speed, _usMotorC_Speed, _usMotorD_Speed, _usMotorA_PWM, _usMotorB_PWM, _usMotorC_PWM, _usMotorD_PWM, g_WheelSpeed[0], g_WheelSpeed[1], g_WheelSpeed[2], g_WheelSpeed[3]);
 
-    //µç»úËÙ¶ÈÄ¿±êËÙ¶ÈÎª0Ê±£¬ÉèÖÃ¶ÔÓ¦PWM=0
-    if(_usMotorA_Speed == 0)
+    //ç”µæœºé€Ÿåº¦ç›®æ ‡é€Ÿåº¦ä¸º0æ—¶ï¼Œè®¾ç½®å¯¹åº”PWM=0
+    if (_usMotorA_Speed == 0)
     {
         _usMotorA_PWM = 0;
     }
-    if(_usMotorB_Speed == 0)
+    if (_usMotorB_Speed == 0)
     {
         _usMotorB_PWM = 0;
     }
-    if(_usMotorC_Speed == 0)
+    if (_usMotorC_Speed == 0)
     {
         _usMotorC_PWM = 0;
     }
-    if(_usMotorD_Speed == 0)
+    if (_usMotorD_Speed == 0)
     {
         _usMotorD_PWM = 0;
     }
 
-
-    //¸ù¾İPID¼ÆËãµÄPWMÖµÇı¶¯µç»ú
+    //æ ¹æ®PIDè®¡ç®—çš„PWMå€¼é©±åŠ¨ç”µæœº
     MotoASetSpeed(_ucMotorA_Direction, _usMotorA_PWM);
     MotoBSetSpeed(_ucMotorB_Direction, _usMotorB_PWM);
     MotoCSetSpeed(_ucMotorC_Direction, _usMotorC_PWM);
     MotoDSetSpeed(_ucMotorD_Direction, _usMotorD_PWM);
-
 }
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: MotorControl_Ps2
-*	¹¦ÄÜËµÃ÷: ÊÖ±úÊı¾İ×ª»»ÎªÊµ¼ÊÔË¶¯ËÙ¶È
-*	ĞÎ    ²Î: _Ps2PadXValueÊÖ±úX·½ÏòµÄÖµ _Ps2PadYValueÊÖ±úY·½ÏòµÄÖµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: MotorControl_Ps2
+*	åŠŸèƒ½è¯´æ˜: æ‰‹æŸ„æ•°æ®è½¬æ¢ä¸ºå®é™…è¿åŠ¨é€Ÿåº¦
+*	å½¢    å‚: _Ps2PadXValueæ‰‹æŸ„Xæ–¹å‘çš„å€¼ _Ps2PadYValueæ‰‹æŸ„Yæ–¹å‘çš„å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void MotorControl_Ps2(uint8_t _Ps2PadXValue,uint8_t  _Ps2PadYValue)
+void MotorControl_Ps2(uint8_t _Ps2PadXValue, uint8_t _Ps2PadYValue)
 {
-	uint8_t _ps2AngularDirection=0;
-	uint16_t _ps2AngularSpeed=0;
-	uint8_t _ps2MotionDirection=0;
-	uint16_t _ps2MotionSpeed=0;
-	  
-	if(_Ps2PadXValue<=138&_Ps2PadXValue>=118)//Ö±ÏßĞĞÊ»
-	{
-	
-			_ps2AngularDirection=0;
-			_ps2AngularSpeed=0;
-	}
-		if(_Ps2PadXValue<118)//×ó×ªÍäĞĞÊ»
-	{
-		_ps2AngularDirection=0;
-		
-		_ps2AngularSpeed=(uint8_t)((127-_Ps2PadXValue)*ANGULAR_SPEED_MAX/127);
-	}
-	if(_Ps2PadXValue>138)//ÓÒ×ªÍäĞĞÊ»
-	{
-		_ps2AngularDirection=1;
-		_ps2AngularSpeed=(_Ps2PadXValue-127)*ANGULAR_SPEED_MAX/127;
-	}
-		if(_Ps2PadYValue<=138&_Ps2PadYValue>=118)//Ö±ÏßĞĞÊ»
-	{
-	
-			_ps2MotionDirection=0;
-			_ps2MotionSpeed=0;
-	}
-			if(_Ps2PadYValue<118)//Ç°½ø
-	{
-			_ps2MotionDirection=0;
-		
-		_ps2MotionSpeed=(uint8_t)((127-_Ps2PadYValue)*PS2_SPEED_MAX/127);
-	}
-			if(_Ps2PadYValue>138)//ºóÍË
-	{
-			_ps2MotionDirection=1;
-		
-		_ps2MotionSpeed=(uint8_t)((_Ps2PadYValue-127)*PS2_SPEED_MAX/127);
-	}
-        MotorControl(_ps2AngularDirection, _ps2AngularSpeed, _ps2MotionDirection, _ps2MotionSpeed);
+    uint8_t _ps2AngularDirection = 0;
+    uint16_t _ps2AngularSpeed = 0;
+    uint8_t _ps2MotionDirection = 0;
+    uint16_t _ps2MotionSpeed = 0;
+
+    if (_Ps2PadXValue <= 138 & _Ps2PadXValue >= 118) //ç›´çº¿è¡Œé©¶
+    {
+
+        _ps2AngularDirection = 0;
+        _ps2AngularSpeed = 0;
+    }
+    if (_Ps2PadXValue < 118) //å·¦è½¬å¼¯è¡Œé©¶
+    {
+        _ps2AngularDirection = 0;
+
+        _ps2AngularSpeed = (uint8_t)((127 - _Ps2PadXValue) * ANGULAR_SPEED_MAX / 127);
+    }
+    if (_Ps2PadXValue > 138) //å³è½¬å¼¯è¡Œé©¶
+    {
+        _ps2AngularDirection = 1;
+        _ps2AngularSpeed = (_Ps2PadXValue - 127) * ANGULAR_SPEED_MAX / 127;
+    }
+    if (_Ps2PadYValue <= 138 & _Ps2PadYValue >= 118) //ç›´çº¿è¡Œé©¶
+    {
+
+        _ps2MotionDirection = 0;
+        _ps2MotionSpeed = 0;
+    }
+    if (_Ps2PadYValue < 118) //å‰è¿›
+    {
+        _ps2MotionDirection = 0;
+
+        _ps2MotionSpeed = (uint8_t)((127 - _Ps2PadYValue) * PS2_SPEED_MAX / 127);
+    }
+    if (_Ps2PadYValue > 138) //åé€€
+    {
+        _ps2MotionDirection = 1;
+
+        _ps2MotionSpeed = (uint8_t)((_Ps2PadYValue - 127) * PS2_SPEED_MAX / 127);
+    }
+    MotorControl(_ps2AngularDirection, _ps2AngularSpeed, _ps2MotionDirection, _ps2MotionSpeed);
 }
 
+#elif defined(MOTOR_SUM_2)
+/*
+*********************************************************************************************************
+*	å‡½ æ•° å: MotorControl
+*	åŠŸèƒ½è¯´æ˜: ç”µæœºè¿åŠ¨æ§åˆ¶
+*	å½¢    å‚: _ucAngularDirectionè½¬å‘æ–¹å‘,_ucAngularSpeedè½¬å‘é€Ÿåº¦, _ucMotionDirectionè¿åŠ¨æ–¹å‘, _usMotionSpeedè¿åŠ¨é€Ÿåº¦
+*	è¿” å› å€¼: æ— 
+*********************************************************************************************************
+*/
+void MotorControl(uint8_t _ucAngularDirection, uint16_t _ucAngularSpeed, uint8_t _ucMotionDirection, uint16_t _usMotionSpeed)
+{
+    uint16_t _usMotorA_Speed = 0;
+    // uint16_t _usMotorB_Speed = 0;
+    uint16_t _usMotorC_Speed = 0;
+    // uint16_t _usMotorD_Speed = 0;
 
+    uint16_t _usMotorA_PWM = 0;
+    // uint16_t _usMotorB_PWM = 0;
+    uint16_t _usMotorC_PWM = 0;
+    // uint16_t _usMotorD_PWM = 0;
 
+    uint8_t _ucMotorA_Direction = 0;
+    // uint8_t _ucMotorB_Direction = 0;
+    uint8_t _ucMotorC_Direction = 0;
+    // uint8_t _ucMotorD_Direction = 0;
 
+    uint16_t _usLinearSpeed = 0; //æ ¹æ®è§’é€Ÿåº¦è®¡ç®—çš„çº¿é€Ÿåº¦
 
+    if ((_ucAngularSpeed == 0) && (_usMotionSpeed == 0)) //å½“è®¾å®šçš„è§’é€Ÿåº¦æˆ–è€…è¿åŠ¨é€Ÿåº¦ä¸º0æ—¶ å¯¹PIDçš„ç´¯è®¡è¯¯å·®è¿›è¡Œæ¸…0
+    {
+        PID_Param_SetZero();
+    }
 
+    if (_usMotionSpeed >= AUTO_SPEED_MAX) //è¡Œé©¶é€Ÿåº¦é™åˆ¶
+    {
+        _usMotionSpeed = AUTO_SPEED_MAX;
+    }
 
+    if (_ucAngularSpeed == 0) //ç›´çº¿è¡Œé©¶
+    {
+        if (_ucMotionDirection == 0)
+        {
+            _ucMotorA_Direction = 0;
+            // _ucMotorB_Direction = 0;
+            _ucMotorC_Direction = 1;
+            // _ucMotorD_Direction = 1;
+        }
+        else
+        {
+            _ucMotorA_Direction = 1;
+            // _ucMotorB_Direction = 1;
+            _ucMotorC_Direction = 0;
+            // _ucMotorD_Direction = 0;
+        }
+        _usMotorA_Speed = _usMotionSpeed;
+        // _usMotorB_Speed = _usMotionSpeed;
+        _usMotorC_Speed = _usMotionSpeed;
+        // _usMotorD_Speed = _usMotionSpeed;
+    }
+    else //éç›´çº¿è¡Œé©¶
+    {
+        _usLinearSpeed = (uint16_t)(_ucAngularSpeed * 0.01 * (TIRE_SPACE * TIRE_SPACE + WHEELBASE * WHEELBASE) / (2 * TIRE_SPACE));
 
+        if (_ucAngularDirection == 0) //å·¦è½¬å¼¯
+        {
+            if (_ucMotionDirection == 0) //å‰è¿›è¿åŠ¨
+            {
+                _ucMotorC_Direction = 1;
+                // _ucMotorD_Direction = _ucMotorC_Direction; //åŒä¸€ä¾§è½®å­è¿åŠ¨æ–¹å‘ç›¸åŒ
 
+                _usMotorC_Speed = _usLinearSpeed + _usMotionSpeed;
 
+                // _usMotorD_Speed = _usMotorC_Speed; //åŒä¸€ä¾§è½®å­è¿åŠ¨é€Ÿåº¦ç›¸ç­‰
 
+                if (_usMotionSpeed >= _usLinearSpeed)
+                {
+                    _ucMotorA_Direction = 0;
+                    // _ucMotorB_Direction = _ucMotorA_Direction;
+                    _usMotorA_Speed = _usMotionSpeed - _usLinearSpeed;
+                    // _usMotorB_Speed = _usMotorA_Speed;
+                }
+                else
+                {
+                    _ucMotorA_Direction = 1;
+                    // _ucMotorB_Direction = _ucMotorA_Direction;
+                    _usMotorA_Speed = _usLinearSpeed - _usMotionSpeed;
+                    // _usMotorB_Speed = _usMotorA_Speed;
+                }
+            }
+            else //å€’è½¦è¿åŠ¨
+            {
+                _ucMotorC_Direction = 0;
+                // _ucMotorD_Direction = _ucMotorC_Direction; //åŒä¸€ä¾§è½®å­è¿åŠ¨æ–¹å‘ç›¸åŒ
+                _usMotorC_Speed = _usLinearSpeed + _usMotionSpeed;
+                // _usMotorD_Speed = _usMotorC_Speed; //åŒä¸€ä¾§è½®å­è¿åŠ¨é€Ÿåº¦ç›¸ç­‰
 
+                if (_usMotionSpeed >= _usLinearSpeed)
+                {
+                    _ucMotorA_Direction = 1;
+                    // _ucMotorB_Direction = _ucMotorA_Direction;
+                    _usMotorA_Speed = _usMotionSpeed - _usLinearSpeed;
+                    // _usMotorB_Speed = _usMotorA_Speed;
+                }
+                else
+                {
+                    _ucMotorA_Direction = 0;
+                    // _ucMotorB_Direction = _ucMotorA_Direction;
+                    _usMotorA_Speed = _usLinearSpeed - _usMotionSpeed;
+                    // _usMotorB_Speed = _usMotorA_Speed;
+                }
+            }
+        }
+        else //å³è½¬å¼¯
+        {
+            if (_ucMotionDirection == 0) //å‰è¿›è¿åŠ¨
+            {
+                _ucMotorA_Direction = 0;
+                // _ucMotorB_Direction = _ucMotorA_Direction; //åŒä¸€ä¾§è½®å­è¿åŠ¨æ–¹å‘ç›¸åŒ
+                _usMotorA_Speed = _usLinearSpeed + _usMotionSpeed;
+                // _usMotorB_Speed = _usMotorA_Speed; //åŒä¸€ä¾§è½®å­è¿åŠ¨é€Ÿåº¦ç›¸ç­‰
+                if (_usMotionSpeed >= _usLinearSpeed)
+                {
+                    _ucMotorC_Direction = 1;
+                    // _ucMotorD_Direction = _ucMotorC_Direction;
+                    _usMotorC_Speed = _usMotionSpeed - _usLinearSpeed;
+                    // _usMotorD_Speed = _usMotorC_Speed;
+                }
+                else
+                {
+                    _ucMotorC_Direction = 0;
+                    // _ucMotorD_Direction = _ucMotorC_Direction;
+                    _usMotorC_Speed = _usLinearSpeed - _usMotionSpeed;
+                    // _usMotorD_Speed = _usMotorC_Speed;
+                }
+            }
+            else //å€’è½¦è¿åŠ¨
+            {
+                _ucMotorA_Direction = 1;
+                // _ucMotorB_Direction = _ucMotorA_Direction; //åŒä¸€ä¾§è½®å­è¿åŠ¨æ–¹å‘ç›¸åŒ
+                _usMotorA_Speed = _usLinearSpeed + _usMotionSpeed;
+                // _usMotorB_Speed = _usMotorA_Speed; //åŒä¸€ä¾§è½®å­è¿åŠ¨é€Ÿåº¦ç›¸ç­‰
 
+                if (_usMotionSpeed >= _usLinearSpeed)
+                {
+                    _ucMotorC_Direction = 0;
+                    // _ucMotorD_Direction = _ucMotorC_Direction;
+                    _usMotorC_Speed = _usMotionSpeed - _usLinearSpeed;
+                    // _usMotorD_Speed = _usMotorC_Speed;
+                }
+                else
+                {
+                    _ucMotorC_Direction = 1;
+                    // _ucMotorD_Direction = _ucMotorC_Direction;
+                    _usMotorC_Speed = _usLinearSpeed - _usMotionSpeed;
+                    // _usMotorD_Speed = _usMotorC_Speed;
+                }
+            }
+        }
+    }
+    _usMotorA_PWM = wheelSpeedPidCalc(0, g_WheelSpeed[0], _usMotorA_Speed); //æ‰§è¡ŒPIDè®¡ç®—
+    // _usMotorB_PWM = _usMotorA_PWM;                                          //åŒä¸€ä¾§è½®å­é€Ÿåº¦ç›¸ç­‰
+    _usMotorC_PWM = wheelSpeedPidCalc(2, g_WheelSpeed[2], _usMotorC_Speed); //æ‰§è¡ŒPIDè®¡ç®—
+    // _usMotorD_PWM = _usMotorC_PWM;                                          //åŒä¸€ä¾§è½®å­é€Ÿåº¦ç›¸ç­‰
+    // printf("%d   %d   %d  %d   %d   %d   %d  %d   %d   %d   %d  %d\r\n", _usMotorA_Speed, _usMotorB_Speed, _usMotorC_Speed, _usMotorD_Speed, _usMotorA_PWM, _usMotorB_PWM, _usMotorC_PWM, _usMotorD_PWM, g_WheelSpeed[0], g_WheelSpeed[1], g_WheelSpeed[2], g_WheelSpeed[3]);
 
+    //ç”µæœºé€Ÿåº¦ç›®æ ‡é€Ÿåº¦ä¸º0æ—¶ï¼Œè®¾ç½®å¯¹åº”PWM=0
+    if (_usMotorA_Speed == 0)
+    {
+        _usMotorA_PWM = 0;
+    }
+    // if (_usMotorB_Speed == 0)
+    // {
+    //     _usMotorB_PWM = 0;
+    // }
+    if (_usMotorC_Speed == 0)
+    {
+        _usMotorC_PWM = 0;
+    }
+    // if (_usMotorD_Speed == 0)
+    // {
+    //     _usMotorD_PWM = 0;
+    // }
 
+    //æ ¹æ®PIDè®¡ç®—çš„PWMå€¼é©±åŠ¨ç”µæœº
+    MotoASetSpeed(_ucMotorA_Direction, _usMotorA_PWM);
+    // MotoBSetSpeed(_ucMotorB_Direction, _usMotorB_PWM);
+    MotoCSetSpeed(_ucMotorC_Direction, _usMotorC_PWM);
+    // MotoDSetSpeed(_ucMotorD_Direction, _usMotorD_PWM);
+}
+/*
+*********************************************************************************************************
+*	å‡½ æ•° å: MotorControl_Ps2
+*	åŠŸèƒ½è¯´æ˜: æ‰‹æŸ„æ•°æ®è½¬æ¢ä¸ºå®é™…è¿åŠ¨é€Ÿåº¦
+*	å½¢    å‚: _Ps2PadXValueæ‰‹æŸ„Xæ–¹å‘çš„å€¼ _Ps2PadYValueæ‰‹æŸ„Yæ–¹å‘çš„å€¼
+*	è¿” å› å€¼: æ— 
+*********************************************************************************************************
+*/
+void MotorControl_Ps2(uint8_t _Ps2PadXValue, uint8_t _Ps2PadYValue)
+{
+    uint8_t _ps2AngularDirection = 0;
+    uint16_t _ps2AngularSpeed = 0;
+    uint8_t _ps2MotionDirection = 0;
+    uint16_t _ps2MotionSpeed = 0;
 
+    if (_Ps2PadXValue <= 138 & _Ps2PadXValue >= 118) //ç›´çº¿è¡Œé©¶
+    {
 
+        _ps2AngularDirection = 0;
+        _ps2AngularSpeed = 0;
+    }
+    if (_Ps2PadXValue < 118) //å·¦è½¬å¼¯è¡Œé©¶
+    {
+        _ps2AngularDirection = 0;
 
+        _ps2AngularSpeed = (uint8_t)((127 - _Ps2PadXValue) * ANGULAR_SPEED_MAX / 127);
+    }
+    if (_Ps2PadXValue > 138) //å³è½¬å¼¯è¡Œé©¶
+    {
+        _ps2AngularDirection = 1;
+        _ps2AngularSpeed = (_Ps2PadXValue - 127) * ANGULAR_SPEED_MAX / 127;
+    }
+    if (_Ps2PadYValue <= 138 & _Ps2PadYValue >= 118) //ç›´çº¿è¡Œé©¶
+    {
 
+        _ps2MotionDirection = 0;
+        _ps2MotionSpeed = 0;
+    }
+    if (_Ps2PadYValue < 118) //å‰è¿›
+    {
+        _ps2MotionDirection = 0;
 
+        _ps2MotionSpeed = (uint8_t)((127 - _Ps2PadYValue) * PS2_SPEED_MAX / 127);
+    }
+    if (_Ps2PadYValue > 138) //åé€€
+    {
+        _ps2MotionDirection = 1;
 
+        _ps2MotionSpeed = (uint8_t)((_Ps2PadYValue - 127) * PS2_SPEED_MAX / 127);
+    }
+    MotorControl(_ps2AngularDirection, _ps2AngularSpeed, _ps2MotionDirection, _ps2MotionSpeed);
+}
 
-
+#endif

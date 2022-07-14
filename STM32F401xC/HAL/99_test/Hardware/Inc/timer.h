@@ -19,5 +19,6 @@ void TIM3_Init(u16 arr,u16 psc);
 void TIM5_PWM_Init(u16 arr,u16 psc);
 void TIM11_PWM_Init(u16 arr,u16 psc);
 void TIM_SetTIM5Compare_1(u32 compare);
+void TIM_SetTIM5Compare_3(u32 compare);
 #endif
 

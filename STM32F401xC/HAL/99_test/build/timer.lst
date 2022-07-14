@@ -1,0 +1,875 @@
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"timer.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.TIM3_Init,"ax",%progbits
+  20              		.align	1
+  21              		.global	TIM3_Init
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	TIM3_Init:
+  27              	.LVL0:
+  28              	.LFB130:
+  29              		.file 1 "Hardware/Src/timer.c"
+   1:Hardware/Src/timer.c **** #include "timer.h"
+   2:Hardware/Src/timer.c **** #include "led.h"
+   3:Hardware/Src/timer.c **** //////////////////////////////////////////////////////////////////////////////////
+   4:Hardware/Src/timer.c **** //本程序只供学习使用，未经作者许可，不得用于其它任何用途
+   5:Hardware/Src/timer.c **** // ALIENTEK STM32F407开发板
+   6:Hardware/Src/timer.c **** //定时器中断驱动代码
+   7:Hardware/Src/timer.c **** //正点原子@ALIENTEK
+   8:Hardware/Src/timer.c **** //技术论坛:www.openedv.com
+   9:Hardware/Src/timer.c **** //创建日期:2017/4/7
+  10:Hardware/Src/timer.c **** //版本：V1.0
+  11:Hardware/Src/timer.c **** //版权所有，盗版必究。
+  12:Hardware/Src/timer.c **** // Copyright(C) 广州市星翼电子科技有限公司 2014-2024
+  13:Hardware/Src/timer.c **** // All rights reserved
+  14:Hardware/Src/timer.c **** //////////////////////////////////////////////////////////////////////////////////
+  15:Hardware/Src/timer.c **** //修改说明
+  16:Hardware/Src/timer.c **** // V1.1 20170407
+  17:Hardware/Src/timer.c **** //新增TIM5_PWM_Init函数,用于PWM输出
+  18:Hardware/Src/timer.c **** //////////////////////////////////////////////////////////////////////////////////
+  19:Hardware/Src/timer.c **** 
+  20:Hardware/Src/timer.c **** TIM_HandleTypeDef TIM3_Handler;      //定时器句柄
+  21:Hardware/Src/timer.c **** TIM_HandleTypeDef TIM5_Handler;      //定时器句柄
+  22:Hardware/Src/timer.c **** TIM_OC_InitTypeDef TIM5_CH1Handler;  //定时器5通道1句柄
+  23:Hardware/Src/timer.c **** TIM_HandleTypeDef TIM11_Handler;     //定时器句柄
+  24:Hardware/Src/timer.c **** TIM_OC_InitTypeDef TIM11_CH1Handler; //定时器11通道1句柄
+  25:Hardware/Src/timer.c **** 
+  26:Hardware/Src/timer.c **** //通用定时器3中断初始化
+  27:Hardware/Src/timer.c **** // arr：自动重装值。
+  28:Hardware/Src/timer.c **** // psc：时钟预分频数
+  29:Hardware/Src/timer.c **** //定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 2
+
+
+  30:Hardware/Src/timer.c **** // Ft=定时器工作频率,单位:Mhz
+  31:Hardware/Src/timer.c **** //这里使用的是定时器3!(定时器3挂在APB1上，时钟为HCLK/2)(F407)
+  32:Hardware/Src/timer.c **** // F401 Timer clock is  APB1 clock.
+  33:Hardware/Src/timer.c **** void TIM3_Init(u16 arr, u16 psc)
+  34:Hardware/Src/timer.c **** {
+  30              		.loc 1 34 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 34 1 is_stmt 0 view .LVU1
+  35 0000 10B5     		push	{r4, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 4, -8
+  39              		.cfi_offset 14, -4
+  35:Hardware/Src/timer.c ****     TIM3_Handler.Instance = TIM3;                             //通用定时器3
+  40              		.loc 1 35 5 is_stmt 1 view .LVU2
+  41              		.loc 1 35 27 is_stmt 0 view .LVU3
+  42 0002 074C     		ldr	r4, .L3
+  43 0004 074B     		ldr	r3, .L3+4
+  44 0006 2360     		str	r3, [r4]
+  36:Hardware/Src/timer.c ****     TIM3_Handler.Init.Prescaler = psc;                        //分频系数
+  45              		.loc 1 36 5 is_stmt 1 view .LVU4
+  46              		.loc 1 36 33 is_stmt 0 view .LVU5
+  47 0008 6160     		str	r1, [r4, #4]
+  37:Hardware/Src/timer.c ****     TIM3_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       //向上计数器
+  48              		.loc 1 37 5 is_stmt 1 view .LVU6
+  49              		.loc 1 37 35 is_stmt 0 view .LVU7
+  50 000a 0023     		movs	r3, #0
+  51 000c A360     		str	r3, [r4, #8]
+  38:Hardware/Src/timer.c ****     TIM3_Handler.Init.Period = arr;                           //自动装载值
+  52              		.loc 1 38 5 is_stmt 1 view .LVU8
+  53              		.loc 1 38 30 is_stmt 0 view .LVU9
+  54 000e E060     		str	r0, [r4, #12]
+  39:Hardware/Src/timer.c ****     TIM3_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //时钟分频因子
+  55              		.loc 1 39 5 is_stmt 1 view .LVU10
+  56              		.loc 1 39 37 is_stmt 0 view .LVU11
+  57 0010 2361     		str	r3, [r4, #16]
+  40:Hardware/Src/timer.c ****     HAL_TIM_Base_Init(&TIM3_Handler);
+  58              		.loc 1 40 5 is_stmt 1 view .LVU12
+  59 0012 2046     		mov	r0, r4
+  60              	.LVL1:
+  61              		.loc 1 40 5 is_stmt 0 view .LVU13
+  62 0014 FFF7FEFF 		bl	HAL_TIM_Base_Init
+  63              	.LVL2:
+  41:Hardware/Src/timer.c **** 
+  42:Hardware/Src/timer.c ****     HAL_TIM_Base_Start_IT(&TIM3_Handler); //使能定时器3和定时器3更新中断：TIM_IT_UPDA
+  64              		.loc 1 42 5 is_stmt 1 view .LVU14
+  65 0018 2046     		mov	r0, r4
+  66 001a FFF7FEFF 		bl	HAL_TIM_Base_Start_IT
+  67              	.LVL3:
+  43:Hardware/Src/timer.c **** }
+  68              		.loc 1 43 1 is_stmt 0 view .LVU15
+  69 001e 10BD     		pop	{r4, pc}
+  70              	.L4:
+  71              		.align	2
+  72              	.L3:
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 3
+
+
+  73 0020 00000000 		.word	.LANCHOR0
+  74 0024 00040040 		.word	1073742848
+  75              		.cfi_endproc
+  76              	.LFE130:
+  78              		.section	.text.TIM5_PWM_Init,"ax",%progbits
+  79              		.align	1
+  80              		.global	TIM5_PWM_Init
+  81              		.syntax unified
+  82              		.thumb
+  83              		.thumb_func
+  85              	TIM5_PWM_Init:
+  86              	.LVL4:
+  87              	.LFB131:
+  44:Hardware/Src/timer.c **** 
+  45:Hardware/Src/timer.c **** // TIM5 PWM部分初始化
+  46:Hardware/Src/timer.c **** // arr：自动重装值。
+  47:Hardware/Src/timer.c **** // psc：时钟预分频数
+  48:Hardware/Src/timer.c **** //定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+  49:Hardware/Src/timer.c **** // Ft=定时器工作频率,单位:Mhz
+  50:Hardware/Src/timer.c **** void TIM5_PWM_Init(u16 arr, u16 psc)
+  51:Hardware/Src/timer.c **** {
+  88              		.loc 1 51 1 is_stmt 1 view -0
+  89              		.cfi_startproc
+  90              		@ args = 0, pretend = 0, frame = 0
+  91              		@ frame_needed = 0, uses_anonymous_args = 0
+  92              		.loc 1 51 1 is_stmt 0 view .LVU17
+  93 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+  94              	.LCFI1:
+  95              		.cfi_def_cfa_offset 24
+  96              		.cfi_offset 3, -24
+  97              		.cfi_offset 4, -20
+  98              		.cfi_offset 5, -16
+  99              		.cfi_offset 6, -12
+ 100              		.cfi_offset 7, -8
+ 101              		.cfi_offset 14, -4
+ 102 0002 0646     		mov	r6, r0
+  52:Hardware/Src/timer.c ****     TIM5_Handler.Instance = TIM5;                             //定时器5
+ 103              		.loc 1 52 5 is_stmt 1 view .LVU18
+ 104              		.loc 1 52 27 is_stmt 0 view .LVU19
+ 105 0004 0F4C     		ldr	r4, .L7
+ 106 0006 104B     		ldr	r3, .L7+4
+ 107 0008 2360     		str	r3, [r4]
+  53:Hardware/Src/timer.c ****     TIM5_Handler.Init.Prescaler = psc;                        //定时器分频
+ 108              		.loc 1 53 5 is_stmt 1 view .LVU20
+ 109              		.loc 1 53 33 is_stmt 0 view .LVU21
+ 110 000a 6160     		str	r1, [r4, #4]
+  54:Hardware/Src/timer.c ****     TIM5_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       //向上计数模式
+ 111              		.loc 1 54 5 is_stmt 1 view .LVU22
+ 112              		.loc 1 54 35 is_stmt 0 view .LVU23
+ 113 000c 0027     		movs	r7, #0
+ 114 000e A760     		str	r7, [r4, #8]
+  55:Hardware/Src/timer.c ****     TIM5_Handler.Init.Period = arr;                           //自动重装载值
+ 115              		.loc 1 55 5 is_stmt 1 view .LVU24
+ 116              		.loc 1 55 30 is_stmt 0 view .LVU25
+ 117 0010 E060     		str	r0, [r4, #12]
+  56:Hardware/Src/timer.c ****     TIM5_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //数字分频因子,数字分频因�
+ 118              		.loc 1 56 5 is_stmt 1 view .LVU26
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 4
+
+
+ 119              		.loc 1 56 37 is_stmt 0 view .LVU27
+ 120 0012 2761     		str	r7, [r4, #16]
+  57:Hardware/Src/timer.c ****     HAL_TIM_PWM_Init(&TIM5_Handler);                          //初始化PWM
+ 121              		.loc 1 57 5 is_stmt 1 view .LVU28
+ 122 0014 2046     		mov	r0, r4
+ 123              	.LVL5:
+ 124              		.loc 1 57 5 is_stmt 0 view .LVU29
+ 125 0016 FFF7FEFF 		bl	HAL_TIM_PWM_Init
+ 126              	.LVL6:
+  58:Hardware/Src/timer.c **** 
+  59:Hardware/Src/timer.c ****     TIM5_CH1Handler.OCMode = TIM_OCMODE_PWM1;                                  //模式选择PWM1
+ 127              		.loc 1 59 5 is_stmt 1 view .LVU30
+ 128              		.loc 1 59 28 is_stmt 0 view .LVU31
+ 129 001a 0C4D     		ldr	r5, .L7+8
+ 130 001c 6023     		movs	r3, #96
+ 131 001e 2B60     		str	r3, [r5]
+  60:Hardware/Src/timer.c ****     TIM5_CH1Handler.Pulse = arr / 1;                                           //设置比较值,�
+ 132              		.loc 1 60 5 is_stmt 1 view .LVU32
+ 133              		.loc 1 60 27 is_stmt 0 view .LVU33
+ 134 0020 6E60     		str	r6, [r5, #4]
+  61:Hardware/Src/timer.c ****     TIM5_CH1Handler.OCPolarity = TIM_OCPOLARITY_LOW;                           //输出比较极性
+ 135              		.loc 1 61 5 is_stmt 1 view .LVU34
+ 136              		.loc 1 61 32 is_stmt 0 view .LVU35
+ 137 0022 0223     		movs	r3, #2
+ 138 0024 AB60     		str	r3, [r5, #8]
+  62:Hardware/Src/timer.c ****     HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH1Handler, TIM_CHANNEL_1); //配置TIM5通道1
+ 139              		.loc 1 62 5 is_stmt 1 view .LVU36
+ 140 0026 3A46     		mov	r2, r7
+ 141 0028 2946     		mov	r1, r5
+ 142 002a 2046     		mov	r0, r4
+ 143 002c FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 144              	.LVL7:
+  63:Hardware/Src/timer.c ****     HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH1Handler, TIM_CHANNEL_3); //配置TIM5通3
+ 145              		.loc 1 63 5 view .LVU37
+ 146 0030 0822     		movs	r2, #8
+ 147 0032 2946     		mov	r1, r5
+ 148 0034 2046     		mov	r0, r4
+ 149 0036 FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 150              	.LVL8:
+  64:Hardware/Src/timer.c ****     // HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_1);                           //开启PWM通道
+  65:Hardware/Src/timer.c ****     HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_3);                           //开启PWM通道3
+ 151              		.loc 1 65 5 view .LVU38
+ 152 003a 0821     		movs	r1, #8
+ 153 003c 2046     		mov	r0, r4
+ 154 003e FFF7FEFF 		bl	HAL_TIM_PWM_Start
+ 155              	.LVL9:
+  66:Hardware/Src/timer.c **** }
+ 156              		.loc 1 66 1 is_stmt 0 view .LVU39
+ 157 0042 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 158              	.L8:
+ 159              		.align	2
+ 160              	.L7:
+ 161 0044 00000000 		.word	.LANCHOR1
+ 162 0048 000C0040 		.word	1073744896
+ 163 004c 00000000 		.word	.LANCHOR2
+ 164              		.cfi_endproc
+ 165              	.LFE131:
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 5
+
+
+ 167              		.section	.text.TIM11_PWM_Init,"ax",%progbits
+ 168              		.align	1
+ 169              		.global	TIM11_PWM_Init
+ 170              		.syntax unified
+ 171              		.thumb
+ 172              		.thumb_func
+ 174              	TIM11_PWM_Init:
+ 175              	.LVL10:
+ 176              	.LFB132:
+  67:Hardware/Src/timer.c **** 
+  68:Hardware/Src/timer.c **** // TIM11 PWM部分初始化
+  69:Hardware/Src/timer.c **** // arr：自动重装值。
+  70:Hardware/Src/timer.c **** // psc：时钟预分频数
+  71:Hardware/Src/timer.c **** //定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+  72:Hardware/Src/timer.c **** // Ft=定时器工作频率,单位:Mhz
+  73:Hardware/Src/timer.c **** void TIM11_PWM_Init(u16 arr, u16 psc)
+  74:Hardware/Src/timer.c **** {
+ 177              		.loc 1 74 1 is_stmt 1 view -0
+ 178              		.cfi_startproc
+ 179              		@ args = 0, pretend = 0, frame = 0
+ 180              		@ frame_needed = 0, uses_anonymous_args = 0
+ 181              		.loc 1 74 1 is_stmt 0 view .LVU41
+ 182 0000 70B5     		push	{r4, r5, r6, lr}
+ 183              	.LCFI2:
+ 184              		.cfi_def_cfa_offset 16
+ 185              		.cfi_offset 4, -16
+ 186              		.cfi_offset 5, -12
+ 187              		.cfi_offset 6, -8
+ 188              		.cfi_offset 14, -4
+ 189 0002 0546     		mov	r5, r0
+  75:Hardware/Src/timer.c ****     TIM5_Handler.Instance = TIM11;                            //定时器11
+ 190              		.loc 1 75 5 is_stmt 1 view .LVU42
+ 191              		.loc 1 75 27 is_stmt 0 view .LVU43
+ 192 0004 0D4B     		ldr	r3, .L11
+ 193 0006 0E4A     		ldr	r2, .L11+4
+ 194 0008 1A60     		str	r2, [r3]
+  76:Hardware/Src/timer.c ****     TIM5_Handler.Init.Prescaler = psc;                        //定时器分频
+ 195              		.loc 1 76 5 is_stmt 1 view .LVU44
+ 196              		.loc 1 76 33 is_stmt 0 view .LVU45
+ 197 000a 5960     		str	r1, [r3, #4]
+  77:Hardware/Src/timer.c ****     TIM5_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       //向上计数模式
+ 198              		.loc 1 77 5 is_stmt 1 view .LVU46
+ 199              		.loc 1 77 35 is_stmt 0 view .LVU47
+ 200 000c 0024     		movs	r4, #0
+ 201 000e 9C60     		str	r4, [r3, #8]
+  78:Hardware/Src/timer.c ****     TIM5_Handler.Init.Period = arr;                           //自动重装载值
+ 202              		.loc 1 78 5 is_stmt 1 view .LVU48
+ 203              		.loc 1 78 30 is_stmt 0 view .LVU49
+ 204 0010 D860     		str	r0, [r3, #12]
+  79:Hardware/Src/timer.c ****     TIM5_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // 数字分频因子,数字分频因
+ 205              		.loc 1 79 5 is_stmt 1 view .LVU50
+ 206              		.loc 1 79 37 is_stmt 0 view .LVU51
+ 207 0012 1C61     		str	r4, [r3, #16]
+  80:Hardware/Src/timer.c ****     HAL_TIM_PWM_Init(&TIM11_Handler);                         //初始化PWM
+ 208              		.loc 1 80 5 is_stmt 1 view .LVU52
+ 209 0014 0B4E     		ldr	r6, .L11+8
+ 210 0016 3046     		mov	r0, r6
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 6
+
+
+ 211              	.LVL11:
+ 212              		.loc 1 80 5 is_stmt 0 view .LVU53
+ 213 0018 FFF7FEFF 		bl	HAL_TIM_PWM_Init
+ 214              	.LVL12:
+  81:Hardware/Src/timer.c **** 
+  82:Hardware/Src/timer.c ****     TIM5_CH1Handler.OCMode = TIM_OCMODE_PWM1;                                    //模式选择PWM1
+ 215              		.loc 1 82 5 is_stmt 1 view .LVU54
+ 216              		.loc 1 82 28 is_stmt 0 view .LVU55
+ 217 001c 0A4B     		ldr	r3, .L11+12
+ 218 001e 6022     		movs	r2, #96
+ 219 0020 1A60     		str	r2, [r3]
+  83:Hardware/Src/timer.c ****     TIM5_CH1Handler.Pulse = arr / 1;                                             //设置比较值,
+ 220              		.loc 1 83 5 is_stmt 1 view .LVU56
+ 221              		.loc 1 83 27 is_stmt 0 view .LVU57
+ 222 0022 5D60     		str	r5, [r3, #4]
+  84:Hardware/Src/timer.c ****     TIM5_CH1Handler.OCPolarity = TIM_OCPOLARITY_LOW;                             //输出比较极�
+ 223              		.loc 1 84 5 is_stmt 1 view .LVU58
+ 224              		.loc 1 84 32 is_stmt 0 view .LVU59
+ 225 0024 0222     		movs	r2, #2
+ 226 0026 9A60     		str	r2, [r3, #8]
+  85:Hardware/Src/timer.c ****     HAL_TIM_PWM_ConfigChannel(&TIM11_Handler, &TIM11_CH1Handler, TIM_CHANNEL_1); //配置TIM11通�
+ 227              		.loc 1 85 5 is_stmt 1 view .LVU60
+ 228 0028 2246     		mov	r2, r4
+ 229 002a 0849     		ldr	r1, .L11+16
+ 230 002c 3046     		mov	r0, r6
+ 231 002e FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 232              	.LVL13:
+  86:Hardware/Src/timer.c **** 
+  87:Hardware/Src/timer.c ****     HAL_TIM_PWM_Start(&TIM11_Handler, TIM_CHANNEL_1); //开启PWM通道1
+ 233              		.loc 1 87 5 view .LVU61
+ 234 0032 2146     		mov	r1, r4
+ 235 0034 3046     		mov	r0, r6
+ 236 0036 FFF7FEFF 		bl	HAL_TIM_PWM_Start
+ 237              	.LVL14:
+  88:Hardware/Src/timer.c **** }
+ 238              		.loc 1 88 1 is_stmt 0 view .LVU62
+ 239 003a 70BD     		pop	{r4, r5, r6, pc}
+ 240              	.L12:
+ 241              		.align	2
+ 242              	.L11:
+ 243 003c 00000000 		.word	.LANCHOR1
+ 244 0040 00480140 		.word	1073825792
+ 245 0044 00000000 		.word	.LANCHOR3
+ 246 0048 00000000 		.word	.LANCHOR2
+ 247 004c 00000000 		.word	.LANCHOR4
+ 248              		.cfi_endproc
+ 249              	.LFE132:
+ 251              		.section	.text.HAL_TIM_Base_MspInit,"ax",%progbits
+ 252              		.align	1
+ 253              		.global	HAL_TIM_Base_MspInit
+ 254              		.syntax unified
+ 255              		.thumb
+ 256              		.thumb_func
+ 258              	HAL_TIM_Base_MspInit:
+ 259              	.LVL15:
+ 260              	.LFB133:
+  89:Hardware/Src/timer.c **** 
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 7
+
+
+  90:Hardware/Src/timer.c **** //定时器底册驱动，开启时钟，设置中断优先级
+  91:Hardware/Src/timer.c **** //此函数会被HAL_TIM_Base_Init()函数调用
+  92:Hardware/Src/timer.c **** void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
+  93:Hardware/Src/timer.c **** {
+ 261              		.loc 1 93 1 is_stmt 1 view -0
+ 262              		.cfi_startproc
+ 263              		@ args = 0, pretend = 0, frame = 8
+ 264              		@ frame_needed = 0, uses_anonymous_args = 0
+  94:Hardware/Src/timer.c ****     if (htim->Instance == TIM3)
+ 265              		.loc 1 94 5 view .LVU64
+ 266              		.loc 1 94 13 is_stmt 0 view .LVU65
+ 267 0000 0268     		ldr	r2, [r0]
+ 268              		.loc 1 94 8 view .LVU66
+ 269 0002 0E4B     		ldr	r3, .L20
+ 270 0004 9A42     		cmp	r2, r3
+ 271 0006 00D0     		beq	.L19
+ 272 0008 7047     		bx	lr
+ 273              	.L19:
+  93:Hardware/Src/timer.c ****     if (htim->Instance == TIM3)
+ 274              		.loc 1 93 1 view .LVU67
+ 275 000a 00B5     		push	{lr}
+ 276              	.LCFI3:
+ 277              		.cfi_def_cfa_offset 4
+ 278              		.cfi_offset 14, -4
+ 279 000c 83B0     		sub	sp, sp, #12
+ 280              	.LCFI4:
+ 281              		.cfi_def_cfa_offset 16
+  95:Hardware/Src/timer.c ****     {
+  96:Hardware/Src/timer.c ****         __HAL_RCC_TIM3_CLK_ENABLE();           //使能TIM3时钟
+ 282              		.loc 1 96 9 is_stmt 1 view .LVU68
+ 283              	.LBB2:
+ 284              		.loc 1 96 9 view .LVU69
+ 285 000e 0023     		movs	r3, #0
+ 286 0010 0193     		str	r3, [sp, #4]
+ 287              		.loc 1 96 9 view .LVU70
+ 288 0012 0B4B     		ldr	r3, .L20+4
+ 289 0014 1A6C     		ldr	r2, [r3, #64]
+ 290 0016 42F00202 		orr	r2, r2, #2
+ 291 001a 1A64     		str	r2, [r3, #64]
+ 292              		.loc 1 96 9 view .LVU71
+ 293 001c 1B6C     		ldr	r3, [r3, #64]
+ 294 001e 03F00203 		and	r3, r3, #2
+ 295 0022 0193     		str	r3, [sp, #4]
+ 296              		.loc 1 96 9 view .LVU72
+ 297 0024 019B     		ldr	r3, [sp, #4]
+ 298              	.LBE2:
+ 299              		.loc 1 96 9 view .LVU73
+  97:Hardware/Src/timer.c ****         HAL_NVIC_SetPriority(TIM3_IRQn, 1, 3); //设置中断优先级，抢占优先级1，子优�
+ 300              		.loc 1 97 9 view .LVU74
+ 301 0026 0322     		movs	r2, #3
+ 302 0028 0121     		movs	r1, #1
+ 303 002a 1D20     		movs	r0, #29
+ 304              	.LVL16:
+ 305              		.loc 1 97 9 is_stmt 0 view .LVU75
+ 306 002c FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 307              	.LVL17:
+  98:Hardware/Src/timer.c ****         HAL_NVIC_EnableIRQ(TIM3_IRQn);         //开启ITM3中断
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 8
+
+
+ 308              		.loc 1 98 9 is_stmt 1 view .LVU76
+ 309 0030 1D20     		movs	r0, #29
+ 310 0032 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 311              	.LVL18:
+  99:Hardware/Src/timer.c ****     }
+ 100:Hardware/Src/timer.c **** }
+ 312              		.loc 1 100 1 is_stmt 0 view .LVU77
+ 313 0036 03B0     		add	sp, sp, #12
+ 314              	.LCFI5:
+ 315              		.cfi_def_cfa_offset 4
+ 316              		@ sp needed
+ 317 0038 5DF804FB 		ldr	pc, [sp], #4
+ 318              	.L21:
+ 319              		.align	2
+ 320              	.L20:
+ 321 003c 00040040 		.word	1073742848
+ 322 0040 00380240 		.word	1073887232
+ 323              		.cfi_endproc
+ 324              	.LFE133:
+ 326              		.section	.text.HAL_TIM_PWM_MspInit,"ax",%progbits
+ 327              		.align	1
+ 328              		.global	HAL_TIM_PWM_MspInit
+ 329              		.syntax unified
+ 330              		.thumb
+ 331              		.thumb_func
+ 333              	HAL_TIM_PWM_MspInit:
+ 334              	.LVL19:
+ 335              	.LFB134:
+ 101:Hardware/Src/timer.c **** 
+ 102:Hardware/Src/timer.c **** //定时器底层驱动，时钟使能，引脚配置
+ 103:Hardware/Src/timer.c **** //此函数会被HAL_TIM_PWM_Init()调用
+ 104:Hardware/Src/timer.c **** // htim:定时器句柄
+ 105:Hardware/Src/timer.c **** void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
+ 106:Hardware/Src/timer.c **** {
+ 336              		.loc 1 106 1 is_stmt 1 view -0
+ 337              		.cfi_startproc
+ 338              		@ args = 0, pretend = 0, frame = 40
+ 339              		@ frame_needed = 0, uses_anonymous_args = 0
+ 340              		.loc 1 106 1 is_stmt 0 view .LVU79
+ 341 0000 00B5     		push	{lr}
+ 342              	.LCFI6:
+ 343              		.cfi_def_cfa_offset 4
+ 344              		.cfi_offset 14, -4
+ 345 0002 8BB0     		sub	sp, sp, #44
+ 346              	.LCFI7:
+ 347              		.cfi_def_cfa_offset 48
+ 107:Hardware/Src/timer.c ****     GPIO_InitTypeDef GPIO_Initure;
+ 348              		.loc 1 107 5 is_stmt 1 view .LVU80
+ 108:Hardware/Src/timer.c ****     __HAL_RCC_TIM5_CLK_ENABLE();  //使能定时器5
+ 349              		.loc 1 108 5 view .LVU81
+ 350              	.LBB3:
+ 351              		.loc 1 108 5 view .LVU82
+ 352 0004 0022     		movs	r2, #0
+ 353 0006 0192     		str	r2, [sp, #4]
+ 354              		.loc 1 108 5 view .LVU83
+ 355 0008 1B4B     		ldr	r3, .L24
+ 356 000a 196C     		ldr	r1, [r3, #64]
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 9
+
+
+ 357 000c 41F00801 		orr	r1, r1, #8
+ 358 0010 1964     		str	r1, [r3, #64]
+ 359              		.loc 1 108 5 view .LVU84
+ 360 0012 196C     		ldr	r1, [r3, #64]
+ 361 0014 01F00801 		and	r1, r1, #8
+ 362 0018 0191     		str	r1, [sp, #4]
+ 363              		.loc 1 108 5 view .LVU85
+ 364 001a 0199     		ldr	r1, [sp, #4]
+ 365              	.LBE3:
+ 366              		.loc 1 108 5 view .LVU86
+ 109:Hardware/Src/timer.c ****     __HAL_RCC_TIM11_CLK_ENABLE(); //使能定时器11
+ 367              		.loc 1 109 5 view .LVU87
+ 368              	.LBB4:
+ 369              		.loc 1 109 5 view .LVU88
+ 370 001c 0292     		str	r2, [sp, #8]
+ 371              		.loc 1 109 5 view .LVU89
+ 372 001e 596C     		ldr	r1, [r3, #68]
+ 373 0020 41F48021 		orr	r1, r1, #262144
+ 374 0024 5964     		str	r1, [r3, #68]
+ 375              		.loc 1 109 5 view .LVU90
+ 376 0026 596C     		ldr	r1, [r3, #68]
+ 377 0028 01F48021 		and	r1, r1, #262144
+ 378 002c 0291     		str	r1, [sp, #8]
+ 379              		.loc 1 109 5 view .LVU91
+ 380 002e 0299     		ldr	r1, [sp, #8]
+ 381              	.LBE4:
+ 382              		.loc 1 109 5 view .LVU92
+ 110:Hardware/Src/timer.c ****     __HAL_RCC_GPIOA_CLK_ENABLE(); //开启GPIOB时钟
+ 383              		.loc 1 110 5 view .LVU93
+ 384              	.LBB5:
+ 385              		.loc 1 110 5 view .LVU94
+ 386 0030 0392     		str	r2, [sp, #12]
+ 387              		.loc 1 110 5 view .LVU95
+ 388 0032 196B     		ldr	r1, [r3, #48]
+ 389 0034 41F00101 		orr	r1, r1, #1
+ 390 0038 1963     		str	r1, [r3, #48]
+ 391              		.loc 1 110 5 view .LVU96
+ 392 003a 196B     		ldr	r1, [r3, #48]
+ 393 003c 01F00101 		and	r1, r1, #1
+ 394 0040 0391     		str	r1, [sp, #12]
+ 395              		.loc 1 110 5 view .LVU97
+ 396 0042 0399     		ldr	r1, [sp, #12]
+ 397              	.LBE5:
+ 398              		.loc 1 110 5 view .LVU98
+ 111:Hardware/Src/timer.c ****     __HAL_RCC_GPIOB_CLK_ENABLE(); //开启GPIOB时钟
+ 399              		.loc 1 111 5 view .LVU99
+ 400              	.LBB6:
+ 401              		.loc 1 111 5 view .LVU100
+ 402 0044 0492     		str	r2, [sp, #16]
+ 403              		.loc 1 111 5 view .LVU101
+ 404 0046 1A6B     		ldr	r2, [r3, #48]
+ 405 0048 42F00202 		orr	r2, r2, #2
+ 406 004c 1A63     		str	r2, [r3, #48]
+ 407              		.loc 1 111 5 view .LVU102
+ 408 004e 1B6B     		ldr	r3, [r3, #48]
+ 409 0050 03F00203 		and	r3, r3, #2
+ 410 0054 0493     		str	r3, [sp, #16]
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 10
+
+
+ 411              		.loc 1 111 5 view .LVU103
+ 412 0056 049B     		ldr	r3, [sp, #16]
+ 413              	.LBE6:
+ 414              		.loc 1 111 5 view .LVU104
+ 112:Hardware/Src/timer.c **** 
+ 113:Hardware/Src/timer.c ****     GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_2; // PA0
+ 415              		.loc 1 113 5 view .LVU105
+ 416              		.loc 1 113 22 is_stmt 0 view .LVU106
+ 417 0058 0523     		movs	r3, #5
+ 418 005a 0593     		str	r3, [sp, #20]
+ 114:Hardware/Src/timer.c ****     GPIO_Initure.Mode = GPIO_MODE_AF_PP;        //复用推挽输出
+ 419              		.loc 1 114 5 is_stmt 1 view .LVU107
+ 420              		.loc 1 114 23 is_stmt 0 view .LVU108
+ 421 005c 0223     		movs	r3, #2
+ 422 005e 0693     		str	r3, [sp, #24]
+ 115:Hardware/Src/timer.c ****     GPIO_Initure.Pull = GPIO_PULLUP;            //上拉
+ 423              		.loc 1 115 5 is_stmt 1 view .LVU109
+ 424              		.loc 1 115 23 is_stmt 0 view .LVU110
+ 425 0060 0122     		movs	r2, #1
+ 426 0062 0792     		str	r2, [sp, #28]
+ 116:Hardware/Src/timer.c ****     GPIO_Initure.Speed = GPIO_SPEED_HIGH;       //高速
+ 427              		.loc 1 116 5 is_stmt 1 view .LVU111
+ 428              		.loc 1 116 24 is_stmt 0 view .LVU112
+ 429 0064 0322     		movs	r2, #3
+ 430 0066 0892     		str	r2, [sp, #32]
+ 117:Hardware/Src/timer.c ****     GPIO_Initure.Alternate = GPIO_AF2_TIM5;     // PA0,2复用为AF2_TIM5
+ 431              		.loc 1 117 5 is_stmt 1 view .LVU113
+ 432              		.loc 1 117 28 is_stmt 0 view .LVU114
+ 433 0068 0993     		str	r3, [sp, #36]
+ 118:Hardware/Src/timer.c ****     HAL_GPIO_Init(GPIOA, &GPIO_Initure);
+ 434              		.loc 1 118 5 is_stmt 1 view .LVU115
+ 435 006a 05A9     		add	r1, sp, #20
+ 436 006c 0348     		ldr	r0, .L24+4
+ 437              	.LVL20:
+ 438              		.loc 1 118 5 is_stmt 0 view .LVU116
+ 439 006e FFF7FEFF 		bl	HAL_GPIO_Init
+ 440              	.LVL21:
+ 119:Hardware/Src/timer.c **** }
+ 441              		.loc 1 119 1 view .LVU117
+ 442 0072 0BB0     		add	sp, sp, #44
+ 443              	.LCFI8:
+ 444              		.cfi_def_cfa_offset 4
+ 445              		@ sp needed
+ 446 0074 5DF804FB 		ldr	pc, [sp], #4
+ 447              	.L25:
+ 448              		.align	2
+ 449              	.L24:
+ 450 0078 00380240 		.word	1073887232
+ 451 007c 00000240 		.word	1073872896
+ 452              		.cfi_endproc
+ 453              	.LFE134:
+ 455              		.section	.text.TIM_SetTIM5Compare_1,"ax",%progbits
+ 456              		.align	1
+ 457              		.global	TIM_SetTIM5Compare_1
+ 458              		.syntax unified
+ 459              		.thumb
+ 460              		.thumb_func
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 11
+
+
+ 462              	TIM_SetTIM5Compare_1:
+ 463              	.LVL22:
+ 464              	.LFB135:
+ 120:Hardware/Src/timer.c **** 
+ 121:Hardware/Src/timer.c **** //设置TIM通道1的占空比
+ 122:Hardware/Src/timer.c **** // compare:比较值,占空比为compare/arr
+ 123:Hardware/Src/timer.c **** void TIM_SetTIM5Compare_1(u32 compare)
+ 124:Hardware/Src/timer.c **** {
+ 465              		.loc 1 124 1 is_stmt 1 view -0
+ 466              		.cfi_startproc
+ 467              		@ args = 0, pretend = 0, frame = 0
+ 468              		@ frame_needed = 0, uses_anonymous_args = 0
+ 469              		@ link register save eliminated.
+ 125:Hardware/Src/timer.c ****     TIM5->CCR1 = compare;
+ 470              		.loc 1 125 5 view .LVU119
+ 471              		.loc 1 125 16 is_stmt 0 view .LVU120
+ 472 0000 014B     		ldr	r3, .L27
+ 473 0002 5863     		str	r0, [r3, #52]
+ 126:Hardware/Src/timer.c **** }
+ 474              		.loc 1 126 1 view .LVU121
+ 475 0004 7047     		bx	lr
+ 476              	.L28:
+ 477 0006 00BF     		.align	2
+ 478              	.L27:
+ 479 0008 000C0040 		.word	1073744896
+ 480              		.cfi_endproc
+ 481              	.LFE135:
+ 483              		.section	.text.TIM_SetTIM5Compare_3,"ax",%progbits
+ 484              		.align	1
+ 485              		.global	TIM_SetTIM5Compare_3
+ 486              		.syntax unified
+ 487              		.thumb
+ 488              		.thumb_func
+ 490              	TIM_SetTIM5Compare_3:
+ 491              	.LVL23:
+ 492              	.LFB136:
+ 127:Hardware/Src/timer.c **** 
+ 128:Hardware/Src/timer.c **** //设置TIM通道3的占空比
+ 129:Hardware/Src/timer.c **** // compare:比较值,占空比为compare/arr
+ 130:Hardware/Src/timer.c **** void TIM_SetTIM5Compare_3(u32 compare)
+ 131:Hardware/Src/timer.c **** {
+ 493              		.loc 1 131 1 is_stmt 1 view -0
+ 494              		.cfi_startproc
+ 495              		@ args = 0, pretend = 0, frame = 0
+ 496              		@ frame_needed = 0, uses_anonymous_args = 0
+ 497              		@ link register save eliminated.
+ 132:Hardware/Src/timer.c ****     TIM5->CCR3 = compare;
+ 498              		.loc 1 132 5 view .LVU123
+ 499              		.loc 1 132 16 is_stmt 0 view .LVU124
+ 500 0000 014B     		ldr	r3, .L30
+ 501 0002 D863     		str	r0, [r3, #60]
+ 133:Hardware/Src/timer.c **** }
+ 502              		.loc 1 133 1 view .LVU125
+ 503 0004 7047     		bx	lr
+ 504              	.L31:
+ 505 0006 00BF     		.align	2
+ 506              	.L30:
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 12
+
+
+ 507 0008 000C0040 		.word	1073744896
+ 508              		.cfi_endproc
+ 509              	.LFE136:
+ 511              		.section	.text.TIM3_IRQHandler,"ax",%progbits
+ 512              		.align	1
+ 513              		.global	TIM3_IRQHandler
+ 514              		.syntax unified
+ 515              		.thumb
+ 516              		.thumb_func
+ 518              	TIM3_IRQHandler:
+ 519              	.LFB137:
+ 134:Hardware/Src/timer.c **** 
+ 135:Hardware/Src/timer.c **** //定时器3中断服务函数
+ 136:Hardware/Src/timer.c **** void TIM3_IRQHandler(void)
+ 137:Hardware/Src/timer.c **** {
+ 520              		.loc 1 137 1 is_stmt 1 view -0
+ 521              		.cfi_startproc
+ 522              		@ args = 0, pretend = 0, frame = 0
+ 523              		@ frame_needed = 0, uses_anonymous_args = 0
+ 524 0000 08B5     		push	{r3, lr}
+ 525              	.LCFI9:
+ 526              		.cfi_def_cfa_offset 8
+ 527              		.cfi_offset 3, -8
+ 528              		.cfi_offset 14, -4
+ 138:Hardware/Src/timer.c ****     HAL_TIM_IRQHandler(&TIM3_Handler);
+ 529              		.loc 1 138 5 view .LVU127
+ 530 0002 0248     		ldr	r0, .L34
+ 531 0004 FFF7FEFF 		bl	HAL_TIM_IRQHandler
+ 532              	.LVL24:
+ 139:Hardware/Src/timer.c **** }
+ 533              		.loc 1 139 1 is_stmt 0 view .LVU128
+ 534 0008 08BD     		pop	{r3, pc}
+ 535              	.L35:
+ 536 000a 00BF     		.align	2
+ 537              	.L34:
+ 538 000c 00000000 		.word	.LANCHOR0
+ 539              		.cfi_endproc
+ 540              	.LFE137:
+ 542              		.section	.text.HAL_TIM_PeriodElapsedCallback,"ax",%progbits
+ 543              		.align	1
+ 544              		.global	HAL_TIM_PeriodElapsedCallback
+ 545              		.syntax unified
+ 546              		.thumb
+ 547              		.thumb_func
+ 549              	HAL_TIM_PeriodElapsedCallback:
+ 550              	.LVL25:
+ 551              	.LFB138:
+ 140:Hardware/Src/timer.c **** 
+ 141:Hardware/Src/timer.c **** //回调函数，定时器中断服务函数调用
+ 142:Hardware/Src/timer.c **** void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+ 143:Hardware/Src/timer.c **** {
+ 552              		.loc 1 143 1 is_stmt 1 view -0
+ 553              		.cfi_startproc
+ 554              		@ args = 0, pretend = 0, frame = 0
+ 555              		@ frame_needed = 0, uses_anonymous_args = 0
+ 556              		.loc 1 143 1 is_stmt 0 view .LVU130
+ 557 0000 08B5     		push	{r3, lr}
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 13
+
+
+ 558              	.LCFI10:
+ 559              		.cfi_def_cfa_offset 8
+ 560              		.cfi_offset 3, -8
+ 561              		.cfi_offset 14, -4
+ 144:Hardware/Src/timer.c ****     if (htim == (&TIM3_Handler))
+ 562              		.loc 1 144 5 is_stmt 1 view .LVU131
+ 563              		.loc 1 144 8 is_stmt 0 view .LVU132
+ 564 0002 034B     		ldr	r3, .L40
+ 565 0004 8342     		cmp	r3, r0
+ 566 0006 00D0     		beq	.L39
+ 567              	.LVL26:
+ 568              	.L36:
+ 145:Hardware/Src/timer.c ****     {
+ 146:Hardware/Src/timer.c ****         LED_Reverse();
+ 147:Hardware/Src/timer.c ****     }
+ 148:Hardware/Src/timer.c **** }
+ 569              		.loc 1 148 1 view .LVU133
+ 570 0008 08BD     		pop	{r3, pc}
+ 571              	.LVL27:
+ 572              	.L39:
+ 146:Hardware/Src/timer.c ****     }
+ 573              		.loc 1 146 9 is_stmt 1 view .LVU134
+ 574 000a FFF7FEFF 		bl	LED_Reverse
+ 575              	.LVL28:
+ 576              		.loc 1 148 1 is_stmt 0 view .LVU135
+ 577 000e FBE7     		b	.L36
+ 578              	.L41:
+ 579              		.align	2
+ 580              	.L40:
+ 581 0010 00000000 		.word	.LANCHOR0
+ 582              		.cfi_endproc
+ 583              	.LFE138:
+ 585              		.global	TIM11_CH1Handler
+ 586              		.global	TIM11_Handler
+ 587              		.global	TIM5_CH1Handler
+ 588              		.global	TIM5_Handler
+ 589              		.global	TIM3_Handler
+ 590              		.section	.bss.TIM11_CH1Handler,"aw",%nobits
+ 591              		.align	2
+ 592              		.set	.LANCHOR4,. + 0
+ 595              	TIM11_CH1Handler:
+ 596 0000 00000000 		.space	28
+ 596      00000000 
+ 596      00000000 
+ 596      00000000 
+ 596      00000000 
+ 597              		.section	.bss.TIM11_Handler,"aw",%nobits
+ 598              		.align	2
+ 599              		.set	.LANCHOR3,. + 0
+ 602              	TIM11_Handler:
+ 603 0000 00000000 		.space	72
+ 603      00000000 
+ 603      00000000 
+ 603      00000000 
+ 603      00000000 
+ 604              		.section	.bss.TIM3_Handler,"aw",%nobits
+ 605              		.align	2
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 14
+
+
+ 606              		.set	.LANCHOR0,. + 0
+ 609              	TIM3_Handler:
+ 610 0000 00000000 		.space	72
+ 610      00000000 
+ 610      00000000 
+ 610      00000000 
+ 610      00000000 
+ 611              		.section	.bss.TIM5_CH1Handler,"aw",%nobits
+ 612              		.align	2
+ 613              		.set	.LANCHOR2,. + 0
+ 616              	TIM5_CH1Handler:
+ 617 0000 00000000 		.space	28
+ 617      00000000 
+ 617      00000000 
+ 617      00000000 
+ 617      00000000 
+ 618              		.section	.bss.TIM5_Handler,"aw",%nobits
+ 619              		.align	2
+ 620              		.set	.LANCHOR1,. + 0
+ 623              	TIM5_Handler:
+ 624 0000 00000000 		.space	72
+ 624      00000000 
+ 624      00000000 
+ 624      00000000 
+ 624      00000000 
+ 625              		.text
+ 626              	.Letext0:
+ 627              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 628              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 629              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xc.h"
+ 630              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 631              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 632              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 633              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h"
+ 634              		.file 9 "User/Inc/sys.h"
+ 635              		.file 10 "Hardware/Inc/timer.h"
+ 636              		.file 11 "User/Inc/led.h"
+ 637              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h"
+ARM GAS  C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 timer.c
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:20     .text.TIM3_Init:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:26     .text.TIM3_Init:00000000 TIM3_Init
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:73     .text.TIM3_Init:00000020 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:79     .text.TIM5_PWM_Init:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:85     .text.TIM5_PWM_Init:00000000 TIM5_PWM_Init
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:161    .text.TIM5_PWM_Init:00000044 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:168    .text.TIM11_PWM_Init:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:174    .text.TIM11_PWM_Init:00000000 TIM11_PWM_Init
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:243    .text.TIM11_PWM_Init:0000003c $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:252    .text.HAL_TIM_Base_MspInit:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:258    .text.HAL_TIM_Base_MspInit:00000000 HAL_TIM_Base_MspInit
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:321    .text.HAL_TIM_Base_MspInit:0000003c $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:327    .text.HAL_TIM_PWM_MspInit:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:333    .text.HAL_TIM_PWM_MspInit:00000000 HAL_TIM_PWM_MspInit
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:450    .text.HAL_TIM_PWM_MspInit:00000078 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:456    .text.TIM_SetTIM5Compare_1:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:462    .text.TIM_SetTIM5Compare_1:00000000 TIM_SetTIM5Compare_1
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:479    .text.TIM_SetTIM5Compare_1:00000008 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:484    .text.TIM_SetTIM5Compare_3:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:490    .text.TIM_SetTIM5Compare_3:00000000 TIM_SetTIM5Compare_3
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:507    .text.TIM_SetTIM5Compare_3:00000008 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:512    .text.TIM3_IRQHandler:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:518    .text.TIM3_IRQHandler:00000000 TIM3_IRQHandler
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:538    .text.TIM3_IRQHandler:0000000c $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:543    .text.HAL_TIM_PeriodElapsedCallback:00000000 $t
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:549    .text.HAL_TIM_PeriodElapsedCallback:00000000 HAL_TIM_PeriodElapsedCallback
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:581    .text.HAL_TIM_PeriodElapsedCallback:00000010 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:595    .bss.TIM11_CH1Handler:00000000 TIM11_CH1Handler
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:602    .bss.TIM11_Handler:00000000 TIM11_Handler
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:616    .bss.TIM5_CH1Handler:00000000 TIM5_CH1Handler
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:623    .bss.TIM5_Handler:00000000 TIM5_Handler
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:609    .bss.TIM3_Handler:00000000 TIM3_Handler
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:591    .bss.TIM11_CH1Handler:00000000 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:598    .bss.TIM11_Handler:00000000 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:605    .bss.TIM3_Handler:00000000 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:612    .bss.TIM5_CH1Handler:00000000 $d
+C:\Users\11655\AppData\Local\Temp\ccTNP5KI.s:619    .bss.TIM5_Handler:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_TIM_Base_Init
+HAL_TIM_Base_Start_IT
+HAL_TIM_PWM_Init
+HAL_TIM_PWM_ConfigChannel
+HAL_TIM_PWM_Start
+HAL_NVIC_SetPriority
+HAL_NVIC_EnableIRQ
+HAL_GPIO_Init
+HAL_TIM_IRQHandler
+LED_Reverse

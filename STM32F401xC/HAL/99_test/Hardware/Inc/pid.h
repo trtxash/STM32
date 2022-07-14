@@ -1,7 +1,8 @@
 #ifndef __PID_H__
 #define __PID_H__
 
-#include "bsp.h"
+#include "sys.h"
+
 typedef struct{
     float P;
     float I;

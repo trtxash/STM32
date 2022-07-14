@@ -57,11 +57,11 @@ void TIM5_PWM_Init(u16 arr, u16 psc)
     HAL_TIM_PWM_Init(&TIM5_Handler);                          //初始化PWM
 
     TIM5_CH1Handler.OCMode = TIM_OCMODE_PWM1;                                  //模式选择PWM1
-    TIM5_CH1Handler.Pulse = arr / 2;                                           //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
+    TIM5_CH1Handler.Pulse = arr / 1;                                           //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
     TIM5_CH1Handler.OCPolarity = TIM_OCPOLARITY_LOW;                           //输出比较极性为低
     HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH1Handler, TIM_CHANNEL_1); //配置TIM5通道1
     HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH1Handler, TIM_CHANNEL_3); //配置TIM5通3
-    HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_1);                           //开启PWM通道1
+    // HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_1);                           //开启PWM通道1
     HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_3);                           //开启PWM通道3
 }
 
@@ -80,7 +80,7 @@ void TIM11_PWM_Init(u16 arr, u16 psc)
     HAL_TIM_PWM_Init(&TIM11_Handler);                         //初始化PWM
 
     TIM5_CH1Handler.OCMode = TIM_OCMODE_PWM1;                                    //模式选择PWM1
-    TIM5_CH1Handler.Pulse = arr / 2;                                             //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
+    TIM5_CH1Handler.Pulse = arr / 1;                                             //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
     TIM5_CH1Handler.OCPolarity = TIM_OCPOLARITY_LOW;                             //输出比较极性为低
     HAL_TIM_PWM_ConfigChannel(&TIM11_Handler, &TIM11_CH1Handler, TIM_CHANNEL_1); //配置TIM11通道1
 
@@ -119,10 +119,17 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 }
 
 //设置TIM通道1的占空比
-// compare:比较值
+// compare:比较值,占空比为compare/arr
 void TIM_SetTIM5Compare_1(u32 compare)
 {
     TIM5->CCR1 = compare;
+}
+
+//设置TIM通道3的占空比
+// compare:比较值,占空比为compare/arr
+void TIM_SetTIM5Compare_3(u32 compare)
+{
+    TIM5->CCR3 = compare;
 }
 
 //定时器3中断服务函数

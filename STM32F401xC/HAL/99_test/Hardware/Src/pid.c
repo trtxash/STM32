@@ -1,28 +1,27 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : pid¿ØÖÆ
-*	ÎÄ¼şÃû³Æ : pid.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ :
+*	æ¨¡å—åç§° : pidæ§åˆ¶
+*	æ–‡ä»¶åç§° : pid.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ :
 *
-*   Copyright (C), 2019-2030, Îäºº¿áµã»úÆ÷ÈË¿Æ¼¼ÓĞÏŞ¹«Ë¾
-*   ÌÔ±¦µêÆÌµØÖ·£ºhttps://shop559826635.taobao.com/
+*   Copyright (C), 2019-2030, æ­¦æ±‰é…·ç‚¹æœºå™¨äººç§‘æŠ€æœ‰é™å…¬å¸
+*   æ·˜å®åº—é“ºåœ°å€ï¼šhttps://shop559826635.taobao.com/
 *********************************************************************************************************
 */
 #include "pid.h"
-#include "includes.h"
 
 static Pid_t tPidSpeedA;
-static Pid_t tPidSpeedB;
+// static Pid_t tPidSpeedB;
 static Pid_t tPidSpeedC;
-static Pid_t tPidSpeedD;
+// static Pid_t tPidSpeedD;
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: PID_Init
-*	¹¦ÄÜËµÃ÷: ÉèÖÃ4¸öµç»úP¡¢I¡¢DµÄÖµ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: PID_Init
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®4ä¸ªç”µæœºPã€Iã€Dçš„å€¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitPid(void)
@@ -35,12 +34,12 @@ void bsp_InitPid(void)
     tPidSpeedA.SumError = 0;
     
     
-    tPidSpeedB.P = 0.1;
-    tPidSpeedB.I = 0.2;
-    tPidSpeedB.D = 0.1;
+    // tPidSpeedB.P = 0.1;
+    // tPidSpeedB.I = 0.2;
+    // tPidSpeedB.D = 0.1;
 
-    tPidSpeedB.PrevError = 0;
-    tPidSpeedB.SumError = 0;
+    // tPidSpeedB.PrevError = 0;
+    // tPidSpeedB.SumError = 0;
 
     tPidSpeedC.P = 0.1;
     tPidSpeedC.I = 0.2;
@@ -48,18 +47,18 @@ void bsp_InitPid(void)
     tPidSpeedC.PrevError = 0;
     tPidSpeedC.SumError = 0;
     
-    tPidSpeedD.P = 0.1;
-    tPidSpeedD.I = 0.2;
-    tPidSpeedD.D = 0.1;
-    tPidSpeedD.PrevError = 0;
-    tPidSpeedD.SumError = 0;
+    // tPidSpeedD.P = 0.1;
+    // tPidSpeedD.I = 0.2;
+    // tPidSpeedD.D = 0.1;
+    // tPidSpeedD.PrevError = 0;
+    // tPidSpeedD.SumError = 0;
 }
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wheelSpeedPidCalc
-*	¹¦ÄÜËµÃ÷: ¸ù¾İPIDÄ£ĞÍ¼ÆËãµç»úµÄpwmÖµ
-*	ĞÎ    ²Î: _ucWheelNumµç»ú±àºÅ _usMeasure ¼ì²âÖµ£¨±àÂëÆ÷¼ì²âµÄµç»úµÄËÙ¶È£©   _usTarget Ä¿±êÖµ£¨Éè¶¨µÄµç»úµÄËÙ¶È£©
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wheelSpeedPidCalc
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®PIDæ¨¡å‹è®¡ç®—ç”µæœºçš„pwmå€¼
+*	å½¢    å‚: _ucWheelNumç”µæœºç¼–å· _usMeasure æ£€æµ‹å€¼ï¼ˆç¼–ç å™¨æ£€æµ‹çš„ç”µæœºçš„é€Ÿåº¦ï¼‰   _usTarget ç›®æ ‡å€¼ï¼ˆè®¾å®šçš„ç”µæœºçš„é€Ÿåº¦ï¼‰
+*	è¿” å› å€¼: int
 *********************************************************************************************************
 */
 
@@ -80,7 +79,7 @@ int wheelSpeedPidCalc(uint8_t _ucWheelNum, uint16_t _usMeasure, uint16_t _usTarg
         break;
         
         case 1:
-          _tpid = &tPidSpeedB; 
+        //   _tpid = &tPidSpeedB; 
         break;
         
         case 2:
@@ -88,18 +87,18 @@ int wheelSpeedPidCalc(uint8_t _ucWheelNum, uint16_t _usMeasure, uint16_t _usTarg
         break;
         
         case 3:
-            _tpid = &tPidSpeedD;
+            // _tpid = &tPidSpeedD;
         break;
     
     }
     
-    _error = _usTarget - _usMeasure;  /*¼ÆËãµ±Ç°Îó²î*/
+    _error = _usTarget - _usMeasure;  /*è®¡ç®—å½“å‰è¯¯å·®*/
 
-    _tempP = _tpid->P * _error;/*¼ÆËãPÏîµÄÖµ*/
+    _tempP = _tpid->P * _error;/*è®¡ç®—Pé¡¹çš„å€¼*/
 
-    _tpid->SumError += _error;  /*ÀÛ¼ÆÎó²î*/
+    _tpid->SumError += _error;  /*ç´¯è®¡è¯¯å·®*/
     
-    _tempI = _tpid->I * _tpid->SumError;   /*¼ÆËãIÏîµÄÖµ*/
+    _tempI = _tpid->I * _tpid->SumError;   /*è®¡ç®—Ié¡¹çš„å€¼*/
 
     if(_tempI > 2000)
     {
@@ -110,9 +109,9 @@ int wheelSpeedPidCalc(uint8_t _ucWheelNum, uint16_t _usMeasure, uint16_t _usTarg
         _tpid->SumError = -2000 / _tpid->I;
     }
 
-    _dError = _error - _tpid->PrevError;/*Î¢·ÖÎó²î*/
+    _dError = _error - _tpid->PrevError;/*å¾®åˆ†è¯¯å·®*/
     
-    _tempD  = _tpid->D * _dError;/*¼ÆËãDÏîµÄÖµ*/
+    _tempD  = _tpid->D * _dError;/*è®¡ç®—Dé¡¹çš„å€¼*/
 
     _tpid->PrevError = _error ;
     
@@ -136,10 +135,10 @@ int wheelSpeedPidCalc(uint8_t _ucWheelNum, uint16_t _usMeasure, uint16_t _usTarg
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: PID_Param_SetZero
-*	¹¦ÄÜËµÃ÷: ¶Ôµç»úµÄÀÛ¼ÆÎó²î PrevErrorÇå0
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: PID_Param_SetZero
+*	åŠŸèƒ½è¯´æ˜: å¯¹ç”µæœºçš„ç´¯è®¡è¯¯å·® PrevErroræ¸…0
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void PID_Param_SetZero(void)
@@ -148,12 +147,12 @@ void PID_Param_SetZero(void)
     tPidSpeedA.PrevError = 0;
     tPidSpeedA.SumError = 0;
     
-    tPidSpeedB.PrevError = 0;
-    tPidSpeedB.SumError = 0;
+    // tPidSpeedB.PrevError = 0;
+    // tPidSpeedB.SumError = 0;
     
     tPidSpeedC.PrevError = 0;
     tPidSpeedC.SumError = 0;
     
-    tPidSpeedD.PrevError = 0;
-    tPidSpeedD.SumError = 0;
+    // tPidSpeedD.PrevError = 0;
+    // tPidSpeedD.SumError = 0;
 }
