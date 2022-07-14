@@ -588,3 +588,28 @@ void OLED_Init(void)
 	OLED_Clear();
 	OLED_WR_Byte(0xAF, OLED_CMD);
 }
+
+/**
+ * @brief	OLED初始化后的一些显示
+ * @param 	none
+ * @arg		none
+ * @note  	显示初始化
+ * @retval	none
+ */
+void OLED_DisplayInit(void)
+{
+	// OLED_Clear();
+	// OLED_ShowString(0, 0, "Init OK!", 16, 1);
+	// OLED_Refresh();
+	OLED_ShowString(0, 0, "PWM", 16, 1);		 // 显示：PWM
+	OLED_ShowChinese(48 - 24, 0, 0, 16, 1);		 // 显示：通
+	OLED_ShowChinese(64 - 24, 0, 1, 16, 1);		 // 显示：道
+	OLED_ShowChar(80 - 24, 0, ':', 16, 1);		 // 显示：：
+	OLED_ShowString(128 - 32, 0, "(Hz)", 16, 1); // 显示：(Hz)
+
+	OLED_ShowString(0, 16, "1:", 16, 1);
+	OLED_ShowString(0, 32, "2:", 16, 1);
+	OLED_ShowString(0, 48, "3:", 16, 1);
+	OLED_ShowString(64, 16, "4:", 16, 1);
+	OLED_Refresh();
+}
