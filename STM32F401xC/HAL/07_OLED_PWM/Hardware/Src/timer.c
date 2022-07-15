@@ -19,9 +19,9 @@
 
 TIM_HandleTypeDef TIM3_Handler;      //定时器句柄
 TIM_HandleTypeDef TIM5_Handler;      //定时器句柄
-TIM_OC_InitTypeDef TIM5_CH1Handler;  //定时器5通道1句柄
+TIM_OC_InitTypeDef TIM5_CHxHandler;  //定时器5通道1句柄
 TIM_HandleTypeDef TIM11_Handler;     //定时器句柄
-TIM_OC_InitTypeDef TIM11_CH1Handler; //定时器11通道1句柄
+TIM_OC_InitTypeDef TIM11_CHxHandler; //定时器11通道1句柄
 
 //通用定时器3中断初始化
 // arr：自动重装值。
@@ -57,28 +57,28 @@ void TIM5_PWM_Init(u16 arr, u16 psc, u8 ways)
     TIM5_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //数字分频因子,数字分频因子为1时，TIMxCLK = PCLKx,其他值时，TIMxCLK = PCLKx/2^(数字分频因子)
     HAL_TIM_PWM_Init(&TIM5_Handler);                          //初始化PWM
 
-    TIM5_CH1Handler.OCMode = TIM_OCMODE_PWM1;        //模式选择PWM1
-    TIM5_CH1Handler.Pulse = arr / 2;                 //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
-    TIM5_CH1Handler.OCPolarity = TIM_OCPOLARITY_LOW; //输出比较极性为低
+    TIM5_CHxHandler.OCMode = TIM_OCMODE_PWM1;        //模式选择PWM1
+    TIM5_CHxHandler.Pulse = arr / 2;                 //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
+    TIM5_CHxHandler.OCPolarity = TIM_OCPOLARITY_LOW; //输出比较极性为低
 
     if (ways & 0x01)
     {
-        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH1Handler, TIM_CHANNEL_1); //配置TIM5通道1
+        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CHxHandler, TIM_CHANNEL_1); //配置TIM5通道1
         HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_1);                           //启动TIM5通道1的PWM输出
     }
     if (ways & 0x02)
     {
-        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH1Handler, TIM_CHANNEL_2); //配置TIM5通道2
+        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CHxHandler, TIM_CHANNEL_2); //配置TIM5通道2
         HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_2);                           //启动TIM5通道2的PWM输出
     }
     if (ways & 0x04)
     {
-        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH1Handler, TIM_CHANNEL_3); //配置TIM5通道3
+        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CHxHandler, TIM_CHANNEL_3); //配置TIM5通道3
         HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_3);                           //启动TIM5通道3的PWM输出
     }
     if (ways & 0x08)
     {
-        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH1Handler, TIM_CHANNEL_4); //配置TIM5通道4
+        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CHxHandler, TIM_CHANNEL_4); //配置TIM5通道4
         HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_4);                           //启动TIM5通道4的PWM输出
     }
 }
@@ -97,10 +97,10 @@ void TIM11_PWM_Init(u16 arr, u16 psc)
     TIM5_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // 数字分频因子,数字分频因子为1时，TIMxCLK = PCLKx,其他值时，TIMxCLK = PCLKx/2^(数字分频因子)
     HAL_TIM_PWM_Init(&TIM11_Handler);                         //初始化PWM
 
-    TIM5_CH1Handler.OCMode = TIM_OCMODE_PWM1;                                    //模式选择PWM1
-    TIM5_CH1Handler.Pulse = arr / 2;                                             //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
-    TIM5_CH1Handler.OCPolarity = TIM_OCPOLARITY_LOW;                             //输出比较极性为低
-    HAL_TIM_PWM_ConfigChannel(&TIM11_Handler, &TIM11_CH1Handler, TIM_CHANNEL_1); //配置TIM11通道1
+    TIM5_CHxHandler.OCMode = TIM_OCMODE_PWM1;                                    //模式选择PWM1
+    TIM5_CHxHandler.Pulse = arr / 2;                                             //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
+    TIM5_CHxHandler.OCPolarity = TIM_OCPOLARITY_LOW;                             //输出比较极性为低
+    HAL_TIM_PWM_ConfigChannel(&TIM11_Handler, &TIM11_CHxHandler, TIM_CHANNEL_1); //配置TIM11通道1
 
     HAL_TIM_PWM_Start(&TIM11_Handler, TIM_CHANNEL_1); //开启PWM通道1
 }
@@ -143,17 +143,17 @@ void TIM_SetTIM5Compare_1(u32 compare)
     TIM5->CCR1 = compare;
 }
 
-//定时器3中断服务函数
-void TIM3_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&TIM3_Handler);
-}
+// //定时器3中断服务函数
+// void TIM3_IRQHandler(void)
+// {
+//     HAL_TIM_IRQHandler(&TIM3_Handler);
+// }
 
 //回调函数，定时器中断服务函数调用
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&TIM3_Handler))
     {
-        LED_Reverse();
+        // LED_Reverse();
     }
 }
