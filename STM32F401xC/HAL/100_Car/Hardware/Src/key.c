@@ -23,7 +23,7 @@ void KEY_Init(void)
 
     GPIO_Initure.Pin = GPIO_PIN_0;        // PA0
     GPIO_Initure.Mode = GPIO_MODE_INPUT;  //输入
-    GPIO_Initure.Pull = GPIO_PULLUP;    //上拉
+    GPIO_Initure.Pull = GPIO_PULLUP;      //上拉
     GPIO_Initure.Speed = GPIO_SPEED_HIGH; //高速
     HAL_GPIO_Init(GPIOA, &GPIO_Initure);
 

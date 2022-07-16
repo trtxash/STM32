@@ -11,14 +11,18 @@
  * @date 	2022年7月14号15点23分
  */
 
-#include "delay.h"
-#include "sys.h"
 #include "stm32f4xx.h"
+#include "sys.h"
+#include "delay.h"
 #include "timer.h"
+#include "motorencoder.h"
 #include "oled.h"
 #include "led.h"
 #include "key.h"
-#include "motorencoder.h"
+
+int Encoder; // 外部变量，当前速度
+int MotorRun;    // 0: stop, 1: run
+int TargetSpeed; // 外部变量，目标速度
 
 /**
  * @brief	主函数,程序入口
@@ -39,23 +43,24 @@ int main(void)
 	delay_init(84);					 //初始化延时函数
 	LED_Init();						 //初始化LED
 	KEY_Init();						 //初始化按键
-	TIM5_PWM_Init(arr, psc, 0B1111); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
+	TIM4_Init(7500 - 1, 84 - 1);	 // 150Hz刷新OLED
+	TIM5_PWM_Init(arr, psc, 0B1110); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
 	OLED_Init();
-	OLED_DisplayInit(); // OLED初始化显示
+	MotorEncoder_Init(); // 初始化电机编码器
+
 	while (1)
-	{
-		if (KEY_Scan(0))
-		{
-			delay_ms(20); // 消抖
-			LED_Reverse();
-			if (pwmval < 50)
-			{
-				pwmval = 50; // pwmval不能小于50
-			}
-			pwmval -= 50;				  // pwmval递减
-			TIM_SetTIM5Compare_3(pwmval); //修改比较值，修改占空比
-		}
-		Encoder = Read_Encoder(3); //读取编码器的值
-		OLED_ShowNum(32, 32, Encoder, 4, 16, 1);
+	{	
+		// if (KEY_Scan(0))
+		// {
+		// 	delay_ms(20); // 消抖
+		// 	LED_Reverse();
+		// 	if (pwmval < 50)
+		// 	{
+		// 		pwmval = 50; // pwmval不能小于50
+		// 	}
+		// 	pwmval -= 50;					 // pwmval递减
+		// 	TIM_SetTIM5Compare_n(pwmval, 3); //修改比较值，修改占空比
+		// }
+		// Encoder = Read_Encoder(3); //读取编码器的值
 	}
 }

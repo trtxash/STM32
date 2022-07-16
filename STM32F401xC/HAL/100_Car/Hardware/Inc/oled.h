@@ -2,6 +2,8 @@
 #define __OLED_H 
 
 #include "stm32f4xx.h"
+#include "sys.h"
+#include "delay.h"
 
 //-----------------测试LED端口定义---------------- 
 
@@ -27,7 +29,7 @@
 #define u16 unsigned int
 #define u32 unsigned long
 
-void OLED_ClearPoint(u8 x,u8 y);
+// void OLED_ClearPoint(u8 x,u8 y);
 void OLED_ColorTurn(u8 i);
 void OLED_DisplayTurn(u8 i);
 void I2C_Start(void);
@@ -51,6 +53,7 @@ void OLED_ScrollDisplay(u8 num,u8 space,u8 mode);
 void OLED_ShowPicture(u8 x,u8 y,u8 sizex,u8 sizey,u8 BMP[],u8 mode);
 void OLED_Init(void);
 void OLED_DisplayInit(void);
+void OLED_Display(void);
 
 #endif
 

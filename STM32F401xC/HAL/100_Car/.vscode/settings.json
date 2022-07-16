@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "motorencoder.h": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "oled.h": "c"
     }
 }

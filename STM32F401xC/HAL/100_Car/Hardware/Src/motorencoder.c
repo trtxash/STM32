@@ -1,5 +1,4 @@
 #include "motorencoder.h"
-#include "timer.h"
 
 /**
  * @brief	编码器初始化函数
@@ -31,7 +30,7 @@ void MotorEncoder_Init(void)
     TIM3_Handler.Init.Period = 0XFFFF;                        //自动装载值
     TIM3_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //时钟分频因子
     HAL_TIM_Base_Init(&TIM3_Handler);
-    HAL_TIM_Base_Start_IT(&TIM3_Handler); //使能定时器3和定时器3更新中断：TIM_IT_UPDATE
+    // HAL_TIM_Base_Start_IT(&TIM3_Handler); //使能定时器3和定时器3更新中断：TIM_IT_UPDATE
 
     TIM_ENCODERMODE_TIM3.EncoderMode = TIM_ENCODERMODE_TI12;                // TIM3编码器模式3，TI12模式,TI1和TI2同时计数
     TIM_ENCODERMODE_TIM3.IC1Polarity = TIM_ICPOLARITY_RISING;               // IC1上升沿触发
@@ -104,11 +103,11 @@ u32 Read_Encoder(u8 tim)
     return Encoder_TIM;
 }
 
-//定时器3中断服务函数
-void TIM3_IRQHandler(void)
-{
-    if (TIM3->SR & 0X0001) //检测定时器3更新中断标志
-    {
-        TIM3->SR &= ~0X0001; //清除定时器3更新中断标志
-    }
-}
+// //定时器3中断服务函数
+// void TIM3_IRQHandler(void)
+// {
+//     if (TIM3->SR & 0X0001) //检测定时器3更新中断标志
+//     {
+//         TIM3->SR &= ~0X0001; //清除定时器3更新中断标志
+//     }
+// }
