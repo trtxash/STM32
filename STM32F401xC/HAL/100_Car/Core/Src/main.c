@@ -49,7 +49,7 @@ int main(void)
 	TIM5_PWM_Init(arr, psc, 0B1111);   // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
 	Encoder_Init();					   // 初始化电机编码器
 	TIM_SetTIM5Compare_n(pwmval_1, 2); //修改比较值，修改占空比
-	// TIM_SetTIM5Compare_n(pwmval_2, 3); //修改比较值，修改占空比
+	TIM_SetTIM5Compare_n(pwmval_2, 4); //修改比较值，修改占空比
 	OLED_Display();					   //显示初始化信息
 	while (1)
 	{
