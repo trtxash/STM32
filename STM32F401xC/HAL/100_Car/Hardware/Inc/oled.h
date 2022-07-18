@@ -21,15 +21,10 @@
 #define OLED_RES_Clr() HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2, GPIO_PIN_RESET)//RES
 #define OLED_RES_Set() HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2, GPIO_PIN_SET)
 
-
 #define OLED_CMD  0	//写命令
 #define OLED_DATA 1	//写数据
 
-#define u8 unsigned char 
-#define u16 unsigned int
-#define u32 unsigned long
-
-// void OLED_ClearPoint(u8 x,u8 y);
+void OLED_ClearPoint(u8 x,u8 y);
 void OLED_ColorTurn(u8 i);
 void OLED_DisplayTurn(u8 i);
 void I2C_Start(void);

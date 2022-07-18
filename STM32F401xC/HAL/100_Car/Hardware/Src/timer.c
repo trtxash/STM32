@@ -18,10 +18,10 @@ TIM_HandleTypeDef TIM4_Handler;     //定时器4句柄，用来定时OLED显示
 TIM_HandleTypeDef TIM5_Handler;     //定时器5句柄，用来发生PWM波
 TIM_OC_InitTypeDef TIM5_CHxHandler; //定时器5通道句柄，4路
 
-extern int Encoder_1; // 外部变量，当前1速度
-extern int Encoder_2; // 外部变量，当前2速度
-extern int pwmval_1;  // 外部变量，当前1速度PWM值
-extern int pwmval_2;  // 外部变量，当前2速度PWM值
+extern s16 Encoder_1; // 外部变量，当前1速度
+extern s16 Encoder_2; // 外部变量，当前2速度
+extern u16 pwmval_1;  // 外部变量，当前1速度PWM值
+extern u16 pwmval_2;  // 外部变量，当前2速度PWM值
 
 //通用定时器2中断初始化
 // arr：自动重装值。
@@ -214,7 +214,6 @@ void TIM2_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&TIM3_Handler);
-
 }
 //定时器4中断服务函数
 void TIM4_IRQHandler(void)
@@ -235,10 +234,28 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
         Encoder_1 = Read_Encoder(3); //读取编码器的值
         OLED_ShowNum(24, 16, pwmval_1, 4, 16, 1);
-        OLED_ShowNum(88, 16, Encoder_1, 4, 16, 1);
+        if (Encoder_1 > 0)
+        {
+            OLED_ShowChar(88, 16, '+', 16, 1);
+            OLED_ShowNum(96, 16, Encoder_1, 3, 16, 1);
+        }
+        else
+        {
+            OLED_ShowChar(88, 16, '-', 16, 1);
+            OLED_ShowNum(96, 16, Encoder_1, 3, 16, 1);
+        }
         Encoder_2 = Read_Encoder(4); //读取编码器的值
         OLED_ShowNum(24, 32, pwmval_2, 4, 16, 1);
-        OLED_ShowNum(88, 32, Encoder_2, 4, 16, 1);
+        if (Encoder_2 > 0)
+        {
+            OLED_ShowChar(88, 32, '+', 16, 1);
+            OLED_ShowNum(96, 32, Encoder_2, 3, 16, 1);
+        }
+        else
+        {
+            OLED_ShowChar(88, 32, '-', 16, 1);
+            OLED_ShowNum(96, 32, Encoder_2, 3, 16, 1);
+        }
         OLED_Refresh();
     }
     else if (htim == (&TIM3_Handler))

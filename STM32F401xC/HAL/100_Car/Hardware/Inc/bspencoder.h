@@ -76,10 +76,10 @@ extern __IO int16_t Encoder_Overflow_Count;
 // extern TIM_HandleTypeDef TIM_EncoderHandle_2;
 
 /* extern表示该变量已在外部定义，所以要在外部定义它们 */
-extern int MotorRun;    // 0: stop, 1: run
-extern int Encoder_1;   // 外部变量，当前1速度
-extern int Encoder_2;   // 外部变量，当前2速度
-extern int TargetSpeed; // 外部变量，目标速度
+extern u8 MotorRun;    // 0: stop, 1: run
+extern s16 Encoder_1;   // 外部变量，当前1速度
+extern s16 Encoder_2;   // 外部变量，当前2速度
+extern s16 TargetSpeed; // 外部变量，目标速度
 
 extern float Kp; // 外部变量，PID参数
 extern float Ki;
