@@ -1,11 +1,6 @@
 /**
- * @file	07_OLED_PWM
- * @brief 	OLED显示管脚的PWM频率
- *          GND    电源地
- *          VCC  接5V或3.3v电源
- *          D0   接（SCL）,可在oled.h里更改
- *          D1   接（SDA）,可在oled.h里更改
- *          RES  PD2（SPI模块改成IIC模块需要接此引脚，IIC模块用户请忽略）
+ * @file	100_Car
+ * @brief 	累
  * @author 	TRTX-gamer
  * @version 1.00
  * @date 	2022年7月14号15点23分
@@ -19,8 +14,8 @@
 #include "oled.h"
 #include "led.h"
 
-u16 pwmval_1 = 350; // 定时器PWM占空比设置
-u16 pwmval_2 = 350; // 定时器PWM占空比设置
+u16 pwmval_1 = 300; // 定时器PWM占空比设置
+u16 pwmval_2 = 300; // 定时器PWM占空比设置
 s16 Encoder_1;		// 外部变量，当前1速度
 s16 Encoder_2;		// 外部变量，当前2速度
 u8 MotorRun;		// 0: stop, 1: run
