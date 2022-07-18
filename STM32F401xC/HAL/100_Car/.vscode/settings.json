@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "sys.h": "c",
+        "oled.h": "c",
+        "timer.h": "c",
+        "cstdio": "c",
+        "stdio.h": "c",
+        "oledfont.h": "c"
+    }
+}

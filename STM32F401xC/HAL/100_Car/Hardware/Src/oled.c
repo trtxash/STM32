@@ -11,7 +11,6 @@
  * @date 	2022年7月14号15点23分
  */
 #include "oled.h"
-// #include "stdlib.h"
 #include "oledfont.h"
 
 u8 OLED_GRAM[144][8];

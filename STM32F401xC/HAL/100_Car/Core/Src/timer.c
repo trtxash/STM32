@@ -9,6 +9,7 @@
  * @date 	2022年7月16号15点32分
  */
 #include "timer.h"
+#include "stdio.h"
 
 TIM_HandleTypeDef TIM2_Handler;     //定时器2句柄，编码器模式，捕捉小车速度
 TIM_OC_InitTypeDef TIM2_CHxHandler; //定时器2通道句柄，4路
@@ -18,10 +19,10 @@ TIM_HandleTypeDef TIM4_Handler;     //定时器4句柄，用来定时OLED显示
 TIM_HandleTypeDef TIM5_Handler;     //定时器5句柄，用来发生PWM波
 TIM_OC_InitTypeDef TIM5_CHxHandler; //定时器5通道句柄，4路
 
-extern s16 Encoder_1; // 外部变量，当前1速度
-extern s16 Encoder_2; // 外部变量，当前2速度
-extern u16 pwmval_1;  // 外部变量，当前1速度PWM值
-extern u16 pwmval_2;  // 外部变量，当前2速度PWM值
+extern double Encoder_1; // 外部变量，当前1速度
+extern double Encoder_2; // 外部变量，当前2速度
+extern u16 pwmval_1;     // 外部变量，当前1速度PWM值
+extern u16 pwmval_2;     // 外部变量，当前2速度PWM值
 
 //通用定时器2中断初始化
 // arr：自动重装值。
@@ -232,31 +233,42 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&TIM2_Handler))
     {
-        Encoder_1 = Read_Encoder(3); //读取编码器的值
-        OLED_ShowNum(24, 16, pwmval_1, 4, 16, 1);
-        if (Encoder_1 >= 0)
-        {
-            OLED_ShowChar(88, 16, '+', 16, 1);
-            OLED_ShowNum(96, 16, Encoder_1, 3, 16, 1);
-        }
-        else
-        {
-            OLED_ShowChar(88, 16, '-', 16, 1);
-            OLED_ShowNum(96, 16, 0XFFFF - (u16)Encoder_1, 3, 16, 1);
-        }
-        Encoder_2 = Read_Encoder(4); //读取编码器的值
-        OLED_ShowNum(24, 32, pwmval_2, 4, 16, 1);
-        if (Encoder_2 >= 0)
-        {
-            OLED_ShowChar(88, 32, '+', 16, 1);
-            OLED_ShowNum(96, 32, Encoder_2, 3, 16, 1);
-        }
-        else
-        {
-            OLED_ShowChar(88, 32, '-', 16, 1);
-            OLED_ShowNum(96, 32, 0XFFFF - (u16)Encoder_2, 3, 16, 1);
-        }
+        u8 temp[16]; // 储存要显示的字符串，最多16个字符
+        float temp1 = 123.456;
+
+        Encoder_1 = Calculate_Velocity(Read_Encoder(3)); //读取编码器的值计算速度
+        sprintf(temp, "E1:%f", Encoder_1);               //将速度转换为字符串
+        OLED_ShowString(0, 16, temp, 16, 1);
+        Encoder_2 = Calculate_Velocity(Read_Encoder(4)); //读取编码器的值计算速度
+        sprintf(temp, "E2:%4.2f", temp1);                //将速度转换为字符串
+        OLED_ShowString(0, 32, temp, 16, 1);
         OLED_Refresh();
+
+        // Encoder_1 = Read_Encoder(3); //读取编码器的值
+        // OLED_ShowNum(24, 16, pwmval_1, 4, 16, 1);
+        // if (Encoder_1 >= 0)
+        // {
+        //     OLED_ShowChar(88, 16, '+', 16, 1);
+        //     OLED_ShowNum(96, 16, Encoder_1, 3, 16, 1);
+        // }
+        // else
+        // {
+        //     OLED_ShowChar(88, 16, '-', 16, 1);
+        //     OLED_ShowNum(96, 16, 0XFFFF - (u16)Encoder_1, 3, 16, 1);
+        // }
+        // Encoder_2 = Read_Encoder(4); //读取编码器的值
+        // OLED_ShowNum(24, 32, pwmval_2, 4, 16, 1);
+        // if (Encoder_2 >= 0)
+        // {
+        //     OLED_ShowChar(88, 32, '+', 16, 1);
+        //     OLED_ShowNum(96, 32, Encoder_2, 3, 16, 1);
+        // }
+        // else
+        // {
+        //     OLED_ShowChar(88, 32, '-', 16, 1);
+        //     OLED_ShowNum(96, 32, 0XFFFF - (u16)Encoder_2, 3, 16, 1);
+        // }
+        // OLED_Refresh();
     }
     else if (htim == (&TIM3_Handler))
     {

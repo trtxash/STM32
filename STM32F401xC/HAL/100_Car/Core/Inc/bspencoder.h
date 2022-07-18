@@ -14,7 +14,7 @@
 /* 定时器溢出值 */
 #define ENCODER_TIM_PERIOD 0XFFFF
 
-#define ENCODER_TIM_PERIOD_2 65535
+#define ENCODER_TIM_PERIOD_2 0XFFFF
 /* 定时器预分频值 */
 #define ENCODER_TIM_PRESCALER 0
 
@@ -58,8 +58,11 @@
 #define ENCODER_IC1_POLARITY TIM_ICPOLARITY_RISING
 #define ENCODER_IC2_POLARITY_2 TIM_ICPOLARITY_RISING
 
+/* 读取编码器的频率 单位Hz */
+#define READ_ENCODER_FREQU 100
+
 /* 编码器物理分辨率 */
-#define ENCODER_RESOLUTION 16
+#define ENCODER_RESOLUTION 11
 
 /* 经过倍频之后的总分辨率 */
 #if (ENCODER_MODE == TIM_ENCODERMODE_TI12)
@@ -71,14 +74,16 @@
 /* 减速电机减速比 */
 #define REDUCTION_RATIO 30
 
-extern __IO int16_t Encoder_Overflow_Count;
-// extern TIM_HandleTypeDef TIM_EncoderHandle;
-// extern TIM_HandleTypeDef TIM_EncoderHandle_2;
+/* 轮胎直径 单位M */
+#define TIRE_DIAMETER 0.065
+
+/* 计算转一圈的距离 单位M */
+#define ONE_WHEEL_CIRCUMFERENCE (3.14159265358979323846 * TIRE_DIAMETER)
 
 /* extern表示该变量已在外部定义，所以要在外部定义它们 */
-extern u8 MotorRun;    // 0: stop, 1: run
-extern s16 Encoder_1;   // 外部变量，当前1速度
-extern s16 Encoder_2;   // 外部变量，当前2速度
+extern u8 MotorRun;     // 0: stop, 1: run
+extern double Encoder_1;   // 外部变量，当前1速度
+extern double Encoder_2;   // 外部变量，当前2速度
 extern s16 TargetSpeed; // 外部变量，目标速度
 
 extern float Kp; // 外部变量，PID参数
@@ -87,5 +92,6 @@ extern float Kd;
 
 void Encoder_Init(void);
 int Read_Encoder(u8 tim);
+double Calculate_Velocity(int encoder_value);
 
 #endif /* __BSP_ENCODER_H */
