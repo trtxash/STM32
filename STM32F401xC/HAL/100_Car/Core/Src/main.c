@@ -15,13 +15,13 @@
 #include "sys.h"
 #include "delay.h"
 #include "timer.h"
-#include "motorencoder.h"
+#include "bspencoder.h"
 #include "oled.h"
 #include "led.h"
-#include "key.h"
 
-int Encoder; // 外部变量，当前速度
-int MotorRun;    // 0: stop, 1: run
+u16 pwmval = 350;
+int Encoder;	 // 外部变量，当前速度
+int MotorRun;	 // 0: stop, 1: run
 int TargetSpeed; // 外部变量，目标速度
 
 /**
@@ -33,23 +33,23 @@ int TargetSpeed; // 外部变量，目标速度
  */
 int main(void)
 {
-	u16 pwmval = 500;
-	u16 arr = pwmval - 1;
+ 
+	u16 arr = 500 - 1;
 	u16 psc = 84 - 1;
 	u32 freq = 84 / (psc + 1) / (arr + 1) * 1000;
 
 	HAL_Init();
 	Stm32_Clock_Init(168, 25, 2, 4);
-	delay_init(84);					 //初始化延时函数
-	LED_Init();						 //初始化LED
-	KEY_Init();						 //初始化按键
-	TIM4_Init(7500 - 1, 84 - 1);	 // 150Hz刷新OLED
-	TIM5_PWM_Init(arr, psc, 0B1110); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
+	delay_init(84); //初始化延时函数
+	LED_Init();		//初始化LED
 	OLED_Init();
-	MotorEncoder_Init(); // 初始化电机编码器
-
+	TIM4_Init(7500 - 1, 84 - 1);	 // 150Hz刷新OLED
+	TIM5_PWM_Init(arr, psc, 0B1111); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
+	Encoder_Init();					 // 初始化电机编码器
+	TIM_SetTIM5Compare_n(pwmval, 1); //修改比较值，修改占空比
+	TIM_SetTIM5Compare_n(pwmval, 3); //修改比较值，修改占空比
 	while (1)
-	{	
+	{
 		// if (KEY_Scan(0))
 		// {
 		// 	delay_ms(20); // 消抖
@@ -61,6 +61,5 @@ int main(void)
 		// 	pwmval -= 50;					 // pwmval递减
 		// 	TIM_SetTIM5Compare_n(pwmval, 3); //修改比较值，修改占空比
 		// }
-		// Encoder = Read_Encoder(3); //读取编码器的值
 	}
 }

@@ -141,11 +141,12 @@ u32 Read_Encoder(u8 tim)
     default:
         break;
     }
-    if (Encoder_TIM > 0XFFFF)
-    {
-        Encoder_TIM = Encoder_TIM - 0XFFFF; // 转化计数器为有方向的值，正数表示正转，负数表示反转
-                                            // CTN范围为0~0XFFFF，初值为0
-    }
+    // if (Encoder_TIM > 0XFFFF)
+    // {
+    //     Encoder_TIM = Encoder_TIM - 0XFFFF; // 转化计数器为有方向的值，正数表示正转，负数表示反转
+    //                                         // CTN范围为0~0XFFFF，初值为0
+    // }
+    Encoder_TIM = (short)Encoder_TIM;
     switch (tim) // 读完清除相关定时器编码器的数值
     {
     case 1:

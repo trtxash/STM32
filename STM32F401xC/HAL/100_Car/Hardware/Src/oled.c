@@ -336,8 +336,8 @@ void OLED_ShowChar(u8 x, u8 y, u8 chr, u8 size1, u8 mode)
 
 //显示字符串
 // x,y:起点坐标
-// size1:字体大小
 //*chr:字符串起始地址
+// size1:字体大小
 // mode:0,反色显示;1,正常显示
 void OLED_ShowString(u8 x, u8 y, u8 *chr, u8 size1, u8 mode)
 {
@@ -651,17 +651,19 @@ void OLED_DisplayInit(void)
  */
 void OLED_Display(void)
 {
-	OLED_ShowString(0, 0, "PWM", 16, 1);		 // 显示：PWM
-	OLED_ShowChinese(48 - 24, 0, 0, 16, 1);		 // 显示：通
-	OLED_ShowChinese(64 - 24, 0, 1, 16, 1);		 // 显示：道
-	OLED_ShowChar(80 - 24, 0, ':', 16, 1);		 // 显示：：
-	OLED_ShowString(128 - 32, 0, "(Hz)", 16, 1); // 显示：(Hz)
+	// OLED_ShowString(0, 0, "PWM", 16, 1);		 // 显示：PWM
+	// OLED_ShowChinese(48 - 24, 0, 0, 16, 1);		 // 显示：通
+	// OLED_ShowChinese(64 - 24, 0, 1, 16, 1);		 // 显示：道
+	// OLED_ShowChar(80 - 24, 0, ':', 16, 1);		 // 显示：：
+	// OLED_ShowString(128 - 32, 0, "(Hz)", 16, 1); // 显示：(Hz)
 
-	OLED_ShowString(0, 16, "1:", 16, 1);
-	OLED_ShowString(0, 32, "2:", 16, 1);
-	OLED_ShowString(0, 48, "3:", 16, 1);
-	OLED_ShowString(64, 16, "4:", 16, 1);
+	// OLED_ShowString(0, 16, "1:", 16, 1);
+	// OLED_ShowString(0, 32, "2:", 16, 1);
+	// OLED_ShowString(0, 48, "3:", 16, 1);
+	// OLED_ShowString(64, 16, "4:", 16, 1);
 
 	// OLED_ShowNum(64, 32, 1234, 4, 16, 1);
+	OLED_ShowString(1, 0, "P1:    ,S1:    ;", 16, 1);
+	OLED_ShowString(2, 0, "P2:    ,S2:    ;", 16, 1);
 	OLED_Refresh();
 }

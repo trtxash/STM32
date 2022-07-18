@@ -17,6 +17,7 @@ TIM_HandleTypeDef TIM5_Handler;     //定时器5句柄，用来发生PWM波
 TIM_OC_InitTypeDef TIM5_CHxHandler; //定时器5通道句柄，4路
 
 extern int Encoder; // 外部变量，当前速度
+extern int pwmval;
 
 //通用定时器3中断初始化
 // arr：自动重装值。
@@ -206,7 +207,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     else if (htim == (&TIM4_Handler))
     {
-        OLED_ShowNum(62, 32, Encoder, 4, 16, 1);
+        Encoder = Read_Encoder(3); //读取编码器的值
+        OLED_ShowNum(1, 24, pwmval, 4, 16, 1);
+        OLED_ShowNum(1, 64, Encoder, 5, 16, 1);
         OLED_Refresh();
     }
     else if (htim == (&TIM5_Handler))
