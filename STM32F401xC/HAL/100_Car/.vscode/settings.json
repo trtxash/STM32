@@ -2,6 +2,9 @@
     "files.associations": {
         "motorencoder.h": "c",
         "timer.h": "c",
-        "oled.h": "c"
+        "oled.h": "c",
+        "bspencoder.h": "c",
+        "stm32f4xx_hal.h": "c",
+        "sys.h": "c"
     }
 }

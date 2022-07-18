@@ -64,9 +64,7 @@ User/Src/sys.c \
 User/Src/usart.c \
 Hardware/Src/timer.c \
 Hardware/Src/oled.c \
-Hardware/Src/key.c \
-Hardware/Src/led.c \
-Hardware/Src/motorencoder.c 
+Hardware/Src/led.c 
 
 # ASM sources
 ASM_SOURCES =  \

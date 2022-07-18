@@ -9,7 +9,7 @@
  */
 void MotorEncoder_Init(void)
 {
-    GPIO_InitTypeDef GPIO_InitTure; // GPIO初始化结构体
+    GPIO_InitTypeDef GPIO_InitTure = {0}; // GPIO初始化结构体
     // TIM_HandleTypeDef TIM2_Handler;     //定时器2句柄
     // TIM_OC_InitTypeDef TIM2_CHxHandler; //定时器2通道x句柄
     TIM_HandleTypeDef TIM3_Handler;               //定时器3句柄
@@ -30,7 +30,7 @@ void MotorEncoder_Init(void)
     TIM3_Handler.Init.Period = 0XFFFF;                        //自动装载值
     TIM3_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //时钟分频因子
     HAL_TIM_Base_Init(&TIM3_Handler);
-    // HAL_TIM_Base_Start_IT(&TIM3_Handler); //使能定时器3和定时器3更新中断：TIM_IT_UPDATE
+    HAL_TIM_Base_Start_IT(&TIM3_Handler); //使能定时器3和定时器3更新中断：TIM_IT_UPDATE
 
     TIM_ENCODERMODE_TIM3.EncoderMode = TIM_ENCODERMODE_TI12;                // TIM3编码器模式3，TI12模式,TI1和TI2同时计数
     TIM_ENCODERMODE_TIM3.IC1Polarity = TIM_ICPOLARITY_RISING;               // IC1上升沿触发
