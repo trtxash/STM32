@@ -10,14 +10,40 @@
  */
 #include "timer.h"
 
+TIM_HandleTypeDef TIM2_Handler;     //定时器2句柄，编码器模式，捕捉小车速度
+TIM_OC_InitTypeDef TIM2_CHxHandler; //定时器2通道句柄，4路
 TIM_HandleTypeDef TIM3_Handler;     //定时器3句柄，编码器模式，捕捉小车速度
 TIM_OC_InitTypeDef TIM3_CHxHandler; //定时器3通道句柄，4路
 TIM_HandleTypeDef TIM4_Handler;     //定时器4句柄，用来定时OLED显示
 TIM_HandleTypeDef TIM5_Handler;     //定时器5句柄，用来发生PWM波
 TIM_OC_InitTypeDef TIM5_CHxHandler; //定时器5通道句柄，4路
 
-extern int Encoder; // 外部变量，当前速度
-extern int pwmval;
+extern int Encoder_1; // 外部变量，当前1速度
+extern int Encoder_2; // 外部变量，当前2速度
+extern int pwmval_1;  // 外部变量，当前1速度PWM值
+extern int pwmval_2;  // 外部变量，当前2速度PWM值
+
+//通用定时器2中断初始化
+// arr：自动重装值。
+// psc：时钟预分频数
+//定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+// Ft=定时器工作频率,单位:Mhz
+//这里使用的是定时器3!(定时器3挂在APB1上，时钟为HCLK/2)(F407)
+// F401 Timer clock is  APB1 clock.
+void TIM2_Init(u16 arr, u16 psc)
+{
+    TIM2_Handler.Instance = TIM2;                             //定时器2
+    TIM2_Handler.Init.Prescaler = psc;                        //分频系数
+    TIM2_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       //向上计数器
+    TIM2_Handler.Init.Period = arr;                           //自动装载值
+    TIM2_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //时钟分频因子
+    HAL_TIM_Base_Init(&TIM2_Handler);
+    // __HAL_TIM_SET_COUNTER(&TIM2_Handler, 0);           /* 清零计数器 */
+    // __HAL_TIM_CLEAR_IT(&TIM2_Handler, TIM_IT_UPDATE);  /* 清零中断标志位 */
+    // __HAL_TIM_ENABLE_IT(&TIM2_Handler, TIM_IT_UPDATE); /* 使能定时器的更新事件中断 */
+    // __HAL_TIM_URS_ENABLE(&TIM2_Handler);               /* 设置更新事件请求源为：计数器溢出 */
+    HAL_TIM_Base_Start_IT(&TIM2_Handler); //使能定时器11和定时器11更新中断：TIM_IT_UPDATE
+}
 
 //通用定时器3中断初始化
 // arr：自动重装值。
@@ -78,7 +104,7 @@ void TIM5_PWM_Init(u16 arr, u16 psc, u8 ways)
     HAL_TIM_PWM_Init(&TIM5_Handler);                          //初始化PWM
 
     TIM5_CHxHandler.OCMode = TIM_OCMODE_PWM1;        //模式选择PWM1
-    TIM5_CHxHandler.Pulse = arr / 2;                 //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
+    TIM5_CHxHandler.Pulse = arr / 1;                 //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
     TIM5_CHxHandler.OCPolarity = TIM_OCPOLARITY_LOW; //输出比较极性为低
 
     if (ways & 0B0001)
@@ -110,25 +136,25 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
     if (htim->Instance == TIM1)
     {
         __HAL_RCC_TIM1_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 3, 0);
+        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 3, 3);
         HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
     }
     else if (htim->Instance == TIM2)
     {
         __HAL_RCC_TIM2_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM2_IRQn, 3, 1);
+        HAL_NVIC_SetPriority(TIM2_IRQn, 2, 2);
         HAL_NVIC_EnableIRQ(TIM2_IRQn);
     }
     else if (htim->Instance == TIM3)
     {
         __HAL_RCC_TIM3_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM3_IRQn, 3, 2);
+        HAL_NVIC_SetPriority(TIM3_IRQn, 3, 3);
         HAL_NVIC_EnableIRQ(TIM3_IRQn);
     }
     else if (htim->Instance == TIM4)
     {
         __HAL_RCC_TIM4_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM4_IRQn, 2, 2);
+        HAL_NVIC_SetPriority(TIM4_IRQn, 3, 3);
         HAL_NVIC_EnableIRQ(TIM4_IRQn);
     }
     else if (htim->Instance == TIM5)
@@ -145,16 +171,14 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 {
     GPIO_InitTypeDef GPIO_Initure;
-    __HAL_RCC_TIM4_CLK_ENABLE();  //使能定时器4
     __HAL_RCC_TIM5_CLK_ENABLE();  //使能定时器5
     __HAL_RCC_GPIOA_CLK_ENABLE(); //开启GPIOA时钟
-    __HAL_RCC_GPIOB_CLK_ENABLE(); //开启GPIOB时钟
 
-    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_2; // PA0
-    GPIO_Initure.Mode = GPIO_MODE_AF_PP;        //复用推挽输出
-    GPIO_Initure.Pull = GPIO_PULLUP;            //上拉
-    GPIO_Initure.Speed = GPIO_SPEED_HIGH;       //高速
-    GPIO_Initure.Alternate = GPIO_AF2_TIM5;     // PA0,2复用为AF2_TIM5
+    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3; // PA0~PA3
+    GPIO_Initure.Mode = GPIO_MODE_AF_PP;                                  //复用推挽输出
+    GPIO_Initure.Pull = GPIO_PULLUP;                                      //上拉
+    GPIO_Initure.Speed = GPIO_SPEED_HIGH;                                 //高速
+    GPIO_Initure.Alternate = GPIO_AF2_TIM5;                               // PA0,2复用为AF2_TIM5
     HAL_GPIO_Init(GPIOA, &GPIO_Initure);
 }
 
@@ -181,10 +205,16 @@ void TIM_SetTIM5Compare_n(u32 compare, u8 n)
     }
 }
 
+//定时器2中断服务函数
+void TIM2_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&TIM2_Handler);
+}
 //定时器3中断服务函数
 void TIM3_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&TIM3_Handler);
+
 }
 //定时器4中断服务函数
 void TIM4_IRQHandler(void)
@@ -201,16 +231,21 @@ void TIM5_IRQHandler(void)
 //中断回调函数会自动清除中断标志
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    if (htim == (&TIM3_Handler))
+    if (htim == (&TIM2_Handler))
     {
-        // LED_Reverse();
+        Encoder_1 = Read_Encoder(3); //读取编码器的值
+        OLED_ShowNum(24, 16, pwmval_1, 4, 16, 1);
+        OLED_ShowNum(88, 16, Encoder_1, 4, 16, 1);
+        Encoder_2 = Read_Encoder(4); //读取编码器的值
+        OLED_ShowNum(24, 32, pwmval_2, 4, 16, 1);
+        OLED_ShowNum(88, 32, Encoder_2, 4, 16, 1);
+        OLED_Refresh();
+    }
+    else if (htim == (&TIM3_Handler))
+    {
     }
     else if (htim == (&TIM4_Handler))
     {
-        Encoder = Read_Encoder(3); //读取编码器的值
-        OLED_ShowNum(1, 24, pwmval, 4, 16, 1);
-        OLED_ShowNum(1, 64, Encoder, 5, 16, 1);
-        OLED_Refresh();
     }
     else if (htim == (&TIM5_Handler))
     {

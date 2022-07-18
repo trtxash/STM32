@@ -16,6 +16,7 @@
 #include "oled.h"
 #include "bspencoder.h"
 
+void TIM2_Init(u16 arr, u16 psc);
 void TIM3_Init(u16 arr, u16 psc);
 void TIM4_Init(u16 arr, u16 psc);
 void TIM5_PWM_Init(u16 arr, u16 psc, u8 ways);

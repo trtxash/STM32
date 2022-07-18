@@ -19,10 +19,12 @@
 #include "oled.h"
 #include "led.h"
 
-u16 pwmval = 350;
-int Encoder;	 // 外部变量，当前速度
-int MotorRun;	 // 0: stop, 1: run
-int TargetSpeed; // 外部变量，目标速度
+u16 pwmval_1 = 350; // 定时器PWM占空比设置
+u16 pwmval_2 = 350; // 定时器PWM占空比设置
+int Encoder_1;		// 外部变量，当前1速度
+int Encoder_2;		// 外部变量，当前2速度
+int MotorRun;		// 0: stop, 1: run
+int TargetSpeed;	// 外部变量，目标速度
 
 /**
  * @brief	主函数,程序入口
@@ -33,7 +35,7 @@ int TargetSpeed; // 外部变量，目标速度
  */
 int main(void)
 {
- 
+
 	u16 arr = 500 - 1;
 	u16 psc = 84 - 1;
 	u32 freq = 84 / (psc + 1) / (arr + 1) * 1000;
@@ -43,23 +45,13 @@ int main(void)
 	delay_init(84); //初始化延时函数
 	LED_Init();		//初始化LED
 	OLED_Init();
-	TIM4_Init(7500 - 1, 84 - 1);	 // 150Hz刷新OLED
-	TIM5_PWM_Init(arr, psc, 0B1111); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
-	Encoder_Init();					 // 初始化电机编码器
-	TIM_SetTIM5Compare_n(pwmval, 1); //修改比较值，修改占空比
-	TIM_SetTIM5Compare_n(pwmval, 3); //修改比较值，修改占空比
+	TIM2_Init(10000 - 1, 84 - 1);	   // 100Hz刷新OLED
+	TIM5_PWM_Init(arr, psc, 0B1111);   // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
+	Encoder_Init();					   // 初始化电机编码器
+	TIM_SetTIM5Compare_n(pwmval_1, 2); //修改比较值，修改占空比
+	TIM_SetTIM5Compare_n(pwmval_2, 3); //修改比较值，修改占空比
+	OLED_Display();					   //显示初始化信息
 	while (1)
 	{
-		// if (KEY_Scan(0))
-		// {
-		// 	delay_ms(20); // 消抖
-		// 	LED_Reverse();
-		// 	if (pwmval < 50)
-		// 	{
-		// 		pwmval = 50; // pwmval不能小于50
-		// 	}
-		// 	pwmval -= 50;					 // pwmval递减
-		// 	TIM_SetTIM5Compare_n(pwmval, 3); //修改比较值，修改占空比
-		// }
 	}
 }

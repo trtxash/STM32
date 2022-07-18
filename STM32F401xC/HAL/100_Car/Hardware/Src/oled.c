@@ -651,19 +651,7 @@ void OLED_DisplayInit(void)
  */
 void OLED_Display(void)
 {
-	// OLED_ShowString(0, 0, "PWM", 16, 1);		 // 显示：PWM
-	// OLED_ShowChinese(48 - 24, 0, 0, 16, 1);		 // 显示：通
-	// OLED_ShowChinese(64 - 24, 0, 1, 16, 1);		 // 显示：道
-	// OLED_ShowChar(80 - 24, 0, ':', 16, 1);		 // 显示：：
-	// OLED_ShowString(128 - 32, 0, "(Hz)", 16, 1); // 显示：(Hz)
-
-	// OLED_ShowString(0, 16, "1:", 16, 1);
-	// OLED_ShowString(0, 32, "2:", 16, 1);
-	// OLED_ShowString(0, 48, "3:", 16, 1);
-	// OLED_ShowString(64, 16, "4:", 16, 1);
-
-	// OLED_ShowNum(64, 32, 1234, 4, 16, 1);
-	OLED_ShowString(1, 0, "P1:    ,S1:    ;", 16, 1);
-	OLED_ShowString(2, 0, "P2:    ,S2:    ;", 16, 1);
+	OLED_ShowString(0, 16, "P1:    ,S1:    ;", 16, 1);
+	OLED_ShowString(0, 32, "P2:    ,S2:    ;", 16, 1);
 	OLED_Refresh();
 }
