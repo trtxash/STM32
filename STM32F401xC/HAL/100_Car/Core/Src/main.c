@@ -38,7 +38,7 @@ int main(void)
 
 	u16 arr = 500 - 1;
 	u16 psc = 84 - 1;
-	u32 freq = 84 / (psc + 1) / (arr + 1) * 1000;
+	// u16 freq = 84 / (psc + 1) / (arr + 1) * 1000;
 
 	HAL_Init();
 	Stm32_Clock_Init(168, 25, 2, 4);

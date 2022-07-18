@@ -234,7 +234,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
         Encoder_1 = Read_Encoder(3); //读取编码器的值
         OLED_ShowNum(24, 16, pwmval_1, 4, 16, 1);
-        if (Encoder_1 > 0)
+        if (Encoder_1 >= 0)
         {
             OLED_ShowChar(88, 16, '+', 16, 1);
             OLED_ShowNum(96, 16, Encoder_1, 3, 16, 1);
@@ -242,11 +242,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         else
         {
             OLED_ShowChar(88, 16, '-', 16, 1);
-            OLED_ShowNum(96, 16, Encoder_1, 3, 16, 1);
+            OLED_ShowNum(96, 16, 0XFFFF - (u16)Encoder_1, 3, 16, 1);
         }
         Encoder_2 = Read_Encoder(4); //读取编码器的值
         OLED_ShowNum(24, 32, pwmval_2, 4, 16, 1);
-        if (Encoder_2 > 0)
+        if (Encoder_2 >= 0)
         {
             OLED_ShowChar(88, 32, '+', 16, 1);
             OLED_ShowNum(96, 32, Encoder_2, 3, 16, 1);
@@ -254,7 +254,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         else
         {
             OLED_ShowChar(88, 32, '-', 16, 1);
-            OLED_ShowNum(96, 32, Encoder_2, 3, 16, 1);
+            OLED_ShowNum(96, 32, 0XFFFF - (u16)Encoder_2, 3, 16, 1);
         }
         OLED_Refresh();
     }
