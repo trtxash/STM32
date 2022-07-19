@@ -1,12 +1,19 @@
 #include "pid.h"
 
-u16 pwmval_1;                                // 定时器PWM占空比设置
-u16 pwmval_2;                                // 定时器PWM占空比设置
-double Encoder_1;                            // 当前1速度
-double Encoder_2;                            // 当前2速度
-double TargetSpeed_1 = 0.25;                 // 目标速度
-double TargetSpeed_2 = 0.25;                 // 目标速度
-float Kp = 0.8000, Ki = 0.8000, Kd = 0.0000; // PID constants
+double P = 0.8000, I = 0.0100, D = 300.0; // PID constants
+
+u16 pwmval_1;                // 定时器PWM占空比设置
+u16 pwmval_2;                // 定时器PWM占空比设置
+double Encoder_1;            // 当前1速度
+double Encoder_2;            // 当前2速度
+double TargetSpeed_1 = 0.25; // 目标速度
+double TargetSpeed_2 = 0.25; // 目标速度
+
+double PID_OUT = 0;                         // PID输出
+double P_OUT = 0, I_OUT = 0, D_OUT = 0;     //比例输出，积分输出，微分输出
+double Current_Error = 0, Last_Error = 0;   //当前误差  最后误差
+double Sum_Error = 0;                       //误差积分
+double PID_I_MAX = 10.0, PID_I_MIN = -10.0; // PID积分上限，PID积分下限
 
 void PID_calc(void) // PID算法
 {
@@ -142,13 +149,38 @@ ControlVelocity+=Kp[e（k）-e(k-1)]+Ki*e(k)
 **************************************************************************/
 int Velocity_FeedbackControl(double TargetVelocity, double CurrentVelocity)
 {
-    double Bias;                   // 定义相关变量
+    double Rate;                   // 定义相关变量
     static double ControlVelocity; // 定义控制输出
-    static double Last_bias;       // 静态变量，函数调用结束后其值依然存在
 
-    Bias = TargetVelocity - CurrentVelocity; //求速度偏差
-    ControlVelocity += Kp * (Bias - Last_bias) + Ki * Bias;
-    //增量式PI控制器,Velcity_Kp*(Bias-Last_bias) 作用为限制加速度,Velcity_Ki*Bias速度控制值由Bias不断积分得到 偏差越大加速度越大
-    Last_bias = Bias;       // 存储偏差
+    Current_Error = TargetVelocity - CurrentVelocity; //求速度偏差
+    P_OUT = P * Current_Error;                        //比列项
+
+    Sum_Error += Current_Error; //误差积分
+    I_OUT = I * Sum_Error;      //积分项
+    if (I_OUT > PID_I_MAX)      //积分限幅处理,不能超过最大值不能低于最小值
+    {
+        I_OUT = PID_I_MAX;
+    }
+    if (I_OUT < PID_I_MIN)
+    {
+        I_OUT = PID_I_MIN;
+    }
+
+    Rate = Current_Error - Last_Error; //变化速率计算
+    Last_Error = Current_Error;        //存储误差分析
+    D_OUT = D * Rate;                  // 微分输出
+
+    PID_OUT = P_OUT + I_OUT + D_OUT; // PID输出
+    // if (PID_OUT >= V_DATA_MAX)       // 如果输出大于最大值，则输出最大值
+    // {
+    //     PID_OUT = V_DATA_MAX;
+    // }
+    // if (PID_OUT <= V_DATA_MIN) // 如果输出小于最小值，则输出最小值
+    // {
+    //     PID_OUT = V_DATA_MIN;
+    // }
+
+    ControlVelocity += PID_OUT; // PID输出
+
     return ControlVelocity; //返回速度控制值
 }
