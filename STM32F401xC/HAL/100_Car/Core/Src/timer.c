@@ -234,41 +234,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if (htim == (&TIM2_Handler))
     {
         u8 temp[16]; // 储存要显示的字符串，最多16个字符
-        float temp1 = 123.456;
 
         Encoder_1 = Calculate_Velocity(Read_Encoder(3)); //读取编码器的值计算速度
-        sprintf(temp, "E1:%f", Encoder_1);               //将速度转换为字符串
-        OLED_ShowString(0, 16, temp, 16, 1);
         Encoder_2 = Calculate_Velocity(Read_Encoder(4)); //读取编码器的值计算速度
-        sprintf(temp, "E2:%4.2f", temp1);                //将速度转换为字符串
-        OLED_ShowString(0, 32, temp, 16, 1);
-        OLED_Refresh();
 
-        // Encoder_1 = Read_Encoder(3); //读取编码器的值
-        // OLED_ShowNum(24, 16, pwmval_1, 4, 16, 1);
-        // if (Encoder_1 >= 0)
-        // {
-        //     OLED_ShowChar(88, 16, '+', 16, 1);
-        //     OLED_ShowNum(96, 16, Encoder_1, 3, 16, 1);
-        // }
-        // else
-        // {
-        //     OLED_ShowChar(88, 16, '-', 16, 1);
-        //     OLED_ShowNum(96, 16, 0XFFFF - (u16)Encoder_1, 3, 16, 1);
-        // }
-        // Encoder_2 = Read_Encoder(4); //读取编码器的值
-        // OLED_ShowNum(24, 32, pwmval_2, 4, 16, 1);
-        // if (Encoder_2 >= 0)
-        // {
-        //     OLED_ShowChar(88, 32, '+', 16, 1);
-        //     OLED_ShowNum(96, 32, Encoder_2, 3, 16, 1);
-        // }
-        // else
-        // {
-        //     OLED_ShowChar(88, 32, '-', 16, 1);
-        //     OLED_ShowNum(96, 32, 0XFFFF - (u16)Encoder_2, 3, 16, 1);
-        // }
-        // OLED_Refresh();
+        
+
+        sprintf(temp, "%4.2f", Encoder_1); //将速度转换为字符串
+        OLED_ShowString(24, 0, temp, 16, 1);
+        sprintf(temp, "%4.2f", Encoder_2); //将速度转换为字符串
+        OLED_ShowString(88, 0, temp, 16, 1);
+        OLED_Refresh();
     }
     else if (htim == (&TIM3_Handler))
     {

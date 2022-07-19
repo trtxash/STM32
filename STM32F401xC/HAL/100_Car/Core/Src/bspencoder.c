@@ -23,11 +23,11 @@ static void TIM_Encoder_Init(void)
     Encoder_ConfigStructure.IC1Polarity = TIM_ICPOLARITY_RISING;     /* 编码器接口通道1设置 上升沿开始*/
     Encoder_ConfigStructure.IC1Selection = TIM_ICSELECTION_DIRECTTI; //编码器极性设置，没有反方向就不用管
     Encoder_ConfigStructure.IC1Prescaler = TIM_ICPSC_DIV1;           //不分频
-    Encoder_ConfigStructure.IC1Filter = 10;                          //滤波器设置
+    Encoder_ConfigStructure.IC1Filter = ENCODER_FILTER_VALUE;        //滤波器设置
     Encoder_ConfigStructure.IC2Polarity = TIM_ICPOLARITY_RISING;     /* 编码器接口通道2设置 */
     Encoder_ConfigStructure.IC2Selection = TIM_ICSELECTION_DIRECTTI;
     Encoder_ConfigStructure.IC2Prescaler = TIM_ICPSC_DIV1;
-    Encoder_ConfigStructure.IC2Filter = 10;                             //滤波器设置
+    Encoder_ConfigStructure.IC2Filter = ENCODER_FILTER_VALUE;           //滤波器设置
     HAL_TIM_Encoder_Init(&TIM_EncoderHandle, &Encoder_ConfigStructure); /* 初始化编码器接口 */
     // __HAL_TIM_SET_COUNTER(&TIM_EncoderHandle, 0);                       /* 清零计数器 */
     // __HAL_TIM_CLEAR_IT(&TIM_EncoderHandle, TIM_IT_UPDATE);              /* 清零中断标志位 */
@@ -48,11 +48,11 @@ static void TIM_Encoder_Init(void)
     Encoder_ConfigStructure_2.IC1Polarity = TIM_ICPOLARITY_RISING;     /* 编码器接口通道1设置 上升沿开始*/
     Encoder_ConfigStructure_2.IC1Selection = TIM_ICSELECTION_DIRECTTI; //编码器极性设置，没有反方向就不用管
     Encoder_ConfigStructure_2.IC1Prescaler = TIM_ICPSC_DIV1;           //不分频
-    Encoder_ConfigStructure_2.IC1Filter = 10;                          //滤波器设置
+    Encoder_ConfigStructure_2.IC1Filter = ENCODER_FILTER_VALUE_2;      //滤波器设置
     Encoder_ConfigStructure_2.IC2Polarity = TIM_ICPOLARITY_RISING;     /* 编码器接口通道2设置 */
     Encoder_ConfigStructure_2.IC2Selection = TIM_ICSELECTION_DIRECTTI;
     Encoder_ConfigStructure_2.IC2Prescaler = TIM_ICPSC_DIV1;
-    Encoder_ConfigStructure_2.IC2Filter = 10;                               //滤波器设置
+    Encoder_ConfigStructure_2.IC2Filter = ENCODER_FILTER_VALUE_2;           //滤波器设置
     HAL_TIM_Encoder_Init(&TIM_EncoderHandle_2, &Encoder_ConfigStructure_2); /* 初始化编码器接口 */
     // __HAL_TIM_SET_COUNTER(&TIM_EncoderHandle_2, 0);                         /* 清零计数器 */
     // __HAL_TIM_CLEAR_IT(&TIM_EncoderHandle_2, TIM_IT_UPDATE);                /* 清零中断标志位 */
@@ -173,6 +173,7 @@ int Read_Encoder(u8 tim)
 double Calculate_Velocity(int encoder_value)
 {
     double velocity = 0;
-    velocity = (double)encoder_value * READ_ENCODER_FREQU / REDUCTION_RATIO / ENCODER_TOTAL_RESOLUTION;
+    /* 转速为周长*编码器读数*当前频率/电机减速比/电机总分辨率 */
+    velocity = ONE_WHEEL_CIRCUMFERENCE * (double)encoder_value * READ_ENCODER_FREQU / REDUCTION_RATIO / ENCODER_TOTAL_RESOLUTION;
     return velocity;
 }

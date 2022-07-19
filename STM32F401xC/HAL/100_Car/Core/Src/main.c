@@ -14,12 +14,13 @@
 #include "oled.h"
 #include "led.h"
 
-u16 pwmval_1 = 350; // 定时器PWM占空比设置
-u16 pwmval_2 = 350; // 定时器PWM占空比设置
-double Encoder_1;		// 外部变量，当前1速度
-double Encoder_2;		// 外部变量，当前2速度
-u8 MotorRun;		// 0: stop, 1: run
-s16 TargetSpeed;	// 外部变量，目标速度
+u16 pwmval_1 = 350;	  // 定时器PWM占空比设置
+u16 pwmval_2 = 350;	  // 定时器PWM占空比设置
+double Encoder_1;	  // 外部变量，当前1速度
+double Encoder_2;	  // 外部变量，当前2速度
+u8 MotorRun;		  // 0: stop, 1: run
+double TargetSpeed_1; // 外部变量，目标速度
+double TargetSpeed_2; // 外部变量，目标速度
 
 /**
  * @brief	主函数,程序入口
@@ -33,7 +34,6 @@ int main(void)
 
 	u16 arr = 500 - 1;
 	u16 psc = 84 - 1;
-	// u16 freq = 84 / (psc + 1) / (arr + 1) * 1000;
 
 	HAL_Init();
 	Stm32_Clock_Init(168, 25, 2, 4);
@@ -45,7 +45,7 @@ int main(void)
 	Encoder_Init();					   // 初始化电机编码器
 	TIM_SetTIM5Compare_n(pwmval_1, 2); //修改比较值，修改占空比
 	TIM_SetTIM5Compare_n(pwmval_2, 4); //修改比较值，修改占空比
-	// OLED_Display();					   //显示初始化信息
+	OLED_Display();					   //显示初始化信息
 	while (1)
 	{
 	}

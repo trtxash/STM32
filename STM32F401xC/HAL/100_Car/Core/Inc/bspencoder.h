@@ -4,6 +4,17 @@
 #include "stm32f4xx.h"
 #include "sys.h"
 
+/* extern表示该变量已在外部定义，所以要在外部定义它们 */
+extern double Encoder_1; // 外部变量，当前1速度
+extern double Encoder_2; // 外部变量，当前2速度
+extern double TargetSpeed_1;  // 外部变量，目标速度
+extern double TargetSpeed_2;  // 外部变量，目标速度
+extern float Kp; // 外部变量，PID参数
+extern float Ki;
+extern float Kd;
+
+extern u8 MotorRun;      // 0: stop, 1: run
+
 /* 定时器选择 */
 #define ENCODER_TIM TIM3
 #define ENCODER_TIM_CLK_ENABLE() __HAL_RCC_TIM3_CLK_ENABLE()
@@ -51,6 +62,11 @@
 
 #define ENCODER_MODE_2 TIM_ENCODERMODE_TI12
 
+/* 编码器软件滤波值 */
+#define ENCODER_FILTER_VALUE 15
+
+#define ENCODER_FILTER_VALUE_2 15
+
 /* 编码器接口输入捕获通道相位设置 */
 #define ENCODER_IC1_POLARITY TIM_ICPOLARITY_RISING
 #define ENCODER_IC2_POLARITY_2 TIM_ICPOLARITY_RISING
@@ -79,16 +95,6 @@
 
 /* 计算转一圈的距离 单位M */
 #define ONE_WHEEL_CIRCUMFERENCE (3.14159265358979323846 * TIRE_DIAMETER)
-
-/* extern表示该变量已在外部定义，所以要在外部定义它们 */
-extern u8 MotorRun;     // 0: stop, 1: run
-extern double Encoder_1;   // 外部变量，当前1速度
-extern double Encoder_2;   // 外部变量，当前2速度
-extern s16 TargetSpeed; // 外部变量，目标速度
-
-extern float Kp; // 外部变量，PID参数
-extern float Ki;
-extern float Kd;
 
 void Encoder_Init(void);
 int Read_Encoder(u8 tim);
