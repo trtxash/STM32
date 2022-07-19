@@ -62,7 +62,12 @@ RTT/SEGGER_RTT.c \
 User/Src/delay.c \
 User/Src/sys.c \
 User/Src/usart.c \
+User/Src/pid.c \
+Core/Src/timer.c \
+Core/Src/bspencoder.c \
+Hardware/Src/oled.c \
 Hardware/Src/led.c 
+
 
 # ASM sources
 ASM_SOURCES =  \
@@ -153,6 +158,7 @@ LDSCRIPT = STM32F401CCUx_FLASH.ld
 LIBS = -lc -lm -lnosys 
 LIBDIR = 
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+LDFLAGS += -lc -lrdimon -u _printf_float # -lprintf_float,if you want sprintf
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
