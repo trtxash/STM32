@@ -9,7 +9,6 @@
  * @date 	2022年7月16号15点32分
  */
 #include "timer.h"
-#include "stdio.h"
 
 TIM_HandleTypeDef TIM2_Handler;     //定时器2句柄，编码器模式，捕捉小车速度
 TIM_OC_InitTypeDef TIM2_CHxHandler; //定时器2通道句柄，4路
@@ -18,11 +17,6 @@ TIM_OC_InitTypeDef TIM3_CHxHandler; //定时器3通道句柄，4路
 TIM_HandleTypeDef TIM4_Handler;     //定时器4句柄，用来定时OLED显示
 TIM_HandleTypeDef TIM5_Handler;     //定时器5句柄，用来发生PWM波
 TIM_OC_InitTypeDef TIM5_CHxHandler; //定时器5通道句柄，4路
-
-extern double Encoder_1; // 外部变量，当前1速度
-extern double Encoder_2; // 外部变量，当前2速度
-extern u16 pwmval_1;     // 外部变量，当前1速度PWM值
-extern u16 pwmval_2;     // 外部变量，当前2速度PWM值
 
 //通用定时器2中断初始化
 // arr：自动重装值。
@@ -184,9 +178,34 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 }
 
 //设置TIM通道n的占空比
-// compare:比较值
+// compare:比较值,越大占空比越小
 void TIM_SetTIM5Compare_n(u32 compare, u8 n)
 {
+    switch (n)
+    {
+    case 1:
+        TIM5->CCR1 = compare;
+        break;
+    case 2:
+        TIM5->CCR2 = compare;
+        break;
+    case 3:
+        TIM5->CCR3 = compare;
+        break;
+    case 4:
+        TIM5->CCR4 = compare;
+        break;
+    default:
+        break;
+    }
+}
+
+//设置TIM通道n的占空比
+// DutyCycle:占空比,越大占空比越大，0~100
+void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
+{
+    u32 compare;
+    compare = (100 - DutyCycle) * TIM5_Handler.Init.Period / 100;
     switch (n)
     {
     case 1:
@@ -236,9 +255,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         u8 temp[16]; // 储存要显示的字符串，最多16个字符
 
         Encoder_1 = Calculate_Velocity(Read_Encoder(3)); //读取编码器的值计算速度
-        Encoder_2 = Calculate_Velocity(Read_Encoder(4)); //读取编码器的值计算速度
+        pwmval_1 = Velocity_FeedbackControl(TargetSpeed_1, -Encoder_1); //速度反馈控制
+        TIM_SetTIM5_DutyCycle_n(pwmval_1, 2);                           //修改比较值，修改占空比
 
-        
+        Encoder_2 = Calculate_Velocity(Read_Encoder(4));                //读取编码器的值计算速度
+        pwmval_2 = Velocity_FeedbackControl(TargetSpeed_2, Encoder_2);  //速度反馈控制
+        TIM_SetTIM5_DutyCycle_n(pwmval_2, 4);                           //修改比较值，修改占空比
 
         sprintf(temp, "%4.2f", Encoder_1); //将速度转换为字符串
         OLED_ShowString(24, 0, temp, 16, 1);

@@ -3,8 +3,6 @@
 
 #include "sys.h"
 
-float Kp = 0.1000, Ki = 0.0000, kd = 0.0000; // PID constants
-
 // float P = 0.800, I = 0.15, D = 300.0; // PID constants
 
 // float Set_Temp = 60;                     //初始化P,I,D 当前值，设置值 常数
@@ -36,5 +34,6 @@ float Kp = 0.1000, Ki = 0.0000, kd = 0.0000; // PID constants
 // float Gain3 = 1.2, PID_I_MAX3 = 100.0, PID_I_MIN3 = -100.0, V_DATA_MAX3 = 100, V_DATA_MIN3 = 0;
 
 void PID_calc(void);
+int Velocity_FeedbackControl(double TargetVelocity, double CurrentVelocity);
 
 #endif // PID_H_INCLUDED

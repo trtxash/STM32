@@ -13,13 +13,23 @@
 #define _TIMER_H
 
 #include "sys.h"
+#include "stdio.h"
 #include "oled.h"
 #include "bspencoder.h"
+#include "pid.h"
+
+extern double Encoder_1;     // 外部变量，当前1速度
+extern double Encoder_2;     // 外部变量，当前2速度
+extern u16 pwmval_1;         // 外部变量，当前1速度PWM值
+extern u16 pwmval_2;         // 外部变量，当前2速度PWM值
+extern double TargetSpeed_1; // 目标速度
+extern double TargetSpeed_2; // 目标速度
 
 void TIM2_Init(u16 arr, u16 psc);
 void TIM3_Init(u16 arr, u16 psc);
 void TIM4_Init(u16 arr, u16 psc);
 void TIM5_PWM_Init(u16 arr, u16 psc, u8 ways);
 void TIM_SetTIM5Compare_n(u32 compare, u8 n);
+void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n);
 
 #endif

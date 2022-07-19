@@ -1,7 +1,12 @@
 #include "pid.h"
 
-extern double Encoder_1; // 当前速度1
-extern double Encoder_2; // 当前速度2
+u16 pwmval_1;                                // 定时器PWM占空比设置
+u16 pwmval_2;                                // 定时器PWM占空比设置
+double Encoder_1;                            // 当前1速度
+double Encoder_2;                            // 当前2速度
+double TargetSpeed_1 = 0.25;                 // 目标速度
+double TargetSpeed_2 = 0.25;                 // 目标速度
+float Kp = 0.8000, Ki = 0.8000, Kd = 0.0000; // PID constants
 
 void PID_calc(void) // PID算法
 {
@@ -137,9 +142,9 @@ ControlVelocity+=Kp[e（k）-e(k-1)]+Ki*e(k)
 **************************************************************************/
 int Velocity_FeedbackControl(double TargetVelocity, double CurrentVelocity)
 {
-    double Bias;                // 定义相关变量
-    static int ControlVelocity; // 定义控制输出
-    static double Last_bias;    // 静态变量，函数调用结束后其值依然存在
+    double Bias;                   // 定义相关变量
+    static double ControlVelocity; // 定义控制输出
+    static double Last_bias;       // 静态变量，函数调用结束后其值依然存在
 
     Bias = TargetVelocity - CurrentVelocity; //求速度偏差
     ControlVelocity += Kp * (Bias - Last_bias) + Ki * Bias;

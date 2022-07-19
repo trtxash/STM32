@@ -4,17 +4,6 @@
 #include "stm32f4xx.h"
 #include "sys.h"
 
-/* extern表示该变量已在外部定义，所以要在外部定义它们 */
-extern double Encoder_1; // 外部变量，当前1速度
-extern double Encoder_2; // 外部变量，当前2速度
-extern double TargetSpeed_1;  // 外部变量，目标速度
-extern double TargetSpeed_2;  // 外部变量，目标速度
-extern float Kp; // 外部变量，PID参数
-extern float Ki;
-extern float Kd;
-
-extern u8 MotorRun;      // 0: stop, 1: run
-
 /* 定时器选择 */
 #define ENCODER_TIM TIM3
 #define ENCODER_TIM_CLK_ENABLE() __HAL_RCC_TIM3_CLK_ENABLE()
