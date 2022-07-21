@@ -228,7 +228,25 @@ void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
 //定时器2中断服务函数
 void TIM2_IRQHandler(void)
 {
-    HAL_TIM_IRQHandler(&TIM2_Handler);
+    u8 temp[16]; // 储存要显示的字符串，最多16个字符
+
+    Encoder_1 = -Calculate_Velocity(Read_Encoder(3));                //读取编码器的值计算速度
+    pwmval_1 = Velocity_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
+    TIM_SetTIM5_DutyCycle_n(pwmval_1, 2);                            //修改比较值，修改占空比
+
+    Encoder_2 = Calculate_Velocity(Read_Encoder(4));                 //读取编码器的值计算速度
+    pwmval_2 = Velocity_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
+    TIM_SetTIM5_DutyCycle_n(pwmval_2, 4);                            //修改比较值，修改占空比
+
+    sprintf(temp, "%4.2f", Encoder_1); //将速度转换为字符串
+    OLED_ShowString(24, 16, temp, 16, 1);
+    sprintf(temp, "%4.2f", Encoder_2); //将速度转换为字符串
+    OLED_ShowString(88, 16, temp, 16, 1);
+    OLED_Refresh();
+
+    __HAL_TIM_CLEAR_FLAG(&TIM2_Handler, TIM_FLAG_UPDATE); //清除更新标志
+
+    // HAL_TIM_IRQHandler(&TIM2_Handler);
 }
 //定时器3中断服务函数
 void TIM3_IRQHandler(void)
@@ -252,21 +270,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&TIM2_Handler))
     {
-        u8 temp[16]; // 储存要显示的字符串，最多16个字符
-
-        Encoder_1 = -Calculate_Velocity(Read_Encoder(3));                //读取编码器的值计算速度
-        pwmval_1 = Velocity_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
-        TIM_SetTIM5_DutyCycle_n(pwmval_1, 2);                            //修改比较值，修改占空比
-
-        Encoder_2 = Calculate_Velocity(Read_Encoder(4));                 //读取编码器的值计算速度
-        pwmval_2 = Velocity_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
-        TIM_SetTIM5_DutyCycle_n(pwmval_2, 4);                            //修改比较值，修改占空比
-
-        sprintf(temp, "%4.2f", Encoder_1); //将速度转换为字符串
-        OLED_ShowString(24, 0, temp, 16, 1);
-        sprintf(temp, "%4.2f", Encoder_2); //将速度转换为字符串
-        OLED_ShowString(88, 0, temp, 16, 1);
-        OLED_Refresh();
     }
     else if (htim == (&TIM3_Handler))
     {
