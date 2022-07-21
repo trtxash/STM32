@@ -18,8 +18,8 @@
 #include "bspencoder.h"
 #include "pid.h"
 
-extern u16 pwmval_1;         // 定时器5PWM占空比设置
-extern u16 pwmval_2;         // 定时器5PWM占空比设置
+extern int pwmval_1;         // 定时器5PWM占空比设置
+extern int pwmval_2;         // 定时器5PWM占空比设置
 extern double Encoder_1;     // 外部变量，当前1速度
 extern double Encoder_2;     // 外部变量，当前2速度
 extern double TargetSpeed_1; // 目标速度

@@ -1,9 +1,9 @@
 #include "pid.h"
 
-double P = 1.5000, I = 0.0050, D = 0.0; // PID constants
+double P = 2.0000, I = 0.0005, D = 50.0; // PID constants
 
-u16 pwmval_1;               // 定时器PWM占空比设置
-u16 pwmval_2;               // 定时器PWM占空比设置
+int pwmval_1;               // 定时器PWM占空比设置
+int pwmval_2;               // 定时器PWM占空比设置
 double Encoder_1;           // 当前1速度
 double Encoder_2;           // 当前2速度
 double TargetSpeed_1 = 0.0; // 目标速度
@@ -23,13 +23,13 @@ ControlVelocity+=Kp[e（k）-e(k-1)]+Ki*e(k)
 **************************************************************************/
 int Velocity_FeedbackControl_1(double TargetVelocity, double CurrentVelocity)
 {
-    double Rate;                                                                       // 定义相关变量
-    static double ControlVelocity;                                                     // 定义控制输出
-    static double PID_OUT = 0;                                                         // PID输出
-    static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                     //比例输出，积分输出，微分输出
-    static double Current_Error = 0, Last_Error = 0;                                   //当前误差  最后误差
-    static double Sum_Error = 0;                                                       //误差积分
-    static double PID_I_MAX = 5.0, PID_I_MIN = -5.0, V_DATA_MAX = 100, V_DATA_MIN = 0; // PID积分上限，PID积分下限
+    double Rate;                                                                          // 定义相关变量
+    static double ControlVelocity;                                                        // 定义控制输出
+    static double PID_OUT = 0;                                                            // PID输出
+    static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                        //比例输出，积分输出，微分输出
+    static double Current_Error = 0, Last_Error = 0;                                      //当前误差  最后误差
+    static double Sum_Error = 0;                                                          //误差积分
+    static double PID_I_MAX = 1.0, PID_I_MIN = -1.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
 
     Current_Error = TargetVelocity - CurrentVelocity; //求速度偏差
     P_OUT = P * Current_Error;                        //比列项
@@ -78,13 +78,13 @@ ControlVelocity+=Kp[e（k）-e(k-1)]+Ki*e(k)
 **************************************************************************/
 int Velocity_FeedbackControl_2(double TargetVelocity, double CurrentVelocity)
 {
-    double Rate;                                                                       // 定义相关变量
-    static double ControlVelocity;                                                     // 定义控制输出
-    static double PID_OUT = 0;                                                         // PID输出
-    static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                     //比例输出，积分输出，微分输出
-    static double Current_Error = 0, Last_Error = 0;                                   //当前误差  最后误差
-    static double Sum_Error = 0;                                                       //误差积分
-    static double PID_I_MAX = 5.0, PID_I_MIN = -5.0, V_DATA_MAX = 100, V_DATA_MIN = 0; // PID积分上限，PID积分下限
+    double Rate;                                                                          // 定义相关变量
+    static double ControlVelocity;                                                        // 定义控制输出
+    static double PID_OUT = 0;                                                            // PID输出
+    static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                        //比例输出，积分输出，微分输出
+    static double Current_Error = 0, Last_Error = 0;                                      //当前误差  最后误差
+    static double Sum_Error = 0;                                                          //误差积分
+    static double PID_I_MAX = 1.0, PID_I_MIN = -1.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
 
     Current_Error = TargetVelocity - CurrentVelocity; //求速度偏差
     P_OUT = P * Current_Error;                        //比列项

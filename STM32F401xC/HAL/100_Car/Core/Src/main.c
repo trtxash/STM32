@@ -20,7 +20,7 @@ int main(void)
 	u16 arr = 500 - 1;
 	u16 psc = 84 - 1;
 
-	HAL_Init();
+ 	HAL_Init();
 	Stm32_Clock_Init(168, 25, 2, 4);
 	uart6_init(115200);
 	delay_init(84); //初始化延时函数

@@ -7,8 +7,8 @@
 #endif
 
 //加入以下代码,支持printf函数,而不需要选择use MicroLIB
-//#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#if 1
+// #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#if 0
 #pragma import(__use_no_semihosting)
 //标准库需要的支持函数
 struct __FILE
@@ -193,8 +193,8 @@ void USART6_IRQHandler(void)
 			}
 			if (temp == USART_RX_BUF[USART_REC_LEN - 2]) // 校验数据包和
 			{
-				TargetSpeed_1 = (float)USART_RX_BUF[1] / 100;
-				TargetSpeed_2 = (float)USART_RX_BUF[5] / 100;
+				TargetSpeed_1 = (float)(USART_RX_BUF[1] + 0x100 * USART_RX_BUF[2] + 0x10000 * USART_RX_BUF[3] + 0x1000000 * USART_RX_BUF[4]) / 100;
+				TargetSpeed_2 = (float)(USART_RX_BUF[5] + 0x100 * USART_RX_BUF[6] + 0x10000 * USART_RX_BUF[7] + 0x1000000 * USART_RX_BUF[8]) / 100;
 			}
 			else
 			{
