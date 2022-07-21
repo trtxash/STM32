@@ -650,6 +650,7 @@ void OLED_DisplayInit(void)
  */
 void OLED_Display(void)
 {
-	OLED_ShowString(0, 0, "V1:     V2:     ", 16, 1);
+	OLED_ShowString(0, 0, "S1:     S2:     ", 16, 1);
+	OLED_ShowString(0, 16, "V1:     V2:     ", 16, 1);
 	OLED_Refresh();
 }
