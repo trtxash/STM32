@@ -1,9 +1,9 @@
 /**
- * @file	100_Car
- * @brief 	累
+ * @file	07_Bluetooth_HC_05
+ * @brief 	蓝牙HC-05模块驱动，蓝牙左右电机驱动
  * @author 	TRTX-gamer
  * @version 1.00
- * @date 	2022年7月14号15点23分
+ * @date 	2022年7月21号18点53分
  */
 
 #include "main.h"
