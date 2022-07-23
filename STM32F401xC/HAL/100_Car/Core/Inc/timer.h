@@ -17,6 +17,7 @@
 #include "oled.h"
 #include "bspencoder.h"
 #include "pid.h"
+#include "infraredtobe.h"
 
 extern u8 beep;
 extern u8 beep_flag;

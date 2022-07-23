@@ -36,6 +36,7 @@ extern "C"
 #include "timer.h"
 #include "oled.h"
 #include "bspencoder.h"
+#include "infraredtobe.h"
 
   void Error_Handler(void);
 

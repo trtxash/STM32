@@ -272,6 +272,8 @@ void TIM2_IRQHandler(void)
     sprintf(temp, "%4.2f", Encoder_2); //将速度转换为字符串
     OLED_ShowString(88, 16, temp, 16, 1);
 
+    OLED_ShowNum(0, 48, Read_Infraredtobe(), 4, 16, 1); // 显示红外传感器的数值
+
     OLED_Refresh();
 
     __HAL_TIM_CLEAR_FLAG(&TIM2_Handler, TIM_FLAG_UPDATE); //清除更新标志

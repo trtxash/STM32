@@ -17,7 +17,8 @@
             "command": "mingw32-make",
             "args": [
                 "clean"
-            ]
+            ],
+            "problemMatcher": []
         },
         {
             "label": "rtt",

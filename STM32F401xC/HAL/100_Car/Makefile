@@ -68,6 +68,7 @@ Core/Src/bspencoder.c \
 Hardware/Src/oled.c \
 Hardware/Src/led.c \
 Hardware/Src/beep.c \
+Hardware/Src/infraredtobe.c \
 
 
 # ASM sources
