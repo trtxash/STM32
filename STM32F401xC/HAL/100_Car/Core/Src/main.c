@@ -20,10 +20,11 @@ int main(void)
 	u16 arr = 500 - 1;
 	u16 psc = 84 - 1;
 
- 	HAL_Init();
+	HAL_Init();
 	Stm32_Clock_Init(168, 25, 2, 4);
 	uart6_init(115200);
 	delay_init(84); //初始化延时函数
+	Beep_Init();	//初始化蜂鸣器
 	OLED_Init();
 	TIM2_Init(10000 - 1, 84 - 1);	 // 100Hz刷新OLED
 	TIM5_PWM_Init(arr, psc, 0B1111); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
@@ -31,5 +32,15 @@ int main(void)
 	OLED_Display();					 //显示初始化信息
 	while (1)
 	{
+		if (beep)
+		{
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, beep_flag);
+			beep_flag = !beep_flag;
+			delay_us(400);
+		}
+		else
+		{
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 1);
+		}
 	}
 }

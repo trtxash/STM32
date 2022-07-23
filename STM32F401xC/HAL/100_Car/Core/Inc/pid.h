@@ -5,5 +5,6 @@
 
 int Velocity_FeedbackControl_1(double TargetVelocity, double CurrentVelocity);
 int Velocity_FeedbackControl_2(double TargetVelocity, double CurrentVelocity);
+int Angle_FeedbackControl(double TargetVelocity, double CurrentVelocity);
 
 #endif // PID_H_INCLUDED

@@ -193,8 +193,11 @@ void USART6_IRQHandler(void)
 			}
 			if (temp == USART_RX_BUF[USART_REC_LEN - 2]) // 校验数据包和
 			{
-				TargetSpeed_1 = (float)(USART_RX_BUF[1] + 0x100 * USART_RX_BUF[2] + 0x10000 * USART_RX_BUF[3] + 0x1000000 * USART_RX_BUF[4]) / 100;
-				TargetSpeed_2 = (float)(USART_RX_BUF[5] + 0x100 * USART_RX_BUF[6] + 0x10000 * USART_RX_BUF[7] + 0x1000000 * USART_RX_BUF[8]) / 100;
+				beep = (char)USART_RX_BUF[1];
+				Angle_Target = (float)(USART_RX_BUF[2] + 0x100 * USART_RX_BUF[3] + 0x10000 * USART_RX_BUF[4] + 0x1000000 * USART_RX_BUF[5]) / 100;
+				TargetSpeed = (float)(USART_RX_BUF[6] + 0x100 * USART_RX_BUF[7] + 0x10000 * USART_RX_BUF[8] + 0x1000000 * USART_RX_BUF[9]) / 100;
+				// TargetSpeed_1 = (float)(USART_RX_BUF[1] + 0x100 * USART_RX_BUF[2] + 0x10000 * USART_RX_BUF[3] + 0x1000000 * USART_RX_BUF[4]) / 100;
+				// TargetSpeed_2 = (float)(USART_RX_BUF[5] + 0x100 * USART_RX_BUF[6] + 0x10000 * USART_RX_BUF[7] + 0x1000000 * USART_RX_BUF[8]) / 100;
 			}
 			else
 			{

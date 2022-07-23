@@ -66,7 +66,8 @@ Core/Src/pid.c \
 Core/Src/timer.c \
 Core/Src/bspencoder.c \
 Hardware/Src/oled.c \
-Hardware/Src/led.c 
+Hardware/Src/led.c \
+Hardware/Src/beep.c \
 
 
 # ASM sources
