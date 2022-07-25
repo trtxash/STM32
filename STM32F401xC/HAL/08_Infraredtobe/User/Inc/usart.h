@@ -11,6 +11,8 @@ extern UART_HandleTypeDef UART6_Handler; // UART句柄
 extern u8 USART_RX_BUF[USART_REC_LEN];   //接收缓冲,最大USART_REC_LEN个字节.末字节为换行符
 extern u16 USART_RX_STA;                 //接收状态标记
 extern u8 beep;
+extern u8 move;
+extern u8 bluetooth;
 extern double TargetSpeed_1; // 目标速度
 extern double TargetSpeed_2; // 目标速度
 extern double TargetSpeed;   // 目标和速度

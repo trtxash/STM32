@@ -228,40 +228,126 @@ void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
 //定时器2中断服务函数
 void TIM2_IRQHandler(void)
 {
+    u8 temp_x;
     u8 temp[16]; // 储存要显示的字符串，最多16个字符
 
-    /* 速度处理 */
-    TargetSpeed_1 = TargetSpeed_2 = TargetSpeed;
-    TargetSpeed_1 += Angle_Target / 2;
-    TargetSpeed_2 -= Angle_Target / 2;
+    if (bluetooth) // 是否蓝牙遥控
+    {
+        /* 速度处理 */
+        TargetSpeed_1 = TargetSpeed_2 = TargetSpeed;
+        TargetSpeed_1 += Angle_Target / 2;
+        TargetSpeed_2 -= Angle_Target / 2;
 
-    /* 左右电机分别速度控制 */
-    Encoder_1 = -Calculate_Velocity(Read_Encoder(3));                //读取编码器的值计算速度
-    pwmval_1 = Velocity_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
-    if (pwmval_1 >= 0)
-    {
-        TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
-        TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+        Encoder_1 = -Calculate_Velocity(Read_Encoder(3));                //读取编码器的值计算速度
+        pwmval_1 = Velocity_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
+        if (pwmval_1 >= 0)
+        {
+            TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+        }
+        else
+        {
+            TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+        }
+
+        Encoder_2 = Calculate_Velocity(Read_Encoder(4));                 //读取编码器的值计算速度
+        pwmval_2 = Velocity_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
+        if (pwmval_2 >= 0)
+        {
+            TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+        }
+        else
+        {
+            TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+        }
     }
-    else
+    else // 默认循迹
     {
-        TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
-        TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+        /* 速度处理 */
+        TargetSpeed_1 = TargetSpeed_2 = TargetSpeed;
+        Now_pos = Read_Infraredtobe_bits();     //读取红外传感器数据
+        Now_pos_num = Read_Infraredtobe_sums(); // 读取红外传感器数据的数值
+        if (Now_pos_num > 0)
+        {
+            if (Now_pos == 1)
+            {
+                TargetSpeed_1 += 0.2;
+                TargetSpeed_2 -= 0.2;
+            }
+            else if (Now_pos == 2)
+            {
+                TargetSpeed_1 += 0.4;
+                TargetSpeed_2 -= 0.4;
+            }
+            else
+            {
+                TargetSpeed_1 += 1.0;
+                TargetSpeed_2 -= 1.0;
+            }
+        }
+        else if (Now_pos_num < 0)
+        {
+            if (Now_pos == -1)
+            {
+                TargetSpeed_1 -= 0.2;
+                TargetSpeed_2 += 0.2;
+            }
+            else if (Now_pos == 2)
+            {
+                TargetSpeed_1 -= 0.4;
+                TargetSpeed_2 += 0.4;
+            }
+            else
+            {
+                TargetSpeed_1 -= 1.0;
+                TargetSpeed_2 += 1.0;
+            }
+        }
+
+        // TargetSpeed_1 += (double)Now_pos_num / 3.7;
+        // TargetSpeed_2 -= (double)Now_pos_num / 3.7;
+        /* 左右电机分别速度控制 */
+        Encoder_1 = -Calculate_Velocity(Read_Encoder(3));         //读取编码器的值计算速度
+        pwmval_1 = X_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
+        if (pwmval_1 >= 0)
+        {
+            TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+        }
+        else
+        {
+            TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+        }
+
+        Encoder_2 = Calculate_Velocity(Read_Encoder(4));          //读取编码器的值计算速度
+        pwmval_2 = X_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
+        if (pwmval_2 >= 0)
+        {
+            TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+        }
+        else
+        {
+            TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+        }
     }
 
-    Encoder_2 = Calculate_Velocity(Read_Encoder(4));                 //读取编码器的值计算速度
-    pwmval_2 = Velocity_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
-    if (pwmval_2 >= 0)
+    if (!move) // 不移动关电机
     {
-        TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
-        TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
-    }
-    else
-    {
-        TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
-        TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+        TargetSpeed_1 = TargetSpeed_2 = 0;
+        pwmval_1 = pwmval_2 = 0;
+        TIM_SetTIM5_DutyCycle_n(0, 1);
+        TIM_SetTIM5_DutyCycle_n(0, 2);
+        TIM_SetTIM5_DutyCycle_n(0, 3);
+        TIM_SetTIM5_DutyCycle_n(0, 4);
     }
 
+    /* OLED显示部分 */
     sprintf(temp, "%4.2f", Angle_Target / 1.5); //将速度转换为字符串
     OLED_ShowString(24, 0, temp, 16, 1);
     sprintf(temp, "%4.2f", TargetSpeed); //将速度转换为字符串
@@ -272,10 +358,20 @@ void TIM2_IRQHandler(void)
     sprintf(temp, "%4.2f", Encoder_2); //将速度转换为字符串
     OLED_ShowString(88, 16, temp, 16, 1);
 
-    OLED_ShowNum(0, 48, Read_Infraredtobe(), 4, 16, 1); // 显示红外传感器的数值
-
+    OLED_ShowNum(0, 48, (u16)Now_pos, 4, 16, 1); // 显示红外传感器的数值
+    if (Now_pos_num >= 0)
+    {
+        OLED_ShowChar(64, 48, '+', 16, 1);
+        OLED_ShowNum(72, 48, Now_pos_num, 1, 16, 1); // 显示红外传感器的数值
+    }
+    else
+    {
+        OLED_ShowChar(64, 48, '-', 16, 1);
+        OLED_ShowNum(72, 48, -Now_pos_num, 1, 16, 1); // 显示红外传感器的数值
+    }
     OLED_Refresh();
 
+    /* 标志清除部分 */
     __HAL_TIM_CLEAR_FLAG(&TIM2_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }
 //定时器3中断服务函数
