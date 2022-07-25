@@ -14,9 +14,57 @@ void Infraredtobe_Init(void)
     HAL_GPIO_Init(GPIOB, &GPIO_Initure);
 }
 
-int Read_Infraredtobe(void)
+int Read_Infraredtobe_bits(void)
 {
     int temp;
+    static int temp_last = 0;
     temp = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) + 10 * HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) + 100 * HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) + 1000 * HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_10);
+
+    return temp;
+}
+
+int Read_Infraredtobe_sums(void)
+{
+    int temp = 0;
+    static int temp_last = 0;
+
+    if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0)) // 管1无红外
+    {
+        if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1)) // 管2无红外
+        {
+            temp = 3;
+        }
+        else
+        {
+            temp = 2;
+        }
+    }
+    else if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1)) // 管2无红外
+    {
+        temp = 1;
+    }
+
+    if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_10)) // 管4无红外
+    {
+        if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2)) // 管3无红外
+        {
+            temp = -3;
+        }
+        else
+        {
+            temp = -2;
+        }
+    }
+    else if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2)) // 管3无红外
+    {
+        temp = -1;
+    }
+
+    if (temp == 0) // temp无更新，返回上次
+    {
+        return temp_last;
+    }
+    temp_last = temp; // 更新temp_last
+
     return temp;
 }
