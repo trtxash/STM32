@@ -3,7 +3,7 @@
 u8 beep = 0;
 u8 beep_flag = 0;
 
-//按键初始化函数
+//beep初始化函数
 void Beep_Init(void)
 {
     GPIO_InitTypeDef GPIO_Initure;

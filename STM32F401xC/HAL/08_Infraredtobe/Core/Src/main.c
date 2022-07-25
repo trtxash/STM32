@@ -1,9 +1,9 @@
 /**
- * @file	07_Bluetooth_HC_05
- * @brief 	蓝牙HC-05模块驱动，蓝牙左右电机驱动
+ * @file	08_Inheritance
+ * @brief 	在遥控小车的基础上加入红外传感，实现循迹
  * @author 	TRTX-gamer
  * @version 1.00
- * @date 	2022年7月21号18点53分
+ * @date 	2022年7月25号13点35分
  */
 
 #include "main.h"
@@ -12,7 +12,7 @@
  * @brief	主函数,程序入口
  * @param 	none
  * @arg		none
- * @note  	初始化函数后利用定时器5PWM发生器实现4路PWM发生器
+ * @note  	超多，不写
  * @retval	int
  */
 int main(void)

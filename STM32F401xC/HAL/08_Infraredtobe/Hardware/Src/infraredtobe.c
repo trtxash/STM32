@@ -14,6 +14,13 @@ void Infraredtobe_Init(void)
     HAL_GPIO_Init(GPIOB, &GPIO_Initure);
 }
 
+/**
+ * @brief	红外查询函数
+ * @param 	none
+ * @arg		none
+ * @note  	值为101010101格式十进制
+ * @retval	int
+ */
 int Read_Infraredtobe_bits(void)
 {
     int temp;
@@ -23,6 +30,13 @@ int Read_Infraredtobe_bits(void)
     return temp;
 }
 
+/**
+ * @brief	红外查询函数
+ * @param 	none
+ * @arg		none
+ * @note  	值为-3到3格式十进制
+ * @retval	int
+ */
 int Read_Infraredtobe_sums(void)
 {
     int temp = 0;

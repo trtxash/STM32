@@ -238,30 +238,42 @@ void TIM2_IRQHandler(void)
         TargetSpeed_1 += Angle_Target / 2;
         TargetSpeed_2 -= Angle_Target / 2;
 
-        Encoder_1 = -Calculate_Velocity(Read_Encoder(3));                //读取编码器的值计算速度
-        pwmval_1 = Velocity_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
-        if (pwmval_1 >= 0)
-        {
-            TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
-        }
+        if (move)
+        {                                                                    /* 左右电机分别速度控制 */
+            Encoder_1 = -Calculate_Velocity(Read_Encoder(3));                //读取编码器的值计算速度
+            pwmval_1 = Velocity_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
+            if (pwmval_1 >= 0)
+            {
+                TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
+                TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+            }
+            else
+            {
+                TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
+                TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+            }
 
-        Encoder_2 = Calculate_Velocity(Read_Encoder(4));                 //读取编码器的值计算速度
-        pwmval_2 = Velocity_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
-        if (pwmval_2 >= 0)
-        {
-            TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+            Encoder_2 = Calculate_Velocity(Read_Encoder(4));                 //读取编码器的值计算速度
+            pwmval_2 = Velocity_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
+            if (pwmval_2 >= 0)
+            {
+                TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
+                TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+            }
+            else
+            {
+                TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
+                TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+            }
         }
         else
         {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+            TargetSpeed_1 = TargetSpeed_2 = 0;
+            pwmval_1 = pwmval_2 = 0;
+            TIM_SetTIM5_DutyCycle_n(0, 1);
+            TIM_SetTIM5_DutyCycle_n(0, 2);
+            TIM_SetTIM5_DutyCycle_n(0, 3);
+            TIM_SetTIM5_DutyCycle_n(0, 4);
         }
     }
     else // 默认循迹
@@ -307,44 +319,44 @@ void TIM2_IRQHandler(void)
             }
         }
 
-        // TargetSpeed_1 += (double)Now_pos_num / 3.7;
-        // TargetSpeed_2 -= (double)Now_pos_num / 3.7;
-        /* 左右电机分别速度控制 */
-        Encoder_1 = -Calculate_Velocity(Read_Encoder(3));         //读取编码器的值计算速度
-        pwmval_1 = X_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
-        if (pwmval_1 >= 0)
+        if (move)
         {
-            TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+            /* 左右电机分别速度控制 */
+            Encoder_1 = -Calculate_Velocity(Read_Encoder(3));         //读取编码器的值计算速度
+            pwmval_1 = X_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
+            if (pwmval_1 >= 0)
+            {
+                TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
+                TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+            }
+            else
+            {
+                TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
+                TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+            }
+
+            Encoder_2 = Calculate_Velocity(Read_Encoder(4));          //读取编码器的值计算速度
+            pwmval_2 = X_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
+            if (pwmval_2 >= 0)
+            {
+                TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
+                TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+            }
+            else
+            {
+                TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
+                TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+            }
         }
         else
         {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+            TargetSpeed_1 = TargetSpeed_2 = 0;
+            pwmval_1 = pwmval_2 = 0;
+            TIM_SetTIM5_DutyCycle_n(0, 1);
+            TIM_SetTIM5_DutyCycle_n(0, 2);
+            TIM_SetTIM5_DutyCycle_n(0, 3);
+            TIM_SetTIM5_DutyCycle_n(0, 4);
         }
-
-        Encoder_2 = Calculate_Velocity(Read_Encoder(4));          //读取编码器的值计算速度
-        pwmval_2 = X_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
-        if (pwmval_2 >= 0)
-        {
-            TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
-        }
-    }
-
-    if (!move) // 不移动关电机
-    {
-        TargetSpeed_1 = TargetSpeed_2 = 0;
-        pwmval_1 = pwmval_2 = 0;
-        TIM_SetTIM5_DutyCycle_n(0, 1);
-        TIM_SetTIM5_DutyCycle_n(0, 2);
-        TIM_SetTIM5_DutyCycle_n(0, 3);
-        TIM_SetTIM5_DutyCycle_n(0, 4);
     }
 
     /* OLED显示部分 */
