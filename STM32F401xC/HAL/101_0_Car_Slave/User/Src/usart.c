@@ -59,7 +59,7 @@ void uart_init(u32 bound)
 	UART1_Handler.Init.Mode = UART_MODE_TX_RX;			//收发模式
 	HAL_UART_Init(&UART1_Handler);						// HAL_UART_Init()会使能UART1
 
-	__HAL_UART_ENABLE_IT(&UART1_Handler, UART_IT_RXNE); //使能接收中断
+	// HAL_UART_Transmit_IT(&UART1_Handler, (u8 *)USART_RX_BUF, USART_REC_LEN); //该函数会开启接收中断：标志位UART_IT_RXNE，并且设置接收缓冲以及接收缓冲接收最大数据量
 }
 
 //初始化IO 串口6
@@ -77,6 +77,18 @@ void uart6_init(u32 bound)
 	HAL_UART_Init(&UART6_Handler);						// HAL_UART_Init()会使能UART6
 
 	HAL_UART_Receive_IT(&UART6_Handler, (u8 *)USART_RX_BUF, USART_REC_LEN); //该函数会开启接收中断：标志位UART_IT_RXNE，并且设置接收缓冲以及接收缓冲接收最大数据量
+}
+
+void SendString(char *s)
+{
+	u8 i;
+	for (i = 0; i < USART_REC_LEN; i++)
+	{
+		USART1->DR = s[i];
+		while ((USART1->SR & 0X40) == 0) // 等待接收完成
+		{
+		}
+	}
 }
 
 // UART底层初始化，时钟使能，引脚配置，中断配置
@@ -137,36 +149,9 @@ void USART1_IRQHandler(void)
 #if SYSTEM_SUPPORT_OS //使用OS
 	OSIntEnter();
 #endif
-	if ((__HAL_UART_GET_FLAG(&UART1_Handler, UART_FLAG_RXNE) != RESET)) //接收中断(接收到的数据必须是0x0d 0x0a结尾)
-	{
-		HAL_UART_Receive(&UART1_Handler, &Res, 1, 1000);
-		if ((USART_RX_STA & 0x8000) == 0) //接收未完成
-		{
-			if (USART_RX_STA & 0x4000) //接收到了0x0d
-			{
-				if (Res != 0x0a)
-					USART_RX_STA = 0; //接收错误,重新开始
-				else
-					USART_RX_STA |= 0x8000; //接收完成了
-			}
-			else //还没收到0X0D
-			{
-				if (Res == 0x0d)
-					USART_RX_STA |= 0x4000;
-				else
-				{
-					USART_RX_BUF[USART_RX_STA & 0X3FFF] = Res;
-					USART_RX_STA++;
-					if (USART_RX_STA > (USART_REC_LEN - 1))
-						USART_RX_STA = 0; //接收数据错误,重新开始接收
-				}
-			}
-		}
-	}
 
-	HAL_UART_IRQHandler(&UART1_Handler);
-
-#if SYSTEM_SUPPORT_OS //使用OS
+	__HAL_UART_CLEAR_FLAG(&UART6_Handler, UART_FLAG_RXNE); //清除接收中断标志
+#if SYSTEM_SUPPORT_OS									   //使用OS
 	OSIntExit();
 #endif
 }

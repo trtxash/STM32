@@ -9,6 +9,8 @@ int pwmval_1;               // 定时器PWM占空比设置
 int pwmval_2;               // 定时器PWM占空比设置
 double Encoder_1;           // 当前1速度
 double Encoder_2;           // 当前2速度
+double Encoder_3;           // 当前3速度
+double Encoder_4;           // 当前4速度
 int Now_pos = 0;            // 当前位置
 int Now_pos_num = 0;        // 当前位置数字
 int Target_pos = 0;         // 目标位置
@@ -135,12 +137,12 @@ ControlVelocity代表增量输出
 **************************************************************************/
 int X_FeedbackControl_1(double TargetVelocity, double CurrentVelocity)
 {
-    double Rate;                                                                            // 定义相关变量
-    static double ControlVelocity;                                                          // 定义控制输出
-    static double PID_OUT = 0;                                                              // PID输出
-    static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                          //比例输出，积分输出，微分输出
-    static double Current_Error = 0, Last_Error = 0;                                        //当前误差  最后误差
-    static double Sum_Error = 0;                                                            //误差积分
+    double Rate;                                                                           // 定义相关变量
+    static double ControlVelocity;                                                         // 定义控制输出
+    static double PID_OUT = 0;                                                             // PID输出
+    static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                         //比例输出，积分输出，微分输出
+    static double Current_Error = 0, Last_Error = 0;                                       //当前误差  最后误差
+    static double Sum_Error = 0;                                                           //误差积分
     static double PID_I_MAX = 15.0, PID_I_MIN = -15.0, V_DATA_MAX = 100, V_DATA_MIN = -50; // PID积分上限，PID积分下限
 
     Current_Error = TargetVelocity - CurrentVelocity; //求速度偏差
@@ -188,12 +190,12 @@ ControlVelocity代表增量输出
 **************************************************************************/
 int X_FeedbackControl_2(double TargetVelocity, double CurrentVelocity)
 {
-    double Rate;                                                                            // 定义相关变量
-    static double ControlVelocity;                                                          // 定义控制输出
-    static double PID_OUT = 0;                                                              // PID输出
-    static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                          //比例输出，积分输出，微分输出
-    static double Current_Error = 0, Last_Error = 0;                                        //当前误差  最后误差
-    static double Sum_Error = 0;                                                            //误差积分
+    double Rate;                                                                           // 定义相关变量
+    static double ControlVelocity;                                                         // 定义控制输出
+    static double PID_OUT = 0;                                                             // PID输出
+    static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                         //比例输出，积分输出，微分输出
+    static double Current_Error = 0, Last_Error = 0;                                       //当前误差  最后误差
+    static double Sum_Error = 0;                                                           //误差积分
     static double PID_I_MAX = 15.0, PID_I_MIN = -15.0, V_DATA_MAX = 100, V_DATA_MIN = -50; // PID积分上限，PID积分下限
 
     Current_Error = TargetVelocity - CurrentVelocity; //求速度偏差

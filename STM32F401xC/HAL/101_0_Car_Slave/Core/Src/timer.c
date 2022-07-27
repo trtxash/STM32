@@ -10,6 +10,8 @@
  */
 #include "timer.h"
 
+TIM_HandleTypeDef TIM1_Handler;     //定时器1句柄，编码器模式，捕捉小车速度
+TIM_OC_InitTypeDef TIM1_CHxHandler; //定时器1通道句柄，4路
 TIM_HandleTypeDef TIM2_Handler;     //定时器2句柄，编码器模式，捕捉小车速度
 TIM_OC_InitTypeDef TIM2_CHxHandler; //定时器2通道句柄，4路
 TIM_HandleTypeDef TIM3_Handler;     //定时器3句柄，编码器模式，捕捉小车速度
@@ -17,6 +19,25 @@ TIM_OC_InitTypeDef TIM3_CHxHandler; //定时器3通道句柄，4路
 TIM_HandleTypeDef TIM4_Handler;     //定时器4句柄，用来定时OLED显示
 TIM_HandleTypeDef TIM5_Handler;     //定时器5句柄，用来发生PWM波
 TIM_OC_InitTypeDef TIM5_CHxHandler; //定时器5通道句柄，4路
+
+//通用定时器2中断初始化
+// arr：自动重装值。
+// psc：时钟预分频数
+//定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+// Ft=定时器工作频率,单位:Mhz
+//这里使用的是定时器3!(定时器3挂在APB1上，时钟为HCLK/2)(F407)
+// F401 Timer clock is  APB1 clock.
+void TIM1_Init(u16 arr, u16 psc)
+{
+    TIM1_Handler.Instance = TIM1;                             //定时器1
+    TIM1_Handler.Init.Prescaler = psc;                        //分频系数
+    TIM1_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       //向上计数器
+    TIM1_Handler.Init.Period = arr;                           //自动装载值
+    TIM1_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //时钟分频因子
+    HAL_TIM_Base_Init(&TIM1_Handler);
+
+    HAL_TIM_Base_Start_IT(&TIM1_Handler); //使能定时器11和定时器11更新中断：TIM_IT_UPDATE
+}
 
 //通用定时器2中断初始化
 // arr：自动重装值。
@@ -33,10 +54,7 @@ void TIM2_Init(u16 arr, u16 psc)
     TIM2_Handler.Init.Period = arr;                           //自动装载值
     TIM2_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //时钟分频因子
     HAL_TIM_Base_Init(&TIM2_Handler);
-    // __HAL_TIM_SET_COUNTER(&TIM2_Handler, 0);           /* 清零计数器 */
-    // __HAL_TIM_CLEAR_IT(&TIM2_Handler, TIM_IT_UPDATE);  /* 清零中断标志位 */
-    // __HAL_TIM_ENABLE_IT(&TIM2_Handler, TIM_IT_UPDATE); /* 使能定时器的更新事件中断 */
-    // __HAL_TIM_URS_ENABLE(&TIM2_Handler);               /* 设置更新事件请求源为：计数器溢出 */
+
     HAL_TIM_Base_Start_IT(&TIM2_Handler); //使能定时器11和定时器11更新中断：TIM_IT_UPDATE
 }
 
@@ -57,11 +75,6 @@ void TIM3_Init(u16 arr, u16 psc)
     HAL_TIM_Base_Init(&TIM3_Handler);
 
     HAL_TIM_Base_Start_IT(&TIM3_Handler); //使能定时器3和定时器3更新中断：TIM_IT_UPDATE
-    // 或者单独更新中断：TIM_IT_CC1，和使能TIM_IT_UPDATE
-    // __HAL_TIM_ENABLE_IT(&TIM3_Handler, TIM_IT_UPDATE); // 使能TIM3更新中断
-    // __HAL_TIM_DISABLE_IT(&TIM3_Handler, TIM_IT_UPDATE); // 禁止TIM3更新中断
-    // __HAL_TIM_ENABLE(&TIM3_Handler); // 使能TIM3
-    // __HAL_TIM_DISABLE(&TIM3_Handler); // 禁止TIM3
 }
 
 //通用定时器4中断初始化
@@ -131,7 +144,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
     if (htim->Instance == TIM1)
     {
         __HAL_RCC_TIM1_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 3, 3);
+        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 2, 2);
         HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
     }
     else if (htim->Instance == TIM2)
@@ -223,6 +236,21 @@ void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
     default:
         break;
     }
+}
+
+//定时器2中断服务函数
+void TIM1_UP_TIM10_IRQHandler(void)
+{
+    usart_tr[1] = Read_Encoder(1);
+    usart_tr[2] = Read_Encoder(2);
+    usart_tr[3] = Read_Encoder(3);
+    usart_tr[4] = Read_Encoder(4);
+
+    usart_tr[5] = Read_Infraredtobe_bits(); // 读取红外传感器的数据
+
+    SendString(usart_tr);
+
+    __HAL_TIM_CLEAR_FLAG(&TIM1_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }
 
 //定时器2中断服务函数

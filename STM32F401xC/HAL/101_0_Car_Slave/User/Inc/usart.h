@@ -21,5 +21,6 @@ extern double Angle_Target;  // 目标速度
 //如果想串口中断接收，请不要注释以下宏定义
 void uart_init(u32 bound);
 void uart6_init(u32 bound);
+void SendString(char *s);
 
 #endif

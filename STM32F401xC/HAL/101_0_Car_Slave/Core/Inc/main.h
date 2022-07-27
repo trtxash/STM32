@@ -33,10 +33,16 @@ extern "C"
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
+#include "stdio.h"
 #include "timer.h"
 #include "oled.h"
 #include "bspencoder.h"
 #include "infraredtobe.h"
+
+  extern double Encoder_1; // 当前1速度
+  extern double Encoder_2; // 当前2速度
+  extern double Encoder_3; // 当前3速度
+  extern double Encoder_4; // 当前4速度
 
   void Error_Handler(void);
 
