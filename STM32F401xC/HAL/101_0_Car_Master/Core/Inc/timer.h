@@ -42,7 +42,9 @@ extern u8 usart_tr[];
 void TIM2_Init(u16 arr, u16 psc);
 void TIM3_Init(u16 arr, u16 psc);
 void TIM4_Init(u16 arr, u16 psc);
+void TIM4_PWM_Init(u16 arr, u16 psc, u8 ways);
 void TIM5_PWM_Init(u16 arr, u16 psc, u8 ways);
+void TIM_SetTIM4Compare_n(u32 compare, u8 n);
 void TIM_SetTIM5Compare_n(u32 compare, u8 n);
 void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n);
 

@@ -38,6 +38,7 @@ extern "C"
 #include "oled.h"
 #include "bspencoder.h"
 #include "infraredtobe.h"
+#include "mlx90614.h"
 
   extern double Encoder_1; // 当前1速度
   extern double Encoder_2; // 当前2速度

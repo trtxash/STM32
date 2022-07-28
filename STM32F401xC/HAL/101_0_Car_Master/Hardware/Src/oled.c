@@ -523,34 +523,32 @@ void OLED_ShowPicture(u8 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode)
 void OLED_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitTypeDef GPIO_InitStruct_2;
+	GPIO_InitTypeDef GPIO_InitStruct_3;
 
-	/* GPIO Ports Clock Enable */
-	// __HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-	// __HAL_RCC_GPIOC_CLK_ENABLE();
-	__HAL_RCC_GPIOD_CLK_ENABLE();
+	OLED_GPIO_SCL_ENABLE();
+	OLED_GPIO_SDA_ENABLE();
 
-	/*Configure GPIO pins : PA4 PA5 PA7 */
-	GPIO_InitStruct.Pin = GPIO_PIN_13 | GPIO_PIN_14;
+	GPIO_InitStruct.Pin = OLED_GPIO_SCL_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_SET);
+	HAL_GPIO_Init(OLED_GPIO_SCL_Port, &GPIO_InitStruct);
+	HAL_GPIO_WritePin(OLED_GPIO_SCL_Port, OLED_GPIO_SCL_Pin, GPIO_PIN_SET);
 
-	// /*Configure GPIO pin : PC12 */
-	// GPIO_InitStruct.Pin = GPIO_PIN_13;
-	// GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	// GPIO_InitStruct.Pull = GPIO_PULLUP;
-	// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	// HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	GPIO_InitStruct_2.Pin = OLED_GPIO_SDA_Pin;
+	GPIO_InitStruct_2.Mode = GPIO_MODE_OUTPUT_OD;
+	GPIO_InitStruct_2.Pull = GPIO_PULLUP;
+	GPIO_InitStruct_2.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(OLED_GPIO_SDA_Port, &GPIO_InitStruct_2);
+	HAL_GPIO_WritePin(OLED_GPIO_SDA_Port, OLED_GPIO_SDA_Pin, GPIO_PIN_SET);
 
 	/*Configure GPIO pin : PD2 */
-	GPIO_InitStruct.Pin = GPIO_PIN_2;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+	GPIO_InitStruct_3.Pin = GPIO_PIN_2;
+	GPIO_InitStruct_3.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct_3.Pull = GPIO_PULLUP;
+	GPIO_InitStruct_3.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct_3);
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
 
 	OLED_RES_Clr();

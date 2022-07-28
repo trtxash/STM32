@@ -10,13 +10,14 @@
  */
 #include "timer.h"
 
-TIM_HandleTypeDef TIM1_Handler;     //定时器1句柄，编码器模式，捕捉小车速度
+TIM_HandleTypeDef TIM1_Handler;     //定时器1句柄
 TIM_OC_InitTypeDef TIM1_CHxHandler; //定时器1通道句柄，4路
-TIM_HandleTypeDef TIM2_Handler;     //定时器2句柄，编码器模式，捕捉小车速度
+TIM_HandleTypeDef TIM2_Handler;     //定时器2句柄
 TIM_OC_InitTypeDef TIM2_CHxHandler; //定时器2通道句柄，4路
-TIM_HandleTypeDef TIM3_Handler;     //定时器3句柄，编码器模式，捕捉小车速度
+TIM_HandleTypeDef TIM3_Handler;     //定时器3句柄
 TIM_OC_InitTypeDef TIM3_CHxHandler; //定时器3通道句柄，4路
-TIM_HandleTypeDef TIM4_Handler;     //定时器4句柄，用来定时OLED显示
+TIM_HandleTypeDef TIM4_Handler;     //定时器4句柄，用来发生PWM波
+TIM_OC_InitTypeDef TIM4_CHxHandler; //定时器5通道句柄，4路
 TIM_HandleTypeDef TIM5_Handler;     //定时器5句柄，用来发生PWM波
 TIM_OC_InitTypeDef TIM5_CHxHandler; //定时器5通道句柄，4路
 
@@ -102,6 +103,47 @@ void TIM4_Init(u16 arr, u16 psc)
 // ways: PWM输出方式，例如可以选择输出PWM1和PWM2，那么就需要设置为0x03
 //定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
 // Ft=定时器工作频率,单位:Mhz
+void TIM4_PWM_Init(u16 arr, u16 psc, u8 ways)
+{
+    TIM4_Handler.Instance = TIM4;                             //定时器5
+    TIM4_Handler.Init.Prescaler = psc;                        //定时器分频
+    TIM4_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       //向上计数模式
+    TIM4_Handler.Init.Period = arr;                           //自动重装载值
+    TIM4_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //数字分频因子,数字分频因子为1时，TIMxCLK = PCLKx,其他值时，TIMxCLK = PCLKx/2^(数字分频因子)
+    HAL_TIM_PWM_Init(&TIM4_Handler);                          //初始化PWM
+
+    TIM4_CHxHandler.OCMode = TIM_OCMODE_PWM1;        //模式选择PWM1
+    TIM4_CHxHandler.Pulse = arr / 1;                 //设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
+    TIM4_CHxHandler.OCPolarity = TIM_OCPOLARITY_LOW; //输出比较极性为低
+
+    if (ways & 0B0001)
+    {
+        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_1); //配置TIM5通道1
+        HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_1);                           //启动TIM5通道1的PWM输出
+    }
+    if (ways & 0B0010)
+    {
+        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_2); //配置TIM5通道2
+        HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_2);                           //启动TIM5通道2的PWM输出
+    }
+    if (ways & 0B0100)
+    {
+        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_3); //配置TIM5通道3
+        HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_3);                           //启动TIM5通道3的PWM输出
+    }
+    if (ways & 0B1000)
+    {
+        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM5_CHxHandler, TIM_CHANNEL_4); //配置TIM5通道4
+        HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_4);                           //启动TIM5通道4的PWM输出
+    }
+}
+
+// TIM5 PWM部分初始化
+// arr：自动重装值。
+// psc：时钟预分频数
+// ways: PWM输出方式，例如可以选择输出PWM1和PWM2，那么就需要设置为0x03
+//定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+// Ft=定时器工作频率,单位:Mhz
 void TIM5_PWM_Init(u16 arr, u16 psc, u8 ways)
 {
     TIM5_Handler.Instance = TIM5;                             //定时器5
@@ -179,15 +221,62 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 {
     GPIO_InitTypeDef GPIO_Initure;
-    __HAL_RCC_TIM5_CLK_ENABLE();  //使能定时器5
-    __HAL_RCC_GPIOA_CLK_ENABLE(); //开启GPIOA时钟
+    if (htim->Instance == TIM1)
+    {
+    }
+    else if (htim->Instance == TIM2)
+    {
+    }
+    else if (htim->Instance == TIM3)
+    {
+    }
+    else if (htim->Instance == TIM4)
+    {
+        __HAL_RCC_TIM4_CLK_ENABLE();
+        __HAL_RCC_GPIOB_CLK_ENABLE();
 
-    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3; // PA0~PA3
-    GPIO_Initure.Mode = GPIO_MODE_AF_PP;                                  //复用推挽输出
-    GPIO_Initure.Pull = GPIO_PULLUP;                                      //上拉
-    GPIO_Initure.Speed = GPIO_SPEED_HIGH;                                 //高速
-    GPIO_Initure.Alternate = GPIO_AF2_TIM5;                               // PA0,2复用为AF2_TIM5
-    HAL_GPIO_Init(GPIOA, &GPIO_Initure);
+        GPIO_Initure.Pin = GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9;
+        GPIO_Initure.Mode = GPIO_MODE_AF_PP;  //复用推挽输出
+        GPIO_Initure.Pull = GPIO_PULLUP;      //上拉
+        GPIO_Initure.Speed = GPIO_SPEED_HIGH; //高速
+        GPIO_Initure.Alternate = GPIO_AF2_TIM4;
+        HAL_GPIO_Init(GPIOB, &GPIO_Initure);
+    }
+    else if (htim->Instance == TIM5)
+    {
+        __HAL_RCC_TIM5_CLK_ENABLE();  //使能定时器5
+        __HAL_RCC_GPIOA_CLK_ENABLE(); //开启GPIOA时钟
+
+        GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3; // PA0~PA3
+        GPIO_Initure.Mode = GPIO_MODE_AF_PP;                                  //复用推挽输出
+        GPIO_Initure.Pull = GPIO_PULLUP;                                      //上拉
+        GPIO_Initure.Speed = GPIO_SPEED_HIGH;                                 //高速
+        GPIO_Initure.Alternate = GPIO_AF2_TIM5;                               // PA0,2复用为AF2_TIM5
+        HAL_GPIO_Init(GPIOA, &GPIO_Initure);
+    }
+}
+
+//设置TIM通道n的占空比
+// compare:比较值,越大占空比越小
+void TIM_SetTIM4Compare_n(u32 compare, u8 n)
+{
+    switch (n)
+    {
+    case 1:
+        TIM4->CCR1 = compare;
+        break;
+    case 2:
+        TIM4->CCR2 = compare;
+        break;
+    case 3:
+        TIM4->CCR3 = compare;
+        break;
+    case 4:
+        TIM4->CCR4 = compare;
+        break;
+    default:
+        break;
+    }
 }
 
 //设置TIM通道n的占空比

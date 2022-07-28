@@ -238,7 +238,7 @@ void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
     }
 }
 
-//定时器2中断服务函数
+//定时器1中断服务函数
 void TIM1_UP_TIM10_IRQHandler(void)
 {
     usart_tr[1] = Read_Encoder(1);
@@ -248,7 +248,16 @@ void TIM1_UP_TIM10_IRQHandler(void)
 
     usart_tr[5] = Read_Infraredtobe_bits(); // 读取红外传感器的数据
 
+    usart_tr[6] = power; // 读取红外传感器的数据
+
+    for (u8 i = 1; i < 12 - 2; i++)
+    {
+        usart_tr[10] += usart_tr[i];
+    }
+
     SendString(usart_tr);
+
+    usart_tr[10] = 0;
 
     __HAL_TIM_CLEAR_FLAG(&TIM1_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }
@@ -402,16 +411,19 @@ void TIM2_IRQHandler(void)
     /* 标志清除部分 */
     __HAL_TIM_CLEAR_FLAG(&TIM2_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }
+
 //定时器3中断服务函数
 void TIM3_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&TIM3_Handler);
 }
+
 //定时器4中断服务函数
 void TIM4_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&TIM4_Handler);
 }
+
 //定时器5中断服务函数
 void TIM5_IRQHandler(void)
 {
