@@ -9,15 +9,15 @@ void Infraredtobe_Init(void)
     __HAL_RCC_GPIOB_CLK_ENABLE(); //开启GPIOB时钟
     __HAL_RCC_GPIOA_CLK_ENABLE(); //开启GPIOA时钟
 
-    GPIO_Initure.Pin = GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; // PB0 PB1 PB2 PB10
-    GPIO_Initure.Mode = GPIO_MODE_INPUT;                                                                             //输入
-    GPIO_Initure.Pull = GPIO_PULLUP;                                                                                 //上拉
-    GPIO_Initure.Speed = GPIO_SPEED_HIGH;                                                                            //高速
+    GPIO_Initure.Pin = GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; // PB0 PB1 PB2 PB10
+    GPIO_Initure.Mode = GPIO_MODE_INPUT;                                                                //输入
+    GPIO_Initure.Pull = GPIO_PULLUP;                                                                    //上拉
+    GPIO_Initure.Speed = GPIO_SPEED_HIGH;                                                               //高速
     HAL_GPIO_Init(GPIOB, &GPIO_Initure);
-    
-    GPIO_Initure_2.Pin = GPIO_PIN_4;       // PB4 PB5 PB6 PB7
-    GPIO_Initure_2.Mode = GPIO_MODE_INPUT; //输入
-    GPIO_Initure_2.Pull = GPIO_PULLUP;     //上拉
+
+    GPIO_Initure_2.Pin = GPIO_PIN_3 | GPIO_PIN_4; // PB4 PB5 PB6 PB7
+    GPIO_Initure_2.Mode = GPIO_MODE_INPUT;        //输入
+    GPIO_Initure_2.Pull = GPIO_PULLUP;            //上拉
     GPIO_Initure_2.Speed = GPIO_SPEED_HIGH;
     HAL_GPIO_Init(GPIOA, &GPIO_Initure_2);
 }

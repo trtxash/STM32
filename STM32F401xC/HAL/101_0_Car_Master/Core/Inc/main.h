@@ -40,11 +40,6 @@ extern "C"
 #include "infraredtobe.h"
 #include "mlx90614.h"
 
-  extern double Encoder_1; // 当前1速度
-  extern double Encoder_2; // 当前2速度
-  extern double Encoder_3; // 当前3速度
-  extern double Encoder_4; // 当前4速度
-
   void Error_Handler(void);
 
 #ifdef __cplusplus

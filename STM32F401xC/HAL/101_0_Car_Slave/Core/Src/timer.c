@@ -10,6 +10,9 @@
  */
 #include "timer.h"
 
+TxPack txpack;
+RxPack rxpack;
+
 TIM_HandleTypeDef TIM1_Handler;     //定时器1句柄，编码器模式，捕捉小车速度
 TIM_OC_InitTypeDef TIM1_CHxHandler; //定时器1通道句柄，4路
 TIM_HandleTypeDef TIM2_Handler;     //定时器2句柄，编码器模式，捕捉小车速度
@@ -241,23 +244,23 @@ void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
 //定时器1中断服务函数
 void TIM1_UP_TIM10_IRQHandler(void)
 {
-    usart_tr[1] = Read_Encoder(1);
-    usart_tr[2] = Read_Encoder(2);
-    usart_tr[3] = Read_Encoder(3);
-    usart_tr[4] = Read_Encoder(4);
+    txpack.shorts[0] = (short)Read_Encoder(2);
+    txpack.shorts[1] = (short)Read_Encoder(3);
+    txpack.shorts[2] = (short)Read_Encoder(4);
+    txpack.shorts[3] = (short)Read_Encoder(5);
 
-    usart_tr[5] = Read_Infraredtobe_bits(); // 读取红外传感器的数据
+    txpack.shorts[4] = (short)power;
 
-    usart_tr[6] = power; // 读取红外传感器的数据
+    txpack.bools[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3);
+    txpack.bools[1] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4);
+    txpack.bools[2] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4);
+    txpack.bools[3] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5);
+    txpack.bools[4] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12);
+    txpack.bools[5] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_13);
+    txpack.bools[6] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14);
+    txpack.bools[7] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15);
 
-    for (u8 i = 1; i < 12 - 2; i++)
-    {
-        usart_tr[10] += usart_tr[i];
-    }
-
-    SendString(usart_tr);
-
-    usart_tr[10] = 0;
+    sendValuePack(&txpack);
 
     __HAL_TIM_CLEAR_FLAG(&TIM1_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }

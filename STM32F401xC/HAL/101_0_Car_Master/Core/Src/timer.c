@@ -21,6 +21,8 @@ TIM_OC_InitTypeDef TIM4_CHxHandler; //定时器5通道句柄，4路
 TIM_HandleTypeDef TIM5_Handler;     //定时器5句柄，用来发生PWM波
 TIM_OC_InitTypeDef TIM5_CHxHandler; //定时器5通道句柄，4路
 
+RxPack rxpack;
+
 //通用定时器2中断初始化
 // arr：自动重装值。
 // psc：时钟预分频数
@@ -327,17 +329,78 @@ void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
     }
 }
 
-//定时器2中断服务函数
+//定时器1中断服务函数
 void TIM1_UP_TIM10_IRQHandler(void)
 {
-    usart_tr[1] = Read_Encoder(1);
-    usart_tr[2] = Read_Encoder(2);
-    usart_tr[3] = Read_Encoder(3);
-    usart_tr[4] = Read_Encoder(4);
+    u8 temp2[16] = {0};
 
-    usart_tr[5] = Read_Infraredtobe_bits(); // 读取红外传感器的数据
+    if (readValuePack(&rxpack))
+    {
+        rxIndex = 0;
+    }
 
-    SendString(usart_tr);
+    /* 编码器读取 */
+    Encoder_1 = rxpack.shorts[0];
+    Encoder_2 = rxpack.shorts[1];
+    Encoder_3 = rxpack.shorts[2];
+    Encoder_4 = rxpack.shorts[3];
+
+    /* 红外 */
+    for (u8 i = 0; i < 8; i++)
+    {
+        OLED_ShowNum(i * 6, 58, rxpack.bools[i], 1, 8, 1);
+    }
+
+    /* 编码器显示 */
+    if (Encoder_1 >= 0)
+    {
+        OLED_ShowChar(0, 16, '+', 8, 1);
+        OLED_ShowNum(6, 16, Encoder_1, 4, 8, 1); // 显示红外传感器的数值
+    }
+    else
+    {
+        OLED_ShowChar(0, 16, '-', 8, 1);
+        OLED_ShowNum(6, 16, -Encoder_1, 4, 8, 1); // 显示红外传感器的数值
+    }
+    if (Encoder_2 >= 0)
+    {
+        OLED_ShowChar(0, 24, '+', 8, 1);
+        OLED_ShowNum(6, 24, Encoder_2, 4, 8, 1); // 显示红外传感器的数值
+    }
+    else
+    {
+        OLED_ShowChar(0, 24, '-', 8, 1);
+        OLED_ShowNum(6, 24, -Encoder_2, 4, 8, 1); // 显示红外传感器的数值
+    }
+    if (Encoder_3 >= 0)
+    {
+        OLED_ShowChar(0, 32, '+', 8, 1);
+        OLED_ShowNum(6, 32, Encoder_3, 4, 8, 1); // 显示红外传感器的数值
+    }
+    else
+    {
+        OLED_ShowChar(0, 32, '-', 8, 1);
+        OLED_ShowNum(6, 32, -Encoder_3, 4, 8, 1); // 显示红外传感器的数值
+    }
+    if (Encoder_4 >= 0)
+    {
+        OLED_ShowChar(0, 40, '+', 8, 1);
+        OLED_ShowNum(6, 40, Encoder_4, 4, 8, 1); // 显示红外传感器的数值
+    }
+    else
+    {
+        OLED_ShowChar(0, 40, '-', 8, 1);
+        OLED_ShowNum(6, 40, -Encoder_4, 4, 8, 1); // 显示红外传感器的数值
+    }
+
+    /* 温度和电量 */
+    sprintf(temp2, "TEM:%3.1f;POW:%d", tem, rxpack.shorts[4]);
+    OLED_ShowString(0, 0, temp2, 16, 1);
+
+    /* 接受错误 */
+    OLED_ShowNum(0, 48, err, 5, 8, 1);
+
+    OLED_Refresh();
 
     __HAL_TIM_CLEAR_FLAG(&TIM1_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }

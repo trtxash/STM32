@@ -108,10 +108,10 @@ static void TIM_Encoder_Init(void)
  */
 static void Encoder_GPIO_Init(void)
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitTypeDef GPIO_InitStruct_2 = {0};
-    GPIO_InitTypeDef GPIO_InitStruct_3 = {0};
-    GPIO_InitTypeDef GPIO_InitStruct_4 = {0};
+    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitTypeDef GPIO_InitStruct_2;
+    GPIO_InitTypeDef GPIO_InitStruct_3;
+    GPIO_InitTypeDef GPIO_InitStruct_4;
 
     ENCODER_TIM_CH1_GPIO_CLK_ENABLE(); /* 定时器通道引脚端口时钟使能 */
     ENCODER_TIM_CH2_GPIO_CLK_ENABLE();

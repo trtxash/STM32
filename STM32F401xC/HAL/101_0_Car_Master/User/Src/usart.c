@@ -32,13 +32,8 @@ int fputc(int ch, FILE *f)
 }
 #endif
 
-//接收状态
-// bit15，	接收完成标志
-// bit14，	接收到0x0d
-// bit13~0，	接收到的有效字节数目
-
 // 发送数据包的字节长度
-const unsigned short TXPACK_BYTE_SIZE = ((TX_BOOL_NUM + 7) >> 3) + TX_BYTE_NUM + (TX_SHORT_NUM << 1) + (TX_INT_NUM << 2) + (TX_FLOAT_NUM << 2);
+#define TXPACK_BYTE_SIZE ((TX_BOOL_NUM + 7) >> 3) + TX_BYTE_NUM + (TX_SHORT_NUM << 1) + (TX_INT_NUM << 2) + (TX_FLOAT_NUM << 2)
 // 接收数据包的字节长度
 const unsigned short RXPACK_BYTE_SIZE = ((RX_BOOL_NUM + 7) >> 3) + RX_BYTE_NUM + (RX_SHORT_NUM << 1) + (RX_INT_NUM << 2) + (RX_FLOAT_NUM << 2);
 // 接收数据包的原数据加上包头、校验和包尾 之后的字节长度
@@ -56,9 +51,6 @@ unsigned char vp_txbuff[TXPACK_BYTE_SIZE + 3];
 // 数据包环形缓冲区计数
 unsigned int vp_circle_rx_index;
 
-UART_HandleTypeDef UART1_Handler; // UART1句柄
-UART_HandleTypeDef UART6_Handler; // UART6句柄
-
 // 数据读取涉及到的变量
 unsigned short rdi, rdii, idl, idi, bool_index, bool_bit;
 // 变量地址
@@ -69,6 +61,9 @@ unsigned int err = 0;
 unsigned char sum = 0;
 // 存放数据包读取的结果
 unsigned char isok;
+
+UART_HandleTypeDef UART1_Handler; // UART1句柄
+UART_HandleTypeDef UART6_Handler; // UART6句柄
 
 //------------------------------------------------------------------------------------------------------------------------
 // unsigned char readValuePack(RxPack *rx_pack_ptr)
@@ -81,7 +76,9 @@ unsigned char readValuePack(RxPack *rx_pack_ptr)
 
 	// 确保读取计数和接收计数之间的距离小于2个数据包的长度
 	while (rdIndex < (rxIndex - ((rx_pack_length)*2)))
+	{
 		rdIndex += rx_pack_length;
+	}
 
 	// 如果读取计数落后于接收计数超过 1个 数据包的长度，则尝试读取
 	while (rdIndex <= (rxIndex - rx_pack_length))
@@ -244,8 +241,6 @@ unsigned char valuepack_tx_index;
 //  传入参数- TxPack *tx_pack_ptr 待发送数据包的指针
 //
 //  先将待发送数据包结构体的变量转移到“发送数据缓冲区”中，然后将发送数据缓冲区中的数据发送
-//
-
 void sendValuePack(TxPack *tx_pack_ptr)
 {
 	int i;
@@ -383,7 +378,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
 #if EN_USART1_RX
 		HAL_NVIC_EnableIRQ(USART1_IRQn);		 //使能USART1中断通道
-		HAL_NVIC_SetPriority(USART1_IRQn, 2, 1); //抢占优先级2，子优先级1
+		HAL_NVIC_SetPriority(USART1_IRQn, 1, 1); //抢占优先级2，子优先级1
 #endif
 	}
 	if (huart->Instance == USART6) //如果是串口1，进行串口1 MSP初始化
@@ -424,7 +419,15 @@ void USART1_IRQHandler(void)
 		{
 			rxIndex = 0;
 		}
+
+		// if (readValuePack(&rxpack))
+		// {
+		// 	rxIndex = 0;
+		// }
+
+		__HAL_UART_CLEAR_FLAG(&UART1_Handler, UART_FLAG_RXNE); //清除接收中断标志
 	}
+
 	// vp_rxbuff[rxIndex] = USART1->DR; //读取串口数据
 	// if (USART1->DR == 0XA5)					 //接受到了开始数据，数据包头正确
 	// 	rxIndex = 0;					 //接收累加器清零
@@ -488,8 +491,7 @@ void USART1_IRQHandler(void)
 	// 	else
 	// 		rxIndex = 0;
 	// }
-	__HAL_UART_CLEAR_FLAG(&UART6_Handler, UART_FLAG_RXNE); //清除接收中断标志
-#if SYSTEM_SUPPORT_OS									   //使用OS
+#if SYSTEM_SUPPORT_OS //使用OS
 	OSIntExit();
 #endif
 }

@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "main.h": "c",
+        "usart.h": "c",
         "bspencoder.h": "c"
     }
 }

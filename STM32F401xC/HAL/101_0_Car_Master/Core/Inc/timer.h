@@ -14,6 +14,7 @@
 
 #include "sys.h"
 #include "stdio.h"
+#include "usart.h"
 #include "oled.h"
 #include "bspencoder.h"
 #include "pid.h"
@@ -25,8 +26,6 @@ extern u8 move;
 extern u8 bluetooth;
 extern int pwmval_1;         // 定时器5PWM占空比设置
 extern int pwmval_2;         // 定时器5PWM占空比设置
-extern double Encoder_1;     // 外部变量，当前1速度
-extern double Encoder_2;     // 外部变量，当前2速度
 extern int Now_pos;          // 外部变量，当前位置
 extern int Now_pos_num;      // 外部变量，当前位置数字
 extern int Target_pos;       // 外部变量，目标位置
@@ -34,11 +33,10 @@ extern double TargetSpeed_1; // 目标速度
 extern double TargetSpeed_2; // 目标速度
 extern double TargetSpeed;   // 目标和速度
 extern double Angle_Target;  // 目标角度
-extern u8 usart_tr[];
+extern long rxIndex;         // 接收索引
+extern unsigned int err;
 
-// #define USART_REC_LEN 200              //定义最大接收字节数 200
-// extern u8 USART_RX_BUF[USART_REC_LEN]; //接收缓冲,最大USART_REC_LEN个字节.
-
+void TIM1_Init(u16 arr, u16 psc);
 void TIM2_Init(u16 arr, u16 psc);
 void TIM3_Init(u16 arr, u16 psc);
 void TIM4_Init(u16 arr, u16 psc);

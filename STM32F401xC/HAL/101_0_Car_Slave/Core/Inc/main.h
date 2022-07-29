@@ -35,7 +35,6 @@ extern "C"
 #include "usart.h"
 #include "stdio.h"
 #include "timer.h"
-#include "oled.h"
 #include "bspencoder.h"
 #include "infraredtobe.h"
 

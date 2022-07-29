@@ -7,10 +7,10 @@ u8 move = 0;
 u8 bluetooth = 0;
 int pwmval_1;               // 定时器PWM占空比设置
 int pwmval_2;               // 定时器PWM占空比设置
-double Encoder_1;           // 当前1速度
-double Encoder_2;           // 当前2速度
-double Encoder_3;           // 当前3速度
-double Encoder_4;           // 当前4速度
+short Encoder_1;           // 当前1速度
+short Encoder_2;           // 当前2速度
+short Encoder_3;           // 当前3速度
+short Encoder_4;           // 当前4速度
 int Now_pos = 0;            // 当前位置
 int Now_pos_num = 0;        // 当前位置数字
 int Target_pos = 0;         // 目标位置

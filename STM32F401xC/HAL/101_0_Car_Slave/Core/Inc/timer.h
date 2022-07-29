@@ -14,6 +14,7 @@
 
 #include "sys.h"
 #include "stdio.h"
+#include "usart.h"
 #include "oled.h"
 #include "bspencoder.h"
 #include "pid.h"
@@ -34,12 +35,12 @@ extern double TargetSpeed_1; // 目标速度
 extern double TargetSpeed_2; // 目标速度
 extern double TargetSpeed;   // 目标和速度
 extern double Angle_Target;  // 目标角度
-extern u8 usart_tr[];
 extern u8 power; // 外部变量，电源
 
 // #define USART_REC_LEN 200              //定义最大接收字节数 200
 // extern u8 USART_RX_BUF[USART_REC_LEN]; //接收缓冲,最大USART_REC_LEN个字节.
 
+void TIM1_Init(u16 arr, u16 psc);
 void TIM2_Init(u16 arr, u16 psc);
 void TIM3_Init(u16 arr, u16 psc);
 void TIM4_Init(u16 arr, u16 psc);

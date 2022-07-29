@@ -5,12 +5,8 @@
  * @version 1.00
  * @date 	2022年7月21号18点53分
  */
-
 #include "main.h"
 
-#define USART_REC_LEN_MAIN 12 //定义最大接收字节数 12
-
-u8 usart_tr[USART_REC_LEN_MAIN] = {0XA5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0X5A};
 u8 power = 93; //电池电量
 
 /**
@@ -32,7 +28,7 @@ int main(void)
 	// Beep_Init();					 //初始化蜂鸣器
 	Infraredtobe_Init(); //初始化红外检测模块
 	// OLED_Init();					 // OLED初始化
-	TIM1_Init(10000 - 1, 84 - 1); // 100Hz,10ms
+	TIM1_Init(5000 - 1, 84 - 1); // 5ms
 	// TIM2_Init(10000 - 1, 84 - 1);	 // 100Hz刷新OLED
 	// TIM5_PWM_Init(arr, psc, 0B1111); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
 	Encoder_Init(); // 初始化电机编码器
