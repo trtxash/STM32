@@ -244,10 +244,10 @@ void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
 //定时器1中断服务函数
 void TIM1_UP_TIM10_IRQHandler(void)
 {
-    txpack.shorts[0] = (short)Read_Encoder(2);
+    txpack.shorts[0] = -(short)Read_Encoder(2);
     txpack.shorts[1] = (short)Read_Encoder(3);
-    txpack.shorts[2] = (short)Read_Encoder(4);
-    txpack.shorts[3] = (short)Read_Encoder(5);
+    txpack.shorts[2] = -(short)Read_Encoder(5);
+    txpack.shorts[3] = (short)Read_Encoder(4);
 
     txpack.shorts[4] = (short)power;
 

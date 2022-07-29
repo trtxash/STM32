@@ -24,11 +24,17 @@ extern u8 beep;
 extern u8 beep_flag;
 extern u8 move;
 extern u8 bluetooth;
-extern int pwmval_1;         // 定时器5PWM占空比设置
-extern int pwmval_2;         // 定时器5PWM占空比设置
-extern int Now_pos;          // 外部变量，当前位置
-extern int Now_pos_num;      // 外部变量，当前位置数字
-extern int Target_pos;       // 外部变量，目标位置
+extern int pwmval_1;    // 定时器5PWM占空比设置
+extern int pwmval_2;    // 定时器5PWM占空比设置
+extern int pwmval_3;    // 定时器5PWM占空比设置
+extern int pwmval_4;    // 定时器5PWM占空比设置
+extern int Now_pos;     // 外部变量，当前位置
+extern int Now_pos_num; // 外部变量，当前位置数字
+extern int Target_pos;  // 外部变量，目标位置
+extern short Encoder_target_1;
+extern short Encoder_target_2;
+extern short Encoder_target_3;
+extern short Encoder_target_4;
 extern double TargetSpeed_1; // 目标速度
 extern double TargetSpeed_2; // 目标速度
 extern double TargetSpeed;   // 目标和速度
@@ -44,6 +50,7 @@ void TIM4_PWM_Init(u16 arr, u16 psc, u8 ways);
 void TIM5_PWM_Init(u16 arr, u16 psc, u8 ways);
 void TIM_SetTIM4Compare_n(u32 compare, u8 n);
 void TIM_SetTIM5Compare_n(u32 compare, u8 n);
+void TIM_SetTIM4_DutyCycle_n(u8 DutyCycle, u8 n);
 void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n);
 
 #endif

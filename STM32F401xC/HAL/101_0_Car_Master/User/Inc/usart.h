@@ -3,6 +3,7 @@
 #include "sys.h"
 #include "stdio.h"
 #include "oled.h"
+#include "pid.h"
 
 #define EN_USART1_RX 1 //使能（1）/禁止（0）串口1接收
 #define EN_USART6_RX 1 //使能（1）/禁止（0）串口1接收
@@ -11,7 +12,7 @@
 // 接收的数据在接收中断中写入到buffer中，通过定时调用readValuePack()函数来解析，定时间隔建议在10ms以内。
 // 1.指定接收缓冲区的大小 ----------------------------------------------------------------------------------
 //    一般需要512字节以上，需要根据实际接收数据的速度和proc函数的频率考虑。
-#define VALUEPACK_BUFFER_SIZE 10240
+#define VALUEPACK_BUFFER_SIZE 1024
 
 // 2.指定发送数据包的结构--------------------------在发送时会自动额外在前后加上包头，包尾和校验和数据，因此会多出3个字节
 //    根据实际需要的变量，定义数据包中 bool byte short int float 五种类型的数目
@@ -93,6 +94,14 @@ extern short Encoder_1;      // 外部变量，当前1速度
 extern short Encoder_2;      // 外部变量，当前2速度
 extern short Encoder_3;      // 外部变量，当前3速度
 extern short Encoder_4;      // 外部变量，当前4速度
+extern short Encoder_target_1;
+extern short Encoder_target_2;
+extern short Encoder_target_3;
+extern short Encoder_target_4;
+extern int pwmval_1;    // 定时器5PWM占空比设置
+extern int pwmval_2;    // 定时器5PWM占空比设置
+extern int pwmval_3;    // 定时器5PWM占空比设置
+extern int pwmval_4;    // 定时器5PWM占空比设置
 extern double TargetSpeed_1; // 目标速度
 extern double TargetSpeed_2; // 目标速度
 extern double TargetSpeed;   // 目标和速度

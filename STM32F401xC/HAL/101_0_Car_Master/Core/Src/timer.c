@@ -135,7 +135,7 @@ void TIM4_PWM_Init(u16 arr, u16 psc, u8 ways)
     }
     if (ways & 0B1000)
     {
-        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM5_CHxHandler, TIM_CHANNEL_4); //配置TIM5通道4
+        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_4); //配置TIM5通道4
         HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_4);                           //启动TIM5通道4的PWM输出
     }
 }
@@ -306,6 +306,31 @@ void TIM_SetTIM5Compare_n(u32 compare, u8 n)
 
 //设置TIM通道n的占空比
 // DutyCycle:占空比,越大占空比越大，0~100
+void TIM_SetTIM4_DutyCycle_n(u8 DutyCycle, u8 n)
+{
+    u32 compare;
+    compare = (100 - DutyCycle) * TIM4_Handler.Init.Period / 100;
+    switch (n)
+    {
+    case 1:
+        TIM4->CCR1 = compare;
+        break;
+    case 2:
+        TIM4->CCR2 = compare;
+        break;
+    case 3:
+        TIM4->CCR3 = compare;
+        break;
+    case 4:
+        TIM4->CCR4 = compare;
+        break;
+    default:
+        break;
+    }
+}
+
+//设置TIM通道n的占空比
+// DutyCycle:占空比,越大占空比越大，0~100
 void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
 {
     u32 compare;
@@ -336,14 +361,65 @@ void TIM1_UP_TIM10_IRQHandler(void)
 
     if (readValuePack(&rxpack))
     {
-        rxIndex = 0;
-    }
+        /* 速度计算 */
+        Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = 500; // 范围-1800~1800
 
-    /* 编码器读取 */
-    Encoder_1 = rxpack.shorts[0];
-    Encoder_2 = rxpack.shorts[1];
-    Encoder_3 = rxpack.shorts[2];
-    Encoder_4 = rxpack.shorts[3];
+        /* 编码器读取 */
+        Encoder_1 = rxpack.shorts[0];
+        Encoder_2 = rxpack.shorts[1];
+        Encoder_3 = rxpack.shorts[2];
+        Encoder_4 = rxpack.shorts[3];
+
+        /* PID计算与反馈 */
+        pwmval_1 = Velocity_FeedbackControl_1(Encoder_target_1, Encoder_1); //速度反馈控制
+        /* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
+        if (pwmval_1 >= 0)
+        {
+            TIM_SetTIM4_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
+            TIM_SetTIM4_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+        }
+        else
+        {
+            TIM_SetTIM4_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
+            TIM_SetTIM4_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+        }
+        pwmval_2 = Velocity_FeedbackControl_2(Encoder_target_2, Encoder_2); //速度反馈控制
+        /* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
+        if (pwmval_2 >= 0)
+        {
+            TIM_SetTIM4_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
+            TIM_SetTIM4_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+        }
+        else
+        {
+            TIM_SetTIM4_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
+            TIM_SetTIM4_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+        }
+        pwmval_3 = Velocity_FeedbackControl_3(Encoder_target_3, Encoder_3); //速度反馈控制
+        /* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
+        if (pwmval_3 >= 0)
+        {
+            TIM_SetTIM5_DutyCycle_n(pwmval_3, 4); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+        }
+        else
+        {
+            TIM_SetTIM5_DutyCycle_n(-pwmval_3, 3); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+        }
+        pwmval_4 = Velocity_FeedbackControl_4(Encoder_target_4, Encoder_4); //速度反馈控制
+        /* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
+        if (pwmval_4 >= 0)
+        {
+            TIM_SetTIM5_DutyCycle_n(pwmval_4, 1); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 2);        //修改比较值，修改占空比
+        }
+        else
+        {
+            TIM_SetTIM5_DutyCycle_n(-pwmval_4, 2); //修改比较值，修改占空比
+            TIM_SetTIM5_DutyCycle_n(0, 1);         //修改比较值，修改占空比
+        }
+    }
 
     /* 红外 */
     for (u8 i = 0; i < 8; i++)

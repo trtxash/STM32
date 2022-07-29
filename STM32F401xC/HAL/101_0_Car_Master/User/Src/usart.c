@@ -35,7 +35,7 @@ int fputc(int ch, FILE *f)
 // 发送数据包的字节长度
 #define TXPACK_BYTE_SIZE ((TX_BOOL_NUM + 7) >> 3) + TX_BYTE_NUM + (TX_SHORT_NUM << 1) + (TX_INT_NUM << 2) + (TX_FLOAT_NUM << 2)
 // 接收数据包的字节长度
-const unsigned short RXPACK_BYTE_SIZE = ((RX_BOOL_NUM + 7) >> 3) + RX_BYTE_NUM + (RX_SHORT_NUM << 1) + (RX_INT_NUM << 2) + (RX_FLOAT_NUM << 2);
+#define RXPACK_BYTE_SIZE ((RX_BOOL_NUM + 7) >> 3) + RX_BYTE_NUM + (RX_SHORT_NUM << 1) + (RX_INT_NUM << 2) + (RX_FLOAT_NUM << 2)
 // 接收数据包的原数据加上包头、校验和包尾 之后的字节长度
 unsigned short rx_pack_length = RXPACK_BYTE_SIZE + 3;
 // 接收计数-记录当前的数据接收进度
@@ -203,7 +203,7 @@ unsigned char readValuePack(RxPack *rx_pack_ptr)
 			rdIndex++;
 			err++;
 		}
-	}
+		}
 	return isok;
 }
 
@@ -378,7 +378,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
 #if EN_USART1_RX
 		HAL_NVIC_EnableIRQ(USART1_IRQn);		 //使能USART1中断通道
-		HAL_NVIC_SetPriority(USART1_IRQn, 1, 1); //抢占优先级2，子优先级1
+		HAL_NVIC_SetPriority(USART1_IRQn, 0, 1); //抢占优先级2，子优先级1
 #endif
 	}
 	if (huart->Instance == USART6) //如果是串口1，进行串口1 MSP初始化
@@ -418,12 +418,8 @@ void USART1_IRQHandler(void)
 		if (rxIndex >= VALUEPACK_BUFFER_SIZE) //接收到的数据长度超过最大长度，环形缓冲区溢出，将接收累加器重置为0
 		{
 			rxIndex = 0;
+			rdIndex = 0;
 		}
-
-		// if (readValuePack(&rxpack))
-		// {
-		// 	rxIndex = 0;
-		// }
 
 		__HAL_UART_CLEAR_FLAG(&UART1_Handler, UART_FLAG_RXNE); //清除接收中断标志
 	}
