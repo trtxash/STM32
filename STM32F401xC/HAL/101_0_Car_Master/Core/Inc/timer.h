@@ -20,6 +20,10 @@
 #include "pid.h"
 #include "infraredtobe.h"
 
+extern u32 TIME_N5ms;
+extern char infraredtobe_flag;
+extern u8 infraredtobe_state;
+extern char car_state; // -2:左转，-1:停止，1:直走，2:右转
 extern u8 beep;
 extern u8 beep_flag;
 extern u8 move;
@@ -31,6 +35,7 @@ extern int pwmval_4;    // 定时器5PWM占空比设置
 extern int Now_pos;     // 外部变量，当前位置
 extern int Now_pos_num; // 外部变量，当前位置数字
 extern int Target_pos;  // 外部变量，目标位置
+extern short Encoder_target;
 extern short Encoder_target_1;
 extern short Encoder_target_2;
 extern short Encoder_target_3;

@@ -251,6 +251,25 @@ void TIM1_UP_TIM10_IRQHandler(void)
 
     txpack.shorts[4] = (short)power;
 
+    // if (pin_a3 / pin_sum > 0.2)
+    //     txpack.bools[0] = 1;
+    // else
+    //     txpack.bools[0] = 0;
+    // if (pin_a4 / pin_sum > 0.2)
+    //     txpack.bools[1] = 1;
+    // else
+    //     txpack.bools[1] = 0;
+    // if (pin_b5 / pin_sum > 0.2)
+    //     txpack.bools[2] = 1;
+    // else
+    //     txpack.bools[2] = 0;
+    // if (pin_b6 / pin_sum > 0.2)
+    //     txpack.bools[3] = 1;
+    // else
+    //     txpack.bools[3] = 0;
+
+    // pin_a3 = pin_a4 = pin_b5 = pin_b6 = pin_sum = 0;
+
     txpack.bools[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3);
     txpack.bools[1] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4);
     txpack.bools[2] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4);

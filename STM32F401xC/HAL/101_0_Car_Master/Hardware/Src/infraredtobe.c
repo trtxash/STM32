@@ -1,5 +1,8 @@
 #include "infraredtobe.h"
 
+char infraredtobe_flag = 0;  // LED标志位
+u8 infraredtobe_state = 0; // -1:左转，0:停止，1:右转
+
 //按键初始化函数
 void Infraredtobe_Init(void)
 {

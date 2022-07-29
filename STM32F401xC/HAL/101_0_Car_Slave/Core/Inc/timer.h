@@ -20,6 +20,11 @@
 #include "pid.h"
 #include "infraredtobe.h"
 
+extern long pin_a3; // A3引脚电压
+extern long pin_a4; // A4引脚电压
+extern long pin_b5; // B5引脚电压
+extern long pin_b6; // B6引脚电压
+extern long pin_sum;
 extern u8 beep;
 extern u8 beep_flag;
 extern u8 move;
@@ -35,7 +40,7 @@ extern double TargetSpeed_1; // 目标速度
 extern double TargetSpeed_2; // 目标速度
 extern double TargetSpeed;   // 目标和速度
 extern double Angle_Target;  // 目标角度
-extern u8 power; // 外部变量，电源
+extern u8 power;             // 外部变量，电源
 
 // #define USART_REC_LEN 200              //定义最大接收字节数 200
 // extern u8 USART_RX_BUF[USART_REC_LEN]; //接收缓冲,最大USART_REC_LEN个字节.

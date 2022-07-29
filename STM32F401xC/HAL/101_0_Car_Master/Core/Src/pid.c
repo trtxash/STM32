@@ -8,25 +8,26 @@ double P_X = 0.8000, I_X = 0.0050, D_X = 300.0;         // PID constants
 
 u8 move = 0;
 u8 bluetooth = 0;
-int pwmval_1;                 // 定时器PWM占空比设置
-int pwmval_2;                 // 定时器PWM占空比设置
-int pwmval_3;                 // 定时器PWM占空比设置
-int pwmval_4;                 // 定时器PWM占空比设置
-short Encoder_1;              // 当前1速度
-short Encoder_2;              // 当前2速度
-short Encoder_3;              // 当前3速度
-short Encoder_4;              // 当前4速度
-short Encoder_target_1 = 500; // 目标速度
-short Encoder_target_2 = 500; // 目标速度
-short Encoder_target_3 = 500; // 目标速度
-short Encoder_target_4 = 500; // 目标速度
-int Now_pos = 0;              // 当前位置
-int Now_pos_num = 0;          // 当前位置数字
-int Target_pos = 0;           // 目标位置
-double TargetSpeed_1 = 0.0;   // 目标速度
-double TargetSpeed_2 = 0.0;   // 目标速度
-double TargetSpeed = 0.5;     // 目标和速度
-double Angle_Target = 0.0;    // 目标角度
+int pwmval_1;               // 定时器PWM占空比设置
+int pwmval_2;               // 定时器PWM占空比设置
+int pwmval_3;               // 定时器PWM占空比设置
+int pwmval_4;               // 定时器PWM占空比设置
+short Encoder_1;            // 当前1速度
+short Encoder_2;            // 当前2速度
+short Encoder_3;            // 当前3速度
+short Encoder_4;            // 当前4速度
+short Encoder_target = 0;   // 目标速度
+short Encoder_target_1 = 0; // 目标速度
+short Encoder_target_2 = 0; // 目标速度
+short Encoder_target_3 = 0; // 目标速度
+short Encoder_target_4 = 0; // 目标速度
+int Now_pos = 0;            // 当前位置
+int Now_pos_num = 0;        // 当前位置数字
+int Target_pos = 0;         // 目标位置
+double TargetSpeed_1 = 0.0; // 目标速度
+double TargetSpeed_2 = 0.0; // 目标速度
+double TargetSpeed = 0.5;   // 目标和速度
+double Angle_Target = 0.0;  // 目标角度
 
 /**************************************************************************
 函数功能：速度闭环PID控制

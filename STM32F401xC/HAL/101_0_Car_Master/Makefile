@@ -70,6 +70,7 @@ Hardware/Src/led.c \
 Hardware/Src/beep.c \
 Hardware/Src/infraredtobe.c \
 Hardware/Src/mlx90614.c \
+Hardware/Src/mecanumwheel.c \
 
 
 # ASM sources

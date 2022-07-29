@@ -359,18 +359,125 @@ void TIM1_UP_TIM10_IRQHandler(void)
 {
     u8 temp2[16] = {0};
 
+    TIME_N5ms++;
+
     if (readValuePack(&rxpack))
     {
-        /* 速度计算 */
-        Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = 500; // 范围-1800~1800
-
         /* 编码器读取 */
         Encoder_1 = rxpack.shorts[0];
         Encoder_2 = rxpack.shorts[1];
         Encoder_3 = rxpack.shorts[2];
         Encoder_4 = rxpack.shorts[3];
 
-        /* PID计算与反馈 */
+        /* 红外数据处理 */
+        Now_pos_num = rxpack.bools[0] * 2 + rxpack.bools[1] * 1 + rxpack.bools[2] * (-1) + rxpack.bools[3] * (-2);
+        if (rxpack.bools[0] && rxpack.bools[1])
+        {
+            if (rxpack.bools[2] && rxpack.bools[3])
+            {
+                infraredtobe_flag = 0;
+            }
+            else
+            {
+                infraredtobe_flag = 1; // 右边
+            }
+        }
+        else if (rxpack.bools[2] && rxpack.bools[3])
+        {
+            infraredtobe_flag = -1; // 左边
+        }
+
+        /* 小车状态 */
+        Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target; // 编码器赋值
+        if (car_state == 1)                                                                         // 直走
+        {
+            if (Now_pos_num > 0)
+            {
+                if (Now_pos_num == 1) // 右转
+                {
+                    Encoder_target_2 += 100;
+                    Encoder_target_4 += 100;
+                    Encoder_target_1 -= 100;
+                    Encoder_target_3 -= 100;
+                }
+                else if (Now_pos == 2) // 大右转
+                {
+                    Encoder_target_2 += 200;
+                    Encoder_target_4 += 200;
+                    Encoder_target_1 -= 200;
+                    Encoder_target_3 -= 200;
+                }
+            }
+            else if (Now_pos_num < 0)
+            {
+                if (Now_pos_num == -1) // 左转
+                {
+                    Encoder_target_2 -= 100;
+                    Encoder_target_4 -= 100;
+                    Encoder_target_1 += 100;
+                    Encoder_target_3 += 100;
+                }
+                else if (Now_pos == -2) // 大左转
+                {
+                    Encoder_target_2 -= 200;
+                    Encoder_target_4 -= 200;
+                    Encoder_target_1 += 200;
+                    Encoder_target_3 += 200;
+                }
+            }
+        }
+        else if (car_state == -1) // 停止
+        {
+            Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target = 0;
+        }
+        else if (car_state == 2) // 右转
+        {
+            if (Now_pos_num > 0)
+            {
+                if (Now_pos_num == 1) // 右转
+                {
+                    Encoder_target_2 += 100;
+                    Encoder_target_4 += 100;
+                    Encoder_target_1 -= 100;
+                    Encoder_target_3 -= 100;
+                }
+                else if (Now_pos == 2) // 大右转
+                {
+                    Encoder_target_2 += 200;
+                    Encoder_target_4 += 200;
+                    Encoder_target_1 -= 200;
+                    Encoder_target_3 -= 200;
+                }
+                else if (Now_pos == 3) // 右转
+                {
+                    Encoder_target_2 += 500;
+                    Encoder_target_4 += 500;
+                    Encoder_target_1 -= 500;
+                    Encoder_target_3 -= 500;
+                }
+            }
+            else if (Now_pos_num < 0)
+            {
+                if (Now_pos_num == -1) // 左转
+                {
+                    Encoder_target_2 -= 100;
+                    Encoder_target_4 -= 100;
+                    Encoder_target_1 += 100;
+                    Encoder_target_3 += 100;
+                }
+                else if (Now_pos == -2) // 大左转
+                {
+                    Encoder_target_2 -= 200;
+                    Encoder_target_4 -= 200;
+                    Encoder_target_1 += 200;
+                    Encoder_target_3 += 200;
+                }
+            }
+        }
+        else if (car_state == -2) // 左转
+        {
+        }
+
         pwmval_1 = Velocity_FeedbackControl_1(Encoder_target_1, Encoder_1); //速度反馈控制
         /* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
         if (pwmval_1 >= 0)
@@ -419,6 +526,57 @@ void TIM1_UP_TIM10_IRQHandler(void)
             TIM_SetTIM5_DutyCycle_n(-pwmval_4, 2); //修改比较值，修改占空比
             TIM_SetTIM5_DutyCycle_n(0, 1);         //修改比较值，修改占空比
         }
+
+        /* PID计算与反馈 */
+
+        // pwmval_1 = Velocity_FeedbackControl_1(Encoder_target_1, Encoder_1); //速度反馈控制
+        // /* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
+        // if (pwmval_1 >= 0)
+        // {
+        //     TIM_SetTIM4_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
+        //     TIM_SetTIM4_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+        // }
+        // else
+        // {
+        //     TIM_SetTIM4_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
+        //     TIM_SetTIM4_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+        // }
+        // pwmval_2 = Velocity_FeedbackControl_2(Encoder_target_2, Encoder_2); //速度反馈控制
+        // /* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
+        // if (pwmval_2 >= 0)
+        // {
+        //     TIM_SetTIM4_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
+        //     TIM_SetTIM4_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+        // }
+        // else
+        // {
+        //     TIM_SetTIM4_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
+        //     TIM_SetTIM4_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+        // }
+        // pwmval_3 = Velocity_FeedbackControl_3(Encoder_target_3, Encoder_3); //速度反馈控制
+        // /* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
+        // if (pwmval_3 >= 0)
+        // {
+        //     TIM_SetTIM5_DutyCycle_n(pwmval_3, 4); //修改比较值，修改占空比
+        //     TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+        // }
+        // else
+        // {
+        //     TIM_SetTIM5_DutyCycle_n(-pwmval_3, 3); //修改比较值，修改占空比
+        //     TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+        // }
+        // pwmval_4 = Velocity_FeedbackControl_4(Encoder_target_4, Encoder_4); //速度反馈控制
+        // /* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
+        // if (pwmval_4 >= 0)
+        // {
+        //     TIM_SetTIM5_DutyCycle_n(pwmval_4, 1); //修改比较值，修改占空比
+        //     TIM_SetTIM5_DutyCycle_n(0, 2);        //修改比较值，修改占空比
+        // }
+        // else
+        // {
+        //     TIM_SetTIM5_DutyCycle_n(-pwmval_4, 2); //修改比较值，修改占空比
+        //     TIM_SetTIM5_DutyCycle_n(0, 1);         //修改比较值，修改占空比
+        // }
     }
 
     /* 红外 */

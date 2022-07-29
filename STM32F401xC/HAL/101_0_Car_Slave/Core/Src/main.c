@@ -7,7 +7,12 @@
  */
 #include "main.h"
 
-u8 power = 93; //电池电量
+u8 power = 93;	 //电池电量
+long pin_a3 = 0; // A3引脚电压
+long pin_a4 = 0; // A4引脚电压
+long pin_b5 = 0; // B5引脚电压
+long pin_b6 = 0; // B6引脚电压
+long pin_sum = 0;
 
 /**
  * @brief	主函数,程序入口
@@ -35,5 +40,38 @@ int main(void)
 	// OLED_Display();					 //显示初始化信息
 	while (1)
 	{
+		// pin_sum++;
+		// if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))
+		// {
+		// 	pin_a3++;
+		// }
+		// else
+		// {
+		// 	pin_a3--;
+		// }
+		// if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4))
+		// {
+		// 	pin_a4++;
+		// }
+		// else
+		// {
+		// 	pin_a4--;
+		// }
+		// if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5))
+		// {
+		// 	pin_b5++;
+		// }
+		// else
+		// {
+		// 	pin_b5--;
+		// }
+		// if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6))
+		// {
+		// 	pin_b6++;
+		// }
+		// else
+		// {
+		// 	pin_b6--;
+		// }
 	}
 }
