@@ -1,10 +1,10 @@
 #include "pid.h"
 
-double P_V_1 = 0.0005, I_V_1 = 0.0000005, D_V_1 = 0.01; // PID constants
-double P_V_2 = 0.0005, I_V_2 = 0.0000005, D_V_2 = 0.01; // PID constants
-double P_V_3 = 0.0005, I_V_3 = 0.0000005, D_V_3 = 0.01; // PID constants
-double P_V_4 = 0.0005, I_V_4 = 0.0000005, D_V_4 = 0.01; // PID constants
-double P_X = 0.8000, I_X = 0.0050, D_X = 300.0;         // PID constants
+double P_V_1 = 0.15, I_V_1 = 0.00001, D_V_1 = 0.25; // PID constants
+double P_V_2 = 0.15, I_V_2 = 0.00001, D_V_2 = 0.25; // PID constants
+double P_V_3 = 0.15, I_V_3 = 0.00001, D_V_3 = 0.25; // PID constants
+double P_V_4 = 0.15, I_V_4 = 0.00001, D_V_4 = 0.25; // PID constants
+double P_X = 0.01, I_X = 0.0050, D_X = 300.0;         // PID constants
 
 u8 move = 0;
 u8 bluetooth = 0;
@@ -47,7 +47,7 @@ int Velocity_FeedbackControl_1(double TargetVelocity, double CurrentVelocity)
     static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                        //比例输出，积分输出，微分输出
     static double Current_Error = 0, Last_Error = 0;                                      //当前误差  最后误差
     static double Sum_Error = 0;                                                          //误差积分
-    static double PID_I_MAX = 5.0, PID_I_MIN = -5.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
+    static double PID_I_MAX = 15.0, PID_I_MIN = -15.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
 
     Current_Error = TargetVelocity - CurrentVelocity; //求速度偏差
     P_OUT = P_V_1 * Current_Error;                    //比列项
@@ -100,7 +100,7 @@ int Velocity_FeedbackControl_2(double TargetVelocity, double CurrentVelocity)
     static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                        //比例输出，积分输出，微分输出
     static double Current_Error = 0, Last_Error = 0;                                      //当前误差  最后误差
     static double Sum_Error = 0;                                                          //误差积分
-    static double PID_I_MAX = 5.0, PID_I_MIN = -5.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
+    static double PID_I_MAX = 15.0, PID_I_MIN = -15.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
 
     Current_Error = TargetVelocity - CurrentVelocity; //求速度偏差
     P_OUT = P_V_2 * Current_Error;                    //比列项
@@ -153,7 +153,7 @@ int Velocity_FeedbackControl_3(double TargetVelocity, double CurrentVelocity)
     static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                        //比例输出，积分输出，微分输出
     static double Current_Error = 0, Last_Error = 0;                                      //当前误差  最后误差
     static double Sum_Error = 0;                                                          //误差积分
-    static double PID_I_MAX = 5.0, PID_I_MIN = -5.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
+    static double PID_I_MAX = 15.0, PID_I_MIN = -15.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
 
     Current_Error = TargetVelocity - CurrentVelocity; //求速度偏差
     P_OUT = P_V_3 * Current_Error;                    //比列项
@@ -206,7 +206,7 @@ int Velocity_FeedbackControl_4(double TargetVelocity, double CurrentVelocity)
     static double P_OUT = 0, I_OUT = 0, D_OUT = 0;                                        //比例输出，积分输出，微分输出
     static double Current_Error = 0, Last_Error = 0;                                      //当前误差  最后误差
     static double Sum_Error = 0;                                                          //误差积分
-    static double PID_I_MAX = 5.0, PID_I_MIN = -5.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
+    static double PID_I_MAX = 15.0, PID_I_MIN = -15.0, V_DATA_MAX = 100, V_DATA_MIN = -100; // PID积分上限，PID积分下限
 
     Current_Error = TargetVelocity - CurrentVelocity; //求速度偏差
     P_OUT = P_V_4 * Current_Error;                    //比列项

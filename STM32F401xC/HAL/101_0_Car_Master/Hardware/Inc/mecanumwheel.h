@@ -13,5 +13,6 @@ extern short Encoder_target;
 void main_plan(void);
 void plan_stop(void);
 void plan_qibu(void);
+void plan_you(void);
 
 #endif

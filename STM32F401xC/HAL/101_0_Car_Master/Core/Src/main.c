@@ -45,5 +45,6 @@ int main(void)
 	while (1)
 	{
 		tem = SMBus_ReadTemp();
+		main_plan();
 	}
 }

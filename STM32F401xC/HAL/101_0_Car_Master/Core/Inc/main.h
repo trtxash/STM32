@@ -39,6 +39,7 @@ extern "C"
 #include "bspencoder.h"
 #include "infraredtobe.h"
 #include "mlx90614.h"
+#include "mecanumwheel.h"
 
   void Error_Handler(void);
 
