@@ -1,9 +1,9 @@
 #include "pid.h"
 
-double P_V_1 = 0.15, I_V_1 = 0.00001, D_V_1 = 0.25; // PID constants
-double P_V_2 = 0.15, I_V_2 = 0.00001, D_V_2 = 0.25; // PID constants
-double P_V_3 = 0.15, I_V_3 = 0.00001, D_V_3 = 0.25; // PID constants
-double P_V_4 = 0.15, I_V_4 = 0.00001, D_V_4 = 0.25; // PID constants
+double P_V_1 = 0.2, I_V_1 = 0.000005, D_V_1 = 0.20; // PID constants
+double P_V_2 = 0.2, I_V_2 = 0.000005, D_V_2 = 0.20; // PID constants
+double P_V_3 = 0.2, I_V_3 = 0.000005, D_V_3 = 0.20; // PID constants
+double P_V_4 = 0.2, I_V_4 = 0.000005, D_V_4 = 0.20; // PID constants
 double P_X = 0.01, I_X = 0.0050, D_X = 300.0;         // PID constants
 
 u8 move = 0;

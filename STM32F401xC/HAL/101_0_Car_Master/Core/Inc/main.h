@@ -41,6 +41,10 @@ extern "C"
 #include "mlx90614.h"
 #include "mecanumwheel.h"
 
+extern char car_state ;   // -2:左转，-1:停止，1:直走，2:右转
+extern u32 TIME_N5ms;	   // 5ms计数器
+extern u32 TIME_N5ms_old; // 5ms计数器
+
   void Error_Handler(void);
 
 #ifdef __cplusplus

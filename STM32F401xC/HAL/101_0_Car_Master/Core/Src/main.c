@@ -36,15 +36,68 @@ int main(void)
 	TIM4_PWM_Init(arr, psc, 0B1111); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
 	/* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
 	TIM5_PWM_Init(arr, psc, 0B1111); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
-	// TIM_SetTIM4Compare_n(300, 2);
-	// TIM_SetTIM4Compare_n(300, 4);
-	// TIM_SetTIM5Compare_n(300, 1);
-	// TIM_SetTIM5Compare_n(300, 3);
-	// Encoder_Init(); // 初始化电机编码器
-	// OLED_Display(); //显示初始化信息
+									 // TIM_SetTIM4Compare_n(300, 2);
+									 // TIM_SetTIM4Compare_n(300, 4);
+									 // TIM_SetTIM5Compare_n(300, 1);
+									 // TIM_SetTIM5Compare_n(300, 3);
+									 // Encoder_Init(); // 初始化电机编码器
+									 // OLED_Display(); //显示初始化信息
+
+	plan_qibu();
+	while (TIME_N5ms - TIME_N5ms_old < 400) // 2s
+	{
+	}
+	TIME_N5ms_old = TIME_N5ms;
+
+	plan_v();
+	while (TIME_N5ms - TIME_N5ms_old < 600) // 3s
+	{
+		if (Now_pos_num == 5)
+		{
+			delay_ms(10);
+			plan_stop();
+			delay_ms(10);
+			break;
+		}
+	}
+	TIME_N5ms_old = TIME_N5ms;
+
+	plan_you();
 	while (1)
 	{
-		tem = SMBus_ReadTemp();
-		main_plan();
+		if (Now_pos_num == 0)
+		{
+			plan_stop();
+			delay_ms(10);
+			break;
+		}
+	}
+	TIME_N5ms_old = TIME_N5ms;
+
+	plan_qibu();
+	while (TIME_N5ms - TIME_N5ms_old < 400) // 2s
+	{
+	}
+	TIME_N5ms_old = TIME_N5ms;
+
+	plan_v();
+	Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target = 250;
+	while (TIME_N5ms - TIME_N5ms_old < 400) // 2s
+	{
+		if (Now_pos_num == 5 || Now_pos_num == 9 || Now_pos_num == -5)
+		{
+			TIM_SetTIM4Compare_n(500, 2);
+			TIM_SetTIM4Compare_n(500, 4);
+			TIM_SetTIM5Compare_n(500, 1);
+			TIM_SetTIM5Compare_n(500, 3);
+			plan_stop();
+			delay_ms(10);
+			break;
+		}
+	}
+	TIME_N5ms_old = TIME_N5ms;
+
+	while (1)
+	{
 	}
 }

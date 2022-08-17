@@ -19,6 +19,7 @@
 #include "bspencoder.h"
 #include "pid.h"
 #include "infraredtobe.h"
+#include "MLX90614.h"
 
 extern u32 TIME_N5ms;
 extern char infraredtobe_flag;

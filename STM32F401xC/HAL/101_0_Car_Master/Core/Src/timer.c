@@ -360,6 +360,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
     u8 temp2[16] = {0};
 
     TIME_N5ms++;
+    tem = SMBus_ReadTemp();
 
     if (readValuePack(&rxpack))
     {
@@ -371,21 +372,6 @@ void TIM1_UP_TIM10_IRQHandler(void)
 
         /* 红外数据处理 */
         Now_pos_num = Read_Infraredtobe_sums();
-        if (rxpack.bools[0] && rxpack.bools[1])
-        {
-            if (rxpack.bools[2] && rxpack.bools[3])
-            {
-                infraredtobe_flag = 0;
-            }
-            else
-            {
-                infraredtobe_flag = 1; // 右边
-            }
-        }
-        else if (rxpack.bools[2] && rxpack.bools[3])
-        {
-            infraredtobe_flag = -1; // 左边
-        }
 
         /* 小车状态 */
         Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target; // 编码器赋值
@@ -429,50 +415,14 @@ void TIM1_UP_TIM10_IRQHandler(void)
         else if (car_state == -1) // 停止
         {
             Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target = 0;
+            pwmval_1 = pwmval_2 = pwmval_3 = pwmval_4 = 0;
         }
         else if (car_state == 2) // 右转
         {
-            if (Now_pos_num > 0)
-            {
-                if (Now_pos_num == 1) // 右转
-                {
-                    Encoder_target_2 += 25;
-                    Encoder_target_4 += 25;
-                    Encoder_target_1 -= 25;
-                    Encoder_target_3 -= 25;
-                }
-                else if (Now_pos_num == 3) // 大右转
-                {
-                    Encoder_target_2 += 75;
-                    Encoder_target_4 += 75;
-                    Encoder_target_1 -= 75;
-                    Encoder_target_3 -= 75;
-                }
-                else if (Now_pos == 5) // 右转
-                {
-                    Encoder_target_2 += 500;
-                    Encoder_target_4 += 500;
-                    Encoder_target_1 -= 500;
-                    Encoder_target_3 -= 500;
-                }
-            }
-            else if (Now_pos_num < 0)
-            {
-                if (Now_pos_num == -1) // 左转
-                {
-                    Encoder_target_2 -= 25;
-                    Encoder_target_4 -= 25;
-                    Encoder_target_1 += 25;
-                    Encoder_target_3 += 25;
-                }
-                else if (Now_pos == -2) // 大左转
-                {
-                    Encoder_target_2 -= 75;
-                    Encoder_target_4 -= 75;
-                    Encoder_target_1 += 75;
-                    Encoder_target_3 += 75;
-                }
-            }
+            Encoder_target_2 = 250;
+            Encoder_target_4 = 250;
+            Encoder_target_1 = -250;
+            Encoder_target_3 = -250;
         }
         else if (car_state == -2) // 左转
         {
