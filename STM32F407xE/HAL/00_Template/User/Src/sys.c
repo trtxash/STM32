@@ -25,13 +25,13 @@
 // SYSCLK:系统时钟频率
 // Fusb:USB,SDIO,RNG等的时钟频率
 // Fs:PLL输入时钟频率,可以是HSI,HSE等.
-// plln:主PLL倍频系数(PLL倍频),取值范围:64~432.
-// pllm:主PLL和音频PLL分频系数(PLL之前的分频),取值范围:2~63.
-// pllp:系统时钟的主PLL分频系数(PLL之后的分频),取值范围:2,4,6,8.(仅限这4个值!)
-// pllq:USB/SDIO/随机数产生器等的主PLL分频系数(PLL之后的分频),取值范围:2~15.
+// plln:主PLL倍频系数(PLL倍频)
+// pllm:主PLL和音频PLL分频系数(PLL之前的分频)
+// pllp:系统时钟的主PLL分频系数(PLL之后的分频)
+// pllq:USB/SDIO/随机数产生器等的主PLL分频系数(PLL之后的分频)
 
 //外部晶振为8M的时候,推荐值:plln=336,pllm=8,pllp=2,pllq=7
-//外部晶振为25M的时候（f401ccu6）,推荐值:plln=168,pllm=25,pllp=2,pllq=4
+//外部晶振为25M的时候（f401ccu6）,推荐值:plln=168,pllm=4,pllp=RCC_PLLP_DIV2,pllq=4
 //得到:Fvco=8*(336/8)=336Mhz
 //     SYSCLK=336/2=168Mhz
 //     Fusb=336/7=48Mhz
