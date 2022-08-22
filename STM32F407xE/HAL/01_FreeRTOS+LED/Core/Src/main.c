@@ -12,29 +12,20 @@
  * @brief   主函数,程序入口
  * @param   none
  * @arg		  none
- * @note    初始化函数后利用定时器5PWM发生器实现4路PWM发生器
+ * @note    循环点亮和熄灭LED
  * @retval  int
  */
 int main(void)
 {
-  while (1)
+  if (HAL_Init()) // 初始化HAL库
   {
+    Error_Handler();
   }
-}
+  Stm32_Clock_Init(168, 4, 2, 4); // 初始化时钟
 
-/**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
   while (1)
   {
   }
-  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef USE_FULL_ASSERT
