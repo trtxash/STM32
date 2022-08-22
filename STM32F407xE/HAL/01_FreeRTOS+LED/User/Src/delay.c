@@ -88,7 +88,7 @@ void delay_ms(u32 nms)
 	}
 	delay_us((u32)(nms * 1000)); //普通方式延时
 }
-#else //不用ucos时
+#else //不用os时
 
 //延时nus
 // nus为要延时的us数.
@@ -118,7 +118,7 @@ void delay_us(u32 nus)
 
 //延时nms
 // nms:要延时的ms数
-void delay_ms(u16 nms)
+void delay_ms(u32 nms)
 {
 	u32 i;
 	for (i = 0; i < nms; i++)
