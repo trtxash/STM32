@@ -1,6 +1,6 @@
 /**
- * @file	  01_FreeRTOS+LED
- * @brief 	移植FreeRTOS和LED驱动
+ * @file	  00_Template
+ * @brief 	模板
  * @author 	TRTX-gamer
  * @version 1.00
  * @date 	  2022年8月22号15点35分
