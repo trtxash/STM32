@@ -38,7 +38,7 @@ void led1_task(void *pvParameters);
 //任务优先级
 #define FLOAT_TASK_PRIO 4
 //任务堆栈大小
-#define FLOAT_STK_SIZE 128
+#define FLOAT_STK_SIZE 256
 //任务句柄
 TaskHandle_t FLOATTask_Handler;
 //任务函数
