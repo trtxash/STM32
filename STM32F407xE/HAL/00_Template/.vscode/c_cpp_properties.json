@@ -14,7 +14,7 @@
             ],
             "defines": [
                 "USE_HAL_DRIVER",
-                "STM32F407xE",
+                "STM32F407xx",
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
