@@ -83,6 +83,11 @@
             3.  修改c_cpp_properties.json
             4.  添加launch.json，在运行和调试中选择自己的工程文件夹的添加配置，生成了launch.json，照着下面的例子改动一些
             5.  添加tasks.json，直接在.vscode里面添加，照着下面的例子改动一些,这个文件创建了两个bash任务，分别叫做build和clean，build任务就是在bash里执行了mingw32-make，clean任务就是在bash里执行了mingw32-make clean
+3.  配置文件注意
+    1.  注意文件路径不能有中文，防止莫名其妙的BUG
+    2.  注意STM32CudeMX配置信息，里面有很多，有时间可以都看看
+    3.  注意Makefile的配置，有头文件目录，要编译的文件，编译所用库（比如要用printf，sprintf）
+    4.  注意移植后相关文件的更改，如NVIC分组，Makefile的配置，SVD的更换
 
 ---
 > c_cpp_properties.json配置文件，网上抄的  
