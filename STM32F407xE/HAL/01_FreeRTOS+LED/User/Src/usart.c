@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 //如果使用os,则包括下面的头文件即可.
 #if SYSTEM_SUPPORT_OS
-#include "includes.h" //os 使用
+#include "FreeRTOS.h" //os 使用
 #endif
 
 //加入以下代码,支持printf函数,而不需要选择use MicroLIB
@@ -408,9 +408,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 void USART1_IRQHandler(void)
 {
 	u8 Res;
-#if SYSTEM_SUPPORT_OS //使用OS
-	OSIntEnter();
-#endif
+
 	if (__HAL_UART_GET_IT_SOURCE(&UART1_Handler, UART_IT_RXNE)) // 判断是否为接收中断
 	{
 		vp_rxbuff[rxIndex] = USART1->DR;	  //读取串口数据
@@ -487,17 +485,11 @@ void USART1_IRQHandler(void)
 	// 	else
 	// 		rxIndex = 0;
 	// }
-#if SYSTEM_SUPPORT_OS //使用OS
-	OSIntExit();
-#endif
 }
 
 //串口6中断服务程序
 void USART6_IRQHandler(void)
 {
-#if SYSTEM_SUPPORT_OS //使用OS
-	OSIntEnter();
-#endif
 	// vp_rxbuff[rxIndex] = USART6->DR;	  //读取串口数据
 	// if (USART6->DR == 0XA5)				  //接受到了开始数据，数据包头正确
 	// 	rxIndex = 0;					  //接收累加器清零
@@ -529,7 +521,4 @@ void USART6_IRQHandler(void)
 	// 		rxIndex = 0;
 	// }
 	__HAL_UART_CLEAR_FLAG(&UART6_Handler, UART_FLAG_RXNE); //清除接收中断标志
-#if SYSTEM_SUPPORT_OS									   //使用OS
-	OSIntExit();
-#endif
 }

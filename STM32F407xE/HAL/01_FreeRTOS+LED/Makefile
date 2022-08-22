@@ -63,6 +63,7 @@ User/Src/delay.c \
 User/Src/sys.c \
 User/Src/usart.c \
 Hardware/Src/led.c \
+FreeRTOS/portable/GCC/port.c \
 
 # ASM sources
 ASM_SOURCES =  \
