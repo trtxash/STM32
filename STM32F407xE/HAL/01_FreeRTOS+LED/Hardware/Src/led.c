@@ -9,30 +9,49 @@
  */
 void LED_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitTure;
+	GPIO_InitTypeDef GPIO_InitTure_0;
+	GPIO_InitTypeDef GPIO_InitTure_1;
 
-	__HAL_RCC_GPIOC_CLK_ENABLE(); // 开启GPIOB时钟
+	LED0_GPIO_CLK_ENABLE(); // 开启GPIO时钟
+	LED1_GPIO_CLK_ENABLE();
 	/*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
 
 	/*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
-	GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;	// 推挽输出
-	GPIO_InitTure.Pull = GPIO_PULLUP;			// 上拉
-	GPIO_InitTure.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
-	GPIO_InitTure.Pin = GPIO_PIN_13;			// 设置GPIOx的5口
+	GPIO_InitTure_0.Mode = GPIO_MODE_OUTPUT_PP;	  // 推挽输出
+	GPIO_InitTure_0.Pull = GPIO_PULLUP;			  // 上拉
+	GPIO_InitTure_0.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
+	GPIO_InitTure_0.Pin = LED0_PIN;				  // 设置GPIOx的5口
+	HAL_GPIO_Init(LED0_GPIO, &GPIO_InitTure_0);	  // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
+	GPIO_InitTure_1.Mode = GPIO_MODE_OUTPUT_PP;	  // 推挽输出
+	GPIO_InitTure_1.Pull = GPIO_PULLUP;			  // 上拉
+	GPIO_InitTure_1.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
+	GPIO_InitTure_1.Pin = LED1_PIN;				  // 设置GPIOx的5口
+	HAL_GPIO_Init(LED1_GPIO, &GPIO_InitTure_1);	  // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
 
-	HAL_GPIO_Init(GPIOC, &GPIO_InitTure); // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
-
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
+	HAL_GPIO_WritePin(LED0_GPIO, LED0_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
+	HAL_GPIO_WritePin(LED1_GPIO, LED1_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
 }
 
 /**
- * @brief	LED灯交替闪烁
+ * @brief	LED0灯交替闪烁
  * @param 	none
  * @arg		none
  * @note  	初始化函数后利用HAL_GPIO_xxxx以达到LED灯状态取反
  * @retval	void
  */
-void LED_Reverse(void)
+void LED0_Reverse(void)
 {
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)); // GPIOB13取反
+	HAL_GPIO_WritePin(LED0_GPIO, LED0_PIN, !HAL_GPIO_ReadPin(LED0_GPIO, LED0_PIN)); // 取反
+}
+
+/**
+ * @brief	LED1灯交替闪烁
+ * @param 	none
+ * @arg		none
+ * @note  	初始化函数后利用HAL_GPIO_xxxx以达到LED灯状态取反
+ * @retval	void
+ */
+void LED1_Reverse(void)
+{
+	HAL_GPIO_WritePin(LED1_GPIO, LED1_PIN, !HAL_GPIO_ReadPin(LED1_GPIO, LED1_PIN)); // 取反
 }

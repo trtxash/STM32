@@ -22,9 +22,15 @@ int main(void)
     Error_Handler();
   }
   Stm32_Clock_Init(168, 4, 2, 4); // 初始化时钟
+  delay_init(168);                // 初始化延时函数
+  LED_Init();                     // 初始化LED
 
   while (1)
   {
+    delay_ms(500);
+    LED0_Reverse();
+    delay_ms(500);
+    LED1_Reverse();
   }
 }
 
