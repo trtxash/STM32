@@ -30,11 +30,7 @@
 // pllp:系统时钟的主PLL分频系数(PLL之后的分频)
 // pllq:USB/SDIO/随机数产生器等的主PLL分频系数(PLL之后的分频)
 
-//外部晶振为8M的时候,推荐值:plln=336,pllm=8,pllp=2,pllq=7
-//外部晶振为25M的时候（f401ccu6）,推荐值:plln=168,pllm=4,pllp=RCC_PLLP_DIV2,pllq=4
-//得到:Fvco=8*(336/8)=336Mhz
-//     SYSCLK=336/2=168Mhz
-//     Fusb=336/7=48Mhz
+//外部晶振为8M的时候（f407）,推荐值:plln=168,pllm=4,pllp=RCC_PLLP_DIV2,pllq=4
 //返回值:0,成功;1,失败
 void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
 {
@@ -60,8 +56,7 @@ void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
 
     if (ret != HAL_OK)
     {
-        while (1)
-            ;
+        Error_Handler();
     }
 
     //选中PLL作为系统时钟源并且配置HCLK,PCLK1和PCLK2
@@ -74,8 +69,7 @@ void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
 
     if (ret != HAL_OK)
     {
-        while (1)
-            ;
+        Error_Handler();
     }
 
     // STM32F405x/407x/415x/417x Z版本的器件支持预取功能
@@ -83,6 +77,21 @@ void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
     {
         __HAL_FLASH_PREFETCH_BUFFER_ENABLE(); //使能flash预取
     }
+}
+
+/**
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void)
+{
+    /* USER CODE BEGIN Error_Handler_Debug */
+    /* User can add his own implementation to report the HAL error return state */
+    __disable_irq();
+    while (1)
+    {
+    }
+    /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef USE_FULL_ASSERT

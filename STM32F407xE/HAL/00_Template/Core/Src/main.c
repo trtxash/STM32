@@ -1,6 +1,6 @@
 /**
- * @file	  00_Template
- * @brief 	模板
+ * @file	  01_FreeRTOS+LED
+ * @brief 	移植FreeRTOS和LED驱动
  * @author 	TRTX-gamer
  * @version 1.00
  * @date 	  2022年8月22号15点35分
@@ -12,29 +12,26 @@
  * @brief   主函数,程序入口
  * @param   none
  * @arg		  none
- * @note    none
+ * @note    循环点亮和熄灭LED
  * @retval  int
  */
 int main(void)
 {
-  while (1)
+  if (HAL_Init()) // 初始化HAL库
   {
+    Error_Handler();
   }
-}
+  Stm32_Clock_Init(168, 4, 2, 4); // 初始化时钟
+  delay_init(168);                // 初始化延时函数
+  LED_Init();                     // 初始化LED
 
-/**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
   while (1)
   {
+    delay_ms(500);
+    LED0_Reverse();
+    delay_ms(500);
+    LED1_Reverse();
   }
-  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef USE_FULL_ASSERT
