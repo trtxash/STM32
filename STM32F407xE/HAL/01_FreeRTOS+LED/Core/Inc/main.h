@@ -30,7 +30,11 @@ extern "C" {
 #include "stm32f4xx_hal.h"
 #include "sys.h"
 #include "delay.h"
+#include "usart.h"
 #include "led.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "portmacro.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */

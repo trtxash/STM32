@@ -65,6 +65,25 @@ unsigned char isok;
 UART_HandleTypeDef UART1_Handler; // UART1句柄
 UART_HandleTypeDef UART6_Handler; // UART6句柄
 
+#ifdef __GNUC__
+__attribute__((used)) int _write(int fd, char *ptr, int len)
+{
+	int i;
+	for (i = 0; i < len; i++)
+	{
+		USART6->DR = ptr[i];
+		while ((USART6->SR & 0x40) == 0)
+			;
+	}
+	return len;
+}
+// int _write(int fd, char *ptr, int len) // 重定向 _write() 函数
+// {
+// 	HAL_UART_Transmit(&UART1_Handler, (uint8_t *)ptr, len, 0xFFFF);
+// 	return len;
+// }
+#endif
+
 //------------------------------------------------------------------------------------------------------------------------
 // unsigned char readValuePack(RxPack *rx_pack_ptr)
 // 尝试从缓冲区中读取数据包
@@ -203,7 +222,7 @@ unsigned char readValuePack(RxPack *rx_pack_ptr)
 			rdIndex++;
 			err++;
 		}
-		}
+	}
 	return isok;
 }
 
@@ -378,23 +397,23 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
 #if EN_USART1_RX
 		HAL_NVIC_EnableIRQ(USART1_IRQn);		 //使能USART1中断通道
-		HAL_NVIC_SetPriority(USART1_IRQn, 0, 1); //抢占优先级2，子优先级1
+		HAL_NVIC_SetPriority(USART1_IRQn, 0, 0); //抢占优先级0，子优先级0
 #endif
 	}
-	if (huart->Instance == USART6) //如果是串口1，进行串口1 MSP初始化
+	if (huart->Instance == USART6) //如果是串口6，进行串口1 MSP初始化
 	{
-		__HAL_RCC_GPIOA_CLK_ENABLE();  //使能GPIOA时钟
+		__HAL_RCC_GPIOC_CLK_ENABLE();  //使能GPIOA时钟
 		__HAL_RCC_USART6_CLK_ENABLE(); //使能USART6时钟
 
-		GPIO_Initure.Pin = GPIO_PIN_11;			  // PA11
+		GPIO_Initure.Pin = GPIO_PIN_6;			  // PA11
 		GPIO_Initure.Mode = GPIO_MODE_AF_PP;	  //复用推挽输出
 		GPIO_Initure.Pull = GPIO_PULLUP;		  //上拉
 		GPIO_Initure.Speed = GPIO_SPEED_FAST;	  //高速
 		GPIO_Initure.Alternate = GPIO_AF8_USART6; //复用为USART6
-		HAL_GPIO_Init(GPIOA, &GPIO_Initure);	  //初始化PA11
+		HAL_GPIO_Init(GPIOC, &GPIO_Initure);	  //初始化PA11
 
-		GPIO_Initure.Pin = GPIO_PIN_12;		 // PA12
-		HAL_GPIO_Init(GPIOA, &GPIO_Initure); //初始化PA12
+		GPIO_Initure.Pin = GPIO_PIN_7;		 // PA12
+		HAL_GPIO_Init(GPIOC, &GPIO_Initure); //初始化PA12
 
 #if EN_USART6_RX
 		HAL_NVIC_EnableIRQ(USART6_IRQn);		 //使能USART1中断通道

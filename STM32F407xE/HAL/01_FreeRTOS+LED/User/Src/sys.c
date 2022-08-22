@@ -32,6 +32,7 @@
 
 //外部晶振为8M的时候（f407）,推荐值:plln=168,pllm=4,pllp=RCC_PLLP_DIV2,pllq=4
 //返回值:0,成功;1,失败
+
 void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
 {
     HAL_StatusTypeDef ret = HAL_OK;

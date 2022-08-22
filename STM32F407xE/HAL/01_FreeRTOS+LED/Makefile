@@ -57,13 +57,21 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
 Core/Src/system_stm32f4xx.c \
+User/Src/sys.c \
+User/Src/delay.c \
+User/Src/usart.c \
+FreeRTOS/portable/Src/port.c \
+FreeRTOS/portable/MemMang/Src/heap_4.c \
+FreeRTOS/Src/croutine.c \
+FreeRTOS/Src/event_groups.c \
+FreeRTOS/Src/list.c \
+FreeRTOS/Src/queue.c \
+FreeRTOS/Src/stream_buffer.c \
+FreeRTOS/Src/tasks.c \
+FreeRTOS/Src/timers.c \
+Hardware/Src/led.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
-User/Src/delay.c \
-User/Src/sys.c \
-User/Src/usart.c \
-Hardware/Src/led.c \
-FreeRTOS/portable/GCC/port.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -155,7 +163,7 @@ LDSCRIPT = STM32F407ZETx_FLASH.ld
 LIBS = -lc -lm -lnosys 
 LIBDIR = 
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
-LDFLAGS += -lc -lrdimon -u _printf_float # -lprintf_float,if you want sprintf
+LDFLAGS += -u _printf_float # -lprintf_float,if you want sprintf
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
