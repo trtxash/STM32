@@ -87,7 +87,7 @@
     1.  注意文件路径不能有中文，防止莫名其妙的BUG
     2.  注意STM32CudeMX配置信息，里面有很多，有时间可以都看看
     3.  注意Makefile的配置，有头文件目录，要编译的文件，编译所用库（比如要用printf，sprintf）
-    4.  注意移植后相关文件的更改，如NVIC分组，Makefile的配置，SVD的更换
+    4.  注意移植后相关文件的更改，如NVIC分组，Makefile的配置，SVD的更换，Vscode配置文件的修改
 
 ---
 > c_cpp_properties.json配置文件，网上抄的  
