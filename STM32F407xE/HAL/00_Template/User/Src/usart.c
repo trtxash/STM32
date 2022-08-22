@@ -498,36 +498,36 @@ void USART6_IRQHandler(void)
 #if SYSTEM_SUPPORT_OS //使用OS
 	OSIntEnter();
 #endif
-	vp_rxbuff[rxIndex] = USART6->DR;	  //读取串口数据
-	if (USART6->DR == 0XA5)				  //接受到了开始数据，数据包头正确
-		rxIndex = 0;					  //接收累加器清零
-	rxIndex++;							  //接收累加器加1
-	if (rxIndex == VALUEPACK_BUFFER_SIZE) //接收完成了
-	{
-		if (vp_rxbuff[rxIndex - 1] = 0X5A) // 数据包尾接受正确
-		{
-			u8 temp;
-			rxIndex = 0;
-			for (int i = 0; i < VALUEPACK_BUFFER_SIZE - 3; i++)
-			{
-				temp += vp_rxbuff[i + 1];
-			}
-			if (temp == vp_rxbuff[VALUEPACK_BUFFER_SIZE - 2]) // 校验数据包和
-			{
-				move = vp_rxbuff[1] & 0X01;				//移动控制
-				bluetooth = (vp_rxbuff[1] >> 1) & 0X01; //蓝牙控制
-				beep = (vp_rxbuff[1] >> 2) & 0X01;		//蜂鸣器控制
-				Angle_Target = (float)(vp_rxbuff[2] + 0x100 * vp_rxbuff[3] + 0x10000 * vp_rxbuff[4] + 0x1000000 * vp_rxbuff[5]) / 100;
-				TargetSpeed = (float)(vp_rxbuff[6] + 0x100 * vp_rxbuff[7] + 0x10000 * vp_rxbuff[8] + 0x1000000 * vp_rxbuff[9]) / 100;
-			}
-			else
-			{
-				rxIndex = 0; // 数据包错误,重新开始接收
-			}
-		}
-		else
-			rxIndex = 0;
-	}
+	// vp_rxbuff[rxIndex] = USART6->DR;	  //读取串口数据
+	// if (USART6->DR == 0XA5)				  //接受到了开始数据，数据包头正确
+	// 	rxIndex = 0;					  //接收累加器清零
+	// rxIndex++;							  //接收累加器加1
+	// if (rxIndex == VALUEPACK_BUFFER_SIZE) //接收完成了
+	// {
+	// 	if (vp_rxbuff[rxIndex - 1] = 0X5A) // 数据包尾接受正确
+	// 	{
+	// 		u8 temp;
+	// 		rxIndex = 0;
+	// 		for (int i = 0; i < VALUEPACK_BUFFER_SIZE - 3; i++)
+	// 		{
+	// 			temp += vp_rxbuff[i + 1];
+	// 		}
+	// 		if (temp == vp_rxbuff[VALUEPACK_BUFFER_SIZE - 2]) // 校验数据包和
+	// 		{
+	// 			move = vp_rxbuff[1] & 0X01;				//移动控制
+	// 			bluetooth = (vp_rxbuff[1] >> 1) & 0X01; //蓝牙控制
+	// 			beep = (vp_rxbuff[1] >> 2) & 0X01;		//蜂鸣器控制
+	// 			Angle_Target = (float)(vp_rxbuff[2] + 0x100 * vp_rxbuff[3] + 0x10000 * vp_rxbuff[4] + 0x1000000 * vp_rxbuff[5]) / 100;
+	// 			TargetSpeed = (float)(vp_rxbuff[6] + 0x100 * vp_rxbuff[7] + 0x10000 * vp_rxbuff[8] + 0x1000000 * vp_rxbuff[9]) / 100;
+	// 		}
+	// 		else
+	// 		{
+	// 			rxIndex = 0; // 数据包错误,重新开始接收
+	// 		}
+	// 	}
+	// 	else
+	// 		rxIndex = 0;
+	// }
 	__HAL_UART_CLEAR_FLAG(&UART6_Handler, UART_FLAG_RXNE); //清除接收中断标志
 #if SYSTEM_SUPPORT_OS									   //使用OS
 	OSIntExit();

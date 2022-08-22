@@ -10,7 +10,9 @@
                 "${workspaceFolder}/Drivers/CMSIS/Include",
                 "${workspaceFolder}/RTT",
                 "${workspaceFolder}/User/Inc",
-                "${workspaceFolder}/Hardware/Inc"
+                "${workspaceFolder}/Hardware/Inc",
+                "${workspaceFolder}/FreeRtos/Inc",
+                "${workspaceFolder}/FreeRtos/portable/Inc"
             ],
             "defines": [
                 "USE_HAL_DRIVER",
