@@ -123,10 +123,11 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
+-IFreeRTOS/Inc \
+-IFreeRTOS/portable/Inc \
 -IRTT \
 -IUser/Inc \
--IHardware/Inc 
-
+-IHardware/Inc \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
