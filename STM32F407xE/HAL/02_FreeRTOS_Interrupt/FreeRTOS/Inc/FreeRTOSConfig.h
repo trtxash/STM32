@@ -47,36 +47,36 @@
 extern uint32_t SystemCoreClock;
 #endif
 
-#define configUSE_PREEMPTION 1
-#define configUSE_IDLE_HOOK 0
-#define configUSE_TICK_HOOK 0
-#define configCPU_CLOCK_HZ (SystemCoreClock)
-#define configTICK_RATE_HZ ((TickType_t)1000)
-#define configMAX_PRIORITIES (5)
-#define configMINIMAL_STACK_SIZE ((unsigned short)130)
-#define configTOTAL_HEAP_SIZE ((size_t)(75 * 1024))
-#define configMAX_TASK_NAME_LEN (10)
-#define configUSE_TRACE_FACILITY 1
-#define configUSE_16_BIT_TICKS 0
-#define configIDLE_SHOULD_YIELD 1
-#define configUSE_MUTEXES 1
-#define configQUEUE_REGISTRY_SIZE 8
-#define configCHECK_FOR_STACK_OVERFLOW 2 // 设置堆栈溢出检测，1或2两种模式，会调用vApplicationStackOverflowHook钩子函数
-#define configUSE_RECURSIVE_MUTEXES 1
-#define configUSE_MALLOC_FAILED_HOOK 0
-#define configUSE_APPLICATION_TASK_TAG 0
-#define configUSE_COUNTING_SEMAPHORES 1
-#define configGENERATE_RUN_TIME_STATS 0
+#define configUSE_PREEMPTION 1						   // 为1时使用抢占式调度器，为0时使用协程，抢断式调度器的话内核会在每个时钟节拍中断中进行任务切换，
+#define configUSE_IDLE_HOOK 0						   // 为1时使用空闲任务钩子函数，vApplicationIdleHook(void)
+#define configUSE_TICK_HOOK 0						   // 为1使用时间片钩子函数，需要vApplicationTickHook(void)
+#define configCPU_CLOCK_HZ (SystemCoreClock)		   // cpu频率
+#define configTICK_RATE_HZ ((TickType_t)1000)		   // 设置FreeRTOS的系统时钟节拍频率Hz，1000为1ms
+#define configMAX_PRIORITIES (5)					   // 设置任务优先级数量，0~num-1
+#define configMINIMAL_STACK_SIZE ((unsigned short)130) // 设置空闲任务的最小任务堆栈大小，字为单位，130*4字节
+#define configTOTAL_HEAP_SIZE ((size_t)(75 * 1024))	   // 设置堆大小，然后使用了动态内存管理，FreeRTOS会使用heapX.c中的内存申请函数来申请内存，这些内存时从堆ucHeap[configTOTAL_HEAP_SIZE]中申请的，堆的大小由这项来定义
+#define configMAX_TASK_NAME_LEN (10)				   // 设置任务名最大长度
+#define configUSE_TRACE_FACILITY 1					   // 为1启用可视化跟踪调试，会增加一些结构体成员和API函数
+#define configUSE_16_BIT_TICKS 0					   // 系统节拍计数器变量数据类型，0为TickType_t为32位，1为16位
+#define configIDLE_SHOULD_YIELD 1					   // 定义了与空闲任务(idle Task)处于同等优先级的其他用户任务行为，为1可以让出cpu使用权，减少空闲任务时间，但有副作用
+#define configUSE_MUTEXES 1							   // 为1使用互斥信号量，相关API函数会被编译
+#define configQUEUE_REGISTRY_SIZE 8					   // 设置可以注册的队列和信号量的最大数量，使用内核调试器查看信号量和队列要设置，而且要先将消息队列和信号量进行注册
+#define configCHECK_FOR_STACK_OVERFLOW 2			   // 设置堆栈溢出检测，1或2两种模式，会调用vApplicationStackOverflowHook钩子函数
+#define configUSE_RECURSIVE_MUTEXES 1				   // 为1时使用递归互斥信号量，相关API会被编译
+#define configUSE_MALLOC_FAILED_HOOK 0				   // 为1时使用内存分配失败钩子函数，vApplicationMallocFailedHook(void)
+#define configUSE_APPLICATION_TASK_TAG 0			   // 为1则configUSE_APPLICATION_TASK_TAGF()和xTaskCallApplicationTaskHook()会被编译
+#define configUSE_COUNTING_SEMAPHORES 1				   // 为1启动计数型信号量，相关的API函数会被编译
+#define configGENERATE_RUN_TIME_STATS 0				   // 为1开启时间统计功能，相应API函数会被编译，为1还要定义额外的宏，见开发手册
 
 /* Co-routine definitions. */
-#define configUSE_CO_ROUTINES 0
-#define configMAX_CO_ROUTINE_PRIORITIES (2)
+#define configUSE_CO_ROUTINES 0				// 为1启用协程，节省开销，但功能有限
+#define configMAX_CO_ROUTINE_PRIORITIES (2) // 设置分配给协程的最大优先级，0~num-1
 
 /* Software timer definitions. */
-#define configUSE_TIMERS 1
-#define configTIMER_TASK_PRIORITY (2)
-#define configTIMER_QUEUE_LENGTH 10
-#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 2)
+#define configUSE_TIMERS 1											// 为1使用软件定时器，相关定API会被编译
+#define configTIMER_TASK_PRIORITY (2)								// 软件定时器任务优先级
+#define configTIMER_QUEUE_LENGTH 10									// 软件定时器API函数会通过命令队列向软件定时器任务发送消息，这用来设置这个软件定时器命令队列长度
+#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 2) // 软件定时器任务的任务堆栈大小
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
