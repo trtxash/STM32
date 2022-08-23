@@ -1,48 +1,11 @@
 /**
  * @file	  00_FreeRTOS_Template
- * @brief 	移植FreeRTOS和LED驱动
+ * @brief 	移植FreeRTOS和模板
  * @author 	TRTX-gamer
  * @version 1.00
- * @date 	  2022年8月22号23点00分
+ * @date 	  2022年8月23号12点33分
  */
-
 #include "main.h"
-
-//任务优先级
-#define START_TASK_PRIO 1
-//任务堆栈大小
-#define START_STK_SIZE 128
-//任务句柄
-TaskHandle_t StartTask_Handler;
-//任务函数
-void start_task(void *pvParameters);
-
-//任务优先级
-#define LED0_TASK_PRIO 2
-//任务堆栈大小
-#define LED0_STK_SIZE 50
-//任务句柄
-TaskHandle_t LED0Task_Handler;
-//任务函数
-void led0_task(void *pvParameters);
-
-//任务优先级
-#define LED1_TASK_PRIO 3
-//任务堆栈大小
-#define LED1_STK_SIZE 50
-//任务句柄
-TaskHandle_t LED1Task_Handler;
-//任务函数
-void led1_task(void *pvParameters);
-
-//任务优先级
-#define FLOAT_TASK_PRIO 4
-//任务堆栈大小
-#define FLOAT_STK_SIZE 256
-//任务句柄
-TaskHandle_t FLOATTask_Handler;
-//任务函数
-void float_task(void *pvParameters);
 
 /**
  * @brief   主函数,程序入口
@@ -108,7 +71,6 @@ void led0_task(void *pvParameters)
   {
     LED0_Reverse();
     vTaskDelay(500);
-    // printf("OK!\n");
   }
 }
 
@@ -139,6 +101,27 @@ void float_task(void *pvParameters)
     vTaskDelay(1000);
   }
 }
+
+#ifdef Debug
+/**
+ * @brief   栈溢出钩子函数
+ * @param   xTask
+ * @arg		  the task that just exceeded its stack boundaries.
+ * @param   pcTaskName
+ * @arg		  A character string containing the name of the offending task.
+ * @note    FreeRTOS打印栈溢出的任务，关联#define configCHECK_FOR_STACK_OVERFLOW 2，在FreeRTOSConfig.h下
+ * @retval  void
+ */
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
+  /* Run time stack overflow checking is performed if
+  configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+  called if a stack overflow is detected. */
+  printf("任务：%s 溢出\r\n", pcTaskName);
+  while (1)
+    ;
+}
+#endif
 
 #ifdef USE_FULL_ASSERT
 /**
