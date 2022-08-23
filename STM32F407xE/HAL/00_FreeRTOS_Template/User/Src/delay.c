@@ -88,6 +88,16 @@ void delay_ms(u32 nms)
 	}
 	delay_us((u32)(nms * 1000)); //普通方式延时
 }
+
+//延时nms,不会引起任务调度
+// nms:要延时的ms数
+void delay_xms(u32 nms)
+{
+	u32 i;
+	for (i = 0; i < nms; i++)
+		delay_us(1000);
+}
+
 #else //不用os时
 
 //延时nus
