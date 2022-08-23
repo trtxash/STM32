@@ -42,10 +42,10 @@ int main(void)
   {
     Error_Handler();
   }
-  Stm32_Clock_Init(168, 4, 2, 4); // 初始化时钟
-  delay_init(168);                // 初始化延时函数
-  uart6_init(115200);             // 初始化串口
-  LED_Init();                     // 初始化LED
+  Stm32_Clock_Init(168, 4, 2, 4, 1, 4, 2); // 初始化时钟
+  delay_init(168);                         // 初始化延时函数
+  uart6_init(115200);                      // 初始化串口
+  LED_Init();                              // 初始化LED
 
   //创建开始任务
   xTaskCreate((TaskFunction_t)start_task,          //任务函数

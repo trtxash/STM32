@@ -47,12 +47,12 @@ int main(void)
   {
     Error_Handler();
   }
-  Stm32_Clock_Init(168, 4, 2, 4); // 初始化时钟
-  delay_init(168);                // 初始化延时函数
-  uart6_init(115200);             // 初始化串口
-  TIM3_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
-  TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
-  LED_Init();                     // 初始化LED
+  Stm32_Clock_Init(168, 4, 2, 4, 1, 4, 2); // 初始化时钟
+  delay_init(168);                         // 初始化延时函数
+  uart6_init(115200);                      // 初始化串口
+  TIM3_Init(10000 - 1, 8400 - 1);          // 定时器3初始化，周期1s
+  TIM4_Init(10000 - 1, 8400 - 1);          // 定时器3初始化，周期1s
+  LED_Init();                              // 初始化LED
 
   //创建开始任务
   xTaskCreate((TaskFunction_t)start_task,          //任务函数
