@@ -20,7 +20,6 @@
 // Fvco=Fs*(plln/pllm);
 // SYSCLK=Fvco/pllp=Fs*(plln/(pllm*pllp));
 // Fusb=Fvco/pllq=Fs*(plln/(pllm*pllq));
-
 // Fvco:VCO频率
 // SYSCLK:系统时钟频率
 // Fusb:USB,SDIO,RNG等的时钟频率
@@ -29,11 +28,9 @@
 // pllm:主PLL和音频PLL分频系数(PLL之前的分频)
 // pllp:系统时钟的主PLL分频系数(PLL之后的分频)
 // pllq:USB/SDIO/随机数产生器等的主PLL分频系数(PLL之后的分频)
-
-//外部晶振为8M的时候（f407）,推荐值:plln=168,pllm=4,pllp=RCC_PLLP_DIV2,pllq=4
+//外部晶振为8M的时候（f407）,推荐值:plln=168,pllm=4,pllp=RCC_PLLP_DIV2,pllq=4,ahb=RCC_SYSCLK_DIV1,apb1=RCC_HCLK_DIV4,apb2=RCC_HCLK_DIV2
 //返回值:0,成功;1,失败
-
-void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
+void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq, u32 ahb, u32 apb1, u32 ape2)
 {
     HAL_StatusTypeDef ret = HAL_OK;
     RCC_OscInitTypeDef RCC_OscInitStructure;
@@ -63,9 +60,9 @@ void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
     //选中PLL作为系统时钟源并且配置HCLK,PCLK1和PCLK2
     RCC_ClkInitStructure.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
     RCC_ClkInitStructure.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;       //设置系统时钟时钟源为PLL
-    RCC_ClkInitStructure.AHBCLKDivider = RCC_SYSCLK_DIV1;              // AHB分频系数为1
-    RCC_ClkInitStructure.APB1CLKDivider = RCC_HCLK_DIV2;               // APB1分频系数为2
-    RCC_ClkInitStructure.APB2CLKDivider = RCC_HCLK_DIV1;               // APB2分频系数为1
+    RCC_ClkInitStructure.AHBCLKDivider = ahb;                          // AHB分频系数为1
+    RCC_ClkInitStructure.APB1CLKDivider = apb1;                        // APB1分频系数为4
+    RCC_ClkInitStructure.APB2CLKDivider = ape2;                        // APB2分频系数为2
     ret = HAL_RCC_ClockConfig(&RCC_ClkInitStructure, FLASH_LATENCY_5); //同时设置FLASH延时周期为5WS，也就是6个CPU周期。
 
     if (ret != HAL_OK)
