@@ -14,20 +14,25 @@
 TaskHandle_t StartTask_Handler;      //任务句柄
 void start_task(void *pvParameters); //任务函数
 
-#define LED0_TASK_PRIO 2            //任务优先级
+#define INTERRUPT_TASK_PRIO 2            //任务优先级
+#define INTERRUPT_STK_SIZE 256           //任务堆栈大小
+TaskHandle_t INTERRUPTTask_Handler;      //任务句柄
+void interrupt_task(void *pvParameters); //任务函数
+
+#define LED0_TASK_PRIO 3            //任务优先级
 #define LED0_STK_SIZE 50            //任务堆栈大小
 TaskHandle_t LED0Task_Handler;      //任务句柄
 void led0_task(void *pvParameters); //任务函数
 
-#define LED1_TASK_PRIO 3            //任务优先级
+#define LED1_TASK_PRIO 4            //任务优先级
 #define LED1_STK_SIZE 50            //任务堆栈大小
 TaskHandle_t LED1Task_Handler;      //任务句柄
 void led1_task(void *pvParameters); //任务函数
 
-#define FLOAT_TASK_PRIO 4            //任务优先级
-#define FLOAT_STK_SIZE 256           //任务堆栈大小
-TaskHandle_t FLOATTask_Handler;      //任务句柄
-void float_task(void *pvParameters); //任务函数
+// #define FLOAT_TASK_PRIO 4            //任务优先级
+// #define FLOAT_STK_SIZE 256           //任务堆栈大小
+// TaskHandle_t FLOATTask_Handler;      //任务句柄
+// void float_task(void *pvParameters); //任务函数
 
 /**
  * @brief   主函数,程序入口
@@ -45,6 +50,8 @@ int main(void)
   Stm32_Clock_Init(168, 4, 2, 4); // 初始化时钟
   delay_init(168);                // 初始化延时函数
   uart6_init(115200);             // 初始化串口
+  TIM3_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
+  TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
   LED_Init();                     // 初始化LED
 
   //创建开始任务
@@ -61,6 +68,13 @@ int main(void)
 void start_task(void *pvParameters)
 {
   taskENTER_CRITICAL(); //进入临界区
+  //创建interrupt任务
+  xTaskCreate((TaskFunction_t)interrupt_task,
+              (const char *)"interrupt_task",
+              (uint16_t)INTERRUPT_STK_SIZE,
+              (void *)NULL,
+              (UBaseType_t)INTERRUPT_TASK_PRIO,
+              (TaskHandle_t *)&INTERRUPTTask_Handler);
   //创建LED0任务
   xTaskCreate((TaskFunction_t)led0_task,
               (const char *)"led0_task",
@@ -75,15 +89,35 @@ void start_task(void *pvParameters)
               (void *)NULL,
               (UBaseType_t)LED1_TASK_PRIO,
               (TaskHandle_t *)&LED1Task_Handler);
-  //浮点测试任务
-  xTaskCreate((TaskFunction_t)float_task,
-              (const char *)"float_task",
-              (uint16_t)FLOAT_STK_SIZE,
-              (void *)NULL,
-              (UBaseType_t)FLOAT_TASK_PRIO,
-              (TaskHandle_t *)&FLOATTask_Handler);
+  // //浮点测试任务
+  // xTaskCreate((TaskFunction_t)float_task,
+  //             (const char *)"float_task",
+  //             (uint16_t)FLOAT_STK_SIZE,
+  //             (void *)NULL,
+  //             (UBaseType_t)FLOAT_TASK_PRIO,
+  //             (TaskHandle_t *)&FLOATTask_Handler);
   vTaskDelete(StartTask_Handler); //删除开始任务
   taskEXIT_CRITICAL();            //退出临界区
+}
+
+// 中断任务函数
+void interrupt_task(void *pvParameters)
+{
+  static u32 total_num = 0;
+  while (1)
+  {
+    total_num += 1;
+    if (total_num >= 5)
+    {
+      total_num = 0;
+      printf("关闭中断......\r\n");
+      portDISABLE_INTERRUPTS(); // 关闭中断
+      delay_xms(5000);          // 延时5s,不会引起任务调度，LED卡死
+      printf("打开中断......\r\n");
+      portENABLE_INTERRUPTS(); // 打开中断
+    }
+    vTaskDelay(1000);
+  }
 }
 
 // LED0任务函数
@@ -108,21 +142,23 @@ void led1_task(void *pvParameters)
   }
 }
 
-//浮点测试任务
-void float_task(void *pvParameters)
-{
-  static float float_num = 0.00;
-  while (1)
-  {
-    float_num += 0.01f;
-    if (float_num > 10.00)
-    {
-      float_num = 0.00;
-    }
-    printf("float_num的值为: %.4f\n", float_num);
-    vTaskDelay(1000);
-  }
-}
+// //浮点测试任务
+// void float_task(void *pvParameters)
+// {
+//   static float float_num = 0.00;
+//   while (1)
+//   {
+//     float_num += 0.01f;
+//     if (float_num > 10.00)
+//     {
+//       float_num = 0.00;
+//     }
+//     taskENTER_CRITICAL(); //进入临界区
+//     printf("float_num的值为: %.4f\r\n", float_num);
+//     taskEXIT_CRITICAL(); //退出临界区
+//     vTaskDelay(1000);
+//   }
+// }
 
 #ifdef Debug
 /**
@@ -140,8 +176,6 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
   called if a stack overflow is detected. */
   printf("任务：%s 溢出\r\n", pcTaskName);
-  while (1)
-    ;
 }
 #endif
 

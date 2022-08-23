@@ -188,31 +188,31 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
     if (htim->Instance == TIM1)
     {
         __HAL_RCC_TIM1_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 2, 2);
+        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 2, 0);
         HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
     }
     else if (htim->Instance == TIM2)
     {
         __HAL_RCC_TIM2_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM2_IRQn, 2, 2);
+        HAL_NVIC_SetPriority(TIM2_IRQn, 2, 0);
         HAL_NVIC_EnableIRQ(TIM2_IRQn);
     }
     else if (htim->Instance == TIM3)
     {
         __HAL_RCC_TIM3_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM3_IRQn, 3, 3);
+        HAL_NVIC_SetPriority(TIM3_IRQn, 4, 0);
         HAL_NVIC_EnableIRQ(TIM3_IRQn);
     }
     else if (htim->Instance == TIM4)
     {
         __HAL_RCC_TIM4_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM4_IRQn, 3, 3);
+        HAL_NVIC_SetPriority(TIM4_IRQn, 5, 0);
         HAL_NVIC_EnableIRQ(TIM4_IRQn);
     }
     else if (htim->Instance == TIM5)
     {
         __HAL_RCC_TIM5_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM5_IRQn, 3, 3);
+        HAL_NVIC_SetPriority(TIM5_IRQn, 3, 0);
         HAL_NVIC_EnableIRQ(TIM5_IRQn);
     }
 }
@@ -357,356 +357,358 @@ void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n)
 //定时器1中断服务函数
 void TIM1_UP_TIM10_IRQHandler(void)
 {
-    u8 temp2[16] = {0};
+    // u8 temp2[16] = {0};
 
-    TIME_N5ms++;
-    tem = SMBus_ReadTemp();
+    // TIME_N5ms++;
+    // tem = SMBus_ReadTemp();
 
-    if (readValuePack(&rxpack))
-    {
-        /* 编码器读取 */
-        Encoder_1 = rxpack.shorts[0];
-        Encoder_2 = rxpack.shorts[1];
-        Encoder_3 = rxpack.shorts[2];
-        Encoder_4 = rxpack.shorts[3];
+    // if (readValuePack(&rxpack))
+    // {
+    //     /* 编码器读取 */
+    //     Encoder_1 = rxpack.shorts[0];
+    //     Encoder_2 = rxpack.shorts[1];
+    //     Encoder_3 = rxpack.shorts[2];
+    //     Encoder_4 = rxpack.shorts[3];
 
-        /* 红外数据处理 */
-        Now_pos_num = Read_Infraredtobe_sums();
+    //     /* 红外数据处理 */
+    //     Now_pos_num = Read_Infraredtobe_sums();
 
-        /* 小车状态 */
-        Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target; // 编码器赋值
-        if (car_state == 1)                                                                         // 直走
-        {
-            if (Now_pos_num > 0 && Now_pos_num < 9)
-            {
-                if (Now_pos_num == 1) // 右转
-                {
-                    Encoder_target_2 += 25;
-                    Encoder_target_4 += 25;
-                    Encoder_target_1 -= 25;
-                    Encoder_target_3 -= 25;
-                }
-                else if (Now_pos_num >= 3) // 大右转
-                {
-                    Encoder_target_2 += 75;
-                    Encoder_target_4 += 75;
-                    Encoder_target_1 -= 75;
-                    Encoder_target_3 -= 75;
-                }
-            }
-            else if (Now_pos_num < 0)
-            {
-                if (Now_pos_num == -1) // 左转
-                {
-                    Encoder_target_2 -= 25;
-                    Encoder_target_4 -= 25;
-                    Encoder_target_1 += 25;
-                    Encoder_target_3 += 25;
-                }
-                else if (Now_pos_num <= -3) // 大左转
-                {
-                    Encoder_target_2 -= 75;
-                    Encoder_target_4 -= 75;
-                    Encoder_target_1 += 75;
-                    Encoder_target_3 += 75;
-                }
-            }
-        }
-        else if (car_state == -1) // 停止
-        {
-            Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target = 0;
-            pwmval_1 = pwmval_2 = pwmval_3 = pwmval_4 = 0;
-        }
-        else if (car_state == 2) // 右转
-        {
-            Encoder_target_2 = 250;
-            Encoder_target_4 = 250;
-            Encoder_target_1 = -250;
-            Encoder_target_3 = -250;
-        }
-        else if (car_state == -2) // 左转
-        {
-        }
+    //     /* 小车状态 */
+    //     Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target; // 编码器赋值
+    //     if (car_state == 1)                                                                         // 直走
+    //     {
+    //         if (Now_pos_num > 0 && Now_pos_num < 9)
+    //         {
+    //             if (Now_pos_num == 1) // 右转
+    //             {
+    //                 Encoder_target_2 += 25;
+    //                 Encoder_target_4 += 25;
+    //                 Encoder_target_1 -= 25;
+    //                 Encoder_target_3 -= 25;
+    //             }
+    //             else if (Now_pos_num >= 3) // 大右转
+    //             {
+    //                 Encoder_target_2 += 75;
+    //                 Encoder_target_4 += 75;
+    //                 Encoder_target_1 -= 75;
+    //                 Encoder_target_3 -= 75;
+    //             }
+    //         }
+    //         else if (Now_pos_num < 0)
+    //         {
+    //             if (Now_pos_num == -1) // 左转
+    //             {
+    //                 Encoder_target_2 -= 25;
+    //                 Encoder_target_4 -= 25;
+    //                 Encoder_target_1 += 25;
+    //                 Encoder_target_3 += 25;
+    //             }
+    //             else if (Now_pos_num <= -3) // 大左转
+    //             {
+    //                 Encoder_target_2 -= 75;
+    //                 Encoder_target_4 -= 75;
+    //                 Encoder_target_1 += 75;
+    //                 Encoder_target_3 += 75;
+    //             }
+    //         }
+    //     }
+    //     else if (car_state == -1) // 停止
+    //     {
+    //         Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target = 0;
+    //         pwmval_1 = pwmval_2 = pwmval_3 = pwmval_4 = 0;
+    //     }
+    //     else if (car_state == 2) // 右转
+    //     {
+    //         Encoder_target_2 = 250;
+    //         Encoder_target_4 = 250;
+    //         Encoder_target_1 = -250;
+    //         Encoder_target_3 = -250;
+    //     }
+    //     else if (car_state == -2) // 左转
+    //     {
+    //     }
 
-        /* PID计算与反馈 */
-        pwmval_1 = Velocity_FeedbackControl_1(Encoder_target_1, Encoder_1); //速度反馈控制
-        /* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
-        if (pwmval_1 >= 0)
-        {
-            TIM_SetTIM4_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
-            TIM_SetTIM4_DutyCycle_n(0, 1);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM4_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
-            TIM_SetTIM4_DutyCycle_n(0, 2);         //修改比较值，修改占空比
-        }
-        pwmval_2 = Velocity_FeedbackControl_2(Encoder_target_2, Encoder_2); //速度反馈控制
-        /* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
-        if (pwmval_2 >= 0)
-        {
-            TIM_SetTIM4_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
-            TIM_SetTIM4_DutyCycle_n(0, 3);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM4_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
-            TIM_SetTIM4_DutyCycle_n(0, 4);         //修改比较值，修改占空比
-        }
-        pwmval_3 = Velocity_FeedbackControl_3(Encoder_target_3, Encoder_3); //速度反馈控制
-        /* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
-        if (pwmval_3 >= 0)
-        {
-            TIM_SetTIM5_DutyCycle_n(pwmval_3, 4); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_3, 3); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
-        }
-        pwmval_4 = Velocity_FeedbackControl_4(Encoder_target_4, Encoder_4); //速度反馈控制
-        /* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
-        if (pwmval_4 >= 0)
-        {
-            TIM_SetTIM5_DutyCycle_n(pwmval_4, 1); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 2);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_4, 2); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 1);         //修改比较值，修改占空比
-        }
-    }
+    //     /* PID计算与反馈 */
+    //     pwmval_1 = Velocity_FeedbackControl_1(Encoder_target_1, Encoder_1); //速度反馈控制
+    //     /* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
+    //     if (pwmval_1 >= 0)
+    //     {
+    //         TIM_SetTIM4_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
+    //         TIM_SetTIM4_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+    //     }
+    //     else
+    //     {
+    //         TIM_SetTIM4_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
+    //         TIM_SetTIM4_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+    //     }
+    //     pwmval_2 = Velocity_FeedbackControl_2(Encoder_target_2, Encoder_2); //速度反馈控制
+    //     /* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
+    //     if (pwmval_2 >= 0)
+    //     {
+    //         TIM_SetTIM4_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
+    //         TIM_SetTIM4_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+    //     }
+    //     else
+    //     {
+    //         TIM_SetTIM4_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
+    //         TIM_SetTIM4_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+    //     }
+    //     pwmval_3 = Velocity_FeedbackControl_3(Encoder_target_3, Encoder_3); //速度反馈控制
+    //     /* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
+    //     if (pwmval_3 >= 0)
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(pwmval_3, 4); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+    //     }
+    //     else
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(-pwmval_3, 3); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+    //     }
+    //     pwmval_4 = Velocity_FeedbackControl_4(Encoder_target_4, Encoder_4); //速度反馈控制
+    //     /* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
+    //     if (pwmval_4 >= 0)
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(pwmval_4, 1); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 2);        //修改比较值，修改占空比
+    //     }
+    //     else
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(-pwmval_4, 2); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 1);         //修改比较值，修改占空比
+    //     }
+    // }
 
-    /* 红外 */
-    for (u8 i = 0; i < 8; i++)
-    {
-        OLED_ShowNum(i * 6, 54, rxpack.bools[i], 1, 8, 1);
-    }
-    if (Now_pos_num >= 0)
-    {
-        OLED_ShowChar(50, 54, '+', 8, 1);
-        OLED_ShowNum(56, 54, Now_pos_num, 1, 8, 1);
-    }
-    else
-    {
-        OLED_ShowChar(50, 54, '-', 8, 1);
-        OLED_ShowNum(56, 54, -Now_pos_num, 1, 8, 1);
-    }
+    // /* 红外 */
+    // for (u8 i = 0; i < 8; i++)
+    // {
+    //     OLED_ShowNum(i * 6, 54, rxpack.bools[i], 1, 8, 1);
+    // }
+    // if (Now_pos_num >= 0)
+    // {
+    //     OLED_ShowChar(50, 54, '+', 8, 1);
+    //     OLED_ShowNum(56, 54, Now_pos_num, 1, 8, 1);
+    // }
+    // else
+    // {
+    //     OLED_ShowChar(50, 54, '-', 8, 1);
+    //     OLED_ShowNum(56, 54, -Now_pos_num, 1, 8, 1);
+    // }
 
-    /* 编码器显示 */
-    if (Encoder_1 >= 0)
-    {
-        OLED_ShowChar(0, 16, '+', 8, 1);
-        OLED_ShowNum(6, 16, Encoder_1, 4, 8, 1); // 显示红外传感器的数值
-    }
-    else
-    {
-        OLED_ShowChar(0, 16, '-', 8, 1);
-        OLED_ShowNum(6, 16, -Encoder_1, 4, 8, 1); // 显示红外传感器的数值
-    }
-    if (Encoder_2 >= 0)
-    {
-        OLED_ShowChar(0, 24, '+', 8, 1);
-        OLED_ShowNum(6, 24, Encoder_2, 4, 8, 1); // 显示红外传感器的数值
-    }
-    else
-    {
-        OLED_ShowChar(0, 24, '-', 8, 1);
-        OLED_ShowNum(6, 24, -Encoder_2, 4, 8, 1); // 显示红外传感器的数值
-    }
-    if (Encoder_3 >= 0)
-    {
-        OLED_ShowChar(0, 32, '+', 8, 1);
-        OLED_ShowNum(6, 32, Encoder_3, 4, 8, 1); // 显示红外传感器的数值
-    }
-    else
-    {
-        OLED_ShowChar(0, 32, '-', 8, 1);
-        OLED_ShowNum(6, 32, -Encoder_3, 4, 8, 1); // 显示红外传感器的数值
-    }
-    if (Encoder_4 >= 0)
-    {
-        OLED_ShowChar(0, 40, '+', 8, 1);
-        OLED_ShowNum(6, 40, Encoder_4, 4, 8, 1); // 显示红外传感器的数值
-    }
-    else
-    {
-        OLED_ShowChar(0, 40, '-', 8, 1);
-        OLED_ShowNum(6, 40, -Encoder_4, 4, 8, 1); // 显示红外传感器的数值
-    }
+    // /* 编码器显示 */
+    // if (Encoder_1 >= 0)
+    // {
+    //     OLED_ShowChar(0, 16, '+', 8, 1);
+    //     OLED_ShowNum(6, 16, Encoder_1, 4, 8, 1); // 显示红外传感器的数值
+    // }
+    // else
+    // {
+    //     OLED_ShowChar(0, 16, '-', 8, 1);
+    //     OLED_ShowNum(6, 16, -Encoder_1, 4, 8, 1); // 显示红外传感器的数值
+    // }
+    // if (Encoder_2 >= 0)
+    // {
+    //     OLED_ShowChar(0, 24, '+', 8, 1);
+    //     OLED_ShowNum(6, 24, Encoder_2, 4, 8, 1); // 显示红外传感器的数值
+    // }
+    // else
+    // {
+    //     OLED_ShowChar(0, 24, '-', 8, 1);
+    //     OLED_ShowNum(6, 24, -Encoder_2, 4, 8, 1); // 显示红外传感器的数值
+    // }
+    // if (Encoder_3 >= 0)
+    // {
+    //     OLED_ShowChar(0, 32, '+', 8, 1);
+    //     OLED_ShowNum(6, 32, Encoder_3, 4, 8, 1); // 显示红外传感器的数值
+    // }
+    // else
+    // {
+    //     OLED_ShowChar(0, 32, '-', 8, 1);
+    //     OLED_ShowNum(6, 32, -Encoder_3, 4, 8, 1); // 显示红外传感器的数值
+    // }
+    // if (Encoder_4 >= 0)
+    // {
+    //     OLED_ShowChar(0, 40, '+', 8, 1);
+    //     OLED_ShowNum(6, 40, Encoder_4, 4, 8, 1); // 显示红外传感器的数值
+    // }
+    // else
+    // {
+    //     OLED_ShowChar(0, 40, '-', 8, 1);
+    //     OLED_ShowNum(6, 40, -Encoder_4, 4, 8, 1); // 显示红外传感器的数值
+    // }
 
-    /* 温度和电量 */
-    sprintf(temp2, "TEM:%3.1f;POW:%d", tem, rxpack.shorts[4]);
-    OLED_ShowString(0, 0, temp2, 16, 1);
+    // /* 温度和电量 */
+    // sprintf(temp2, "TEM:%3.1f;POW:%d", tem, rxpack.shorts[4]);
+    // OLED_ShowString(0, 0, temp2, 16, 1);
 
-    /* 接受错误 */
-    OLED_ShowNum(0, 48, err, 5, 8, 1);
+    // /* 接受错误 */
+    // OLED_ShowNum(0, 48, err, 5, 8, 1);
 
-    OLED_Refresh();
+    // OLED_Refresh();
 
-    __HAL_TIM_CLEAR_FLAG(&TIM1_Handler, TIM_FLAG_UPDATE); //清除更新标志
+    // __HAL_TIM_CLEAR_FLAG(&TIM1_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }
 
 //定时器2中断服务函数
 void TIM2_IRQHandler(void)
 {
-    u8 temp_x;
-    u8 temp[16]; // 储存要显示的字符串，最多16个字符
+    // u8 temp_x;
+    // u8 temp[16]; // 储存要显示的字符串，最多16个字符
 
-    if (bluetooth) // 是否蓝牙遥控
-    {
-        /* 速度处理 */
-        TargetSpeed_1 = TargetSpeed_2 = TargetSpeed;
-        TargetSpeed_1 += Angle_Target / 2;
-        TargetSpeed_2 -= Angle_Target / 2;
+    // if (bluetooth) // 是否蓝牙遥控
+    // {
+    //     /* 速度处理 */
+    //     TargetSpeed_1 = TargetSpeed_2 = TargetSpeed;
+    //     TargetSpeed_1 += Angle_Target / 2;
+    //     TargetSpeed_2 -= Angle_Target / 2;
 
-        Encoder_1 = -Calculate_Velocity(Read_Encoder(3));                //读取编码器的值计算速度
-        pwmval_1 = Velocity_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
-        if (pwmval_1 >= 0)
-        {
-            TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
-        }
+    //     Encoder_1 = -Calculate_Velocity(Read_Encoder(3));                //读取编码器的值计算速度
+    //     pwmval_1 = Velocity_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
+    //     if (pwmval_1 >= 0)
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+    //     }
+    //     else
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+    //     }
 
-        Encoder_2 = Calculate_Velocity(Read_Encoder(4));                 //读取编码器的值计算速度
-        pwmval_2 = Velocity_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
-        if (pwmval_2 >= 0)
-        {
-            TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
-        }
-    }
-    else // 默认循迹
-    {
-        /* 速度处理 */
-        TargetSpeed_1 = TargetSpeed_2 = TargetSpeed;
-        Now_pos = Read_Infraredtobe_bits();     //读取红外传感器数据
-        Now_pos_num = Read_Infraredtobe_sums(); // 读取红外传感器数据的数值
-        if (Now_pos_num > 0)
-        {
-            if (Now_pos == 1)
-            {
-                TargetSpeed_1 += 0.2;
-                TargetSpeed_2 -= 0.2;
-            }
-            else if (Now_pos == 2)
-            {
-                TargetSpeed_1 += 0.4;
-                TargetSpeed_2 -= 0.4;
-            }
-            else
-            {
-                TargetSpeed_1 += 1.0;
-                TargetSpeed_2 -= 1.0;
-            }
-        }
-        else if (Now_pos_num < 0)
-        {
-            if (Now_pos == -1)
-            {
-                TargetSpeed_1 -= 0.2;
-                TargetSpeed_2 += 0.2;
-            }
-            else if (Now_pos == 2)
-            {
-                TargetSpeed_1 -= 0.4;
-                TargetSpeed_2 += 0.4;
-            }
-            else
-            {
-                TargetSpeed_1 -= 1.0;
-                TargetSpeed_2 += 1.0;
-            }
-        }
+    //     Encoder_2 = Calculate_Velocity(Read_Encoder(4));                 //读取编码器的值计算速度
+    //     pwmval_2 = Velocity_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
+    //     if (pwmval_2 >= 0)
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+    //     }
+    //     else
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+    //     }
+    // }
+    // else // 默认循迹
+    // {
+    //     /* 速度处理 */
+    //     TargetSpeed_1 = TargetSpeed_2 = TargetSpeed;
+    //     Now_pos = Read_Infraredtobe_bits();     //读取红外传感器数据
+    //     Now_pos_num = Read_Infraredtobe_sums(); // 读取红外传感器数据的数值
+    //     if (Now_pos_num > 0)
+    //     {
+    //         if (Now_pos == 1)
+    //         {
+    //             TargetSpeed_1 += 0.2;
+    //             TargetSpeed_2 -= 0.2;
+    //         }
+    //         else if (Now_pos == 2)
+    //         {
+    //             TargetSpeed_1 += 0.4;
+    //             TargetSpeed_2 -= 0.4;
+    //         }
+    //         else
+    //         {
+    //             TargetSpeed_1 += 1.0;
+    //             TargetSpeed_2 -= 1.0;
+    //         }
+    //     }
+    //     else if (Now_pos_num < 0)
+    //     {
+    //         if (Now_pos == -1)
+    //         {
+    //             TargetSpeed_1 -= 0.2;
+    //             TargetSpeed_2 += 0.2;
+    //         }
+    //         else if (Now_pos == 2)
+    //         {
+    //             TargetSpeed_1 -= 0.4;
+    //             TargetSpeed_2 += 0.4;
+    //         }
+    //         else
+    //         {
+    //             TargetSpeed_1 -= 1.0;
+    //             TargetSpeed_2 += 1.0;
+    //         }
+    //     }
 
-        // TargetSpeed_1 += (double)Now_pos_num / 3.7;
-        // TargetSpeed_2 -= (double)Now_pos_num / 3.7;
-        /* 左右电机分别速度控制 */
-        Encoder_1 = -Calculate_Velocity(Read_Encoder(3));         //读取编码器的值计算速度
-        pwmval_1 = X_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
-        if (pwmval_1 >= 0)
-        {
-            TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
-        }
+    //     // TargetSpeed_1 += (double)Now_pos_num / 3.7;
+    //     // TargetSpeed_2 -= (double)Now_pos_num / 3.7;
+    //     /* 左右电机分别速度控制 */
+    //     Encoder_1 = -Calculate_Velocity(Read_Encoder(3));         //读取编码器的值计算速度
+    //     pwmval_1 = X_FeedbackControl_1(TargetSpeed_1, Encoder_1); //速度反馈控制
+    //     if (pwmval_1 >= 0)
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(pwmval_1, 2); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 1);        //修改比较值，修改占空比
+    //     }
+    //     else
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(-pwmval_1, 1); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 2);         //修改比较值，修改占空比
+    //     }
 
-        Encoder_2 = Calculate_Velocity(Read_Encoder(4));          //读取编码器的值计算速度
-        pwmval_2 = X_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
-        if (pwmval_2 >= 0)
-        {
-            TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
-        }
-        else
-        {
-            TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
-            TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
-        }
-    }
+    //     Encoder_2 = Calculate_Velocity(Read_Encoder(4));          //读取编码器的值计算速度
+    //     pwmval_2 = X_FeedbackControl_2(TargetSpeed_2, Encoder_2); //速度反馈控制
+    //     if (pwmval_2 >= 0)
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(pwmval_2, 4); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 3);        //修改比较值，修改占空比
+    //     }
+    //     else
+    //     {
+    //         TIM_SetTIM5_DutyCycle_n(-pwmval_2, 3); //修改比较值，修改占空比
+    //         TIM_SetTIM5_DutyCycle_n(0, 4);         //修改比较值，修改占空比
+    //     }
+    // }
 
-    if (!move) // 不移动关电机
-    {
-        TargetSpeed_1 = TargetSpeed_2 = 0;
-        pwmval_1 = pwmval_2 = 0;
-        TIM_SetTIM5_DutyCycle_n(0, 1);
-        TIM_SetTIM5_DutyCycle_n(0, 2);
-        TIM_SetTIM5_DutyCycle_n(0, 3);
-        TIM_SetTIM5_DutyCycle_n(0, 4);
-    }
+    // if (!move) // 不移动关电机
+    // {
+    //     TargetSpeed_1 = TargetSpeed_2 = 0;
+    //     pwmval_1 = pwmval_2 = 0;
+    //     TIM_SetTIM5_DutyCycle_n(0, 1);
+    //     TIM_SetTIM5_DutyCycle_n(0, 2);
+    //     TIM_SetTIM5_DutyCycle_n(0, 3);
+    //     TIM_SetTIM5_DutyCycle_n(0, 4);
+    // }
 
-    /* OLED显示部分 */
-    sprintf(temp, "%4.2f", Angle_Target / 1.5); //将速度转换为字符串
-    OLED_ShowString(24, 0, temp, 16, 1);
-    sprintf(temp, "%4.2f", TargetSpeed); //将速度转换为字符串
-    OLED_ShowString(88, 0, temp, 16, 1);
+    // /* OLED显示部分 */
+    // sprintf(temp, "%4.2f", Angle_Target / 1.5); //将速度转换为字符串
+    // OLED_ShowString(24, 0, temp, 16, 1);
+    // sprintf(temp, "%4.2f", TargetSpeed); //将速度转换为字符串
+    // OLED_ShowString(88, 0, temp, 16, 1);
 
-    sprintf(temp, "%4.2f", Encoder_1); //将速度转换为字符串
-    OLED_ShowString(24, 16, temp, 16, 1);
-    sprintf(temp, "%4.2f", Encoder_2); //将速度转换为字符串
-    OLED_ShowString(88, 16, temp, 16, 1);
+    // sprintf(temp, "%4.2f", Encoder_1); //将速度转换为字符串
+    // OLED_ShowString(24, 16, temp, 16, 1);
+    // sprintf(temp, "%4.2f", Encoder_2); //将速度转换为字符串
+    // OLED_ShowString(88, 16, temp, 16, 1);
 
-    OLED_ShowNum(0, 48, (u16)Now_pos, 4, 16, 1); // 显示红外传感器的数值
-    if (Now_pos_num >= 0)
-    {
-        OLED_ShowChar(64, 48, '+', 16, 1);
-        OLED_ShowNum(72, 48, Now_pos_num, 1, 16, 1); // 显示红外传感器的数值
-    }
-    else
-    {
-        OLED_ShowChar(64, 48, '-', 16, 1);
-        OLED_ShowNum(72, 48, -Now_pos_num, 1, 16, 1); // 显示红外传感器的数值
-    }
-    OLED_Refresh();
+    // OLED_ShowNum(0, 48, (u16)Now_pos, 4, 16, 1); // 显示红外传感器的数值
+    // if (Now_pos_num >= 0)
+    // {
+    //     OLED_ShowChar(64, 48, '+', 16, 1);
+    //     OLED_ShowNum(72, 48, Now_pos_num, 1, 16, 1); // 显示红外传感器的数值
+    // }
+    // else
+    // {
+    //     OLED_ShowChar(64, 48, '-', 16, 1);
+    //     OLED_ShowNum(72, 48, -Now_pos_num, 1, 16, 1); // 显示红外传感器的数值
+    // }
+    // OLED_Refresh();
 
-    /* 标志清除部分 */
-    __HAL_TIM_CLEAR_FLAG(&TIM2_Handler, TIM_FLAG_UPDATE); //清除更新标志
+    // /* 标志清除部分 */
+    // __HAL_TIM_CLEAR_FLAG(&TIM2_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }
 //定时器3中断服务函数
 void TIM3_IRQHandler(void)
 {
-    HAL_TIM_IRQHandler(&TIM3_Handler);
+    printf("TIM3输出......\r\n");
+    __HAL_TIM_CLEAR_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }
 //定时器4中断服务函数
 void TIM4_IRQHandler(void)
 {
-    HAL_TIM_IRQHandler(&TIM4_Handler);
+    printf("TIM4输出......\r\n");
+    __HAL_TIM_CLEAR_FLAG(&TIM4_Handler, TIM_FLAG_UPDATE); //清除更新标志
 }
 //定时器5中断服务函数
 void TIM5_IRQHandler(void)
