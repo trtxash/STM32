@@ -49,7 +49,7 @@ int main(void)
   }
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
   delay_init(168);                // 初始化延时函数
-  uart6_init(256000);             // 初始化串口
+  uart6_init(115200);             // 初始化串口
   TIM3_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
   TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
   LED_Init();                     // 初始化LED
@@ -112,7 +112,7 @@ void interrupt_task(void *pvParameters)
       total_num = 0;
       printf("关闭中断......\r\n");
       portDISABLE_INTERRUPTS(); // 关闭中断
-      delay_ms(5000);          // 延时5s,不会引起任务调度，LED卡死
+      delay_xms(5000);          // 延时5s,不会引起任务调度，LED卡死
       printf("打开中断......\r\n");
       portENABLE_INTERRUPTS(); // 打开中断
     }
