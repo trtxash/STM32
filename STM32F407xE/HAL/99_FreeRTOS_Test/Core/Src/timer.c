@@ -73,12 +73,12 @@ void TIM3_Init(u16 arr, u16 psc)
     TIM_ClockConfigTypeDef sClockSourceConfig = {0};
     TIM_MasterConfigTypeDef sMasterConfig = {0};
 
-    TIM3_Handler.Instance = TIM3;                                         //通用定时器3
-    TIM3_Handler.Init.Prescaler = psc;                                    //分频系数
-    TIM3_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;                   //向上计数器
-    TIM3_Handler.Init.Period = arr;                                       //自动装载值
-    TIM3_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;             //时钟分频因子
-    TIM3_Handler.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE; // ARPE,1有更新事件才自动重装他的上限值
+    TIM3_Handler.Instance = TIM3;                                        //通用定时器3
+    TIM3_Handler.Init.Prescaler = psc;                                   //分频系数
+    TIM3_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;                  //向上计数器
+    TIM3_Handler.Init.Period = arr;                                      //自动装载值
+    TIM3_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;            //时钟分频因子
+    TIM3_Handler.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE; // ARPE,1有更新事件才自动重装他的上限值,如果用OS尽量要打开
     if (HAL_TIM_Base_Init(&TIM3_Handler) != HAL_OK)
     {
         Error_Handler();
@@ -107,14 +107,32 @@ void TIM3_Init(u16 arr, u16 psc)
 // F401 Timer clock is  APB1 clock.
 void TIM4_Init(u16 arr, u16 psc)
 {
-    TIM4_Handler.Instance = TIM4;                             //定时器11
-    TIM4_Handler.Init.Prescaler = psc;                        //分频系数
-    TIM4_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       //向上计数器
-    TIM4_Handler.Init.Period = arr;                           //自动装载值
-    TIM4_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; //时钟分频因子
-    HAL_TIM_Base_Init(&TIM4_Handler);
+    TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
 
-    HAL_TIM_Base_Start_IT(&TIM4_Handler); //使能定时器11和定时器11更新中断：TIM_IT_UPDATE
+    TIM4_Handler.Instance = TIM4;                                        //定时器11
+    TIM4_Handler.Init.Prescaler = psc;                                   //分频系数
+    TIM4_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;                  //向上计数器
+    TIM4_Handler.Init.Period = arr;                                      //自动装载值
+    TIM4_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;            //时钟分频因子
+    TIM4_Handler.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE; // ARPE,1有更新事件才自动重装他的上限值,如果用OS尽量要打开
+    if (HAL_TIM_Base_Init(&TIM4_Handler) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+    if (HAL_TIM_ConfigClockSource(&TIM4_Handler, &sClockSourceConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&TIM4_Handler, &sMasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    __HAL_TIM_ENABLE_IT(&TIM4_Handler, TIM_IT_UPDATE);
+    __HAL_TIM_ENABLE(&TIM4_Handler);
 }
 
 // TIM5 PWM部分初始化
@@ -719,16 +737,24 @@ void TIM2_IRQHandler(void)
 //定时器3中断服务函数
 void TIM3_IRQHandler(void)
 {
-    LED0_Reverse();
-    printf("TIM3输出......\r\n");
-    __HAL_TIM_CLEAR_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE); //清除更新标志
+    if (__HAL_TIM_GET_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE))
+    {
+        u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
+        printf("TIM3输出......\r\n");
+        taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区
+        __HAL_TIM_CLEAR_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE); //清除更新标志
+    }
 }
 //定时器4中断服务函数
 void TIM4_IRQHandler(void)
 {
-    LED1_Reverse();
-    printf("TIM4输出......\r\n");
-    __HAL_TIM_CLEAR_FLAG(&TIM4_Handler, TIM_FLAG_UPDATE); //清除更新标志
+    if (__HAL_TIM_GET_FLAG(&TIM4_Handler, TIM_FLAG_UPDATE))
+    {
+        u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
+        printf("TIM4输出......\r\n");
+        taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区
+        __HAL_TIM_CLEAR_FLAG(&TIM4_Handler, TIM_FLAG_UPDATE); //清除更新标志
+    }
 }
 //定时器5中断服务函数
 void TIM5_IRQHandler(void)

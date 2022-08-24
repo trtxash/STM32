@@ -60,6 +60,7 @@ Core/Src/system_stm32f4xx.c \
 User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
+Core/Src/timer.c \
 FreeRTOS/portable/Src/port.c \
 FreeRTOS/portable/MemMang/Src/heap_4.c \
 FreeRTOS/Src/croutine.c \

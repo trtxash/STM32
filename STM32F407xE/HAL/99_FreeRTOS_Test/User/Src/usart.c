@@ -1,9 +1,4 @@
 #include "usart.h"
-//////////////////////////////////////////////////////////////////////////////////
-// //如果使用os,则包括下面的头文件即可.
-// #if SYSTEM_SUPPORT_OS
-// #include "FreeRTOS.h" //os 使用
-// #endif
 
 //加入以下代码,支持printf函数,而不需要选择use MicroLIB
 // #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)

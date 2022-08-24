@@ -30,11 +30,10 @@
 // pllq:USB/SDIO/随机数产生器等的主PLL分频系数(PLL之后的分频)
 //外部晶振为8M的时候（f407）,推荐值:plln=168,pllm=4,pllp=RCC_PLLP_DIV2,pllq=4,ahb=RCC_SYSCLK_DIV1,apb1=RCC_HCLK_DIV4,apb2=RCC_HCLK_DIV2
 //返回值:0,成功;1,失败
-void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq, u32 ahb, u32 apb1, u32 ape2)
+void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
 {
-    HAL_StatusTypeDef ret = HAL_OK;
-    RCC_OscInitTypeDef RCC_OscInitStructure;
-    RCC_ClkInitTypeDef RCC_ClkInitStructure;
+    RCC_OscInitTypeDef RCC_OscInitStructure = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStructure = {0};
 
     __HAL_RCC_PWR_CLK_ENABLE(); //使能PWR时钟
 
@@ -50,22 +49,18 @@ void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq, u32 ahb, u32 apb1,
     RCC_OscInitStructure.PLL.PLLN = plln;                         //主PLL倍频系数(PLL倍频),取值范围:64~432.
     RCC_OscInitStructure.PLL.PLLP = pllp;                         //系统时钟的主PLL分频系数(PLL之后的分频),取值范围:2,4,6,8.(仅限这4个值!)
     RCC_OscInitStructure.PLL.PLLQ = pllq;                         // USB/SDIO/随机数产生器等的主PLL分频系数(PLL之后的分频),取值范围:2~15.
-    ret = HAL_RCC_OscConfig(&RCC_OscInitStructure);               //初始化
-
-    if (ret != HAL_OK)
+    if (HAL_RCC_OscConfig(&RCC_OscInitStructure) != HAL_OK)
     {
         Error_Handler();
     }
 
     //选中PLL作为系统时钟源并且配置HCLK,PCLK1和PCLK2
-    RCC_ClkInitStructure.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
-    RCC_ClkInitStructure.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;       //设置系统时钟时钟源为PLL
-    RCC_ClkInitStructure.AHBCLKDivider = ahb;                          // AHB分频系数为1
-    RCC_ClkInitStructure.APB1CLKDivider = apb1;                        // APB1分频系数为4
-    RCC_ClkInitStructure.APB2CLKDivider = ape2;                        // APB2分频系数为2
-    ret = HAL_RCC_ClockConfig(&RCC_ClkInitStructure, FLASH_LATENCY_5); //同时设置FLASH延时周期为5WS，也就是6个CPU周期。
-
-    if (ret != HAL_OK)
+    RCC_ClkInitStructure.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+    RCC_ClkInitStructure.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+    RCC_ClkInitStructure.AHBCLKDivider = RCC_SYSCLK_DIV1;
+    RCC_ClkInitStructure.APB1CLKDivider = RCC_HCLK_DIV4;
+    RCC_ClkInitStructure.APB2CLKDivider = RCC_HCLK_DIV2;
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStructure, FLASH_LATENCY_5) != HAL_OK)
     {
         Error_Handler();
     }
