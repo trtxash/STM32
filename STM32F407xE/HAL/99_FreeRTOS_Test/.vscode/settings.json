@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "sys.h": "c",
-        "main.h": "c",
-        "timer.h": "c",
-        "delay.h": "c",
-        "stm32f4xx.h": "c"
-    }
-}
