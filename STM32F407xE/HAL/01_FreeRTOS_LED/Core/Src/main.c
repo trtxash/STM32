@@ -1,9 +1,9 @@
 /**
- * @file	  02_FreeRTOS_Interrupt
- * @brief 	移植FreeRTOS和中断
+ * @file	  01_FreeRTOS_LED
+ * @brief 	移植FreeRTOS和LED
  * @author 	TRTX-gamer
- * @version 1.00
- * @date 	  2022年8月23号15点17分
+ * @version 2.00
+ * @date 	  2022年8月24号15点23分
  */
 #include "main.h"
 
