@@ -2,6 +2,7 @@
     "files.associations": {
         "main.h": "c",
         "stdint.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "oledconf.h": "c"
     }
 }
