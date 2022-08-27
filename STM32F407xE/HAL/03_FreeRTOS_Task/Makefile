@@ -63,13 +63,10 @@ User/Src/usart.c \
 Core/Src/timer.c \
 FreeRTOS/portable/Src/port.c \
 FreeRTOS/portable/MemMang/Src/heap_4.c \
-FreeRTOS/Src/croutine.c \
-FreeRTOS/Src/event_groups.c \
-FreeRTOS/Src/list.c \
-FreeRTOS/Src/queue.c \
-FreeRTOS/Src/stream_buffer.c \
 FreeRTOS/Src/tasks.c \
 FreeRTOS/Src/timers.c \
+FreeRTOS/Src/queue.c \
+FreeRTOS/Src/list.c \
 Hardware/Src/led.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
