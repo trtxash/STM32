@@ -1,6 +1,6 @@
 /**
  * @file	  03_FreeRTOS_Task
- * @brief 	移植FreeRTOS和任务
+ * @brief 	移植FreeRTOS和任务(动态)
  * @author 	TRTX-gamer
  * @version 1.00
  * @date 	  2022年8月23号15点17分
