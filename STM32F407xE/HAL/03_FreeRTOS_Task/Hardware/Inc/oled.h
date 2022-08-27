@@ -1,120 +1,76 @@
+/**
+ **********************************************************************************************************************
+ * @file    oled.h
+ * @brief   该文件提供OLED驱动所有函数原型
+ * @author  周鹏程    any question please send mail to const_zpc@163.com
+ * @version V1.1.0
+ * @date    2021-3-30
+ **********************************************************************************************************************
+ *
+ **********************************************************************************************************************
+ */
+
+/* Define to prevent recursive inclusion -----------------------------------------------------------------------------*/
 #ifndef __OLED_H
 #define __OLED_H
 
-#include "sys.h"
-#include "delay.h"
+/* Includes ----------------------------------------------------------------------------------------------------------*/
+#include "oledconf.h"
+#include <stdint.h>
 
-/******************************************
-定义
-OledCS  ：CS
-OledRS  : DC
-OledRst ：RES可以直接接单片机RST引脚
-OledSck : D0
-OledSdin: D1
-******************************************/
+/* Exported types ----------------------------------------------------------------------------------------------------*/
 
-// OLEDIIC模式选择
-// 0: SPI模式
-// 1: IIC模式
-#define OLEDIIC 0
+typedef unsigned char oledsize_t;
 
-#if OLEDIIC == 1
-#define I2CSCLPort GPIOC
-#define I2CSDAPort GPIOC
-#define I2CSCLPortClkEnable() __HAL_RCC_GPIOC_CLK_ENABLE()
-#define I2CSDAPortClkEnable() __HAL_RCC_GPIOC_CLK_ENABLE()
-#define I2CSCLPin GPIO_PIN_14
-#define I2CSDAPin GPIO_PIN_15
+/**
+ * @brief 画笔颜色
+ */
+typedef enum
+{
+  OLED_BLACK = 0,
+  OLED_WHITE = 0xff,
+} eOledcolor;
 
-#define OledSCL_H() HAL_GPIO_WritePin(I2CSCLPort, I2CSCLPin, GPIO_PIN_SET)
-#define OledSCL_L() HAL_GPIO_WritePin(I2CSCLPort, I2CSCLPin, GPIO_PIN_RESET)
+/* Exported constants ------------------------------------------------------------------------------------------------*/
+/* Exported macro ----------------------------------------------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------------------------------------------------*/
 
-#define OledSDA_H() HAL_GPIO_WritePin(I2CSDAPort, I2CSDAPin, GPIO_PIN_SET)
-#define OledSDA_L() HAL_GPIO_WritePin(I2CSDAPort, I2CSDAPin, GPIO_PIN_RESET)
+/* OLED 初始化函数 ****************************************************************************************************/
+extern void OLED_Init(void);
 
-#define OledSDA_Read() HAL_GPIO_ReadPin(I2CSDAPort, I2CSDAPin)
+/* OLED 控制函数 ******************************************************************************************************/
+extern void OLED_DisplayOn(void);
+extern void OLED_DisplayOff(void);
 
-#else
+/* 画点/读点函数 ******************************************************************************************************/
+extern void OLED_DrawPoint(oledsize_t x, oledsize_t y, eOledcolor color);
+extern void OLED_DrawRoughPoint(oledsize_t x, oledsize_t y, eOledcolor color, uint8_t size);
+extern eOledcolor OLED_ReadPoint(oledsize_t x, oledsize_t y);
 
-// OLED模式设置
-// 0: SPI串行模式  （模块的BS1，BS2均接GND）
-// 1: 并行8080模式 （模块的BS1，BS2均接VCC）
-#define OLED_MODE 0
+/* OLED 清屏函数 ******************************************************************************************************/
+extern void OLED_Clear(uint8_t color);
+extern void OLED_SetFill(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high, eOledcolor color);
 
-// SPI模式设置
-// 0: 4线串行模式 8 bit data send
-// 1: 3线串行模式 9 bit data send
-#define OLED_SPI_X 0
+/* 画面操作函数 *******************************************************************************************************/
+extern void OLED_SyncScreen(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high);
+extern void OLED_ShowTask(void);
+extern void OLED_SetScreenOffset(oledsize_t x, oledsize_t y, oledsize_t width, oledsize_t high, uint8_t dir, uint8_t pixels);
+extern void OLED_ReverseScreen(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high);
 
-#define OledCsPort GPIOB
-#define OledCsPin GPIO_PIN_0
+/* 画图形函数 *********************************************************************************************************/
+extern void OLED_DrawLine(oledsize_t sx, oledsize_t sy, oledsize_t ex, oledsize_t ey, uint8_t size);
+extern void OLED_DrawRectangle(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high, uint8_t size);
+extern void OLED_DrawCircle(oledsize_t x, oledsize_t y, oledsize_t radius, uint8_t size);
+extern void OLED_DrawGraphic(oledsize_t x, oledsize_t y, const char *pkszName, uint8_t size);
 
-#define OledRstPort GPIOB
-#define OledRstPin GPIO_PIN_1
+/* 设置文本/数字函数 **************************************************************************************************/
+extern void OLED_SetColor(eOledcolor backColor, eOledcolor pointColor);
+extern void OLED_SetText(oledsize_t x, oledsize_t y, const char *pszStr, uint8_t isMultiLine, efontSize size);
+extern void OLED_SetIntegerNum(oledsize_t x, oledsize_t y, int32_t num, uint8_t len, uint8_t zero, efontSize size);
+extern void OLED_SetFloatNum(oledsize_t x, oledsize_t y, float num, uint8_t intLen, uint8_t decLen, uint8_t zero, efontSize size);
 
-#define OledRSPort GPIOF
-#define OledRSPin GPIO_PIN_11
+/* 格式化输出函数 *****************************************************************************************************/
+extern void OLED_XYPrintf(oledsize_t x, oledsize_t y, uint8_t isMultiLine, efontSize size, const char *format, ...);
+extern void OLED_Printf(const char *format, ...);
 
-#define OledCs_H() HAL_GPIO_WritePin(OledCsPort, OledCsPin, GPIO_PIN_SET)
-#define OledCs_L() HAL_GPIO_WritePin(OledCsPort, OledCsPin, GPIO_PIN_RESET)
-
-#define OledRst_H() HAL_GPIO_WritePin(OledRstPort, OledRstPin, GPIO_PIN_SET)
-#define OledRst_L() HAL_GPIO_WritePin(OledRstPort, OledRstPin, GPIO_PIN_RESET)
-
-#if OLED_MODE == 1
-#define OledWRPort GPIOB
-#define OledWRPin GPIO_PIN_15
-
-#define OledRDPort GPIOB
-#define OledRDPin GPIO_PIN_11
-
-#define OledWR_H() HAL_GPIO_WritePin(OledWRPort, OledWRPin, GPIO_PIN_SET)
-#define OledWR_L() HAL_GPIO_WritePin(OledWRPort, OledWRPin, GPIO_PIN_RESET)
-
-#define OledRD_H() HAL_GPIO_WritePin(OledRDPort, OledRDPin, GPIO_PIN_SET)
-#define OledRD_L() HAL_GPIO_WritePin(OledRDPort, OledRDPin, GPIO_PIN_RESET)
-
-#define DATAOUT(x) HAL_GPIO_WritePin(GPIOA, x, GPIO_PIN_SET); //输出  //PA0~7,作为数据线
-// #define DATAOUT(x) GPIO_Write(GPIOA, x); //输出  //PA0~7,作为数据线
-
-#else
-#define OledSckPort GPIOB
-#define OledSckPin GPIO_PIN_2
-
-#define OledSdinPort GPIOC
-#define OledSdinPin GPIO_PIN_2
-
-#define OledSck_H() HAL_GPIO_WritePin(OledSckPort, OledSckPin, GPIO_PIN_SET)
-#define OledSck_L() HAL_GPIO_WritePin(OledSckPort, OledSckPin, GPIO_PIN_RESET)
-
-#define OledSdin_H() HAL_GPIO_WritePin(OledSdinPort, OledSdinPin, GPIO_PIN_SET)
-#define OledSdin_L() HAL_GPIO_WritePin(OledSdinPort, OledSdinPin, GPIO_PIN_RESET)
-
-#endif
-
-#define OledRS_H() HAL_GPIO_WritePin(OledRSPort, OledRSPin, GPIO_PIN_SET)
-#define OledRS_L() HAL_GPIO_WritePin(OledRSPort, OledRSPin, GPIO_PIN_RESET)
-
-#endif
-
-#define OLED_ADDRESS 0x78 // IIC模式下的地址,需要结合硬件
-#define OLED_CMD 0x00     //写命令
-#define OLED_DATA 0x01    //写数据
-
-void OLED_ON(void);
-void OLED_CLS(void);
-void OLED_OFF(void);
-void OLED_Init(void);
-void WriteDat(u8 I2C_Data);
-void OLED_SetPos(u8 x, u8 y);
-void OLED_Fill(u8 fill_Data);
-void I2C_Configuration(void);
-void WriteCmd(u8 I2C_Command);
-void OLED_ShowCN(u8 x, u8 y, u8 N);
-void OLED_ShowCHinese(u8 x, u8 y, u8 no);
-void I2C_WriteByte(uint8_t addr, uint8_t data);
-void OLED_ShowStr(u8 x, u8 y, u8 ch[], u8 TextSize);
-void OLED_DrawBMP(u8 x0, u8 y0, u8 x1, u8 y1, u8 BMP[]);
-void OLED_ShowString(u8 x, u8 y, char *chr, u8 Char_Size);
-
-#endif
+#endif // __OLED_H

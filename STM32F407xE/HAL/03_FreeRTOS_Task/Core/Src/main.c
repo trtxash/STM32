@@ -29,10 +29,10 @@ void led1_task(void *pvParameters); //任务函数
 TaskHandle_t INTERRUPTTask_Handler;      //任务句柄
 void interrupt_task(void *pvParameters); //任务函数
 
-// #define INTERRUPT_TASK_PRIO 3            //任务优先级
-// #define INTERRUPT_STK_SIZE 256           //任务堆栈大小
-// TaskHandle_t INTERRUPTTask_Handler;      //任务句柄
-// void interrupt_task(void *pvParameters); //任务函数
+#define OLED_TASK_PRIO 4            //任务优先级
+#define OLED_STK_SIZE 128           //任务堆栈大小
+TaskHandle_t OLEDTask_Handler;      //任务句柄
+void oled_task(void *pvParameters); //任务函数
 
 // #define FLOAT_TASK_PRIO 4            //任务优先级
 // #define FLOAT_STK_SIZE 256           //任务堆栈大小
@@ -53,11 +53,12 @@ int main(void)
     Error_Handler();
   }
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
-  delay_init(168);                // 初始化延时函数
-  uart6_init(115200);             // 初始化串口
-  TIM3_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
-  TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
-  LED_Init();                     // 初始化LED
+  delay_init(168);                    // 初始化延时函数
+  uart6_init(115200);                 // 初始化串口
+  TIM3_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
+  TIM4_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
+  LED_Init();                         // 初始化LED
+  OLED_Init();                        // 初始化OLED
 
   //创建开始任务
   xTaskCreate((TaskFunction_t)start_task,          //任务函数
@@ -94,6 +95,13 @@ void start_task(void *pvParameters)
               (void *)NULL,
               (UBaseType_t)LED1_TASK_PRIO,
               (TaskHandle_t *)&LED1Task_Handler);
+  //创建OLED任务
+  xTaskCreate((TaskFunction_t)oled_task,
+              (const char *)"oled_task",
+              (uint16_t)OLED_STK_SIZE,
+              (void *)NULL,
+              (UBaseType_t)OLED_TASK_PRIO,
+              (TaskHandle_t *)&OLEDTask_Handler);
   // //浮点测试任务
   // xTaskCreate((TaskFunction_t)float_task,
   //             (const char *)"float_task",
@@ -103,6 +111,14 @@ void start_task(void *pvParameters)
   //             (TaskHandle_t *)&FLOATTask_Handler);
   vTaskDelete(StartTask_Handler); //删除开始任务
   taskEXIT_CRITICAL();            //退出临界区
+}
+
+void oled_task(void *pvParameters)
+{
+  while (1)
+  {
+    vTaskDelay(10);
+  }
 }
 
 // 中断任务函数

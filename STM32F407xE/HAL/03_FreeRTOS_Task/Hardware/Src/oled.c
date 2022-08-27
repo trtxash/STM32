@@ -1,1138 +1,1466 @@
 /**
- * @file	oled.c
- * @brief 	OLED显示,150Hz没问题
- *          GND    电源地
- *          VCC  接5V或3.3v电源
- *          D0   接（SCL）,可在oled.h里更改
- *          D1   接（SDA）,可在oled.h里更改
- *          RES  PD2（SPI模块改成IIC模块需要接此引脚，IIC模块用户请忽略）
- * @author 	TRTX-gamer
- * @version 1.00
- * @date 	2022年7月14号15点23分
+ **********************************************************************************************************************
+ * @file    oled.c
+ * @brief   该文件提供OLED驱动相关功能
+ * @author  周鹏程    any question please send mail to const_zpc@163.com
+ * @version V1.2.0
+ * @date    2021-4-24
+ *
+ * @details  功能详细说明：
+ *           + OLED 初始化函数
+ *           + OLED 控制函数
+ *           + 画点/读点函数
+ *           + OLED 清屏函数
+ *           + 画面操作函数
+ *           + 画图形函数
+ *           + 设置文本/数字函数
+ *           + 格式化输出函数
+ *
+ **********************************************************************************************************************
+ * 源码路径：https://gitee.com/const-zpc/STM32_OLED.git 具体问题及建议可在该网址填写 Issue
+ *
+ * 使用方式:
+ *    1、使用前初始化函数 OLED_Init, 同时可以使用 OLED_Clear 立即清屏
+ *    2、周期调用函数 OLED_ShowTask, 用来同步画面内容(即缓冲同步到 OLED 上显示)
+ *    3、可定义宏定义 "_USE_OLED_PRINTF" 使能OLED 的式样化输出功能, 即类似 printf 的功能
+ *
+ **********************************************************************************************************************
  */
+
+/* Includes ----------------------------------------------------------------------------------------------------------*/
 #include "oled.h"
-#include "oledfont.h"
+#include "oledio.h"
+#include <string.h>
+
+#ifdef _USE_OLED_PRINTF
+#include <stdio.h>
+#include <stdarg.h>
+#endif // _USE_OLED_PRINTF
+
+/* Private typedef ---------------------------------------------------------------------------------------------------*/
+
+/**
+ * @brief OLED 重要参数集结构体定义
+ */
+typedef struct tag_OLedDev
+{
+    oledsize_t width; /*!< OLED 宽度 */
+
+    oledsize_t height; /*!< OLED 高度 */
+
+    eOledcolor backColor; /*!< 背景色 */
+
+    eOledcolor pointColor; /*!< 画笔色 */
+} OLedDev_t;
+
+#ifdef _USE_OLED_PRINTF
+
+/**
+ * @brief OLED Printf 输出相关定义
+ */
+typedef struct tag_OLedPrint
+{
+    oledsize_t printX; /*!< 屏幕输出纵坐标起点 */
+
+    oledsize_t printY; /*!< 屏幕输出横坐标起点 */
+
+    oledsize_t printWidth; /*!< 屏幕输出宽度 */
+
+    oledsize_t printHeight; /*!< 屏幕输出高度 */
+
+    efontSize printFontSize; /*!< 屏幕输出的字体大小 */
+
+    uint8_t lastTextLenth; /*!< 最后一行文本内容长度 */
+
+    char szlastText[100]; /*!< 最后一行文本内容 */
+
+} OLedPrint_t;
+
+#endif // _USE_OLED_PRINTF
+
+/* Private define ----------------------------------------------------------------------------------------------------*/
+/* Private macro -----------------------------------------------------------------------------------------------------*/
+
+/* 取绝对值 */
+#define LCD_ABS(x) ((x) > 0 ? (x) : -(x))
+
+/* Private variables -------------------------------------------------------------------------------------------------*/
 
 // OLED的显存
-//存放格式如下.
-//[0]0 1 2 3 ... 127
-//[1]0 1 2 3 ... 127
-//[2]0 1 2 3 ... 127
-//[3]0 1 2 3 ... 127
-//[4]0 1 2 3 ... 127
-//[5]0 1 2 3 ... 127
-//[6]0 1 2 3 ... 127
-//[7]0 1 2 3 ... 127
-#if OLEDIIC == 1
+static uint8_t sg_arrFrameBuffer[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布
+
+/** OLED 重要参数集配置表 */
+static OLedDev_t sg_tOLedDevInfo =
+    {
+        OLED_WIDTH,
+        OLED_HEIGHT,
+        OLED_BLACK,
+        OLED_WHITE,
+};
+
+#ifdef _USE_OLED_PRINTF
+/** OLED Printf 输出配置表 */
+static OLedPrint_t sg_tOLedPrintInfo =
+    {
+        OLED_PRINT_X,
+        OLED_PRINT_Y,
+        OLED_PRINT_WIDTH,
+        OLED_PRINT_HIGH,
+        OLED_PRINT_FONT,
+        0,
+        {0}};
+#endif // _USE_OLED_PRINTF
+
+/* Private function prototypes ---------------------------------------------------------------------------------------*/
+static void WriteCmd(uint8_t cmd);
+static void WriteData(uint8_t data);
+static uint16_t GetCharDataSize(eMoldMode way, oledsize_t width, oledsize_t high);
+static void DrawDotMatrix(oledsize_t x, oledsize_t y, eMoldMode way, oledsize_t width, oledsize_t high, const uint8_t *pkBufData);
+static int IsCharExit(char chr, char schr, char echr);
+static void DrawOneChar(oledsize_t x, oledsize_t y, uint8_t chr, const fontConfig_t *pkfontInfo);
+static int IsFontExit(uint8_t pszFont[2], const uint8_t *pkInx);
+static void DrawOneFont(oledsize_t x, oledsize_t y, uint8_t pszFont[2], const fontConfig_t *pkfontInfo);
+static int GetLineString(char *pszDest, const char *pszSrc, oledsize_t x, oledsize_t setWidth, oledsize_t charWidth, oledsize_t fontWidth, uint8_t init);
+static void DrawLine(oledsize_t sx, oledsize_t sy, oledsize_t ex, oledsize_t ey);
+static uint32_t myPow(uint8_t m, uint8_t n);
+static void UintToStr(uint32_t num, char *str, uint8_t intLen, uint8_t zero);
+static void IntToStr(int32_t num, char *str, uint8_t intLen, uint8_t zero);
+static void FloatToStr(double num, char *str, uint8_t intLen, uint8_t decLen, uint8_t zero);
+
+/* Private function --------------------------------------------------------------------------------------------------*/
 
 /**
-**  设置SDA为输出
-**/
-void SDA_OUT(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructer;
-	I2CSDAPortClkEnable();
-	GPIO_InitStructer.Pin = I2CSDAPin;
-	GPIO_InitStructer.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStructer.Mode = GPIO_MODE_OUTPUT_PP;
-	HAL_GPIO_Init(I2CSDAPort, &GPIO_InitStructer);
-}
-/**
-**  设置SDA为输入
-**/
-void SDA_IN(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructer;
-	I2CSDAPortClkEnable();
-	GPIO_InitStructer.Pin = I2CSDAPin;
-	GPIO_InitStructer.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStructer.Mode = GPIO_MODE_INPUT;
-	HAL_GPIO_Init(I2CSDAPort, &GPIO_InitStructer);
-}
-//开始信号
-void IIC_Start(void)
-{
-	SDA_OUT();
-	OledSDA_H();
-	OledSCL_H();
-	delay_us(2);
-	OledSDA_L();
-	delay_us(2);
-	OledSCL_L();
-	delay_us(2);
-}
-void IIC_Stop(void)
-{
-	OledSCL_H();
-	OledSDA_L();
-	delay_us(2);
-	OledSDA_H();
-	delay_us(2);
-}
-
-/*
- *   返回1--应答出错
- *   放回0--应答正确
+ * @brief      写指令.
+ * @param[in]  cmd  指令.
+ * @retval     None.
  */
-u8 IIC_Wait_Ask(void)
+static void WriteCmd(uint8_t cmd)
 {
-	int count = 0;
-	SDA_IN();
-	OledSCL_H();
-	delay_us(2);
-	while (OledSDA_Read())
-	{
-		count++;
-		if (count > 250)
-		{
-			IIC_Stop();
-			return 1;
-		}
-	}
-	OledSCL_L();
-	delay_us(2);
-	return 0;
-}
-//写一个字节
-void IIC_WriteByte(u8 data)
-{
-	u8 i;
-	SDA_OUT();
-	for (i = 0; i < 8; i++)
-	{
-		OledSCL_L();
-		delay_us(2);
-		if (data & 0x80) // MSB,从高位开始一位一位传输
-			OledSDA_H();
-		else
-			OledSDA_L();
-		OledSCL_H();
-		delay_us(2);
-		OledSCL_L();
-		data <<= 1;
-	}
-}
-u8 IIC_ReadByte(void)
-{
-	u8 data, i;
-	OledSDA_H();
-	delay_us(3);
-	for (i = 0; i < 8; i++)
-	{
-		data <<= 1;
-		OledSCL_L();
-		delay_us(1);
-		OledSCL_H();
-		delay_us(1);
-		if (OledSDA_Read())
-			data = data | 0x01;
-		else
-			data = data & 0xFE;
-	}
-	OledSCL_L();
-	delay_us(3);
-	return data;
-}
-
-void WriteCmd(u8 command)
-{
-	IIC_Start();
-	IIC_WriteByte(0x78); // OLED地址
-	IIC_Wait_Ask();
-	IIC_WriteByte(0x00); //寄存器地址
-	IIC_Wait_Ask();
-	IIC_WriteByte(command);
-	IIC_Wait_Ask();
-	IIC_Stop();
-}
-void WriteDat(u8 data)
-{
-	IIC_Start();
-	IIC_WriteByte(0x78); // OLED地址
-	IIC_Wait_Ask();
-	IIC_WriteByte(0x40); //寄存器地址
-	IIC_Wait_Ask();
-	IIC_WriteByte(data);
-	IIC_Wait_Ask();
-	IIC_Stop();
-}
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+    OledDrv_IICStart();
+    OledDrv_IICWriteByte(0x78); // Slave address,SA0=0
+    OledDrv_IICWriteByte(0x00); // write command
+    OledDrv_IICWriteByte(cmd);
+    OledDrv_IICStop();
 #else
-#if OLED_MODE == 1 // 8080并口
-/*****************************************************************
-	向SSD1306写入一个字节
-	dat:要写入的数据/命令
-	cmd:数据/命令标志 0,表示命令;1,表示数据
-*****************************************************************/
-void OLED_WR_Byte(u8 dat, u8 cmd)
-{
-	DATAOUT(dat);
-	if (cmd)
-		OledRS_H();
-	else
-		OledRS_L();
-	OledCs_L();
-	OledWR_L();
-	OledWR_H();
-	OledCs_H();
-	OledRS_H();
+    OLED_DC_Clr();
+    OledDrv_SPIWriteByte(cmd);
+#endif
 }
+
+/**
+ * @brief      写数据.
+ * @param[in]  data  数据.
+ * @retval     None.
+ */
+static void WriteData(uint8_t data)
+{
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+    OledDrv_IICStart();
+    OledDrv_IICWriteByte(0x78); // D/C#=0; R/W#=0
+    OledDrv_IICWriteByte(0x40); // write data
+    OledDrv_IICWriteByte(data);
+    OledDrv_IICStop();
 #else
-void OLED_WR_Byte(u8 dat, u8 cmd)
-{
-	char i;
-	OledCs_L();
-#if OLED_SPI_X == 1
-	OledSck_L();
-	if (cmd)
-	{
-		OledSdin_H();
-	}
-	else
-	{
-		OledSdin_L();
-	}
-	OledSck_H();
-#else
-	if (cmd)
-	{
-		OledRS_H();
-	}
-	else
-	{
-		OledRS_L();
-	}
-#endif
-	for (i = 0; i < 8; i++)
-	{
-		OledSck_L();
-		if (dat & 0x80)
-		{
-			OledSdin_H();
-		}
-		else
-		{
-			OledSdin_L();
-		}
-		OledSck_H();
-		dat <<= 1;
-	}
-	OledCs_H();
-#if OLED_SPI_X == 0
-	OledRS_H();
+    OLED_DC_Set();
+    OledDrv_SPIWriteByte(data);
 #endif
 }
-#endif
-void WriteCmd(u8 command)
-{
-	OLED_WR_Byte(command, OLED_CMD);
-}
-void WriteDat(u8 data)
-{
-	OLED_WR_Byte(data, OLED_DATA);
-}
-#endif
-// 公共部分
 
-/*****************************************************************
-	将OLED从休眠中唤醒
-*****************************************************************/
-void OLED_ON(void)
-{
-	WriteCmd(0X8D); //设置电荷泵
-	WriteCmd(0X14); //开启电荷泵
-	WriteCmd(0XAF); // OLED唤醒
-}
-
-/*****************************************************************
-  设置光标
-  x,光标x位置 0-127
-  y,光标y位置 0-7
-*****************************************************************/
-void OLED_SetPos(u8 x, u8 y)
-{
-	WriteCmd(0xb0 + y);
-	WriteCmd(((x & 0xf0) >> 4) | 0x10);
-	WriteCmd((x & 0x0f) | 0x01);
-}
-
-/*****************************************************************
-  填充整个屏幕
-  fill_Data:要填充的数据
-*****************************************************************/
-void OLED_Fill(u8 fill_Data)
-{
-	u8 m, n;
-	for (m = 0; m < 8; m++)
-	{
-		WriteCmd(0xb0 + m); // page0-page1
-		WriteCmd(0x00);		// low column start address
-		WriteCmd(0x10);		// high column start address
-		for (n = 0; n < 128; n++)
-		{
-			WriteDat(fill_Data);
-		}
-	}
-}
-
-//清屏
-void OLED_CLS(void)
-{
-	u8 i, n;
-	for (i = 0; i < 8; i++)
-	{
-		WriteCmd(0xb0 + i);
-		WriteCmd(0x00);
-		WriteCmd(0x10);
-		for (n = 0; n < 128; n++)
-			WriteDat(0);
-	}
-}
-
-/*****************************************************************
-  显示oledfont.h中的ASCII字符,有6*8和8*16可选择
-  x,y : 起始点坐标(x:0~127, y:0~7);
-					 ch[] :- 要显示的字符串;
-					 TextSize : 字符大小(1:6*8 ; 2:8*16)
-*****************************************************************/
-void OLED_ShowStr(u8 x, u8 y, u8 ch[], u8 TextSize)
-{
-	u8 c = 0, i = 0, j = 0;
-	switch (TextSize)
-	{
-	case 1:
-	{
-		while (ch[j] != '\0')
-		{
-			c = ch[j] - 32;
-			if (x > 126)
-			{
-				x = 0;
-				y++;
-			}
-			OLED_SetPos(x, y);
-			for (i = 0; i < 6; i++)
-				WriteDat(F6x8[c][i]);
-			x += 6;
-			j++;
-		}
-	}
-	break;
-	case 2:
-	{
-		while (ch[j] != '\0')
-		{
-			c = ch[j] - 32;
-			if (x > 120)
-			{
-				x = 0;
-				y++;
-			}
-			OLED_SetPos(x, y);
-			for (i = 0; i < 8; i++)
-				WriteDat(F8X16[c * 16 + i]);
-			OLED_SetPos(x, y + 1);
-			for (i = 0; i < 8; i++)
-				WriteDat(F8X16[c * 16 + i + 8]);
-			x += 8;
-			j++;
-		}
-	}
-	break;
-	}
-}
-
-void OLED_ShowChar(u8 x, u8 y, char chr, u8 Char_Size)
-{
-	u8 c = 0, i = 0;
-	c = chr - ' ';
-	if (x > 128 - 1)
-	{
-		x = 0;
-		y = y + 2;
-	}
-	if (Char_Size == 16)
-	{
-		OLED_SetPos(x, y);
-		for (i = 0; i < 8; i++)
-			WriteDat(F8X16[c * 16 + i]);
-		OLED_SetPos(x, y + 1);
-		for (i = 0; i < 8; i++)
-			WriteDat(F8X16[c * 16 + i + 8]);
-	}
-	else
-	{
-		OLED_SetPos(x, y);
-		for (i = 0; i < 6; i++)
-		{
-			WriteDat(F6x8[c][i]);
-		}
-	}
-}
-
-/*****************************************************************
-	显示字符串
-	示例:OLED_ShowString(0,0,"4Wire SPI Runing",16);
-*****************************************************************/
-void OLED_ShowString(u8 x, u8 y, char *chr, u8 Char_Size)
-{
-	u8 j = 0;
-	while (chr[j] != '\0')
-	{
-		OLED_ShowChar(x, y, chr[j], Char_Size);
-		x += 8;
-		if (x > 120)
-		{
-			x = 0;
-			y += 2;
-		}
-		{
-			j++;
-		}
-	}
-}
-
-/*****************************************************************
-	显示中文
-	no  :中文数组Hzk[] 编号
-	示例:OLED_ShowCHinese(32,4,2);
-*****************************************************************/
-void OLED_ShowCHinese(u8 x, u8 y, u8 no)
-{
-	u8 t, adder = 0;
-	OLED_SetPos(x, y);
-	for (t = 0; t < 16; t++)
-	{
-		WriteDat(Hzk[2 * no][t]);
-		adder += 1;
-	}
-	OLED_SetPos(x, y + 1);
-	for (t = 0; t < 16; t++)
-	{
-		WriteDat(Hzk[2 * no + 1][t]);
-		adder += 1;
-	}
-}
-
-/*****************************************************************
-	OLED初始化
-*****************************************************************/
+/**
+ * @brief      OLED 初始化.
+ * @retval     None.
+ */
 void OLED_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure = {0};
-#if OLEDIIC == 1
-	GPIO_InitStructure.Pin = I2CSCLPin | I2CSDAPin;
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-	HAL_GPIO_Init(I2CSCLPort, &GPIO_InitStructure);
-#else
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStructure.Pin = OledCsPin;
-	HAL_GPIO_Init(OledCsPort, &GPIO_InitStructure);
-	HAL_GPIO_WritePin(OledCsPort, OledCsPin, GPIO_PIN_SET);
+    OledDrv_Init();
 
-	GPIO_InitStructure.Pin = OledRstPin;
-	HAL_GPIO_Init(OledRstPort, &GPIO_InitStructure);
-	HAL_GPIO_WritePin(OledRstPort, OledRstPin, GPIO_PIN_SET);
-
-	GPIO_InitStructure.Pin = OledRSPin;
-	HAL_GPIO_Init(OledRSPort, &GPIO_InitStructure);
-	HAL_GPIO_WritePin(OledRSPort, OledRSPin, GPIO_PIN_SET);
-#if OLED_MODE == 1
-	GPIO_InitStructure.Pin = 0xFF; // PA0~7 OUT推挽输出
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
-	HAL_GPIO_WritePin(GPIOA, 0xFF, GPIO_PIN_SET); // PA0~7输出高
-
-	GPIO_InitStructure.Pin = OledWRPin;
-	HAL_GPIO_Init(OledWRPort, &GPIO_InitStructure);
-	HAL_GPIO_WritePin(OledWRPort, OledWRPin, GPIO_PIN_SET);
-
-	GPIO_InitStructure.Pin = OledRDPin;
-	HAL_GPIO_Init(OledRDPort, &GPIO_InitStructure);
-	HAL_GPIO_WritePin(OledRDPort, OledRDPin, GPIO_PIN_SET);
-#else
-	GPIO_InitStructure.Pin = OledSckPin;
-	HAL_GPIO_Init(OledSckPort, &GPIO_InitStructure);
-	HAL_GPIO_WritePin(OledSckPort, OledSckPin, GPIO_PIN_SET);
-
-	GPIO_InitStructure.Pin = OledSdinPin;
-	HAL_GPIO_Init(OledSdinPort, &GPIO_InitStructure);
-	HAL_GPIO_WritePin(OledSdinPort, OledSdinPin, GPIO_PIN_SET);
-
-#endif
-
-	OledCs_H();
-	OledRS_H();
-	OledRst_L();
-	delay_ms(100);
-	OledRst_H();
-#endif
-
-	WriteCmd(0xAE); // display off
-	WriteCmd(0x20); // Set Memory Addressing Mode
-	WriteCmd(0x10); // 00,Horizontal Addressing Mode;01,Vertical Addressing Mode;10,Page Addressing Mode (RESET);11,Invalid
-	WriteCmd(0xb0); // Set Page Start Address for Page Addressing Mode,0-7
-	WriteCmd(0xc8); // Set COM Output Scan Direction
-	WriteCmd(0x00); //---set low column address
-	WriteCmd(0x10); //---set high column address
-	WriteCmd(0x40); //--set start line address
-	WriteCmd(0x81); //--set contrast control register
-	WriteCmd(0xdf); //亮度调节 0x00~0xff
-	WriteCmd(0xa1); //--set segment re-map 0 to 127
-	WriteCmd(0xa6); //--set normal display
-	WriteCmd(0xa8); //--set multiplex ratio(1 to 64)
-	WriteCmd(0x3F); //
-	WriteCmd(0xa4); // 0xa4,Output follows RAM content;0xa5,Output ignores RAM content
-	WriteCmd(0xd3); //-set display offset
-	WriteCmd(0x00); //-not offset
-	WriteCmd(0xd5); //--set display clock divide ratio/oscillator frequency
-	WriteCmd(0xf0); //--set divide ratio
-	WriteCmd(0xd9); //--set pre-charge period
-	WriteCmd(0x22); //
-	WriteCmd(0xda); //--set com pins hardware configuration
-	WriteCmd(0x12);
-	WriteCmd(0xdb); //--set vcomh
-	WriteCmd(0x20); // 0x20,0.77xVcc
-	WriteCmd(0x8d); //--set DC-DC enable
-	WriteCmd(0x14); //
-	WriteCmd(0xaf); //--turn on oled panel
-	OLED_CLS();
+    WriteCmd(0xae); //--turn off oled panel
+    WriteCmd(0x00); //---set low column address
+    WriteCmd(0x10); //---set high column address
+    WriteCmd(0x40); //--set start line address  Set Mapping RAM Display Start Line (0x00~0x3F)
+    WriteCmd(0x81); //--set contrast control register
+    WriteCmd(0xcf); // Set SEG Output Current Brightness
+    WriteCmd(0xa1); //--Set SEG/Column Mapping     0xa0左右反置 0xa1正常
+    WriteCmd(0xc8); // Set COM/Row Scan Direction   0xc0上下反置 0xc8正常
+    WriteCmd(0xa6); //--set normal display
+    WriteCmd(0xa8); //--set multiplex ratio(1 to 64)
+    WriteCmd(0x3f); //--1/64 duty
+    WriteCmd(0xd3); //-set display offset	Shift Mapping RAM Counter (0x00~0x3F)
+    WriteCmd(0x00); //-not offset
+    WriteCmd(0xd5); //--set display clock divide ratio/oscillator frequency
+    WriteCmd(0x80); //--set divide ratio, Set Clock as 100 Frames/Sec
+    WriteCmd(0xd9); //--set pre-charge period
+    WriteCmd(0xf1); // Set Pre-Charge as 15 Clocks & Discharge as 1 Clock
+    WriteCmd(0xda); //--set com pins hardware configuration
+    WriteCmd(0x12);
+    WriteCmd(0xdb); //--set vcomh
+    WriteCmd(0x40); // Set VCOM Deselect Level
+    WriteCmd(0x20); //-Set Page Addressing Mode (0x00/0x01/0x02)
+    WriteCmd(0x02); //
+    WriteCmd(0x8d); //--set Charge Pump enable/disable
+    WriteCmd(0x14); //--set(0x10) disable
+    WriteCmd(0xa4); // Disable Entire Display On (0xa4/0xa5)
+    WriteCmd(0xa6); // Disable Inverse Display On (0xa6/a7)
+    WriteCmd(0xaf); //--turn on oled panel
 }
 
-// //反显函数
-// void OLED_ColorTurn(u8 i)
-// {
-// 	if (i == 0)
-// 	{
-// 		OLED_WR_Byte(0xA6, OLED_CMD); //正常显示
-// 	}
-// 	if (i == 1)
-// 	{
-// 		OLED_WR_Byte(0xA7, OLED_CMD); //反色显示
-// 	}
-// }
+/**
+ * @brief      设置光标.
+ * @param[in]  data  字节数据.
+ * @retval     None.
+ */
+void SetCursor(oledsize_t x, oledsize_t y)
+{
+    WriteCmd(0xb0 + (y >> 3));
+    WriteCmd(((x & 0xf0) >> 4) | 0x10);
+    WriteCmd((x & 0x0f));
+    // WriteCmd((x & 0x0f) | 0x01);
+}
 
-// //屏幕旋转180度
-// void OLED_DisplayTurn(u8 i)
-// {
-// 	if (i == 0)
-// 	{
-// 		OLED_WR_Byte(0xC8, OLED_CMD); //正常显示
-// 		OLED_WR_Byte(0xA1, OLED_CMD);
-// 	}
-// 	if (i == 1)
-// 	{
-// 		OLED_WR_Byte(0xC0, OLED_CMD); //反转显示
-// 		OLED_WR_Byte(0xA0, OLED_CMD);
-// 	}
-// }
+/**
+ * @brief      开启OLED显示.
+ * @retval     None.
+ */
+void OLED_DisplayOn(void)
+{
+    WriteCmd(0X8D); // SET DCDC命令
+    WriteCmd(0X14); // DCDC ON
+    WriteCmd(0XAF); // DISPLAY ON
+}
 
-// //延时
-// void IIC_delay(void)
-// {
-// 	u8 t = 3;
-// 	while (t--)
-// 		;
-// }
+/**
+ * @brief      关闭OLED显示.
+ * @retval     None.
+ */
+void OLED_DisplayOff(void)
+{
+    WriteCmd(0X8D); // SET DCDC命令
+    WriteCmd(0X10); // DCDC OFF
+    WriteCmd(0XAE); // DISPLAY OFF
+}
 
-// //起始信号
-// void I2C_Start(void)
-// {
-// 	OLED_SDA_Set();
-// 	OLED_SCL_Set();
-// 	IIC_delay();
-// 	OLED_SDA_Clr();
-// 	IIC_delay();
-// 	OLED_SCL_Clr();
-// 	IIC_delay();
-// }
+/**
+ * @brief      画点函数.
+ * @param[in]  x  纵坐标
+ * @param[in]  y  横坐标
+ * @param[in]  color  画点颜色
+ * @retval     None.
+ */
+void OLED_DrawPoint(oledsize_t x, oledsize_t y, eOledcolor color)
+{
+    oledsize_t tmpY;
 
-// //结束信号
-// void I2C_Stop(void)
-// {
-// 	OLED_SDA_Clr();
-// 	OLED_SCL_Set();
-// 	IIC_delay();
-// 	OLED_SDA_Set();
-// }
+    x = x > sg_tOLedDevInfo.width ? sg_tOLedDevInfo.width : x;
+    y = y > sg_tOLedDevInfo.height ? sg_tOLedDevInfo.height : y;
 
-// //等待信号响应
-// void I2C_WaitAck(void) //测数据信号的电平
-// {
-// 	OLED_SDA_Set();
-// 	IIC_delay();
-// 	OLED_SCL_Set();
-// 	IIC_delay();
-// 	OLED_SCL_Clr();
-// 	IIC_delay();
-// }
+    tmpY = 0 + (y >> 3);
 
-// //写入一个字节
-// void Send_Byte(u8 dat)
-// {
-// 	u8 i;
-// 	for (i = 0; i < 8; i++)
-// 	{
-// 		if (dat & 0x80) //将dat的8位从最高位依次写入
-// 		{
-// 			OLED_SDA_Set();
-// 		}
-// 		else
-// 		{
-// 			OLED_SDA_Clr();
-// 		}
-// 		IIC_delay();
-// 		OLED_SCL_Set();
-// 		IIC_delay();
-// 		OLED_SCL_Clr(); //将时钟信号设置为低电平
-// 		dat <<= 1;
-// 	}
-// }
+    if (color == OLED_WHITE)
+    {
+        sg_arrFrameBuffer[x][tmpY] = sg_arrFrameBuffer[x][tmpY] | (0x01 << (y % 8));
+    }
+    else
+    {
+        sg_arrFrameBuffer[x][tmpY] = sg_arrFrameBuffer[x][tmpY] & (~(0x01 << (y % 8)));
+    }
+}
 
-// //发送一个字节
-// // mode:数据/命令标志 0,表示命令;1,表示数据;
-// void OLED_WR_Byte(u8 dat, u8 mode)
-// {
-// 	I2C_Start();
-// 	Send_Byte(0x78);
-// 	I2C_WaitAck();
-// 	if (mode)
-// 	{
-// 		Send_Byte(0x40);
-// 	}
-// 	else
-// 	{
-// 		Send_Byte(0x00);
-// 	}
-// 	I2C_WaitAck();
-// 	Send_Byte(dat);
-// 	I2C_WaitAck();
-// 	I2C_Stop();
-// }
+/**
+ * @brief      画粗点函数.
+ * @param[in]  x  纵坐标
+ * @param[in]  y  横坐标
+ * @param[in]  color  画点颜色
+ * @param[in]  size  点大小
+ * @retval     None.
+ */
+void OLED_DrawRoughPoint(oledsize_t x, oledsize_t y, eOledcolor color, uint8_t size)
+{
+    uint8_t i, j;
 
-// //开启OLED显示
-// void OLED_DisPlay_On(void)
-// {
-// 	OLED_WR_Byte(0x8D, OLED_CMD); //电荷泵使能
-// 	OLED_WR_Byte(0x14, OLED_CMD); //开启电荷泵
-// 	OLED_WR_Byte(0xAF, OLED_CMD); //点亮屏幕
-// }
+    for (i = 0; i < size; i++)
+    {
+        for (j = 0; j < size; j++)
+        {
+            OLED_DrawPoint(x + i, y + j, color);
+        }
+    }
+}
 
-// //关闭OLED显示
-// void OLED_DisPlay_Off(void)
-// {
-// 	OLED_WR_Byte(0x8D, OLED_CMD); //电荷泵使能
-// 	OLED_WR_Byte(0x10, OLED_CMD); //关闭电荷泵
-// 	OLED_WR_Byte(0xAE, OLED_CMD); //关闭屏幕
-// }
+/**
+ * @brief      读点函数.
+ * @param[in]  x  纵坐标
+ * @param[in]  y  横坐标
+ * @retval     None.
+ */
+eOledcolor OLED_ReadPoint(oledsize_t x, oledsize_t y)
+{
+    oledsize_t tmpY = 0 + (y >> 3);
 
-// //更新显存到OLED
-// void OLED_Refresh(void)
-// {
-// 	u8 i, n;
-// 	for (i = 0; i < 8; i++)
-// 	{
-// 		OLED_WR_Byte(0xb0 + i, OLED_CMD); //设置行起始地址
-// 		OLED_WR_Byte(0x00, OLED_CMD);	  //设置低列起始地址
-// 		OLED_WR_Byte(0x10, OLED_CMD);	  //设置高列起始地址
-// 		I2C_Start();
-// 		Send_Byte(0x78);
-// 		I2C_WaitAck();
-// 		Send_Byte(0x40);
-// 		I2C_WaitAck();
-// 		for (n = 0; n < 128; n++)
-// 		{
-// 			Send_Byte(OLED_GRAM[n][i]);
-// 			I2C_WaitAck();
-// 		}
-// 		I2C_Stop();
-// 	}
-// }
-// //清屏函数
-// void OLED_Clear(void)
-// {
-// 	u8 i, n;
-// 	for (i = 0; i < 8; i++)
-// 	{
-// 		for (n = 0; n < 128; n++)
-// 		{
-// 			OLED_GRAM[n][i] = 0; //清除所有数据
-// 		}
-// 	}
-// 	OLED_Refresh(); //更新显示
-// }
+    if (sg_arrFrameBuffer[x][tmpY] & (0x01 << (y % 8)))
+    {
+        return OLED_WHITE;
+    }
+    else
+    {
+        return OLED_BLACK;
+    }
+}
 
-// //画点
-// // x:0~127
-// // y:0~63
-// // t:1 填充 0,清空
-// void OLED_DrawPoint(u8 x, u8 y, u8 t)
-// {
-// 	u8 i, m, n;
-// 	i = y / 8;
-// 	m = y % 8;
-// 	n = 1 << m;
-// 	if (t)
-// 	{
-// 		OLED_GRAM[x][i] |= n;
-// 	}
-// 	else
-// 	{
-// 		OLED_GRAM[x][i] = ~OLED_GRAM[x][i];
-// 		OLED_GRAM[x][i] |= n;
-// 		OLED_GRAM[x][i] = ~OLED_GRAM[x][i];
-// 	}
-// }
+/**
+ * @brief      全部清除.
+ * @note       屏幕会立即刷新
+ * @param[in]  color  画笔颜色.
+ * @retval     None.
+ */
+void OLED_Clear(uint8_t color)
+{
+    oledsize_t x, y;
 
-// //画线
-// // x1,y1:起点坐标
-// // x2,y2:结束坐标
-// void OLED_DrawLine(u8 x1, u8 y1, u8 x2, u8 y2, u8 mode)
-// {
-// 	u16 t;
-// 	int xerr = 0, yerr = 0, delta_x, delta_y, distance;
-// 	int incx, incy, uRow, uCol;
-// 	delta_x = x2 - x1; //计算坐标增量
-// 	delta_y = y2 - y1;
-// 	uRow = x1; //画线起点坐标
-// 	uCol = y1;
-// 	if (delta_x > 0)
-// 		incx = 1; //设置单步方向
-// 	else if (delta_x == 0)
-// 		incx = 0; //垂直线
-// 	else
-// 	{
-// 		incx = -1;
-// 		delta_x = -delta_x;
-// 	}
-// 	if (delta_y > 0)
-// 		incy = 1;
-// 	else if (delta_y == 0)
-// 		incy = 0; //水平线
-// 	else
-// 	{
-// 		incy = -1;
-// 		delta_y = -delta_x;
-// 	}
-// 	if (delta_x > delta_y)
-// 		distance = delta_x; //选取基本增量坐标轴
-// 	else
-// 		distance = delta_y;
-// 	for (t = 0; t < distance + 1; t++)
-// 	{
-// 		OLED_DrawPoint(uRow, uCol, mode); //画点
-// 		xerr += delta_x;
-// 		yerr += delta_y;
-// 		if (xerr > distance)
-// 		{
-// 			xerr -= distance;
-// 			uRow += incx;
-// 		}
-// 		if (yerr > distance)
-// 		{
-// 			yerr -= distance;
-// 			uCol += incy;
-// 		}
-// 	}
-// }
-// // x,y:圆心坐标
-// // r:圆的半径
-// void OLED_DrawCircle(u8 x, u8 y, u8 r)
-// {
-// 	int a, b, num;
-// 	a = 0;
-// 	b = r;
-// 	while (2 * b * b >= r * r)
-// 	{
-// 		OLED_DrawPoint(x + a, y - b, 1);
-// 		OLED_DrawPoint(x - a, y - b, 1);
-// 		OLED_DrawPoint(x - a, y + b, 1);
-// 		OLED_DrawPoint(x + a, y + b, 1);
+    for (y = 0; y < sg_tOLedDevInfo.height / 8; y++)
+    {
+        for (x = 0; x < sg_tOLedDevInfo.width; x++)
+        {
+            sg_arrFrameBuffer[x][y] = color;
+        }
+    }
 
-// 		OLED_DrawPoint(x + b, y + a, 1);
-// 		OLED_DrawPoint(x + b, y - a, 1);
-// 		OLED_DrawPoint(x - b, y - a, 1);
-// 		OLED_DrawPoint(x - b, y + a, 1);
+    OLED_SyncScreen(0, 0, sg_tOLedDevInfo.width, sg_tOLedDevInfo.height);
+}
 
-// 		a++;
-// 		num = (a * a + b * b) - r * r; //计算画的点离圆心的距离
-// 		if (num > 0)
-// 		{
-// 			b--;
-// 			a--;
-// 		}
-// 	}
-// }
+/**
+ * @brief      局部清除.
+ * @param[in]  sx  纵坐标起点
+ * @param[in]  sy  横坐标起点
+ * @param[in]  width 宽度
+ * @param[in]  high  高度
+ * @param[in]  color  画笔颜色.
+ * @retval     None.
+ */
+void OLED_SetFill(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high, eOledcolor color)
+{
+    oledsize_t x, y;
 
-// //在指定位置显示一个字符,包括部分字符
-// // x:0~127
-// // y:0~63
-// // size1:选择字体 6x8/6x12/8x16/12x24
-// // mode:0,反色显示;1,正常显示
-// void OLED_ShowChar(u8 x, u8 y, u8 chr, u8 size1, u8 mode)
-// {
-// 	u8 i, m, temp, size2, chr1;
-// 	u8 x0 = x, y0 = y;
-// 	if (size1 == 8)
-// 		size2 = 6;
-// 	else
-// 		size2 = (size1 / 8 + ((size1 % 8) ? 1 : 0)) * (size1 / 2); //得到字体一个字符对应点阵集所占的字节数
-// 	chr1 = chr - ' ';											   //计算偏移后的值
-// 	for (i = 0; i < size2; i++)
-// 	{
-// 		if (size1 == 8)
-// 		{
-// 			temp = asc2_0806[chr1][i];
-// 		} //调用0806字体
-// 		else if (size1 == 12)
-// 		{
-// 			temp = asc2_1206[chr1][i];
-// 		} //调用1206字体
-// 		else if (size1 == 16)
-// 		{
-// 			temp = asc2_1608[chr1][i];
-// 		} //调用1608字体
-// 		else if (size1 == 24)
-// 		{
-// 			temp = asc2_2412[chr1][i];
-// 		} //调用2412字体
-// 		else
-// 			return;
-// 		for (m = 0; m < 8; m++)
-// 		{
-// 			if (temp & 0x01)
-// 				OLED_DrawPoint(x, y, mode);
-// 			else
-// 				OLED_DrawPoint(x, y, !mode);
-// 			temp >>= 1;
-// 			y++;
-// 		}
-// 		x++;
-// 		if ((size1 != 8) && ((x - x0) == size1 / 2))
-// 		{
-// 			x = x0;
-// 			y0 = y0 + 8;
-// 		}
-// 		y = y0;
-// 	}
-// }
+    for (y = sy; y < high; y++)
+    {
+        for (x = sx; x < width; x++)
+        {
+            OLED_DrawPoint(x, y, color);
+        }
+    }
+}
 
-// //显示字符串
-// // x,y:起点坐标
-// //*chr:字符串起始地址
-// // size1:字体大小
-// // mode:0,反色显示;1,正常显示
-// void OLED_ShowString(u8 x, u8 y, u8 *chr, u8 size1, u8 mode)
-// {
-// 	while ((*chr >= ' ') && (*chr <= '~')) //判断是不是非法字符!
-// 	{
-// 		OLED_ShowChar(x, y, *chr, size1, mode);
-// 		if (size1 == 8)
-// 			x += 6;
-// 		else
-// 			x += size1 / 2;
-// 		chr++;
-// 	}
-// }
+/**
+ * @brief      同步画面函数.
+ * @param[in]  sx  纵坐标起点
+ * @param[in]  sy  横坐标起点
+ * @param[in]  width 宽度
+ * @param[in]  high  高度
+ * @retval     None.
+ */
+void OLED_SyncScreen(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high)
+{
+    uint8_t y, x;
+    oledsize_t ex = sx + width;
+    oledsize_t ey = sy + high;
 
-// // m^n
-// u32 OLED_Pow(u8 m, u8 n)
-// {
-// 	u32 result = 1;
-// 	while (n--)
-// 	{
-// 		result *= m;
-// 	}
-// 	return result;
-// }
+    sx = sx > sg_tOLedDevInfo.width ? sg_tOLedDevInfo.width : sx;
+    ex = ex > sg_tOLedDevInfo.width ? sg_tOLedDevInfo.width : ex;
 
-// //显示数字
-// // x,y :起点坐标
-// // num :要显示的数字
-// // len :数字的位数
-// // size:字体大小
-// // mode:0,反色显示;1,正常显示
-// void OLED_ShowNum(u8 x, u8 y, u32 num, u8 len, u8 size1, u8 mode)
-// {
-// 	u8 t, temp, m = 0;
-// 	if (size1 == 8)
-// 		m = 2;
-// 	for (t = 0; t < len; t++)
-// 	{
-// 		temp = (num / OLED_Pow(10, len - t - 1)) % 10;
-// 		if (temp == 0)
-// 		{
-// 			OLED_ShowChar(x + (size1 / 2 + m) * t, y, '0', size1, mode);
-// 		}
-// 		else
-// 		{
-// 			OLED_ShowChar(x + (size1 / 2 + m) * t, y, temp + '0', size1, mode);
-// 		}
-// 	}
-// }
+    sy = sy > sg_tOLedDevInfo.height ? sg_tOLedDevInfo.height : sy;
+    ey = ey > sg_tOLedDevInfo.height ? sg_tOLedDevInfo.height : ey;
 
-// //显示汉字
-// // x,y:起点坐标
-// // num:汉字对应的序号
-// // mode:0,反色显示;1,正常显示
-// void OLED_ShowChinese(u8 x, u8 y, u8 num, u8 size1, u8 mode)
-// {
-// 	u8 m, temp;
-// 	u8 x0 = x, y0 = y;
-// 	u16 i, size3 = (size1 / 8 + ((size1 % 8) ? 1 : 0)) * size1; //得到字体一个字符对应点阵集所占的字节数
-// 	for (i = 0; i < size3; i++)
-// 	{
-// 		if (size1 == 16)
-// 		{
-// 			temp = Hzk1[num][i];
-// 		} //调用16*16字体
-// 		else if (size1 == 24)
-// 		{
-// 			temp = Hzk2[num][i];
-// 		} //调用24*24字体
-// 		else if (size1 == 32)
-// 		{
-// 			temp = Hzk3[num][i];
-// 		} //调用32*32字体
-// 		else if (size1 == 64)
-// 		{
-// 			temp = Hzk4[num][i];
-// 		} //调用64*64字体
-// 		else
-// 			return;
-// 		for (m = 0; m < 8; m++)
-// 		{
-// 			if (temp & 0x01)
-// 				OLED_DrawPoint(x, y, mode);
-// 			else
-// 				OLED_DrawPoint(x, y, !mode);
-// 			temp >>= 1;
-// 			y++;
-// 		}
-// 		x++;
-// 		if ((x - x0) == size1)
-// 		{
-// 			x = x0;
-// 			y0 = y0 + 8;
-// 		}
-// 		y = y0;
-// 	}
-// }
+    sy = sy / 8;
+    ey % 8 == 0 ? (ey = ey / 8) : (ey = ey / 8 + 1);
 
-// // num 显示汉字的个数
-// // space 每一遍显示的间隔
-// // mode:0,反色显示;1,正常显示
-// void OLED_ScrollDisplay(u8 num, u8 space, u8 mode)
-// {
-// 	u8 i, n, t = 0, m = 0, r;
-// 	while (1)
-// 	{
-// 		if (m == 0)
-// 		{
-// 			OLED_ShowChinese(128, 24, t, 16, mode); //写入一个汉字保存在OLED_GRAM[][]数组中
-// 			t++;
-// 		}
-// 		if (t == num)
-// 		{
-// 			for (r = 0; r < 16 * space; r++) //显示间隔
-// 			{
-// 				for (i = 1; i < 144; i++)
-// 				{
-// 					for (n = 0; n < 8; n++)
-// 					{
-// 						OLED_GRAM[i - 1][n] = OLED_GRAM[i][n];
-// 					}
-// 				}
-// 				OLED_Refresh();
-// 			}
-// 			t = 0;
-// 		}
-// 		m++;
-// 		if (m == 16)
-// 		{
-// 			m = 0;
-// 		}
-// 		for (i = 1; i < 144; i++) //实现左移
-// 		{
-// 			for (n = 0; n < 8; n++)
-// 			{
-// 				OLED_GRAM[i - 1][n] = OLED_GRAM[i][n];
-// 			}
-// 		}
-// 		OLED_Refresh();
-// 	}
-// }
+    for (y = sy; y < ey; y++)
+    {
+        WriteCmd(0xb0 + y);                  //设置页地址（0~7）
+        WriteCmd((sx & 0x0f) + 0x02);        //设置显示位置—列低地址
+        WriteCmd(((sx & 0xf0) >> 4) | 0x10); //设置显示位置—列高地址
 
-// // x,y：起点坐标
-// // sizex,sizey,图片长宽
-// // BMP[]：要写入的图片数组
-// // mode:0,反色显示;1,正常显示
-// void OLED_ShowPicture(u8 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode)
-// {
-// 	u16 j = 0;
-// 	u8 i, n, temp, m;
-// 	u8 x0 = x, y0 = y;
-// 	sizey = sizey / 8 + ((sizey % 8) ? 1 : 0);
-// 	for (n = 0; n < sizey; n++)
-// 	{
-// 		for (i = 0; i < sizex; i++)
-// 		{
-// 			temp = BMP[j];
-// 			j++;
-// 			for (m = 0; m < 8; m++)
-// 			{
-// 				if (temp & 0x01)
-// 					OLED_DrawPoint(x, y, mode);
-// 				else
-// 					OLED_DrawPoint(x, y, !mode);
-// 				temp >>= 1;
-// 				y++;
-// 			}
-// 			x++;
-// 			if ((x - x0) == sizex)
-// 			{
-// 				x = x0;
-// 				y0 = y0 + 8;
-// 			}
-// 			y = y0;
-// 		}
-// 	}
-// }
-// // OLED的初始化
-// // GND  电源地
-// // VCC  接5V或3.3v电源
-// // D0   接PA14（SCL）
-// // D1   接PA15（SDA）
-// // RES  PD2（SPI模块改成IIC模块需要接此引脚，IIC模块用户请忽略）
-// void OLED_Init(void)
-// {
-// 	GPIO_InitTypeDef GPIO_InitStruct;
-// 	GPIO_InitTypeDef GPIO_InitStruct_2;
-// 	GPIO_InitTypeDef GPIO_InitStruct_3;
+        for (x = sx; x < ex; x++)
+        {
+            WriteData(sg_arrFrameBuffer[x][y]);
+        }
+    }
+}
 
-// 	OLED_GPIO_SCL_ENABLE();
-// 	OLED_GPIO_SDA_ENABLE();
+/**
+ * @brief      屏幕刷新显示函数.
+ *             界面画面同步任务
+ * @retval     None.
+ */
+void OLED_ShowTask(void)
+{
+    uint8_t y, x;
 
-// 	GPIO_InitStruct.Pin = OLED_GPIO_SCL_Pin;
-// 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-// 	GPIO_InitStruct.Pull = GPIO_PULLUP;
-// 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-// 	HAL_HAL_GPIO_Init(OLED_GPIO_SCL_Port, &GPIO_InitStruct);
-// 	HAL_GPIO_WritePin(OLED_GPIO_SCL_Port, OLED_GPIO_SCL_Pin, GPIO_PIN_SET);
+    for (y = 0; y < sg_tOLedDevInfo.height / 8; y++)
+    {
+        WriteCmd(0xb0 + y); //设置页地址（0~7）
+        WriteCmd(0x02);     //设置显示位置—列低地址
+        WriteCmd(0x10);     //设置显示位置—列高地址
 
-// 	GPIO_InitStruct_2.Pin = OLED_GPIO_SDA_Pin;
-// 	GPIO_InitStruct_2.Mode = GPIO_MODE_OUTPUT_OD;
-// 	GPIO_InitStruct_2.Pull = GPIO_PULLUP;
-// 	GPIO_InitStruct_2.Speed = GPIO_SPEED_FREQ_HIGH;
-// 	HAL_HAL_GPIO_Init(OLED_GPIO_SDA_Port, &GPIO_InitStruct_2);
-// 	HAL_GPIO_WritePin(OLED_GPIO_SDA_Port, OLED_GPIO_SDA_Pin, GPIO_PIN_SET);
+        for (x = 0; x < sg_tOLedDevInfo.width; x++)
+        {
+            WriteData(sg_arrFrameBuffer[x][y]);
+        }
+    }
+}
 
-// 	/*Configure GPIO pin : PD2 */
-// 	GPIO_InitStruct_3.Pin = GPIO_PIN_2;
-// 	GPIO_InitStruct_3.Mode = GPIO_MODE_OUTPUT_PP;
-// 	GPIO_InitStruct_3.Pull = GPIO_PULLUP;
-// 	GPIO_InitStruct_3.Speed = GPIO_SPEED_FREQ_HIGH;
-// 	HAL_HAL_GPIO_Init(GPIOD, &GPIO_InitStruct_3);
-// 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
+/**
+ * @brief      指定窗口已有画面往指定方向偏移, 超出屏幕部分则自动填充背景色.
+ * @param[in]  x       纵坐标起点位置.
+ * @param[in]  y       行坐标起点位置
+ * @param[in]  width   窗口宽度
+ * @param[in]  high    窗口高度
+ * @param[in]  dir     偏移方向
+ *                      @arg 0 往上偏移
+ *                      @arg 1 往下偏移
+ *                      @arg 2 往左偏移
+ *                      @arg 3 往右偏移
+ * @param[in]  pixels  偏移的像素点
+ * @retval     None.
+ */
+void OLED_SetScreenOffset(oledsize_t x, oledsize_t y, oledsize_t width, oledsize_t high, uint8_t dir, uint8_t pixels)
+{
+    uint8_t i, j;
 
-// 	OLED_RES_Clr();
-// 	delay_ms(200);
-// 	OLED_RES_Set();
+    /* 屏幕部分窗口往上偏移消失 */
+    if (dir == 0)
+    {
+        for (i = x; i < x + width; i++)
+        {
+            for (j = y; j < y + high; j++)
+            {
+                if (j + pixels < (y + high))
+                {
+                    OLED_DrawPoint(i, j, OLED_ReadPoint(i, j + pixels));
+                }
+                else
+                {
+                    OLED_DrawPoint(i, j, sg_tOLedDevInfo.backColor);
+                }
+            }
+        }
+    }
+    else if (dir == 1) /* 屏幕部分窗口往下偏移消失 */
+    {
+        for (i = x; i < x + width; i++)
+        {
+            for (j = y + high; j > y; j--)
+            {
+                if (j - 1 - pixels > y)
+                {
+                    OLED_DrawPoint(i, j - 1, OLED_ReadPoint(i, j - 1 - pixels));
+                }
+                else
+                {
+                    OLED_DrawPoint(i, j - 1, sg_tOLedDevInfo.backColor);
+                }
+            }
+        }
+    }
+    else if (dir == 2) /* 屏幕部分窗口往左偏移消失 */
+    {
+        for (j = y; j < y + high; j++)
+        {
+            for (i = x; i < x + width; i++)
+            {
+                if (i + pixels < (x + width))
+                {
+                    OLED_DrawPoint(i, j, OLED_ReadPoint(i + pixels, j));
+                }
+                else
+                {
+                    OLED_DrawPoint(i, j, sg_tOLedDevInfo.backColor);
+                }
+            }
+        }
+    }
+    else if (dir == 3) /* 屏幕部分窗口往右偏移消失 */
+    {
+        for (j = y; j < y + high; j++)
+        {
+            for (i = x + width; i > x; i--)
+            {
+                if (i - 1 - pixels > x)
+                {
+                    OLED_DrawPoint(i - 1, j, OLED_ReadPoint(i - 1 - pixels, j));
+                }
+                else
+                {
+                    OLED_DrawPoint(i - 1, j, sg_tOLedDevInfo.backColor);
+                }
+            }
+        }
+    }
+}
 
-// 	// OLED_WR_Byte(0xAE, OLED_CMD); //--turn off oled panel
-// 	// OLED_WR_Byte(0x00, OLED_CMD); //---set low column address
-// 	// OLED_WR_Byte(0x10, OLED_CMD); //---set high column address
-// 	// OLED_WR_Byte(0x40, OLED_CMD); //--set start line address  Set Mapping RAM Display Start Line (0x00~0x3F)
-// 	// OLED_WR_Byte(0x81, OLED_CMD); //--set contrast control register
-// 	// OLED_WR_Byte(0xCF, OLED_CMD); // Set SEG Output Current Brightness
-// 	// OLED_WR_Byte(0xA1, OLED_CMD); //--Set SEG/Column Mapping     0xa0左右反置 0xa1正常
-// 	// OLED_WR_Byte(0xC8, OLED_CMD); // Set COM/Row Scan Direction   0xc0上下反置 0xc8正常
-// 	// OLED_WR_Byte(0xA6, OLED_CMD); //--set normal display
-// 	// OLED_WR_Byte(0xA8, OLED_CMD); //--set multiplex ratio(1 to 64)
-// 	// OLED_WR_Byte(0x3f, OLED_CMD); //--1/64 duty
-// 	// OLED_WR_Byte(0xD3, OLED_CMD); //-set display offset	Shift Mapping RAM Counter (0x00~0x3F)
-// 	// OLED_WR_Byte(0x00, OLED_CMD); //-not offset
-// 	// OLED_WR_Byte(0xd5, OLED_CMD); //--set display clock divide ratio/oscillator frequency
-// 	// OLED_WR_Byte(0x80, OLED_CMD); //--set divide ratio, Set Clock as 100 Frames/Sec
-// 	// OLED_WR_Byte(0xD9, OLED_CMD); //--set pre-charge period
-// 	// OLED_WR_Byte(0xF1, OLED_CMD); // Set Pre-Charge as 15 Clocks & Discharge as 1 Clock
-// 	// OLED_WR_Byte(0xDA, OLED_CMD); //--set com pins hardware configuration
-// 	// OLED_WR_Byte(0x12, OLED_CMD);
-// 	// OLED_WR_Byte(0xDB, OLED_CMD); //--set vcomh
-// 	// OLED_WR_Byte(0x40, OLED_CMD); // Set VCOM Deselect Level
-// 	// OLED_WR_Byte(0x20, OLED_CMD); //-Set Page Addressing Mode (0x00/0x01/0x02)
-// 	// OLED_WR_Byte(0x02, OLED_CMD); //
-// 	// OLED_WR_Byte(0x8D, OLED_CMD); //--set Charge Pump enable/disable
-// 	// OLED_WR_Byte(0x14, OLED_CMD); //--set(0x10) disable
-// 	// OLED_WR_Byte(0xA4, OLED_CMD); // Disable Entire Display On (0xa4/0xa5)
-// 	// OLED_WR_Byte(0xA6, OLED_CMD); // Disable Inverse Display On (0xa6/a7)
-// 	// OLED_Clear();
-// 	// OLED_WR_Byte(0xAF, OLED_CMD);
+/**
+ * @brief      画面反显函数.
+ * @param[in]  sx  纵坐标起点
+ * @param[in]  sy  横坐标起点
+ * @param[in]  width 宽度
+ * @param[in]  high  高度
+ * @retval     None.
+ */
+void OLED_ReverseScreen(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high)
+{
+    oledsize_t i, j;
 
-// 	OLED_WR_Byte(0xAE, OLED_CMD); //--display off
-// 	OLED_WR_Byte(0x00, OLED_CMD); //---set low column address
-// 	OLED_WR_Byte(0x10, OLED_CMD); //---set high column address
-// 	OLED_WR_Byte(0x40, OLED_CMD); //--set start line address
-// 	OLED_WR_Byte(0xB0, OLED_CMD); //--set page address
-// 	OLED_WR_Byte(0x81, OLED_CMD); // contract control
-// 	OLED_WR_Byte(0xFF, OLED_CMD); //--128
-// 	OLED_WR_Byte(0xA1, OLED_CMD); // set segment remap
-// 	OLED_WR_Byte(0xA6, OLED_CMD); //--normal / reverse
-// 	OLED_WR_Byte(0xA8, OLED_CMD); //--set multiplex ratio(1 to 64)
-// 	OLED_WR_Byte(0x3F, OLED_CMD); //--1/32 duty
-// 	OLED_WR_Byte(0xC8, OLED_CMD); // Com scan direction
-// 	OLED_WR_Byte(0xD3, OLED_CMD); //-set display offset
-// 	OLED_WR_Byte(0x00, OLED_CMD); //
-// 	OLED_WR_Byte(0xD5, OLED_CMD); // set osc division
-// 	OLED_WR_Byte(0x80, OLED_CMD); //
-// 	OLED_WR_Byte(0xD8, OLED_CMD); // set area color mode off
-// 	OLED_WR_Byte(0x05, OLED_CMD); //
-// 	OLED_WR_Byte(0xD9, OLED_CMD); // Set Pre-Charge Period
-// 	OLED_WR_Byte(0xF1, OLED_CMD); //
-// 	OLED_WR_Byte(0xDA, OLED_CMD); // set com pin configuartion
-// 	OLED_WR_Byte(0x12, OLED_CMD); //
-// 	OLED_WR_Byte(0xDB, OLED_CMD); // set Vcomh
-// 	OLED_WR_Byte(0x30, OLED_CMD); //
-// 	OLED_WR_Byte(0x8D, OLED_CMD); // set charge pump enable
-// 	OLED_WR_Byte(0x14, OLED_CMD); //
-// 	OLED_WR_Byte(0xAF, OLED_CMD); //--turn on oled panel
-// }
+    for (i = sx; i < sx + width; i++)
+    {
+        for (j = sy; j < sy + high; j++)
+        {
+            if (OLED_ReadPoint(i, j) == OLED_BLACK)
+            {
+                OLED_DrawPoint(i, j, OLED_WHITE);
+            }
+            else
+            {
+                OLED_DrawPoint(i, j, OLED_BLACK);
+            }
+        }
+    }
+}
 
-// /**
-//  * @brief	OLED初始化后的一些显示
-//  * @param 	none
-//  * @arg		none
-//  * @note  	显示初始化
-//  * @retval	none
-//  */
-// void OLED_DisplayInit(void)
-// {
-// 	// OLED_Clear();
-// 	// OLED_ShowString(0, 0, "Init OK!", 16, 1);
-// 	// OLED_Refresh();
-// 	OLED_ShowString(0, 0, "PWM", 16, 1);		 // 显示：PWM
-// 	OLED_ShowChinese(48 - 24, 0, 0, 16, 1);		 // 显示：通
-// 	OLED_ShowChinese(64 - 24, 0, 1, 16, 1);		 // 显示：道
-// 	OLED_ShowChar(80 - 24, 0, ':', 16, 1);		 // 显示：：
-// 	OLED_ShowString(128 - 32, 0, "(Hz)", 16, 1); // 显示：(Hz)
+/**
+ * @brief      根据取模方式得到字符点阵数据大小.
+ * @param      way     取模方式, 参考枚举 @enum eMoldMode
+ * @param      width   显示的宽度
+ * @param      high    显示的高度
+ * @retval     字符点阵数据大小.
+ */
+static uint16_t GetCharDataSize(eMoldMode way, oledsize_t width, oledsize_t high)
+{
+    uint16_t dataSize = 0;
 
-// 	OLED_ShowString(0, 16, "1:", 16, 1);
-// 	OLED_ShowString(0, 32, "2:", 16, 1);
-// 	OLED_ShowString(0, 48, "3:", 16, 1);
-// 	OLED_ShowString(64, 16, "4:", 16, 1);
-// 	OLED_Refresh();
-// }
+    switch (way)
+    {
+    case FONT_MODE_COLUMN_BY_COLUMN: // 逐列式
+    case FONT_MODE_COLUMN_BY_ROW:    // 列行式
+        if (high & 0x07)
+        {
+            dataSize = ((high >> 3) + 1) * width;
+        }
+        else
+        {
+            dataSize = (high >> 3) * width;
+        }
+        break;
 
-// /**
-//  * @brief	OLED显示
-//  * @param 	none
-//  * @arg		none
-//  * @note  	显示
-//  * @retval	none
-//  */
-// void OLED_Display(void)
-// {
-// 	OLED_ShowString(0, 0, "S1:     S2:     ", 16, 1);
-// 	OLED_ShowString(0, 16, "V1:     V2:     ", 16, 1);
-// 	OLED_Refresh();
-// }
+    case FONT_MODE_PROGRESSIVE: // 逐行式
+    case FONT_MODE_DETERMINANT: // 行列式
+        if (width & 0x07)
+        {
+            dataSize = ((width >> 3) + 1) * high;
+        }
+        else
+        {
+            dataSize = (width >> 3) * high;
+        }
+        break;
+    default:
+        break;
+    }
+
+    return dataSize;
+}
+
+/**
+ * @brief      在指定位置画点阵内容.
+ * @param      x       纵坐标起点位置.
+ * @param      y       行坐标起点位置
+ * @param      way     取模方式, 参考枚举 @enum eMoldMode
+ * @param      width   显示的宽度
+ * @param      high    显示的高度
+ * @param      pkBufData 字符点阵数据
+ * @retval     None.
+ */
+static void DrawDotMatrix(oledsize_t x, oledsize_t y, eMoldMode way, oledsize_t width, oledsize_t high, const uint8_t *pkBufData)
+{
+    oledsize_t temp;
+    oledsize_t tmpx, tmpy;
+    uint8_t dataNum;
+    eOledcolor colortemp[2];
+
+    colortemp[1] = sg_tOLedDevInfo.pointColor;
+    colortemp[0] = sg_tOLedDevInfo.backColor;
+
+    switch (way)
+    {
+    case FONT_MODE_COLUMN_BY_COLUMN: // 逐列式
+        dataNum = (high & 7) ? ((high >> 3) + 1) : (high >> 3);
+
+        for (tmpx = 0; tmpx < width; tmpx++)
+        {
+            for (tmpy = 0; tmpy < high; tmpy++)
+            {
+                temp = pkBufData[tmpx * dataNum + (tmpy >> 3)] >> (tmpy & 7);
+                OLED_DrawPoint(tmpx + x, tmpy + y, colortemp[temp & 0x01]);
+            }
+        }
+        break;
+
+    case FONT_MODE_PROGRESSIVE: // 逐行式
+        dataNum = (width & 7) ? (width >> 3) + 1 : (width >> 3);
+
+        for (tmpy = 0; tmpy < high; tmpy++)
+        {
+            for (tmpx = 0; tmpx < width; tmpx++)
+            {
+                temp = pkBufData[tmpy * dataNum + (tmpx >> 3)] >> (tmpx & 7);
+                OLED_DrawPoint(tmpx + x, tmpy + y, colortemp[temp & 0x01]);
+            }
+        }
+        break;
+
+    case FONT_MODE_COLUMN_BY_ROW: // 列行式
+        for (tmpx = 0; tmpx < width; tmpx++)
+        {
+            for (tmpy = 0; tmpy < high; tmpy++)
+            {
+                temp = pkBufData[tmpx + (tmpy >> 3) * width] >> (tmpy & 7);
+                OLED_DrawPoint(tmpx + x, tmpy + y, colortemp[temp & 0x01]);
+            }
+        }
+        break;
+
+    case FONT_MODE_DETERMINANT: // 行列式
+        for (tmpy = 0; tmpy < high; tmpy++)
+        {
+            for (tmpx = 0; tmpx < width; tmpx++)
+            {
+                temp = pkBufData[tmpy + (tmpx >> 3) * high] >> (tmpx & 7);
+                OLED_DrawPoint(tmpx + x, tmpy + y, colortemp[temp & 0x01]);
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+/**
+ * @brief      ASCII 字符集是否存在该字符.
+ * @param[in]  chr    需要查找的字符
+ * @param[in]  schr   ASCII 字符集开始偏移字符
+ * @param[in]  echr   ASCII 字符集结束偏移字符
+ * @retval     -1, 不存在; 其他,该字符的偏移位置.
+ *
+ */
+static int IsCharExit(char chr, char schr, char echr)
+{
+    if (chr >= schr && chr <= echr)
+    {
+        return chr - schr;
+    }
+
+    return -1;
+}
+
+/**
+ * @brief      在指定位置画一个非叠加的字符.
+ * @param      x       纵坐标起点位置.
+ * @param      y       行坐标起点位置
+ * @param      chr     字符(" "--->"~")
+ * @param      pkfontInfo 字体配置信息
+ * @retval     None.
+ */
+static void DrawOneChar(oledsize_t x, oledsize_t y, uint8_t chr, const fontConfig_t *pkfontInfo)
+{
+    int idx;
+    oledsize_t tmpx, tmpy;
+
+    if (x > sg_tOLedDevInfo.width - pkfontInfo->charWidth || y > sg_tOLedDevInfo.height - pkfontInfo->height)
+    {
+        return;
+    }
+
+    if ((idx = IsCharExit(chr, pkfontInfo->charSIndex, pkfontInfo->charEIndex)) >= 0)
+    {
+        idx *= GetCharDataSize(pkfontInfo->way, pkfontInfo->charWidth, pkfontInfo->height);
+        DrawDotMatrix(x, y, pkfontInfo->way, pkfontInfo->charWidth, pkfontInfo->height, &pkfontInfo->pkCharBufData[idx]);
+    }
+    else
+    {
+        for (tmpx = 0; tmpx < pkfontInfo->charWidth; tmpx++)
+        {
+            for (tmpy = 0; tmpy < pkfontInfo->height; tmpy++)
+            {
+                OLED_DrawPoint(tmpx + x, tmpy + y, sg_tOLedDevInfo.backColor);
+            }
+        }
+    }
+}
+
+/**
+ * @brief      汉字字符库是否存在该汉字.
+ * @param[in]  pszFont 汉字(GB2312)
+ * @param[in]  pkInx  汉字字符库
+ * @retval     -1, 不存在; 其他,该汉字所在的字符库位置.
+ *
+ */
+static int IsFontExit(uint8_t pszFont[2], const uint8_t *pkInx)
+{
+    uint16_t index = 0;
+
+    /* 寻找字体索引 */
+    while (pkInx[index] > 127)
+    {
+        if (pkInx[index] == pszFont[0] && pkInx[index + 1] == pszFont[1])
+        {
+            return index >> 1;
+        }
+
+        index += 2;
+    }
+
+    return -1;
+}
+
+/**
+ * @brief      在指定位置画一个非叠加的汉字.
+ * @param      x       纵坐标起点位置.
+ * @param      y       行坐标起点位置
+ * @param      pszFont  GB2312 格式的汉字
+ * @param      pkfontInfo 字体配置信息
+ * @retval     None.
+ */
+static void DrawOneFont(oledsize_t x, oledsize_t y, uint8_t pszFont[2], const fontConfig_t *pkfontInfo)
+{
+    oledsize_t tmpx, tmpy;
+    int32_t idx;
+
+    if (x > sg_tOLedDevInfo.width - pkfontInfo->fontWidth || y > sg_tOLedDevInfo.height - pkfontInfo->height)
+    {
+        return;
+    }
+
+    if ((idx = IsFontExit(pszFont, pkfontInfo->pkFontIdx)) >= 0)
+    {
+        idx *= GetCharDataSize(pkfontInfo->way, pkfontInfo->fontWidth, pkfontInfo->height);
+        DrawDotMatrix(x, y, pkfontInfo->way, pkfontInfo->fontWidth, pkfontInfo->height, &pkfontInfo->pkFontBufData[idx]);
+    }
+    else
+    {
+        for (tmpx = 0; tmpx < pkfontInfo->fontWidth; tmpx++)
+        {
+            for (tmpy = 0; tmpy < pkfontInfo->height; tmpy++)
+            {
+                OLED_DrawPoint(tmpx + x, tmpy + y, sg_tOLedDevInfo.backColor);
+            }
+        }
+    }
+}
+
+/**
+ * @brief      设置背景色和画笔色.
+ * @param[in]  backColor  画笔背景颜色.
+ * @param[in]  pointColor  画笔颜色.
+ * @retval     None.
+ */
+void OLED_SetColor(eOledcolor backColor, eOledcolor pointColor)
+{
+    sg_tOLedDevInfo.backColor = backColor;
+    sg_tOLedDevInfo.pointColor = pointColor;
+}
+
+/**
+ * @brief      根据换行符和设定屏幕宽度依次得到每行的文本内容(需要多次调用得到).
+ * @param[out] pszDest 一行的文本内容
+ * @param[in]  pszSrc  需要处理的字符串
+ * @param[in]  x       纵坐标起点位置.
+ * @param[in]  setWidth 设定屏幕宽度
+ * @param[in]  fontWidth 字宽
+ * @param[in]  init    重新获取每行文本内容
+ * @retval     -1, 没有下行文本
+ *              0, 回车符
+ *              1, 换行符.
+ *              2, 超出屏幕范围
+ */
+static int GetLineString(char *pszDest, const char *pszSrc, oledsize_t x, oledsize_t setWidth,
+                         oledsize_t charWidth, oledsize_t fontWidth, uint8_t init)
+{
+    oledsize_t tmpWidth = 0;
+    static const char *s_pszSrc = 0;
+
+    if (init)
+    {
+        s_pszSrc = pszSrc;
+    }
+
+    while (s_pszSrc != 0 && *s_pszSrc != 0)
+    {
+        if (*s_pszSrc == '\n')
+        {
+            s_pszSrc++;
+            return 1;
+        }
+        else if (*s_pszSrc == '\r')
+        {
+            s_pszSrc++;
+
+            if (*s_pszSrc == '\n')
+            {
+                s_pszSrc++;
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        if (*s_pszSrc > 127)
+        {
+            tmpWidth += fontWidth;
+
+            if (tmpWidth > setWidth)
+            {
+                return 2;
+            }
+
+            *pszDest = *s_pszSrc;
+            s_pszSrc++;
+            pszDest++;
+        }
+        else
+        {
+            tmpWidth += charWidth;
+
+            if (tmpWidth > setWidth)
+            {
+                return 2;
+            }
+        }
+
+        *pszDest = *s_pszSrc;
+        s_pszSrc++;
+        pszDest++;
+    }
+
+    return -1;
+}
+
+/**
+ * @brief      在指定位置设置文本内容.
+ * @param[in]  x       纵坐标起点位置.
+ * @param[in]  y       行坐标起点位置
+ * @param[in]  pszStr  文本内容
+ * @param[in]  isMultiLine 0-不支持多行显示 1-支持多行显示
+ * @param[in]  size    文本大小
+ * @retval     None.
+ */
+void OLED_SetText(oledsize_t x, oledsize_t y, const char *pszStr, uint8_t isMultiLine, efontSize size)
+{
+    fontConfig_t tFontConfig;
+    uint8_t isAscii = 1;
+    oledsize_t tmpX = x;
+    oledsize_t tmpY = y;
+    uint8_t szFontData[2] = {0};
+    uint16_t i = 0;
+
+    if (OLED_GetFontConfig(size, &tFontConfig))
+    {
+        return;
+    }
+
+    while (pszStr[i] != '\0')
+    {
+        if (pszStr[i] > 127)
+        {
+            isAscii = 0;
+
+            if (tmpX > sg_tOLedDevInfo.width - tFontConfig.fontWidth)
+            {
+                if (isMultiLine && tmpY < (sg_tOLedDevInfo.height - tFontConfig.height))
+                {
+                    tmpX = x;
+                    tmpY += tFontConfig.height;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            isAscii = 1;
+
+            if (tmpX > sg_tOLedDevInfo.width - tFontConfig.charWidth)
+            {
+                if (isMultiLine && tmpY < (sg_tOLedDevInfo.height - tFontConfig.height))
+                {
+                    tmpX = x;
+                    tmpY += tFontConfig.height;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        if (isAscii == 0)
+        {
+            if (tFontConfig.pkFontIdx != 0 && tFontConfig.pkFontBufData != 0)
+            {
+                szFontData[0] = pszStr[i];
+                szFontData[1] = pszStr[i + 1];
+                DrawOneFont(tmpX, tmpY, szFontData, &tFontConfig);
+                tmpX += tFontConfig.fontWidth;
+            }
+
+            i += 2;
+        }
+        else
+        {
+            if (tFontConfig.pkCharBufData != 0)
+            {
+                DrawOneChar(tmpX, tmpY, pszStr[i], &tFontConfig);
+                tmpX += tFontConfig.charWidth;
+            }
+
+            i++;
+        }
+    }
+}
+
+/**
+ * @brief      原型函数 pow.
+ * @param      m     基数
+ * @param      n     指数
+ * @return     m 的 n 次幂的结果
+ */
+static uint32_t myPow(uint8_t m, uint8_t n)
+{
+    uint32_t result = 1;
+
+    while (n--)
+    {
+        result *= m;
+    }
+
+    return result;
+}
+
+/**
+ * @brief      无符号整数转字符串.
+ * @param      num     数值
+ * @param      str     转换后的字符串
+ * @param      intLen  整数长度
+ * @param      zero    0,高位为 0 时不显示; 1,高位为 0 时显示
+ * @retval     None.
+ */
+static void UintToStr(uint32_t num, char *str, uint8_t intLen, uint8_t zero)
+{
+    uint8_t t;
+    uint8_t flag = 0;
+
+    if (intLen > 10)
+    {
+        intLen = 10;
+    }
+
+    for (t = 0; t < intLen; t++)
+    {
+        str[t] = ((num / myPow(10, intLen - t - 1)) % 10) + '0';
+
+        /* 高位不显示 && 高位为 0 未搜索完成 && 当前位为 0 && 若检索到最低位还是 0 则保留, 防止 0 没有显示 */
+        if (zero == 0 && flag == 0 && str[t] == '0' && (t < intLen - 1))
+        {
+            str[t] = ' ';
+        }
+        else
+        {
+            flag = 1; /* 标记高位为 0 的个数已完结 */
+        }
+    }
+}
+
+/**
+ * @brief      有符号整数转字符串.
+ * @param      num     数值
+ * @param      str     转换后的字符串
+ * @param      intLen  整数长度
+ * @param      zero    0,高位为 0 时不显示; 1,高位为 0 时显示
+ * @retval     None.
+ */
+static void IntToStr(int32_t num, char *str, uint8_t intLen, uint8_t zero)
+{
+    uint8_t t;
+    uint8_t flag = 0;
+    uint8_t zeroNum = 0;
+
+    if (intLen > 10)
+    {
+        intLen = 10;
+    }
+
+    /* 增加符号位 */
+    str[0] = ' ';
+
+    if (num > 0)
+    {
+        for (t = 0; t < intLen; t++)
+        {
+            str[t + 1] = ((num / myPow(10, intLen - t - 1)) % 10) + '0';
+
+            /* 高位不显示 && 高位为 0 未搜索完成 && 当前位为 0 && 若检索到最低位还是 0 则保留, 防止 0 没有显示 */
+            if (zero == 0 && flag == 0 && str[t + 1] == '0' && (t < intLen - 1))
+            {
+                str[t + 1] = ' ';
+            }
+            else
+            {
+                flag = 1; /* 标记高位为 0 的个数已完结 */
+            }
+        }
+    }
+    else
+    {
+        num = LCD_ABS(num);
+
+        for (t = 0; t < intLen; t++)
+        {
+            str[t + 1] = ((num / myPow(10, intLen - t - 1)) % 10) + '0';
+
+            /* 高位不显示 && 高位为 0 未搜索完成 && 当前位为 0 && 若检索到最低位还是 0 则保留, 防止 0 没有显示 */
+            if (zero == 0 && flag == 0 && str[t + 1] == '0' && (t < intLen - 1))
+            {
+                str[t + 1] = ' ';
+                zeroNum++;
+            }
+            else
+            {
+                flag = 1; /* 标记高位为 0 的个数已完结 */
+            }
+        }
+
+        if (num != 0) /* 该值为 0 不显示负号 */
+        {
+            str[zeroNum] = '-';
+        }
+    }
+}
+
+/**
+ * @brief      浮点数转字符串.
+ * @param      num     数值
+ * @param      str     转换后的字符串
+ * @param      intLen  整数长度
+ * @param      decLen  小数长度
+ * @param      zero    0,高位为 0 时不显示; 1,高位为 0 时显示
+ * @retval     None.
+ */
+static void FloatToStr(double num, char *str, uint8_t intLen, uint8_t decLen, uint8_t zero)
+{
+    uint8_t t;
+    uint8_t flag = 0;
+    uint8_t zeroNum = 0;
+    int16_t powVal = myPow(10, decLen);
+    int16_t integer_num = (int16_t)num;
+    int16_t decimal_num = (int16_t)((num * powVal - integer_num * powVal));
+
+    if (intLen > 10)
+    {
+        intLen = 10;
+    }
+
+    if (decLen > 10)
+    {
+        decLen = 10;
+    }
+
+    integer_num = LCD_ABS(integer_num);
+    decimal_num = LCD_ABS(decimal_num);
+
+    /* 增加符号位 */
+    str[0] = ' ';
+
+    /* 增加小数位 */
+    if (decLen != 0)
+    {
+        str[intLen + 1] = '.';
+    }
+
+    for (t = 0; t < intLen; t++)
+    {
+        str[t + 1] = ((integer_num / myPow(10, intLen - t - 1)) % 10) + '0';
+
+        /* 高位不显示 && 高位为 0 未搜索完成 && 当前位为 0 && 若检索到最低位还是 0 则保留, 防止 0 没有显示 */
+        if (zero == 0 && flag == 0 && str[t + 1] == '0' && (t < intLen - 1))
+        {
+            str[t + 1] = ' ';
+
+            if (num < 0)
+            {
+                zeroNum++;
+            }
+        }
+        else
+        {
+            flag = 1; /* 标记高位为 0 的个数已完结 */
+        }
+    }
+
+    for (t = 0; t < decLen; t++)
+    {
+        str[t + intLen + 2] = ((decimal_num / myPow(10, decLen - t - 1)) % 10) + '0';
+    }
+
+    if (num >= 0)
+    {
+        for (t = 0; t < (decLen + intLen + 2); t++)
+        {
+            str[t] = str[t + 1];
+        }
+    }
+    else
+    {
+        str[zeroNum] = '-';
+    }
+}
+
+/**
+ * @brief      在指定位置设置整数型数字内容.
+ * @param[in]  x       纵坐标起点位置.
+ * @param[in]  y       行坐标起点位置
+ * @param[in]  num     整数型数字
+ * @param[in]  len     可显示的数字最大长度
+ * @param[in]  zero    最高位为0是否显示, 0-不显示 1-显示
+ * @param[in]  size    数字文本大小
+ * @retval     None.
+ */
+void OLED_SetIntegerNum(oledsize_t x, oledsize_t y, int32_t num, uint8_t len, uint8_t zero, efontSize size)
+{
+    char tmpStr[25] = {0};
+    uint32_t unum = num;
+
+    if (num < 0)
+    {
+        IntToStr(num, tmpStr, len, zero);
+    }
+    else
+    {
+        UintToStr(unum, tmpStr, len, zero);
+    }
+
+    OLED_SetText(x, y, tmpStr, 0, size);
+}
+
+/**
+ * @brief      在指定位置设置浮点型数字内容.
+ * @param[in]  x       纵坐标起点位置.
+ * @param[in]  y       行坐标起点位置
+ * @param[in]  num     浮点型数字
+ * @param[in]  intLen  可显示的整数部分数字最大长度
+ * @param[in]  decLen  可显示的小数部分数字最大长度
+ * @param[in]  zero    最高位为0是否显示, 0-不显示 1-显示
+ * @param[in]  size    数字文本大小
+ * @retval     None.
+ */
+void OLED_SetFloatNum(oledsize_t x, oledsize_t y, float num, uint8_t intLen, uint8_t decLen, uint8_t zero, efontSize size)
+{
+    char tmpStr[25] = {0};
+
+    FloatToStr(num, tmpStr, intLen, decLen, zero);
+
+    OLED_SetText(x, y, tmpStr, 0, size);
+}
+
+#ifdef _USE_OLED_PRINTF
+/**
+ * @brief      发送格式化输出到 OLED 输出(简易).
+ * @param[in]  x       纵坐标起点位置.
+ * @param[in]  y       行坐标起点位置
+ * @param[in]  isMultiLine 0-不支持多行显示 1-支持多行显示
+ * @param[in]  size    文本大小
+ * @param[in]  format 格式化字符串
+ * @param[in]  ... 格式化字符串中的参数表
+ * @retval     None
+ */
+void OLED_XYPrintf(oledsize_t x, oledsize_t y, uint8_t isMultiLine, efontSize size, const char *format, ...)
+{
+    char szText[100] = {0};
+    va_list aptr;
+
+    va_start(aptr, format);
+    vsprintf(szText, format, aptr);
+    va_end(aptr);
+
+    OLED_SetText(x, y, szText, isMultiLine, size);
+}
+
+/**
+ * @brief      发送格式化输出到 OLED 输出.
+ *             具备自动换行, 同时支持识别'\r'和'\n'
+ * @param[in]  format 格式化字符串
+ * @param[in]  ... 格式化字符串中的参数表
+ * @retval     None
+ */
+void OLED_Printf(const char *format, ...)
+{
+    fontConfig_t tFontConfig;
+    OLedPrint_t *pOLedPrint = &sg_tOLedPrintInfo;
+    oledsize_t printWindowHeight = pOLedPrint->printHeight;
+    uint8_t init = 1;
+    int ret = 0;
+    char szText[100] = {0};
+    va_list aptr;
+
+    if (OLED_GetFontConfig(pOLedPrint->printFontSize, &tFontConfig))
+    {
+        return;
+    }
+
+    if (pOLedPrint->lastTextLenth)
+    {
+        memcpy(szText, pOLedPrint->szlastText, pOLedPrint->lastTextLenth);
+    }
+
+    va_start(aptr, format);
+    vsprintf(&szText[pOLedPrint->lastTextLenth], format, aptr);
+    va_end(aptr);
+
+    do
+    {
+        ret = GetLineString(pOLedPrint->szlastText, szText, OLED_PRINT_X, OLED_PRINT_WIDTH,
+                            tFontConfig.charWidth, tFontConfig.fontWidth, init);
+        init = 0;
+
+        if (pOLedPrint->printY > (printWindowHeight - tFontConfig.height) && ret >= 0)
+        {
+            OLED_SetScreenOffset(OLED_PRINT_X, OLED_PRINT_Y, OLED_PRINT_WIDTH, OLED_PRINT_HIGH,
+                                 0, tFontConfig.height - (printWindowHeight - pOLedPrint->printY));
+            pOLedPrint->printY = printWindowHeight - tFontConfig.height;
+        }
+
+        OLED_SetText(pOLedPrint->printX, pOLedPrint->printY, pOLedPrint->szlastText, 0, pOLedPrint->printFontSize);
+
+        if (ret >= 0)
+        {
+            pOLedPrint->lastTextLenth = 0;
+            memset(pOLedPrint->szlastText, 0, sizeof(pOLedPrint->szlastText));
+
+            if (ret > 0)
+            {
+                pOLedPrint->printY += tFontConfig.height;
+            }
+        }
+        else
+        {
+            pOLedPrint->lastTextLenth = strlen(pOLedPrint->szlastText);
+        }
+    } while (ret >= 0);
+}
+#endif // _USE_OLED_PRINTF
+
+/**
+ * @brief      画线.
+ * @param[in]  sx  纵坐标起点
+ * @param[in]  sy  横坐标起点
+ * @param[in]  ex  纵坐标终点
+ * @param[in]  ey  横坐标终点
+ * @param[in]  color  画笔颜色.
+ * @retval     None.
+ */
+static void DrawLine(oledsize_t sx, oledsize_t sy, oledsize_t ex, oledsize_t ey)
+{
+    uint16_t t;
+    int32_t xerr = 0, yerr = 0, delta_x, delta_y, distance;
+    int32_t incx, incy, uRow, uCol;
+
+    delta_x = (int32_t)ex - sx; //计算坐标增量
+    delta_y = (int32_t)ey - sy;
+    uRow = sx;
+    uCol = sy;
+
+    if (delta_x > 0)
+    {
+        incx = 1; //设置单步方向
+    }
+    else if (delta_x == 0)
+    {
+        incx = 0; //垂直线
+    }
+    else
+    {
+        incx = -1;
+        delta_x = -delta_x;
+    }
+
+    if (delta_y > 0)
+    {
+        incy = 1;
+    }
+    else if (delta_y == 0)
+    {
+        incy = 0; //水平线
+    }
+    else
+    {
+        incy = -1;
+        delta_y = -delta_y;
+    }
+
+    if (delta_x > delta_y)
+    {
+        distance = delta_x; //选取基本增量坐标轴
+    }
+    else
+    {
+        distance = delta_y;
+    }
+
+    for (t = 0; t <= distance + 1; t++) //画线输出
+    {
+        OLED_DrawPoint(uRow, uCol, sg_tOLedDevInfo.pointColor);
+
+        xerr += delta_x;
+        yerr += delta_y;
+
+        if (xerr > distance)
+        {
+            xerr -= distance;
+            uRow += incx;
+        }
+
+        if (yerr > distance)
+        {
+            yerr -= distance;
+            uCol += incy;
+        }
+    }
+}
+
+/**
+ * @brief      画线.
+ *             线体根据大小往下缩放
+ * @param[in]  sx  纵坐标起点
+ * @param[in]  sy  横坐标起点
+ * @param[in]  ex  纵坐标终点
+ * @param[in]  ey  横坐标终点
+ * @param[in]  size 线体大小.
+ * @retval     None.
+ */
+void OLED_DrawLine(oledsize_t sx, oledsize_t sy, oledsize_t ex, oledsize_t ey, uint8_t size)
+{
+    uint8_t i;
+
+    for (i = 0; i < size; i++)
+    {
+        DrawLine(sx + i, sy + i, ex + i, ey + i);
+    }
+}
+
+/**
+ * @brief      画矩形.
+ *             线体根据大小往矩形内缩放
+ * @param[in]  sx  纵坐标起点
+ * @param[in]  sy  横坐标起点
+ * @param[in]  width 宽度
+ * @param[in]  high  高度
+ * @param[in]  size 线体大小.
+ * @retval     None.
+ */
+void OLED_DrawRectangle(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high, uint8_t size)
+{
+    uint8_t i;
+    oledsize_t ex = sx + width;
+    oledsize_t ey = sy + high;
+
+    for (i = 0; i < size; i++)
+    {
+        DrawLine(sx + i, sy + i, ex - i, sy + i);
+        DrawLine(sx + i, sy + i, sx + i, ey - i);
+        DrawLine(sx + i, ey - i, ex - i, ey - i);
+        DrawLine(ex - i, sy + i, ex - i, ey - i);
+    }
+}
+
+/**
+ * @brief      画矩形.
+ *             线体根据大小往矩形内缩放
+ * @param[in]  sx  纵坐标起点
+ * @param[in]  sy  横坐标起点
+ * @param[in]  ex  纵坐标对点
+ * @param[in]  ey  横坐标对点
+ * @param[in]  size 线体大小.
+ * @retval     None.
+ */
+void OLED_DrawCircle(oledsize_t x, oledsize_t y, oledsize_t radius, uint8_t size)
+{
+    uint8_t i;
+    oledsize_t tmpRadius = radius;
+    int32_t a = 0;
+    int32_t di = 3 - (radius << 1); /* 判断下个点位置的标志 */
+
+    radius = radius - size / 2;
+
+    tmpRadius = radius;
+    di = 3 - (radius << 1);
+
+    for (i = 0; i < size; i++)
+    {
+        while (a <= tmpRadius)
+        {
+            OLED_DrawPoint(x - tmpRadius, y - a, sg_tOLedDevInfo.pointColor); // 3
+            OLED_DrawPoint(x + tmpRadius, y - a, sg_tOLedDevInfo.pointColor); // 0
+
+            OLED_DrawPoint(x - a, y + tmpRadius, sg_tOLedDevInfo.pointColor); // 1
+            OLED_DrawPoint(x - tmpRadius, y - a, sg_tOLedDevInfo.pointColor); // 7
+
+            OLED_DrawPoint(x - a, y - tmpRadius, sg_tOLedDevInfo.pointColor); // 2
+            OLED_DrawPoint(x + tmpRadius, y + a, sg_tOLedDevInfo.pointColor); // 4
+
+            OLED_DrawPoint(x + a, y - tmpRadius, sg_tOLedDevInfo.pointColor); // 5
+            OLED_DrawPoint(x + a, y + tmpRadius, sg_tOLedDevInfo.pointColor); // 6
+            OLED_DrawPoint(x - tmpRadius, y + a, sg_tOLedDevInfo.pointColor);
+
+            a++;
+
+            /* 使用Bresenham算法画圆 */
+            if (di < 0)
+            {
+                di += 8 * a + 5 - i;
+            }
+            else
+            {
+                di += 10 + 8 * (a - tmpRadius) - i;
+                tmpRadius--;
+            }
+
+            OLED_DrawPoint(x + a, y + tmpRadius, sg_tOLedDevInfo.pointColor);
+        }
+
+        a = 0;
+        tmpRadius = radius - i;
+        di = 3 - (radius << 1);
+    }
+}
+
+#if OLED_GRAPHIC_NUM
+/**
+ * @brief      画图形.
+ * @param[in]  sx  纵坐标起点
+ * @param[in]  sy  横坐标起点
+ * @param[in]  ex  纵坐标对点
+ * @param[in]  ey  横坐标对点
+ * @param[in]  pkszName  图形名称
+ * @param[in]  size 图形线体大小.
+ * @retval     None.
+ */
+void OLED_DrawGraphic(oledsize_t x, oledsize_t y, const char *pkszName, uint8_t size)
+{
+    graphicConfig_t graphicInfo;
+
+    if (OLED_GetGraphicConfig(pkszName, &graphicInfo) == 0)
+    {
+        DrawDotMatrix(x, y, graphicInfo.way, graphicInfo.width, graphicInfo.high, graphicInfo.pkBufData);
+    }
+}
+#endif
