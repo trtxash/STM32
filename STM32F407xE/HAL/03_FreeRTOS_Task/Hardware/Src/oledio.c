@@ -119,6 +119,7 @@ void OledDrv_Init(void)
   GPIO_InitTypeDef GPIO_InitStructure;
 
   /* GPIO时钟开启 */
+  OLED_CS_Port_Clk_Enable();
   OLED_DC_Port_Clk_Enable();
   OLED_RST_Port_Clk_Enable();
   OLED_DIN_Port_Clk_Enable();
@@ -127,22 +128,30 @@ void OledDrv_Init(void)
   // GPIO_PINRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); //失能JTAG
 
   GPIO_InitStructure.Mode = GPIO_MODE_AF_PP; //推挽输出
-  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStructure.Pull = GPIO_PULLUP;
+
+  GPIO_InitStructure.Pin = OLED_CS_Pin;
+  HAL_GPIO_Init(OLED_CS_Port, &GPIO_InitStructure);
+
   GPIO_InitStructure.Pin = OLED_DC_Pin;
   HAL_GPIO_Init(OLED_DC_Port, &GPIO_InitStructure);
-  HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_RESET);
 
   GPIO_InitStructure.Pin = OLED_RST_Pin;
   HAL_GPIO_Init(OLED_RST_Port, &GPIO_InitStructure);
-  HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET);
 
   GPIO_InitStructure.Pin = OLED_DIN_Pin;
   HAL_GPIO_Init(OLED_DIN_Port, &GPIO_InitStructure);
-  HAL_GPIO_WritePin(OLED_DIN_Port, OLED_DIN_Pin, GPIO_PIN_SET);
 
   GPIO_InitStructure.Pin = OLED_CLK_Pin;
   HAL_GPIO_Init(OLED_CLK_Port, &GPIO_InitStructure);
+
+  HAL_GPIO_WritePin(OLED_DIN_Port, OLED_DIN_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(OLED_CLK_Port, OLED_CLK_Pin, GPIO_PIN_SET);
+
+  HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET);
+  delay_ms(1);
+  HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET);
 }
 
 /**
@@ -154,7 +163,7 @@ void OledDrv_SPIWriteByte(uint8_t data)
 {
   char i = 8;
 
-  OLED_CLK_Clr();
+  OLED_CS_Clr();
 
   while (i--)
   {
@@ -168,9 +177,27 @@ void OledDrv_SPIWriteByte(uint8_t data)
     }
 
     OLED_CLK_Set();
-    OLED_CLK_Clr();
     data <<= 1;
   }
+  OLED_CS_Set();
+  OLED_DC_Set();
+  // OLED_CLK_Clr();
+
+  // while (i--)
+  // {
+  //   if (data & 0x80)
+  //   {
+  //     OLED_DIN_Set();
+  //   }
+  //   else
+  //   {
+  //     OLED_DIN_Clr();
+  //   }
+
+  //   OLED_CLK_Set();
+  //   OLED_CLK_Clr();
+  //   data <<= 1;
+  // }
 }
 
 #endif

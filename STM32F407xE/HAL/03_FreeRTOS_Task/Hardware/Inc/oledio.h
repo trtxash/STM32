@@ -44,6 +44,10 @@
 /*************************************************** OLED IIC 端口定义 ************************************************/
 #else
 /*************************************************** OLED SPI 端口定义 ************************************************/
+#define OLED_CS_Port GPIOB
+#define OLED_CS_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define OLED_CS_Pin GPIO_PIN_0
+
 #define OLED_DC_Port GPIOF
 #define OLED_DC_Port_Clk_Enable() __HAL_RCC_GPIOF_CLK_ENABLE()
 #define OLED_DC_Pin GPIO_PIN_11
@@ -60,16 +64,19 @@
 #define OLED_CLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define OLED_CLK_Pin GPIO_PIN_2
 
-#define OLED_DC_Clr() HAL_GPIO_ReadPin(OLED_DC_Port, OLED_DC_Pin)
+#define OLED_CS_Clr() HAL_GPIO_WritePin(OLED_CS_Port, OLED_CS_Pin, GPIO_PIN_RESET)
+#define OLED_CS_Set() HAL_GPIO_WritePin(OLED_CS_Port, OLED_CS_Pin, GPIO_PIN_SET)
+
+#define OLED_DC_Clr() HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_RESET)
 #define OLED_DC_Set() HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_SET)
 
-#define OLED_RST_Clr() HAL_GPIO_ReadPin(OLED_RST_Port, OLED_RST_Pin)
+#define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
 #define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
 
-#define OLED_DIN_Clr() HAL_GPIO_ReadPin(OLED_DIN_Port, GPIO_PIN_2)
+#define OLED_DIN_Clr() HAL_GPIO_WritePin(OLED_DIN_Port, GPIO_PIN_2, GPIO_PIN_RESET)
 #define OLED_DIN_Set() HAL_GPIO_WritePin(OLED_DIN_Port, GPIO_PIN_2, GPIO_PIN_SET)
 
-#define OLED_CLK_Clr() HAL_GPIO_ReadPin(OLED_CLK_Port, GPIO_PIN_2)
+#define OLED_CLK_Clr() HAL_GPIO_WritePin(OLED_CLK_Port, GPIO_PIN_2, GPIO_PIN_RESET)
 #define OLED_CLK_Set() HAL_GPIO_WritePin(OLED_CLK_Port, GPIO_PIN_2, GPIO_PIN_SET)
 /*************************************************** OLED SPI 端口定义 ************************************************/
 #endif
