@@ -69,6 +69,8 @@ FreeRTOS/Src/queue.c \
 FreeRTOS/Src/list.c \
 Hardware/Src/led.c \
 Hardware/Src/oled.c \
+Hardware/Src/oledconf.c \
+Hardware/Src/oledio.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 

@@ -30,7 +30,7 @@ TaskHandle_t INTERRUPTTask_Handler;      //任务句柄
 void interrupt_task(void *pvParameters); //任务函数
 
 #define OLED_TASK_PRIO 4            //任务优先级
-#define OLED_STK_SIZE 128           //任务堆栈大小
+#define OLED_STK_SIZE 256           //任务堆栈大小
 TaskHandle_t OLEDTask_Handler;      //任务句柄
 void oled_task(void *pvParameters); //任务函数
 
@@ -54,11 +54,11 @@ int main(void)
   }
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
   delay_init(168);                    // 初始化延时函数
-  uart6_init(115200);                 // 初始化串口
-  TIM3_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
-  TIM4_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
   LED_Init();                         // 初始化LED
   OLED_Init();                        // 初始化OLED
+  uart6_init(115200);                 // 初始化串口
+  TIM3_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
+  // TIM4_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
 
   //创建开始任务
   xTaskCreate((TaskFunction_t)start_task,          //任务函数
@@ -115,9 +115,16 @@ void start_task(void *pvParameters)
 
 void oled_task(void *pvParameters)
 {
+  uint16_t test = 0;
   while (1)
   {
-    vTaskDelay(10);
+    taskENTER_CRITICAL();
+    printf("进入OLED任务\r\n");
+    OLED_SetIntegerNum(22, 34, test++, 3, 1, FONT_12X12);
+    OLED_ShowTask();
+    printf("OLED任务完成,等待退出\r\n");
+    taskEXIT_CRITICAL();
+    vTaskDelay(1000); // 1s
   }
 }
 
@@ -127,16 +134,16 @@ void interrupt_task(void *pvParameters)
   static u32 total_num = 0;
   while (1)
   {
-    total_num += 1;
-    if (total_num >= 5)
-    {
-      total_num = 0;
-      printf("关闭中断......\r\n");
-      portDISABLE_INTERRUPTS(); // 关闭中断
-      delay_xms(5000);          // 延时5s,不会引起任务调度，LED卡死
-      printf("打开中断......\r\n");
-      portENABLE_INTERRUPTS(); // 打开中断
-    }
+    // total_num += 1;
+    // if (total_num >= 5)
+    // {
+    //   total_num = 0;
+    //   printf("关闭中断......\r\n");
+    //   portDISABLE_INTERRUPTS(); // 关闭中断
+    //   delay_xms(5000);          // 延时5s,不会引起任务调度，LED卡死
+    //   printf("打开中断......\r\n");
+    //   portENABLE_INTERRUPTS(); // 打开中断
+    // }
     vTaskDelay(1000);
   }
 }
