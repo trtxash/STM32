@@ -49,7 +49,7 @@ int main(void)
   }
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
   delay_init(168);                // 初始化延时函数
-  uart6_init(115200);             // 初始化串口
+  uart_init(115200);             // 初始化串口
   TIM3_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
   TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
   LED_Init();                     // 初始化LED
