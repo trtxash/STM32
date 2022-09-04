@@ -56,9 +56,9 @@ int main(void)
   delay_init(168);                    // 初始化延时函数
   LED_Init();                         // 初始化LED
   OLED_Init();                        // 初始化OLED
-  uart6_init(115200);                 // 初始化串口
+  uart_init(115200);                  // 初始化串口
   TIM3_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
-  // TIM4_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
+  TIM4_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
 
   //创建开始任务
   xTaskCreate((TaskFunction_t)start_task,          //任务函数
@@ -134,16 +134,16 @@ void interrupt_task(void *pvParameters)
   static u32 total_num = 0;
   while (1)
   {
-    // total_num += 1;
-    // if (total_num >= 5)
-    // {
-    //   total_num = 0;
-    //   printf("关闭中断......\r\n");
-    //   portDISABLE_INTERRUPTS(); // 关闭中断
-    //   delay_xms(5000);          // 延时5s,不会引起任务调度，LED卡死
-    //   printf("打开中断......\r\n");
-    //   portENABLE_INTERRUPTS(); // 打开中断
-    // }
+    total_num += 1;
+    if (total_num >= 5)
+    {
+      total_num = 0;
+      printf("关闭中断......\r\n");
+      portDISABLE_INTERRUPTS(); // 关闭中断
+      delay_xms(5000);          // 延时5s,不会引起任务调度，LED卡死
+      printf("打开中断......\r\n");
+      portENABLE_INTERRUPTS(); // 打开中断
+    }
     vTaskDelay(1000);
   }
 }

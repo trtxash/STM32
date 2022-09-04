@@ -65,8 +65,8 @@ __attribute__((used)) int _write(int fd, char *ptr, int len)
 	int i;
 	for (i = 0; i < len; i++)
 	{
-		USART6->DR = ptr[i];
-		while ((USART6->SR & 0x40) == 0)
+		USART1->DR = ptr[i];
+		while ((USART1->SR & 0x40) == 0)
 			;
 	}
 	return len;

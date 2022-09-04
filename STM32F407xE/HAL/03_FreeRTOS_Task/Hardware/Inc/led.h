@@ -19,8 +19,8 @@
 #define LED1_GPIO_CLK_ENABLE() __HAL_RCC_GPIOF_CLK_ENABLE()
 
 /* GPIO PIN */
-#define LED0_PIN GPIO_PIN_9
-#define LED1_PIN GPIO_PIN_10
+#define LED0_PIN GPIO_PIN_6
+#define LED1_PIN GPIO_PIN_7
 
 void LED_Init(void);
 void LED0_Reverse(void);
