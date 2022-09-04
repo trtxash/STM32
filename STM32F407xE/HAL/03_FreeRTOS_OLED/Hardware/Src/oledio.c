@@ -116,7 +116,7 @@ void OledDrv_IICWriteByte(uint8_t data)
  */
 void OledDrv_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStructure;
+  GPIO_InitTypeDef GPIO_InitStructure = {0};
 
   /* GPIO时钟开启 */
   OLED_CS_Port_Clk_Enable();
@@ -125,32 +125,24 @@ void OledDrv_Init(void)
   OLED_DIN_Port_Clk_Enable();
   OLED_CLK_Port_Clk_Enable();
 
-  // GPIO_PINRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); //失能JTAG
-
-  GPIO_InitStructure.Mode = GPIO_MODE_AF_PP; //推挽输出
-  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //推挽输出
+  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStructure.Pull = GPIO_PULLUP;
 
   GPIO_InitStructure.Pin = OLED_CS_Pin;
   HAL_GPIO_Init(OLED_CS_Port, &GPIO_InitStructure);
-
   GPIO_InitStructure.Pin = OLED_DC_Pin;
   HAL_GPIO_Init(OLED_DC_Port, &GPIO_InitStructure);
-
   GPIO_InitStructure.Pin = OLED_RST_Pin;
   HAL_GPIO_Init(OLED_RST_Port, &GPIO_InitStructure);
-
   GPIO_InitStructure.Pin = OLED_DIN_Pin;
   HAL_GPIO_Init(OLED_DIN_Port, &GPIO_InitStructure);
-
   GPIO_InitStructure.Pin = OLED_CLK_Pin;
   HAL_GPIO_Init(OLED_CLK_Port, &GPIO_InitStructure);
 
   HAL_GPIO_WritePin(OLED_DIN_Port, OLED_DIN_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(OLED_CLK_Port, OLED_CLK_Pin, GPIO_PIN_SET);
-
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET);
-  delay_ms(1);
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET);
 }
 
