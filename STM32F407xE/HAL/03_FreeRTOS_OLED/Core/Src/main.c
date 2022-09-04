@@ -166,7 +166,7 @@ void led1_task(void *pvParameters)
     LED1_Reverse();
     vTaskDelay(200);
     LED1_Reverse();
-    vTaskDelay(800);
+    vTaskDelay(200);
   }
 }
 

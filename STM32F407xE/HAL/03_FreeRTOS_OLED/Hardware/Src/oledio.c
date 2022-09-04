@@ -41,16 +41,15 @@ void OledDrv_Init(void)
   OLED_SCLK_Port_Clk_Enable();
   OLED_SDIN_Port_Clk_Enable();
 
-  // GPIO_PINRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); //失能JTAG
-
-  GPIO_InitStructure.Mode = GPIO_MODE_AF_PP; //推挽输出
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //推挽输出
   GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStructure.Pin = OLED_SCLK_Pin;
   HAL_GPIO_Init(OLED_SCLK_Port, &GPIO_InitStructure);
-  HAL_GPIO_WritePin(OLED_SCLK_Port, OLED_SCLK_Pin, GPIO_PIN_SET);
 
   GPIO_InitStructure.Pin = OLED_SDIN_Pin;
   HAL_GPIO_Init(OLED_SDIN_Port, &GPIO_InitStructure);
+
+  HAL_GPIO_WritePin(OLED_SCLK_Port, OLED_SCLK_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(OLED_SDIN_Port, OLED_SDIN_Pin, GPIO_PIN_SET);
 }
 
@@ -143,6 +142,7 @@ void OledDrv_Init(void)
   HAL_GPIO_WritePin(OLED_DIN_Port, OLED_DIN_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(OLED_CLK_Port, OLED_CLK_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET);
+  delay_ms(1);
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET);
 }
 
@@ -155,7 +155,7 @@ void OledDrv_SPIWriteByte(uint8_t data)
 {
   char i = 8;
 
-  OLED_CS_Clr();
+  OLED_CLK_Clr();
 
   while (i--)
   {
@@ -169,27 +169,9 @@ void OledDrv_SPIWriteByte(uint8_t data)
     }
 
     OLED_CLK_Set();
+    OLED_CLK_Clr();
     data <<= 1;
   }
-  OLED_CS_Set();
-  OLED_DC_Set();
-  // OLED_CLK_Clr();
-
-  // while (i--)
-  // {
-  //   if (data & 0x80)
-  //   {
-  //     OLED_DIN_Set();
-  //   }
-  //   else
-  //   {
-  //     OLED_DIN_Clr();
-  //   }
-
-  //   OLED_CLK_Set();
-  //   OLED_CLK_Clr();
-  //   data <<= 1;
-  // }
 }
 
 #endif
