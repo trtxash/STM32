@@ -1,76 +1,28 @@
-/**
- **********************************************************************************************************************
- * @file    oled.h
- * @brief   该文件提供OLED驱动所有函数原型
- * @author  周鹏程    any question please send mail to const_zpc@163.com
- * @version V1.1.0
- * @date    2021-3-30
- **********************************************************************************************************************
- *
- **********************************************************************************************************************
- */
-
-/* Define to prevent recursive inclusion -----------------------------------------------------------------------------*/
 #ifndef __OLED_H
 #define __OLED_H
 
-/* Includes ----------------------------------------------------------------------------------------------------------*/
+#include "sys.h"
+#include "delay.h"
+#include "oledio.h"
 #include "oledconf.h"
-#include <stdint.h>
 
-/* Exported types ----------------------------------------------------------------------------------------------------*/
+#define OLED_CMD 0  //写命令
+#define OLED_DATA 1 //写数据
 
-typedef unsigned char oledsize_t;
-
-/**
- * @brief 画笔颜色
- */
-typedef enum
-{
-  OLED_BLACK = 0,
-  OLED_WHITE = 0xff,
-} eOledcolor;
-
-/* Exported constants ------------------------------------------------------------------------------------------------*/
-/* Exported macro ----------------------------------------------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------------------------------------------------*/
-
-/* OLED 初始化函数 ****************************************************************************************************/
-extern void OLED_Init(void);
-
-/* OLED 控制函数 ******************************************************************************************************/
-extern void OLED_DisplayOn(void);
-extern void OLED_DisplayOff(void);
-
-/* 画点/读点函数 ******************************************************************************************************/
-extern void OLED_DrawPoint(oledsize_t x, oledsize_t y, eOledcolor color);
-extern void OLED_DrawRoughPoint(oledsize_t x, oledsize_t y, eOledcolor color, uint8_t size);
-extern eOledcolor OLED_ReadPoint(oledsize_t x, oledsize_t y);
-
-/* OLED 清屏函数 ******************************************************************************************************/
-extern void OLED_Clear(uint8_t color);
-extern void OLED_SetFill(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high, eOledcolor color);
-
-/* 画面操作函数 *******************************************************************************************************/
-extern void OLED_SyncScreen(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high);
-extern void OLED_ShowTask(void);
-extern void OLED_SetScreenOffset(oledsize_t x, oledsize_t y, oledsize_t width, oledsize_t high, uint8_t dir, uint8_t pixels);
-extern void OLED_ReverseScreen(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high);
-
-/* 画图形函数 *********************************************************************************************************/
-extern void OLED_DrawLine(oledsize_t sx, oledsize_t sy, oledsize_t ex, oledsize_t ey, uint8_t size);
-extern void OLED_DrawRectangle(oledsize_t sx, oledsize_t sy, oledsize_t width, oledsize_t high, uint8_t size);
-extern void OLED_DrawCircle(oledsize_t x, oledsize_t y, oledsize_t radius, uint8_t size);
-extern void OLED_DrawGraphic(oledsize_t x, oledsize_t y, const char *pkszName, uint8_t size);
-
-/* 设置文本/数字函数 **************************************************************************************************/
-extern void OLED_SetColor(eOledcolor backColor, eOledcolor pointColor);
-extern void OLED_SetText(oledsize_t x, oledsize_t y, const char *pszStr, uint8_t isMultiLine, efontSize size);
-extern void OLED_SetIntegerNum(oledsize_t x, oledsize_t y, int32_t num, uint8_t len, uint8_t zero, efontSize size);
-extern void OLED_SetFloatNum(oledsize_t x, oledsize_t y, float num, uint8_t intLen, uint8_t decLen, uint8_t zero, efontSize size);
-
-/* 格式化输出函数 *****************************************************************************************************/
-extern void OLED_XYPrintf(oledsize_t x, oledsize_t y, uint8_t isMultiLine, efontSize size, const char *format, ...);
-extern void OLED_Printf(const char *format, ...);
+void OLED_WR_Byte(u8 dat, u8 mode);
+void OLED_DisPlay_On(void);
+void OLED_DisPlay_Off(void);
+void OLED_Refresh(void);
+void OLED_Clear(void);
+void OLED_DrawPoint(u8 x, u8 y, u8 t);
+void OLED_DrawLine(u8 x1, u8 y1, u8 x2, u8 y2, u8 mode);
+void OLED_DrawCircle(u8 x, u8 y, u8 r);
+void OLED_ShowChar(u8 x, u8 y, u8 chr, u8 size1, u8 mode);
+void OLED_ShowString(u8 x, u8 y, u8 *chr, u8 size1, u8 mode);
+void OLED_ShowNum(u8 x, u8 y, u32 num, u8 len, u8 size1, u8 mode);
+void OLED_ShowChinese(u8 x, u8 y, u8 num, u8 size1, u8 mode);
+void OLED_ScrollDisplay(u8 num, u8 space, u8 mode);
+void OLED_ShowPicture(u8 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode);
+void OLED_Init(void);
 
 #endif // __OLED_H

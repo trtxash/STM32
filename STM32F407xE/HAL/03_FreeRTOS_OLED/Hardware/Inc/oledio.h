@@ -1,21 +1,7 @@
-/**
- **********************************************************************************************************************
- * @file    oledio.h
- * @brief   该文件提供 OLED 驱动硬件接口所有函数原型
- * @author  周鹏程    any question please send mail to const_zpc@163.com
- * @version V1.0.0
- * @date    2021-3-12
- **********************************************************************************************************************
- *
- **********************************************************************************************************************
- */
-
-/* Define to prevent recursive inclusion -----------------------------------------------------------------------------*/
 #ifndef __OLEDIO_H
 #define __OLEDIO_H
 
 /* Includes ----------------------------------------------------------------------------------------------------------*/
-#include <stdint.h>
 #include "sys.h"
 #include "delay.h"
 
@@ -92,16 +78,16 @@
 /* Exported functions ------------------------------------------------------------------------------------------------*/
 
 /* 硬件初始化函数 *****************************************************************************************************/
-extern void OledDrv_Init(void);
+void OledDrv_Init(void);
 
 /* IIC 通信接口函数 ***************************************************************************************************/
-extern void OledDrv_IICDelay(void);
-extern void OledDrv_IICWaitAck(void);
-extern void OledDrv_IICStart(void);
-extern void OledDrv_IICStop(void);
-extern void OledDrv_IICWriteByte(uint8_t data);
+void OledDrv_IICDelay(void);
+void OledDrv_IICWaitAck(void);
+void OledDrv_IICStart(void);
+void OledDrv_IICStop(void);
+void OledDrv_IICWriteByte(uint8_t data);
 
 /* SPI 通信接口函数 ***************************************************************************************************/
-extern void OledDrv_SPIWriteByte(uint8_t data);
+void OledDrv_SPIWriteByte(uint8_t data);
 
 #endif // __OLEDIO_H

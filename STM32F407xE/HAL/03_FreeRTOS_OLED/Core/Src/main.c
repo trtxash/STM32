@@ -119,10 +119,10 @@ void oled_task(void *pvParameters)
   while (1)
   {
     taskENTER_CRITICAL();
-    printf("进入OLED任务\r\n");
-    OLED_SetIntegerNum(22, 34, test++, 3, 1, FONT_12X12);
-    OLED_ShowTask();
-    printf("OLED任务完成,等待退出\r\n");
+    // printf("进入OLED任务\r\n");
+    // OLED_ShowString(0, 0, "OK!", 12, 1);
+    // OLED_Refresh();
+    // printf("OLED任务完成,等待退出\r\n");
     taskEXIT_CRITICAL();
     vTaskDelay(1000); // 1s
   }

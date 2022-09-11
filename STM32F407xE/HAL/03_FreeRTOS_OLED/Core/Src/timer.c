@@ -741,6 +741,10 @@ void TIM3_IRQHandler(void)
     {
         u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
         printf("TIM3输出......\r\n");
+        printf("进入OLED任务\r\n");
+        OLED_ShowString(0, 0, "OK!", 12, 1);
+        OLED_Refresh();
+        printf("OLED任务完成,等待退出\r\n");
         taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区
         __HAL_TIM_CLEAR_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE); //清除更新标志
     }
