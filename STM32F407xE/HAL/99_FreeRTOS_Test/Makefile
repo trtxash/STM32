@@ -37,7 +37,6 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Core/Src/main.c \
-Core/Src/gpio.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
@@ -71,6 +70,7 @@ FreeRTOS/Src/stream_buffer.c \
 FreeRTOS/Src/tasks.c \
 FreeRTOS/Src/timers.c \
 Hardware/Src/led.c \
+Hardware/Src/gpiotest.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 

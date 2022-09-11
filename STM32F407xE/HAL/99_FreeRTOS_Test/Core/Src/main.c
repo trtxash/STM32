@@ -6,6 +6,7 @@
  * @date 	  2022年8月23号15点17分
  */
 #include "main.h"
+#include "gpiotest.h"
 
 #define Debug 1 // 控制Debug的一些相关函数
 
@@ -48,20 +49,27 @@ int main(void)
     Error_Handler();
   }
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
-  delay_init(168);                // 初始化延时函数
-  uart6_init(115200);             // 初始化串口
-  TIM3_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
-  TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
-  LED_Init();                     // 初始化LED
+  delay_init(168);                    // 初始化延时函数
+  GPIOTest_Init();
 
-  //创建开始任务
-  xTaskCreate((TaskFunction_t)start_task,          //任务函数
-              (const char *)"start_task",          //任务名称
-              (uint16_t)START_STK_SIZE,            //任务堆栈大小
-              (void *)NULL,                        //传递给任务函数的参数
-              (UBaseType_t)START_TASK_PRIO,        //任务优先级
-              (TaskHandle_t *)&StartTask_Handler); //任务句柄
-  vTaskStartScheduler();                           //开启任务调度
+  while (1)
+  {
+    GPIOpwmout();
+  }
+
+  // uart6_init(115200);             // 初始化串口
+  // TIM3_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
+  // TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
+  // LED_Init();                     // 初始化LED
+
+  // //创建开始任务
+  // xTaskCreate((TaskFunction_t)start_task,          //任务函数
+  //             (const char *)"start_task",          //任务名称
+  //             (uint16_t)START_STK_SIZE,            //任务堆栈大小
+  //             (void *)NULL,                        //传递给任务函数的参数
+  //             (UBaseType_t)START_TASK_PRIO,        //任务优先级
+  //             (TaskHandle_t *)&StartTask_Handler); //`
+  // vTaskStartScheduler();                           //开启任务调度
 }
 
 //开始任务任务函数
