@@ -22,7 +22,7 @@
 /* Exported macro ----------------------------------------------------------------------------------------------------*/
 
 /* OLED 驱动接口定义 */
-#define OLED_IIC_INTERFACE 0 // iic 接口
+#define OLED_IIC_INTERFACE 1 // iic 接口
 #define OLED_SPI_INTERFACE 1 // spi 接口
 #define _DRIVE_INTERFACE_TYPE OLED_SPI_INTERFACE
 
@@ -37,11 +37,18 @@
 #define OLED_SDIN_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define OLED_SDIN_Pin GPIO_PIN_5
 
+#define OLED_RST_Port GPIOB
+#define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define OLED_RST_Pin GPIO_PIN_1
+
 #define OLED_SCLK_Clr() HAL_GPIO_ReadPin(OLED_SCLK_Port, OLED_SCLK_Pin) // SCL IIC接口的时钟信号
 #define OLED_SCLK_Set() HAL_GPIO_WritePin(OLED_SCLK_Port, OLED_SCLK_Pin, GPIO_PIN_SET)
 
 #define OLED_SDIN_Clr() HAL_GPIO_ReadPin(OLED_SDIN_Port, OLED_SDIN_Pin) // SDA IIC接口的数据信号
 #define OLED_SDIN_Set() HAL_GPIO_WritePin(OLED_SDIN_Port, OLED_SDIN_Pin, GPIO_PIN_SET)
+
+#define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
+#define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
 /*************************************************** OLED IIC 端口定义 ************************************************/
 #else
 /*************************************************** OLED SPI 端口定义 ************************************************/
@@ -88,6 +95,8 @@
 extern void OledDrv_Init(void);
 
 /* IIC 通信接口函数 ***************************************************************************************************/
+extern void OledDrv_IICDelay(void);
+extern void OledDrv_IICWaitAck(void);
 extern void OledDrv_IICStart(void);
 extern void OledDrv_IICStop(void);
 extern void OledDrv_IICWriteByte(uint8_t data);

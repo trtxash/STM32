@@ -139,8 +139,11 @@ static void WriteCmd(uint8_t cmd)
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     OledDrv_IICStart();
     OledDrv_IICWriteByte(0x78); // Slave address,SA0=0
+    OledDrv_IICWaitAck();
     OledDrv_IICWriteByte(0x00); // write command
+    OledDrv_IICWaitAck();
     OledDrv_IICWriteByte(cmd);
+    OledDrv_IICWaitAck();
     OledDrv_IICStop();
 #else
     OLED_DC_Clr();
@@ -202,6 +205,7 @@ void OLED_Init(void)
     WriteCmd(0x14); //--set(0x10) disable
     WriteCmd(0xa4); // Disable Entire Display On (0xa4/0xa5)
     WriteCmd(0xa6); // Disable Inverse Display On (0xa6/a7)
+    OLED_Clear(OLED_WHITE);
     WriteCmd(0xaf); //--turn on oled panel
 }
 
@@ -398,8 +402,9 @@ void OLED_ShowTask(void)
     for (y = 0; y < sg_tOLedDevInfo.height / 8; y++)
     {
         WriteCmd(0xb0 + y); //设置页地址（0~7）
-        WriteCmd(0x02);     //设置显示位置—列低地址
-        WriteCmd(0x10);     //设置显示位置—列高地址
+        WriteCmd(0x00);     //设置显示位置—列低地址
+        // WriteCmd(0x02);
+        WriteCmd(0x10); //设置显示位置—列高地址
 
         for (x = 0; x < sg_tOLedDevInfo.width; x++)
         {
