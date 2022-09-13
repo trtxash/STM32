@@ -57,30 +57,40 @@ int main(void)
   LED_Init();                         // 初始化LED
   OLED_Init();                        // 初始化OLED
   uart_init(115200);                  // 初始化串口
-  TIM3_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
-  TIM4_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
+  // TIM3_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
+  // TIM4_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
 
-  //创建开始任务
-  xTaskCreate((TaskFunction_t)start_task,          //任务函数
-              (const char *)"start_task",          //任务名称
-              (uint16_t)START_STK_SIZE,            //任务堆栈大小
-              (void *)NULL,                        //传递给任务函数的参数
-              (UBaseType_t)START_TASK_PRIO,        //任务优先级
-              (TaskHandle_t *)&StartTask_Handler); //任务句柄
-  vTaskStartScheduler();                           //开启任务调度
+  while (1)
+  {
+    delay_ms(100);
+    LED1_Reverse();
+    printf("进入OLED任务\r\n");
+    OLED_ShowString(0, 0, "OK!", 12, 1);
+    OLED_Refresh();
+    printf("OLED任务完成,等待退出\r\n");
+  }
+
+  // //创建开始任务
+  // xTaskCreate((TaskFunction_t)start_task,          //任务函数
+  //             (const char *)"start_task",          //任务名称
+  //             (uint16_t)START_STK_SIZE,            //任务堆栈大小
+  //             (void *)NULL,                        //传递给任务函数的参数
+  //             (UBaseType_t)START_TASK_PRIO,        //任务优先级
+  //             (TaskHandle_t *)&StartTask_Handler); //任务句柄
+  // vTaskStartScheduler();                           //开启任务调度
 }
 
 //开始任务任务函数
 void start_task(void *pvParameters)
 {
   taskENTER_CRITICAL(); //进入临界区
-  //创建interrupt任务
-  xTaskCreate((TaskFunction_t)interrupt_task,
-              (const char *)"interrupt_task",
-              (uint16_t)INTERRUPT_STK_SIZE,
-              (void *)NULL,
-              (UBaseType_t)INTERRUPT_TASK_PRIO,
-              (TaskHandle_t *)&INTERRUPTTask_Handler);
+  // //创建interrupt任务
+  // xTaskCreate((TaskFunction_t)interrupt_task,
+  //             (const char *)"interrupt_task",
+  //             (uint16_t)INTERRUPT_STK_SIZE,
+  //             (void *)NULL,
+  //             (UBaseType_t)INTERRUPT_TASK_PRIO,
+  //             (TaskHandle_t *)&INTERRUPTTask_Handler);
   //创建LED0任务
   xTaskCreate((TaskFunction_t)led0_task,
               (const char *)"led0_task",
@@ -119,12 +129,12 @@ void oled_task(void *pvParameters)
   while (1)
   {
     taskENTER_CRITICAL();
-    // printf("进入OLED任务\r\n");
-    // OLED_ShowString(0, 0, "OK!", 12, 1);
-    // OLED_Refresh();
-    // printf("OLED任务完成,等待退出\r\n");
+    printf("进入OLED任务\r\n");
+    OLED_ShowString(0, 0, "OK!", 12, 1);
+    OLED_Refresh();
+    printf("OLED任务完成,等待退出\r\n");
     taskEXIT_CRITICAL();
-    vTaskDelay(1000); // 1s
+    vTaskDelay(100); // 0.1s
   }
 }
 

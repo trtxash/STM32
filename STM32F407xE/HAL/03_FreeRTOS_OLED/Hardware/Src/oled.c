@@ -8,18 +8,18 @@ static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布
 void OLED_WR_Byte(u8 dat, u8 mode)
 {
     OledDrv_IICStart();
-    OledDrv_IICWriteByte(0x78);
+    OledDrv_IICSendByte(0x78);
     OledDrv_IICWaitAck();
     if (mode)
     {
-        OledDrv_IICWriteByte(0x40);
+        OledDrv_IICSendByte(0x40);
     }
     else
     {
-        OledDrv_IICWriteByte(0x00);
+        OledDrv_IICSendByte(0x00);
     }
     OledDrv_IICWaitAck();
-    OledDrv_IICWriteByte(dat);
+    OledDrv_IICSendByte(dat);
     OledDrv_IICWaitAck();
     OledDrv_IICStop();
 }
@@ -50,13 +50,13 @@ void OLED_Refresh(void)
         OLED_WR_Byte(0x00, OLED_CMD);     //设置低列起始地址
         OLED_WR_Byte(0x10, OLED_CMD);     //设置高列起始地址
         OledDrv_IICStart();
-        OledDrv_IICWriteByte(0x78);
+        OledDrv_IICSendByte(0x78);
         OledDrv_IICWaitAck();
-        OledDrv_IICWriteByte(0x40);
+        OledDrv_IICSendByte(0x40);
         OledDrv_IICWaitAck();
         for (n = 0; n < 128; n++)
         {
-            OledDrv_IICWriteByte(OLED_GRAM[n][i]);
+            OledDrv_IICSendByte(OLED_GRAM[n][i]);
             OledDrv_IICWaitAck();
         }
         OledDrv_IICStop();
@@ -409,7 +409,7 @@ void OLED_ShowPicture(u8 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode)
                 y0 = y0 + 8;
             }
             y = y0;
-        }
+        } 
     }
 }
 
