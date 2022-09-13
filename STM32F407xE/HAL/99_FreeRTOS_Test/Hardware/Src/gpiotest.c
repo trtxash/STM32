@@ -32,7 +32,7 @@ void GPIOTest_Init()
 
     HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = ~(GPIO_PIN_13 | GPIO_PIN_14);
+    GPIO_InitStruct.Pin = ~(GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15);
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
@@ -40,11 +40,13 @@ void GPIOTest_Init()
 void GPIOpwmout(void)
 {
     delay_us(delay_time);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_All));
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_All));
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_All));
-    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_All));
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_All));
-    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_All));
-    HAL_GPIO_WritePin(GPIOG, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_All));
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_All & ~(GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15), !HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0));
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0));
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0));
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_0));
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_0));
+    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_0));
+    HAL_GPIO_WritePin(GPIOG, GPIO_PIN_All, !HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_0));
 }
+
+// PD0 PB12 PE2 PC5 PB1 PF13 PE9 PE12 PE13 
