@@ -10,6 +10,9 @@
  */
 #include "timer.h"
 
+u8 fps;
+u8 fps_num;
+
 TIM_HandleTypeDef TIM1_Handler;     //定时器1句柄
 TIM_OC_InitTypeDef TIM1_CHxHandler; //定时器1通道句柄，4路
 TIM_HandleTypeDef TIM2_Handler;     //定时器2句柄
@@ -236,13 +239,13 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
     else if (htim->Instance == TIM3)
     {
         __HAL_RCC_TIM3_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM3_IRQn, 4, 0);
+        HAL_NVIC_SetPriority(TIM3_IRQn, 3, 0);
         HAL_NVIC_EnableIRQ(TIM3_IRQn);
     }
     else if (htim->Instance == TIM4)
     {
         __HAL_RCC_TIM4_CLK_ENABLE();
-        HAL_NVIC_SetPriority(TIM4_IRQn, 5, 0);
+        HAL_NVIC_SetPriority(TIM4_IRQn, 4, 0);
         HAL_NVIC_EnableIRQ(TIM4_IRQn);
     }
     else if (htim->Instance == TIM5)
@@ -739,13 +742,15 @@ void TIM3_IRQHandler(void)
 {
     if (__HAL_TIM_GET_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE))
     {
-        u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
-        printf("TIM3输出......\r\n");
-        printf("进入OLED任务\r\n");
-        OLED_ShowString(0, 0, "OK!", 12, 1);
+        fps_num++;
         OLED_Refresh();
-        printf("OLED任务完成,等待退出\r\n");
-        taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区
+        // u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
+        // printf("TIM3输出......\r\n");
+        // printf("进入OLED任务\r\n");
+        // OLED_ShowString(0, 0, "OK!", 12, 1);
+        // OLED_Refresh();
+        // printf("OLED任务完成,等待退出\r\n");
+        // taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区
         __HAL_TIM_CLEAR_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE); //清除更新标志
     }
 }
@@ -754,9 +759,15 @@ void TIM4_IRQHandler(void)
 {
     if (__HAL_TIM_GET_FLAG(&TIM4_Handler, TIM_FLAG_UPDATE))
     {
-        u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
-        printf("TIM4输出......\r\n");
-        taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区
+        u8 temp[] = {0};
+
+        fps = fps_num;
+        fps_num = 0;
+        sprintf(temp, "%3dfps", fps);
+        OLED_ShowString(92, 0, temp, 8, 1);
+        // u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
+        // printf("TIM4输出......\r\n");
+        // taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区
         __HAL_TIM_CLEAR_FLAG(&TIM4_Handler, TIM_FLAG_UPDATE); //清除更新标志
     }
 }

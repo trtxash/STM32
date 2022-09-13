@@ -16,7 +16,7 @@
 #include "stdio.h"
 #include "usart.h"
 #include "task.h"
-// #include "oled.h"
+#include "oled.h"
 // #include "bspencoder.h"
 // #include "pid.h"
 // #include "infraredtobe.h"

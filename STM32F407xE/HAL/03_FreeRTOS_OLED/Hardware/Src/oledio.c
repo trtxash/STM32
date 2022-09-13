@@ -35,13 +35,17 @@ void OledDrv_Init(void)
  * @brief      IIC延时.
  * @retval     None.
  */
+#pragma GCC push_options // 防止GCC优化掉延时函数
+#pragma GCC optimize("O0")
 void OledDrv_IICDelay(void)
 {
-  u8 t = 10;
+  u8 t = OledDrv_IICDelay_Time;
+
   while (t--)
   {
   }
 }
+#pragma GCC pop_options
 
 /**
  * @brief      IIC 通信开始.
