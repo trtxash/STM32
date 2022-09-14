@@ -4,7 +4,6 @@
 /* OLED 驱动接口定义 */
 #define OLED_IIC_INTERFACE 1 // iic 接口
 #define OLED_SPI_INTERFACE 1 // spi 接口
-#define _DRIVE_INTERFACE_TYPE OLED_SPI_INTERFACE
 
 /**
  * @brief  OLED 的宽度和高度
