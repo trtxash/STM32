@@ -153,7 +153,7 @@ void OledDrv_Init(void)
   HAL_GPIO_WritePin(OLED_CLK_Port, OLED_CLK_Pin, GPIO_PIN_SET);
 
   OLED_RST_Clr();
-  delay_ms(200);
+  delay_ms(100);
   OLED_RST_Set();
 }
 

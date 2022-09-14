@@ -7,6 +7,7 @@ static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布
 // mode:数据/命令标志 0,表示命令;1,表示数据;
 void OLED_WR_Byte(u8 dat, u8 mode)
 {
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     OledDrv_IICStart();
     OledDrv_IICSendByte(0x78);
     OledDrv_IICWaitAck();
@@ -22,6 +23,17 @@ void OLED_WR_Byte(u8 dat, u8 mode)
     OledDrv_IICSendByte(dat);
     OledDrv_IICWaitAck();
     OledDrv_IICStop();
+#else
+    if (mode)
+    {
+        OLED_DC_Set();
+    }
+    else
+    {
+        OLED_DC_Clr();
+    }
+    OledDrv_SPIWriteByte(dat);
+#endif
 }
 
 //开启OLED显示
@@ -49,6 +61,7 @@ void OLED_Refresh(void)
         OLED_WR_Byte(0xb0 + i, OLED_CMD); //设置行起始地址
         OLED_WR_Byte(0x00, OLED_CMD);     //设置低列起始地址
         OLED_WR_Byte(0x10, OLED_CMD);     //设置高列起始地址
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
         OledDrv_IICStart();
         OledDrv_IICSendByte(0x78);
         OledDrv_IICWaitAck();
@@ -60,6 +73,10 @@ void OLED_Refresh(void)
             OledDrv_IICWaitAck();
         }
         OledDrv_IICStop();
+#else
+        for (n = 0; n < 128; n++)
+            OLED_WR_Byte(OLED_GRAM[n][i], OLED_DATA);
+#endif
     }
 }
 //清屏函数
@@ -409,7 +426,7 @@ void OLED_ShowPicture(u8 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode)
                 y0 = y0 + 8;
             }
             y = y0;
-        } 
+        }
     }
 }
 
