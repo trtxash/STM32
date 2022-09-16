@@ -5,6 +5,14 @@
 #include "sys.h"
 #include "oledconf.h"
 
+#if _SOFT_OR_HARE == OLED_HARD
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+#include "i2c.h"
+#else
+#endif
+#endif
+
+#if _SOFT_OR_HARE == OLED_SOFT // 是否软件模拟
 /* Exported constants ------------------------------------------------------------------------------------------------*/
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
 /*************************************************** OLED IIC 端口定义 ************************************************/
@@ -82,5 +90,25 @@ void OledDrv_IICSendByte(uint8_t data);
 
 /* SPI 通信接口函数 ***************************************************************************************************/
 void OledDrv_SPIWriteByte(uint8_t data);
+
+#else // 硬件
+
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE // 是否IIC
+
+#define OLED_RST_Port GPIOB
+#define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define OLED_RST_Pin GPIO_PIN_0
+
+#define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
+#define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
+
+#else // SPI
+
+#endif
+
+/* 硬件初始化函数 *****************************************************************************************************/
+void OledDrv_Init(void);
+
+#endif
 
 #endif // __OLEDIO_H

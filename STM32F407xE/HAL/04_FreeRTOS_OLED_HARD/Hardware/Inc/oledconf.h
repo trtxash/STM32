@@ -5,7 +5,15 @@
 #define OLED_IIC_INTERFACE 0 // iic 接口
 #define OLED_SPI_INTERFACE 1 // spi 接口
 
-#define _DRIVE_INTERFACE_TYPE OLED_IIC_INTERFACE // 改这个
+#define OLED_SOFT 0 // 软件模拟通信
+#define OLED_HARD 1 // 硬件通信
+
+/* OLED 具体选择 */
+#define _DRIVE_INTERFACE_TYPE OLED_IIC_INTERFACE // 改接口类型
+#define _SOFT_OR_HARE OLED_HARD                  // 改是否模拟
+
+/* OLED 的通信地址 */
+#define OLED_ADDRESS 0x78
 
 /* OLED 的宽度和高度 */
 #define OLED_WIDTH 128
