@@ -10,8 +10,8 @@
 // IIC最大157fps，延时TIM3_Init(64 - 1, 8400 - 1);
 // SPI最大250fps，延时TIM3_Init(20 - 1, 8400 - 1);
 // 硬件，未优化
-// IIC最大10fps，延时TIM3_Init(500 - 1, 8400 - 1);垃圾
-// 
+// IIC最大10fps，延时TIM3_Init(500 - 1, 8400 - 1);
+//
 #include "main.h"
 
 #define Debug 1 // 控制Debug的一些相关函数
@@ -48,11 +48,12 @@ int main(void)
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
   delay_init(168);                    // 初始化延时函数
   LED_Init();                         // 初始化LED
-  MX_I2C1_Init();                     // 初始化i2c接口
-  OLED_Init();                        // 初始化OLED
-  uart_init(115200);                  // 初始化串口
-  TIM3_Init(500 - 1, 8400 - 1);        // 定时器3初始化
-  TIM4_Init(10000 - 1, 8400 - 1);     // 定时器3初始化，周期1s
+  // MX_I2C1_Init();                     // 初始化i2c接口
+  MX_SPI1_Init();
+  OLED_Init();                    // 初始化OLED
+  uart_init(115200);              // 初始化串口
+  TIM3_Init(500 - 1, 8400 - 1);   // 定时器3初始化
+  TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
 
   //创建开始任务
   xTaskCreate((TaskFunction_t)start_task,          //任务函数
