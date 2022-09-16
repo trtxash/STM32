@@ -56,13 +56,13 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
 Core/Src/system_stm32f4xx.c \
 User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
 Core/Src/timer.c \
-Core/Src/i2c.c \
+Core/Src/spi.c \
 FreeRTOS/portable/Src/port.c \
 FreeRTOS/portable/MemMang/Src/heap_4.c \
 FreeRTOS/Src/tasks.c \

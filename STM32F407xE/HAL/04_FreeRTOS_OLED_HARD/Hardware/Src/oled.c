@@ -520,15 +520,10 @@ void OLED_Refresh(void)
         OLED_WR_Byte(0x00, OLED_CMD);     //设置低列起始地址
         OLED_WR_Byte(0x10, OLED_CMD);     //设置高列起始地址
 
-#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
         for (n = 0; n < 128; n++)
         {
             OLED_WR_Byte(OLED_GRAM[n][i], OLED_DATA);
         }
-#else
-        for (n = 0; n < 128; n++)
-            OLED_WR_Byte(OLED_GRAM[n][i], OLED_DATA);
-#endif
     }
 }
 //清屏函数

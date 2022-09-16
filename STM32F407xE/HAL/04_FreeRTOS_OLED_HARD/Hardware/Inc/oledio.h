@@ -9,6 +9,7 @@
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
 #include "i2c.h"
 #else
+#include "spi.h"
 #endif
 #endif
 
@@ -103,6 +104,29 @@ void OledDrv_SPIWriteByte(uint8_t data);
 #define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
 
 #else // SPI
+
+#define OLED_CS_Port GPIOB
+#define OLED_CS_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define OLED_CS_Pin GPIO_PIN_0
+
+#define OLED_DC_Port GPIOF
+#define OLED_DC_Port_Clk_Enable() __HAL_RCC_GPIOF_CLK_ENABLE()
+#define OLED_DC_Pin GPIO_PIN_11
+
+#define OLED_RST_Port GPIOB
+#define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define OLED_RST_Pin GPIO_PIN_1
+
+#define OLED_CS_Clr() HAL_GPIO_WritePin(OLED_CS_Port, OLED_CS_Pin, GPIO_PIN_RESET)
+#define OLED_CS_Set() HAL_GPIO_WritePin(OLED_CS_Port, OLED_CS_Pin, GPIO_PIN_SET)
+
+#define OLED_DC_Clr() HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_RESET)
+#define OLED_DC_Set() HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_SET)
+
+#define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
+#define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
+
+void OledDrv_SPIWriteByte(uint8_t data);
 
 #endif
 

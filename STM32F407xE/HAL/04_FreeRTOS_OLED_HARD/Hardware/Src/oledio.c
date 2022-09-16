@@ -215,90 +215,6 @@ void OledDrv_Init(void)
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET);
 }
 
-// /**
-//  * @brief      IIC延时.
-//  * @retval     None.
-//  */
-// #pragma GCC push_options // 防止GCC优化掉延时函数
-// #pragma GCC optimize("O0")
-// void OledDrv_IICDelay(void)
-// {
-//   u8 t = OledDrv_IICDelay_Time;
-
-//   while (t--)
-//   {
-//   }
-// }
-// #pragma GCC pop_options
-
-// /**
-//  * @brief      IIC 通信开始.
-//  * @retval     None.
-//  */
-// void OledDrv_IICStart(void)
-// {
-//   OLED_SDIN_Set();
-//   OLED_SCLK_Set();
-//   OledDrv_IICDelay();
-//   OLED_SDIN_Clr();
-//   OledDrv_IICDelay();
-//   OLED_SCLK_Clr();
-//   OledDrv_IICDelay();
-// }
-
-// /**
-//  * @brief      IIC 通信停止.
-//  * @retval     None.
-//  */
-// void OledDrv_IICStop(void)
-// {
-//   OLED_SDIN_Clr();
-//   OLED_SCLK_Clr();
-//   OledDrv_IICDelay();
-//   OLED_SDIN_Set();
-// }
-
-// /**
-//  * @brief      IIC 等待信号响应.
-//  * @retval     None.
-//  */
-// void OledDrv_IICWaitAck(void)
-// {
-//   OLED_SDIN_Set();
-//   OledDrv_IICDelay();
-//   OLED_SCLK_Set();
-//   OledDrv_IICDelay();
-//   OLED_SCLK_Clr();
-//   OledDrv_IICDelay();
-// }
-
-// /**
-//  * @brief      IIC 写以一个字节.
-//  * @param[in]  data  字节数据.
-//  * @retval     None.
-//  */
-// void OledDrv_IICSendByte(uint8_t data)
-// {
-//   u8 i;
-
-//   for (i = 0; i < 8; i++)
-//   {
-//     if (data & 0x80)
-//     {
-//       OLED_SDIN_Set();
-//     }
-//     else
-//     {
-//       OLED_SDIN_Clr();
-//     }
-//     OledDrv_IICDelay();
-//     OLED_SCLK_Set();
-//     OledDrv_IICDelay();
-//     OLED_SCLK_Clr();
-//     data <<= 1;
-//   }
-// }
-
 #else
 
 /**
@@ -313,8 +229,6 @@ void OledDrv_Init(void)
   OLED_CS_Port_Clk_Enable();
   OLED_DC_Port_Clk_Enable();
   OLED_RST_Port_Clk_Enable();
-  OLED_DIN_Port_Clk_Enable();
-  OLED_CLK_Port_Clk_Enable();
 
   GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //推挽输出
   GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -326,15 +240,9 @@ void OledDrv_Init(void)
   HAL_GPIO_Init(OLED_DC_Port, &GPIO_InitStructure);
   GPIO_InitStructure.Pin = OLED_RST_Pin;
   HAL_GPIO_Init(OLED_RST_Port, &GPIO_InitStructure);
-  GPIO_InitStructure.Pin = OLED_DIN_Pin;
-  HAL_GPIO_Init(OLED_DIN_Port, &GPIO_InitStructure);
-  GPIO_InitStructure.Pin = OLED_CLK_Pin;
-  HAL_GPIO_Init(OLED_CLK_Port, &GPIO_InitStructure);
 
   HAL_GPIO_WritePin(OLED_CS_Port, OLED_CS_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(OLED_CLK_Port, OLED_CLK_Pin, GPIO_PIN_SET);
 
   OLED_RST_Clr();
   delay_ms(100);
@@ -351,21 +259,7 @@ void OledDrv_SPIWriteByte(uint8_t data)
   char i = 8;
 
   OLED_CS_Clr();
-
-  while (i--)
-  {
-    OLED_CLK_Clr();
-    if (data & 0x80)
-    {
-      OLED_DIN_Set();
-    }
-    else
-    {
-      OLED_DIN_Clr();
-    }
-    OLED_CLK_Set();
-    data <<= 1;
-  }
+  HAL_SPI_Transmit(&hspi1, &data, 1, 100);
   OLED_CS_Set();
   OLED_DC_Set();
 }

@@ -418,7 +418,7 @@ void TIM4_IRQHandler(void)
 
         fps = fps_num;
         fps_num = 0;
-        sprintf(temp, "%3dfps", fps);
+        sprintf(temp, "%dfps", fps);
         OLED_ShowString(92, 0, temp, 8, 1);
         // u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
         // printf("TIM4输出......\r\n");
