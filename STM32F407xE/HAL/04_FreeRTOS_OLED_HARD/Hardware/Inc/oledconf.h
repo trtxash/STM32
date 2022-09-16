@@ -5,7 +5,7 @@
 #define OLED_IIC_INTERFACE 0 // iic 接口
 #define OLED_SPI_INTERFACE 1 // spi 接口
 
-#define _DRIVE_INTERFACE_TYPE OLED_SPI_INTERFACE // 改这个
+#define _DRIVE_INTERFACE_TYPE OLED_IIC_INTERFACE // 改这个
 
 /* OLED 的宽度和高度 */
 #define OLED_WIDTH 128

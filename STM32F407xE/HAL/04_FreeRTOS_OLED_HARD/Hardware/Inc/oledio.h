@@ -8,17 +8,17 @@
 /* Exported constants ------------------------------------------------------------------------------------------------*/
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
 /*************************************************** OLED IIC 端口定义 ************************************************/
-#define OLED_SCLK_Port GPIOG
-#define OLED_SCLK_Port_Clk_Enable() __HAL_RCC_GPIOG_CLK_ENABLE()
-#define OLED_SCLK_Pin GPIO_PIN_13
+#define OLED_SCLK_Port GPIOB
+#define OLED_SCLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define OLED_SCLK_Pin GPIO_PIN_6
 
-#define OLED_SDIN_Port GPIOG
-#define OLED_SDIN_Port_Clk_Enable() __HAL_RCC_GPIOG_CLK_ENABLE()
-#define OLED_SDIN_Pin GPIO_PIN_14
+#define OLED_SDIN_Port GPIOB
+#define OLED_SDIN_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define OLED_SDIN_Pin GPIO_PIN_7
 
-#define OLED_RST_Port GPIOG
-#define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOG_CLK_ENABLE()
-#define OLED_RST_Pin GPIO_PIN_15
+#define OLED_RST_Port GPIOB
+#define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define OLED_RST_Pin GPIO_PIN_0
 
 #define OLED_SCLK_Clr() HAL_GPIO_WritePin(OLED_SCLK_Port, OLED_SCLK_Pin, GPIO_PIN_RESET) // SCL IIC接口的时钟信号
 #define OLED_SCLK_Set() HAL_GPIO_WritePin(OLED_SCLK_Port, OLED_SCLK_Pin, GPIO_PIN_SET)
