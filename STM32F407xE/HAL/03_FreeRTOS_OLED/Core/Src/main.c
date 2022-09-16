@@ -3,7 +3,7 @@
  * @brief 	移植FreeRTOS和OLED
  * @author 	TRTX-gamer
  * @version 1.00
- * @date 	  2022年8月23号15点17分
+ * @date 	  2022年9月16号18点21分
  */
 
 // 软件模拟，未优化
