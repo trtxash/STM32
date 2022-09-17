@@ -26,6 +26,8 @@ void OLED_WR_Byte(u8 dat, u8 mode)
     OledDrv_IICWaitAck();
     OledDrv_IICStop();
 #else
+    char i = 8;
+
     if (mode)
     {
         OLED_DC_Set();
@@ -34,7 +36,25 @@ void OLED_WR_Byte(u8 dat, u8 mode)
     {
         OLED_DC_Clr();
     }
-    OledDrv_SPIWriteByte(dat);
+
+    OLED_CS_Clr();
+
+    while (i--)
+    {
+        OLED_CLK_Clr();
+        if (dat & 0x80)
+        {
+            OLED_DIN_Set();
+        }
+        else
+        {
+            OLED_DIN_Clr();
+        }
+        OLED_CLK_Set();
+        dat <<= 1;
+    }
+    OLED_CS_Set();
+    OLED_DC_Set();
 #endif
 }
 
@@ -525,7 +545,11 @@ void OLED_Refresh(void)
 
         for (n = 0; n < 128; n++)
         {
-            OLED_WR_Byte(OLED_GRAM[n][i], OLED_DATA);
+            OLED_DC_Set();
+            OLED_CS_Clr();
+            HAL_SPI_Transmit(&hspi1, &OLED_GRAM[n][i], 1, 100);
+            OLED_CS_Set();
+            OLED_DC_Set();
         }
     }
 }

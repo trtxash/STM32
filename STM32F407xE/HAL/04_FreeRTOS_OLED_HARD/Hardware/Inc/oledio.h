@@ -29,11 +29,11 @@
 #define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define OLED_RST_Pin GPIO_PIN_0
 
-#define OLED_SCLK_Clr() HAL_GPIO_WritePin(OLED_SCLK_Port, OLED_SCLK_Pin, GPIO_PIN_RESET) // SCL IIC接口的时钟信号
-#define OLED_SCLK_Set() HAL_GPIO_WritePin(OLED_SCLK_Port, OLED_SCLK_Pin, GPIO_PIN_SET)
+#define OLED_SCLK_Clr() OLED_SCLK_Port->BSRR = (uint32_t)OLED_SCLK_Pin << 16U
+#define OLED_SCLK_Set() OLED_SCLK_Port->BSRR = OLED_SCLK_Pin
 
-#define OLED_SDIN_Clr() HAL_GPIO_WritePin(OLED_SDIN_Port, OLED_SDIN_Pin, GPIO_PIN_RESET) // SDA IIC接口的数据信号
-#define OLED_SDIN_Set() HAL_GPIO_WritePin(OLED_SDIN_Port, OLED_SDIN_Pin, GPIO_PIN_SET)
+#define OLED_SDIN_Clr() OLED_SDIN_Port->BSRR = (uint32_t)OLED_SDIN_Pin << 16U
+#define OLED_SDIN_Set() OLED_SDIN_Port->BSRR = OLED_SDIN_Pin
 
 #define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
 #define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
@@ -52,13 +52,13 @@
 #define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define OLED_RST_Pin GPIO_PIN_1
 
-#define OLED_DIN_Port GPIOC
-#define OLED_DIN_Port_Clk_Enable() __HAL_RCC_GPIOC_CLK_ENABLE()
-#define OLED_DIN_Pin GPIO_PIN_2
+#define OLED_DIN_Port GPIOA
+#define OLED_DIN_Port_Clk_Enable() __HAL_RCC_GPIOA_CLK_ENABLE()
+#define OLED_DIN_Pin GPIO_PIN_7
 
-#define OLED_CLK_Port GPIOB
-#define OLED_CLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define OLED_CLK_Pin GPIO_PIN_2
+#define OLED_CLK_Port GPIOA
+#define OLED_CLK_Port_Clk_Enable() __HAL_RCC_GPIOA_CLK_ENABLE()
+#define OLED_CLK_Pin GPIO_PIN_5
 
 #define OLED_CS_Clr() OLED_CS_Port->BSRR = (uint32_t)OLED_CS_Pin << 16U
 #define OLED_CS_Set() OLED_CS_Port->BSRR = OLED_CS_Pin
@@ -69,11 +69,11 @@
 #define OLED_RST_Clr() OLED_RST_Port->BSRR = (uint32_t)OLED_RST_Pin << 16U
 #define OLED_RST_Set() OLED_RST_Port->BSRR = OLED_RST_Pin
 
-#define OLED_DIN_Clr() HAL_GPIO_WritePin(OLED_DIN_Port, GPIO_PIN_2, GPIO_PIN_RESET)
-#define OLED_DIN_Set() HAL_GPIO_WritePin(OLED_DIN_Port, GPIO_PIN_2, GPIO_PIN_SET)
+#define OLED_DIN_Clr() OLED_DIN_Port->BSRR = (uint32_t)OLED_DIN_Pin << 16U
+#define OLED_DIN_Set() OLED_DIN_Port->BSRR = OLED_DIN_Pin
 
-#define OLED_CLK_Clr() HAL_GPIO_WritePin(OLED_CLK_Port, GPIO_PIN_2, GPIO_PIN_RESET)
-#define OLED_CLK_Set() HAL_GPIO_WritePin(OLED_CLK_Port, GPIO_PIN_2, GPIO_PIN_SET)
+#define OLED_CLK_Clr() OLED_CLK_Port->BSRR = (uint32_t)OLED_CLK_Pin << 16U
+#define OLED_CLK_Set() OLED_CLK_Port->BSRR = OLED_CLK_Pin
 /*************************************************** OLED SPI 端口定义 ************************************************/
 #endif
 
@@ -88,9 +88,6 @@ void OledDrv_IICWaitAck(void);
 void OledDrv_IICStart(void);
 void OledDrv_IICStop(void);
 void OledDrv_IICSendByte(uint8_t data);
-
-/* SPI 通信接口函数 ***************************************************************************************************/
-void OledDrv_SPIWriteByte(uint8_t data);
 
 #else // 硬件
 

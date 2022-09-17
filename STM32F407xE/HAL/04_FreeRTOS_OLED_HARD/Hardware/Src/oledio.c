@@ -135,7 +135,7 @@ void OledDrv_Init(void)
   OLED_CLK_Port_Clk_Enable();
 
   GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //推挽输出
-  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStructure.Pull = GPIO_PULLUP;
 
   GPIO_InitStructure.Pin = OLED_CS_Pin;
@@ -157,35 +157,6 @@ void OledDrv_Init(void)
   OLED_RST_Clr();
   delay_ms(100);
   OLED_RST_Set();
-}
-
-/**
- * @brief      SPI 写以一个字节.
- * @param[in]  data  字节数据.
- * @retval     None.
- */
-void OledDrv_SPIWriteByte(uint8_t data)
-{
-  char i = 8;
-
-  OLED_CS_Clr();
-
-  while (i--)
-  {
-    OLED_CLK_Clr();
-    if (data & 0x80)
-    {
-      OLED_DIN_Set();
-    }
-    else
-    {
-      OLED_DIN_Clr();
-    }
-    OLED_CLK_Set();
-    data <<= 1;
-  }
-  OLED_CS_Set();
-  OLED_DC_Set();
 }
 
 #endif
