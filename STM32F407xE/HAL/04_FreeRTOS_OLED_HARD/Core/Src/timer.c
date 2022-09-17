@@ -10,8 +10,8 @@
  */
 #include "timer.h"
 
-u8 fps;
-u8 fps_num;
+u32 fps;
+u32 fps_num;
 
 TIM_HandleTypeDef TIM1_Handler;     //定时器1句柄
 TIM_OC_InitTypeDef TIM1_CHxHandler; //定时器1通道句柄，4路
@@ -414,7 +414,7 @@ void TIM4_IRQHandler(void)
 {
     if (__HAL_TIM_GET_FLAG(&TIM4_Handler, TIM_FLAG_UPDATE))
     {
-        u8 temp[] = {0};
+        u8 temp[32] = {0};
 
         fps = fps_num;
         fps_num = 0;

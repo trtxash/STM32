@@ -9,7 +9,7 @@
 #define OLED_HARD 1 // 硬件通信
 
 /* OLED 具体选择 */
-#define _DRIVE_INTERFACE_TYPE OLED_SPI_INTERFACE // 改接口类型
+#define _DRIVE_INTERFACE_TYPE OLED_IIC_INTERFACE // 改接口类型
 #define _SOFT_OR_HARE OLED_HARD                  // 改是否模拟
 
 /* OLED 的通信地址 */

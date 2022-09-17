@@ -60,14 +60,14 @@
 #define OLED_CLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define OLED_CLK_Pin GPIO_PIN_2
 
-#define OLED_CS_Clr() HAL_GPIO_WritePin(OLED_CS_Port, OLED_CS_Pin, GPIO_PIN_RESET)
-#define OLED_CS_Set() HAL_GPIO_WritePin(OLED_CS_Port, OLED_CS_Pin, GPIO_PIN_SET)
+#define OLED_CS_Clr() OLED_CS_Port->BSRR = (uint32_t)OLED_CS_Pin << 16U
+#define OLED_CS_Set() OLED_CS_Port->BSRR = OLED_CS_Pin
 
-#define OLED_DC_Clr() HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_RESET)
-#define OLED_DC_Set() HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_SET)
+#define OLED_DC_Clr() OLED_DC_Port->BSRR = (uint32_t)OLED_DC_Pin << 16U
+#define OLED_DC_Set() OLED_DC_Port->BSRR = OLED_DC_Pin
 
-#define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
-#define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
+#define OLED_RST_Clr() OLED_RST_Port->BSRR = (uint32_t)OLED_RST_Pin << 16U
+#define OLED_RST_Set() OLED_RST_Port->BSRR = OLED_RST_Pin
 
 #define OLED_DIN_Clr() HAL_GPIO_WritePin(OLED_DIN_Port, GPIO_PIN_2, GPIO_PIN_RESET)
 #define OLED_DIN_Set() HAL_GPIO_WritePin(OLED_DIN_Port, GPIO_PIN_2, GPIO_PIN_SET)
@@ -117,16 +117,14 @@ void OledDrv_SPIWriteByte(uint8_t data);
 #define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define OLED_RST_Pin GPIO_PIN_1
 
-#define OLED_CS_Clr() HAL_GPIO_WritePin(OLED_CS_Port, OLED_CS_Pin, GPIO_PIN_RESET)
-#define OLED_CS_Set() HAL_GPIO_WritePin(OLED_CS_Port, OLED_CS_Pin, GPIO_PIN_SET)
+#define OLED_CS_Clr() OLED_CS_Port->BSRR = (uint32_t)OLED_CS_Pin << 16U
+#define OLED_CS_Set() OLED_CS_Port->BSRR = OLED_CS_Pin
 
-#define OLED_DC_Clr() HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_RESET)
-#define OLED_DC_Set() HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_SET)
+#define OLED_DC_Clr() OLED_DC_Port->BSRR = (uint32_t)OLED_DC_Pin << 16U
+#define OLED_DC_Set() OLED_DC_Port->BSRR = OLED_DC_Pin
 
-#define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
-#define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
-
-void OledDrv_SPIWriteByte(uint8_t data);
+#define OLED_RST_Clr() OLED_RST_Port->BSRR = (uint32_t)OLED_RST_Pin << 16U
+#define OLED_RST_Set() OLED_RST_Port->BSRR = OLED_RST_Pin
 
 #endif
 

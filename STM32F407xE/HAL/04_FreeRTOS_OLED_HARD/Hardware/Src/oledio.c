@@ -249,21 +249,6 @@ void OledDrv_Init(void)
   OLED_RST_Set();
 }
 
-/**
- * @brief      SPI 写以一个字节.
- * @param[in]  data  字节数据.
- * @retval     None.
- */
-void OledDrv_SPIWriteByte(uint8_t data)
-{
-  char i = 8;
-
-  OLED_CS_Clr();
-  HAL_SPI_Transmit(&hspi1, &data, 1, 100);
-  OLED_CS_Set();
-  OLED_DC_Set();
-}
-
 #endif
 
 #endif

@@ -490,7 +490,10 @@ void OLED_WR_Byte(u8 dat, u8 mode)
     {
         OLED_DC_Clr();
     }
-    OledDrv_SPIWriteByte(dat);
+    OLED_CS_Clr();
+    HAL_SPI_Transmit(&hspi1, &dat, 1, 100);
+    OLED_CS_Set();
+    OLED_DC_Set();
 #endif
 }
 
