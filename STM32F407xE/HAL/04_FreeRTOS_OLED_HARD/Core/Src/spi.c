@@ -38,17 +38,17 @@ void MX_SPI1_Init(void)
 
   /* USER CODE END SPI1_Init 1 */
   hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.Mode = SPI_MODE_MASTER;                      // 设置SPI工作模式：主机模式
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;            // 只发送模式
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;                // 设置SPI数据大小：8位帧结构
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;             // 串行同步时钟空闲时SCLK位高电平
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;                  // 串行同步时钟空第二个时钟沿捕获
+  hspi1.Init.NSS = SPI_NSS_SOFT;                          // NSS信号由软件管理
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2; // 波特率预分频值：波特率预分频值为2
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;                 // 数据传输高位先行
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 10;
+  hspi1.Init.CRCPolynomial = 10; // CRC值计算的多项式
   if (HAL_SPI_Init(&hspi1) != HAL_OK)
   {
     Error_Handler();
