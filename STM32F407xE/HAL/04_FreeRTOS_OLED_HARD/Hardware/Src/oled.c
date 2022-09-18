@@ -14,12 +14,13 @@
 static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布
 
 /* 相关选择----------------------------------------------------------------------------- */
-#if _SOFT_OR_HARE == OLED_SOFT
 
 //发送一个字节
 // mode:数据/命令标志 0,表示命令;1,表示数据;
 void OLED_WR_Byte(u8 dat, u8 mode)
 {
+#if _SOFT_OR_HARE == OLED_SOFT
+
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     OledDrv_IICStart();
     OledDrv_IICSendByte(OLED_ADDRESS);
@@ -67,41 +68,9 @@ void OLED_WR_Byte(u8 dat, u8 mode)
     OLED_CS_Set();
     OLED_DC_Set();
 #endif
-}
 
-//更新显存到OLED
-void OLED_Refresh(void)
-{
-    u8 i, n;
-    for (i = 0; i < 8; i++)
-    {
-        OLED_WR_Byte(0xb0 + i, OLED_CMD); //设置行起始地址
-        OLED_WR_Byte(0x00, OLED_CMD);     //设置低列起始地址
-        OLED_WR_Byte(0x10, OLED_CMD);     //设置高列起始地址
-#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
-        OledDrv_IICStart();
-        OledDrv_IICSendByte(OLED_ADDRESS);
-        OledDrv_IICWaitAck();
-        OledDrv_IICSendByte(0x40);
-        OledDrv_IICWaitAck();
-        for (n = 0; n < 128; n++)
-        {
-            OledDrv_IICSendByte(OLED_GRAM[n][i]);
-            OledDrv_IICWaitAck();
-        }
-        OledDrv_IICStop();
-#elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-        for (n = 0; n < 128; n++)
-            OLED_WR_Byte(OLED_GRAM[n][i], OLED_DATA);
-#endif
-    }
-}
+#elif _SOFT_OR_HARE == OLED_HARD
 
-#elif _SOFT_OR_HARE == OLED_HARD // 硬件
-//发送一个字节
-// mode:数据/命令标志 0,表示命令;1,表示数据;
-void OLED_WR_Byte(u8 dat, u8 mode)
-{
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     if (mode)
     {
@@ -125,6 +94,8 @@ void OLED_WR_Byte(u8 dat, u8 mode)
     OLED_CS_Set();
     OLED_DC_Set();
 #endif
+
+#endif
 }
 
 //更新显存到OLED
@@ -136,7 +107,40 @@ void OLED_Refresh(void)
         OLED_WR_Byte(0xb0 + i, OLED_CMD); //设置行起始地址
         OLED_WR_Byte(0x00, OLED_CMD);     //设置低列起始地址
         OLED_WR_Byte(0x10, OLED_CMD);     //设置高列起始地址
+#if _SOFT_OR_HARE == OLED_SOFT
 
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+        OledDrv_IICStart();
+        OledDrv_IICSendByte(OLED_ADDRESS);
+        OledDrv_IICWaitAck();
+        OledDrv_IICSendByte(0x40);
+        OledDrv_IICWaitAck();
+        for (n = 0; n < 128; n++)
+        {
+            OledDrv_IICSendByte(OLED_GRAM[n][i]);
+            OledDrv_IICWaitAck();
+        }
+        OledDrv_IICStop();
+#elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
+        for (n = 0; n < 128; n++)
+            OLED_WR_Byte(OLED_GRAM[n][i], OLED_DATA);
+#endif
+
+#elif _SOFT_OR_HARE == OLED_HARD
+
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+        OledDrv_IICStart();
+        OledDrv_IICSendByte(OLED_ADDRESS);
+        OledDrv_IICWaitAck();
+        OledDrv_IICSendByte(0x40);
+        OledDrv_IICWaitAck();
+        for (n = 0; n < 128; n++)
+        {
+            OledDrv_IICSendByte(OLED_GRAM[n][i]);
+            OledDrv_IICWaitAck();
+        }
+        OledDrv_IICStop();
+#elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
         for (n = 0; n < 128; n++)
         {
             OLED_DC_Set();
@@ -145,10 +149,11 @@ void OLED_Refresh(void)
             OLED_CS_Set();
             OLED_DC_Set();
         }
-    }
-}
+#endif
 
 #endif
+    }
+}
 
 /* 公共部分----------------------------------------------------------------------------- */
 
