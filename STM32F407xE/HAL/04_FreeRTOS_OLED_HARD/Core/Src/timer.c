@@ -10,6 +10,7 @@
  */
 #include "timer.h"
 
+u32 sec;
 u32 fps;
 u32 fps_num;
 
@@ -403,7 +404,7 @@ void TIM3_IRQHandler(void)
 {
     if (__HAL_TIM_GET_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE))
     {
-        OLED_Refresh();
+        // OLED_Refresh();
         fps_num++;
 
         __HAL_TIM_CLEAR_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE); //清除更新标志
@@ -416,10 +417,13 @@ void TIM4_IRQHandler(void)
     {
         u8 temp[32] = {0};
 
+        sec++;
         fps = fps_num;
         fps_num = 0;
         sprintf(temp, "%dfps", fps);
-        OLED_ShowString(92, 0, temp, 8, 1);
+        OLED_ShowString(92, 56, temp, 8, 1);
+        sprintf(temp, "%dS", sec);
+        OLED_ShowString(0, 0, temp, 8, 1);
         // u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
         // printf("TIM4输出......\r\n");
         // taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区

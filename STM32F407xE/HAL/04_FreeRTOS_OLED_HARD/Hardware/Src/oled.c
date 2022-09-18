@@ -4,14 +4,15 @@
  *          这是相关API
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.00
- * @date 	2022年9月17号15点22分
+ * @version 1.01
+ * @date 	2022年9月18号23点43分
  */
 
 #include "oled.h"
 #include "oledfont.h"
 
 static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布
+// static u8 OLED_GRAM[OLED_HEIGHT / 8][OLED_WIDTH] = {0}; // OLED画布
 
 /* 相关选择-------------------------------------------------------------------------------------------------- */
 
@@ -121,11 +122,7 @@ void OLED_WR_DATA8(u8 dat)
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     HAL_I2C_Mem_Write(&hi2c1, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-    OLED_DC_Set();
-    OLED_CS_Clr();
     HAL_SPI_Transmit(&hspi1, &dat, 1, 100);
-    OLED_CS_Set();
-    OLED_DC_Set();
 #endif
 
 #endif
@@ -134,12 +131,13 @@ void OLED_WR_DATA8(u8 dat)
 //更新显存到OLED
 void OLED_Refresh(void)
 {
+#if _OLED_DMA == OLED_DMA_DISABLE
     u8 i, n;
     for (i = 0; i < 8; i++)
     {
-        OLED_WR_CMD(0xb0 + i); //设置行起始地址
-        OLED_WR_CMD(0x00);     //设置低列起始地址
-        OLED_WR_CMD(0x10);     //设置高列起始地址
+        // OLED_WR_CMD(0xb0 + i); //设置行起始地址
+        // OLED_WR_CMD(0x00);     //设置低列起始地址
+        // OLED_WR_CMD(0x10);     //设置高列起始地址
 #if _SOFT_OR_HARE == OLED_SOFT
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
@@ -186,6 +184,10 @@ void OLED_Refresh(void)
 
 #endif
     }
+#elif _OLED_DMA == OLED_DMA_ABLE
+    OLED_CS_Clr();
+    HAL_SPI_Transmit_DMA(&hspi1, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8); // DMA循环，运行一次就行
+#endif
 }
 
 /* 公共部分-------------------------------------------------------------------------------------------------- */
@@ -215,9 +217,13 @@ void OLED_Clear(void)
         for (n = 0; n < 128; n++)
         {
             OLED_GRAM[n][i] = 0; //清除所有数据
+            OLED_DC_Set();
+            OLED_CS_Clr();
+            HAL_SPI_Transmit(&hspi1, &OLED_GRAM[n][i], 1, 100);
+            OLED_CS_Set();
+            OLED_DC_Set();
         }
     }
-    OLED_Refresh(); //更新显示
 }
 
 //画点
@@ -584,11 +590,13 @@ void OLED_Init(void)
     OLED_WR_CMD(0xDB); //--set vcomh
     OLED_WR_CMD(0x40); // Set VCOM Deselect Level
     OLED_WR_CMD(0x20); //-Set Page Addressing Mode (0x00/0x01/0x02)
-    OLED_WR_CMD(0x02); //
+    OLED_WR_CMD(0x01);
     OLED_WR_CMD(0x8D); //--set Charge Pump enable/disable
     OLED_WR_CMD(0x14); //--set(0x10) disable
     OLED_WR_CMD(0xA4); // Disable Entire Display On (0xa4/0xa5)
     OLED_WR_CMD(0xA6); // Disable Inverse Display On (0xa6/a7)
     OLED_Clear();
     OLED_WR_CMD(0xAF);
+
+    OLED_Refresh();
 }

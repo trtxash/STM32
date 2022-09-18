@@ -13,6 +13,7 @@
 // 硬件，未开启GCC优化
 // IIC最大20fps，延时TIM3_Init(2500 - 1, 840 - 1);
 // SPI最大495FPS，延时TIM3_Init(202 - 1, 840 - 1);
+// DMA下FPS不好测，估算5,126FPS，实际写入可能低一点
 
 /**
  * 软件模拟优点：波特率高，速度快，可移植性好
@@ -21,7 +22,6 @@
  *
  * 本次实验还可以继续优化
  *    优化方向1：不用HAL的SPI发送，用寄存器；
- *    优化方向2：加入DMA
  */
 #include "main.h"
 
@@ -59,10 +59,11 @@ int main(void)
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
   delay_init(168);                    // 初始化延时函数
   LED_Init();                         // 初始化LED
-  // MX_I2C1_Init();                     // 初始化i2c接口
-  MX_SPI1_Init();
-  OLED_Init();       // 初始化OLED
-  uart_init(115200); // 初始化串口
+// MX_I2C1_Init();                    // 初始化i2c接口
+  MX_DMA_Init();                      // 要先初始化DMA
+  MX_SPI1_Init();                     // 初始化MDA后再初始话SPI
+  OLED_Init();                        // 初始化OLED
+  uart_init(115200);                  // 初始化串口
   TIM3_Init(202 - 1, 840 - 1);
   TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
 
