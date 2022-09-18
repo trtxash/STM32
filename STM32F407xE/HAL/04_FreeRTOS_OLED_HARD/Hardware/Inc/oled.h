@@ -6,9 +6,6 @@
 #include "oledio.h"
 #include "oledconf.h"
 
-#define OLED_CMD 0  //写命令
-#define OLED_DATA 1 //写数据
-
 void OLED_WR_Byte(u8 dat, u8 mode);
 void OLED_DisPlay_On(void);
 void OLED_DisPlay_Off(void);

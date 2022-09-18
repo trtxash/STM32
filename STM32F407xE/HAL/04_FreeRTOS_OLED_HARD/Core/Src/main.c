@@ -1,23 +1,24 @@
 /**
  * @file	  04_FreeRTOS_OLED_HARD
  * @brief 	移植FreeRTOS和OLED硬件
- * @author 	TRTX-gamer
+ * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
+ *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
  * @date 	  2022年9月17号15点22分
  */
 
-// 软件模拟，未优化
-// IIC最大213fps，延时TIM3_Init(47 - 1, 8400 - 1);
-// SPI最大667fps，延时TIM3_Init(15 - 1, 8400 - 1);
-// 硬件，未优化
-// IIC最大20fps，延时TIM3_Init(250 - 1, 8400 - 1);
-// SPI最大476FPS，延时TIM3_Init(21 - 1, 8400 - 1);
+// 软件模拟，未开启GCC优化
+// IIC最大214fps，延时TIM3_Init(469 - 1, 840 - 1);
+// SPI最大720fps，延时TIM3_Init(139 - 1, 840 - 1);
+// 硬件，未开启GCC优化
+// IIC最大20fps，延时TIM3_Init(2500 - 1, 840 - 1);
+// SPI最大495FPS，延时TIM3_Init(202 - 1, 840 - 1);
 
 /**
  * 软件模拟优点：波特率高，速度快，可移植性好
  *        缺点：占用管脚口，使用MCU资源多，不太稳定
  * 硬件优缺点和软件模拟相反
- * 
+ *
  * 本次实验还可以继续优化
  *    优化方向1：不用HAL的SPI发送，用寄存器；
  *    优化方向2：加入DMA
@@ -62,7 +63,7 @@ int main(void)
   MX_SPI1_Init();
   OLED_Init();       // 初始化OLED
   uart_init(115200); // 初始化串口
-  TIM3_Init(21 - 1, 8400 - 1);
+  TIM3_Init(202 - 1, 840 - 1);
   TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
 
   //创建开始任务

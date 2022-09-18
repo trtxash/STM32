@@ -13,11 +13,16 @@
 
 static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布
 
-/* 相关选择----------------------------------------------------------------------------- */
+/* 相关选择-------------------------------------------------------------------------------------------------- */
 
-//发送一个字节
-// mode:数据/命令标志 0,表示命令;1,表示数据;
-void OLED_WR_Byte(u8 dat, u8 mode)
+/**
+ * @brief   OLED发送命令
+ * @param   dat
+ * @arg		u8，命令
+ * @note
+ * @retval  void
+ */
+void OLED_WR_CMD(u8 dat)
 {
 #if _SOFT_OR_HARE == OLED_SOFT
 
@@ -25,14 +30,7 @@ void OLED_WR_Byte(u8 dat, u8 mode)
     OledDrv_IICStart();
     OledDrv_IICSendByte(OLED_ADDRESS);
     OledDrv_IICWaitAck();
-    if (mode)
-    {
-        OledDrv_IICSendByte(0x40);
-    }
-    else
-    {
-        OledDrv_IICSendByte(0x00);
-    }
+    OledDrv_IICSendByte(0x00);
     OledDrv_IICWaitAck();
     OledDrv_IICSendByte(dat);
     OledDrv_IICWaitAck();
@@ -40,17 +38,8 @@ void OLED_WR_Byte(u8 dat, u8 mode)
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
     char i = 8;
 
-    if (mode)
-    {
-        OLED_DC_Set();
-    }
-    else
-    {
-        OLED_DC_Clr();
-    }
-
+    OLED_DC_Clr();
     OLED_CS_Clr();
-
     while (i--)
     {
         OLED_CLK_Clr();
@@ -72,23 +61,67 @@ void OLED_WR_Byte(u8 dat, u8 mode)
 #elif _SOFT_OR_HARE == OLED_HARD
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
-    if (mode)
-    {
-        HAL_I2C_Mem_Write(&hi2c1, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
-    }
-    else
-    {
-        HAL_I2C_Mem_Write(&hi2c1, OLED_ADDRESS, 0x00, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
-    }
+    HAL_I2C_Mem_Write(&hi2c1, OLED_ADDRESS, 0x00, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-    if (mode)
+    OLED_DC_Clr();
+    OLED_CS_Clr();
+    HAL_SPI_Transmit(&hspi1, &dat, 1, 100);
+    OLED_CS_Set();
+    OLED_DC_Set();
+#endif
+
+#endif
+}
+
+/**
+ * @brief   OLED发送数据
+ * @param   dat
+ * @arg		u8，数据
+ * @note
+ * @retval  void
+ */
+void OLED_WR_DATA8(u8 dat)
+{
+#if _SOFT_OR_HARE == OLED_SOFT
+
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+    OledDrv_IICStart();
+    OledDrv_IICSendByte(OLED_ADDRESS);
+    OledDrv_IICWaitAck();
+    OledDrv_IICSendByte(0x40);
+    OledDrv_IICWaitAck();
+    OledDrv_IICSendByte(dat);
+    OledDrv_IICWaitAck();
+    OledDrv_IICStop();
+#elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
+    char i = 8;
+
+    OLED_DC_Set();
+    OLED_CS_Clr();
+    while (i--)
     {
-        OLED_DC_Set();
+        OLED_CLK_Clr();
+        if (dat & 0x80)
+        {
+            OLED_DIN_Set();
+        }
+        else
+        {
+            OLED_DIN_Clr();
+        }
+        OLED_CLK_Set();
+        dat <<= 1;
     }
-    else
-    {
-        OLED_DC_Clr();
-    }
+    OLED_CS_Set();
+    OLED_DC_Set();
+#endif
+
+#elif _SOFT_OR_HARE == OLED_HARD
+
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+    HAL_I2C_Mem_Write(&hi2c1, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
+#elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
+    OLED_DC_Set();
     OLED_CS_Clr();
     HAL_SPI_Transmit(&hspi1, &dat, 1, 100);
     OLED_CS_Set();
@@ -104,9 +137,9 @@ void OLED_Refresh(void)
     u8 i, n;
     for (i = 0; i < 8; i++)
     {
-        OLED_WR_Byte(0xb0 + i, OLED_CMD); //设置行起始地址
-        OLED_WR_Byte(0x00, OLED_CMD);     //设置低列起始地址
-        OLED_WR_Byte(0x10, OLED_CMD);     //设置高列起始地址
+        OLED_WR_CMD(0xb0 + i); //设置行起始地址
+        OLED_WR_CMD(0x00);     //设置低列起始地址
+        OLED_WR_CMD(0x10);     //设置高列起始地址
 #if _SOFT_OR_HARE == OLED_SOFT
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
@@ -123,7 +156,7 @@ void OLED_Refresh(void)
         OledDrv_IICStop();
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
         for (n = 0; n < 128; n++)
-            OLED_WR_Byte(OLED_GRAM[n][i], OLED_DATA);
+            OLED_WR_DATA8(OLED_GRAM[n][i]);
 #endif
 
 #elif _SOFT_OR_HARE == OLED_HARD
@@ -155,22 +188,22 @@ void OLED_Refresh(void)
     }
 }
 
-/* 公共部分----------------------------------------------------------------------------- */
+/* 公共部分-------------------------------------------------------------------------------------------------- */
 
 //开启OLED显示
 void OLED_DisPlay_On(void)
 {
-    OLED_WR_Byte(0x8D, OLED_CMD); //电荷泵使能
-    OLED_WR_Byte(0x14, OLED_CMD); //开启电荷泵
-    OLED_WR_Byte(0xAF, OLED_CMD); //点亮屏幕
+    OLED_WR_CMD(0x8D); //电荷泵使能
+    OLED_WR_CMD(0x14); //开启电荷泵
+    OLED_WR_CMD(0xAF); //点亮屏幕
 }
 
 //关闭OLED显示
 void OLED_DisPlay_Off(void)
 {
-    OLED_WR_Byte(0x8D, OLED_CMD); //电荷泵使能
-    OLED_WR_Byte(0x10, OLED_CMD); //关闭电荷泵
-    OLED_WR_Byte(0xAE, OLED_CMD); //关闭屏幕
+    OLED_WR_CMD(0x8D); //电荷泵使能
+    OLED_WR_CMD(0x10); //关闭电荷泵
+    OLED_WR_CMD(0xAE); //关闭屏幕
 }
 
 //清屏函数
@@ -529,33 +562,33 @@ void OLED_Init(void)
 {
     OledDrv_Init();
 
-    OLED_WR_Byte(0xAE, OLED_CMD); //--turn off oled panel
-    OLED_WR_Byte(0x00, OLED_CMD); //---set low column address
-    OLED_WR_Byte(0x10, OLED_CMD); //---set high column address
-    OLED_WR_Byte(0x40, OLED_CMD); //--set start line address  Set Mapping RAM Display Start Line (0x00~0x3F)
-    OLED_WR_Byte(0x81, OLED_CMD); //--set contrast control register
-    OLED_WR_Byte(0xCF, OLED_CMD); // Set SEG Output Current Brightness
-    OLED_WR_Byte(0xA1, OLED_CMD); //--Set SEG/Column Mapping     0xa0左右反置 0xa1正常
-    OLED_WR_Byte(0xC8, OLED_CMD); // Set COM/Row Scan Direction   0xc0上下反置 0xc8正常
-    OLED_WR_Byte(0xA6, OLED_CMD); //--set normal display
-    OLED_WR_Byte(0xA8, OLED_CMD); //--set multiplex ratio(1 to 64)
-    OLED_WR_Byte(0x3f, OLED_CMD); //--1/64 duty
-    OLED_WR_Byte(0xD3, OLED_CMD); //-set display offset	Shift Mapping RAM Counter (0x00~0x3F)
-    OLED_WR_Byte(0x00, OLED_CMD); //-not offset
-    OLED_WR_Byte(0xd5, OLED_CMD); //--set display clock divide ratio/oscillator frequency
-    OLED_WR_Byte(0x80, OLED_CMD); //--set divide ratio, Set Clock as 100 Frames/Sec
-    OLED_WR_Byte(0xD9, OLED_CMD); //--set pre-charge period
-    OLED_WR_Byte(0xF1, OLED_CMD); // Set Pre-Charge as 15 Clocks & Discharge as 1 Clock
-    OLED_WR_Byte(0xDA, OLED_CMD); //--set com pins hardware configuration
-    OLED_WR_Byte(0x12, OLED_CMD);
-    OLED_WR_Byte(0xDB, OLED_CMD); //--set vcomh
-    OLED_WR_Byte(0x40, OLED_CMD); // Set VCOM Deselect Level
-    OLED_WR_Byte(0x20, OLED_CMD); //-Set Page Addressing Mode (0x00/0x01/0x02)
-    OLED_WR_Byte(0x02, OLED_CMD); //
-    OLED_WR_Byte(0x8D, OLED_CMD); //--set Charge Pump enable/disable
-    OLED_WR_Byte(0x14, OLED_CMD); //--set(0x10) disable
-    OLED_WR_Byte(0xA4, OLED_CMD); // Disable Entire Display On (0xa4/0xa5)
-    OLED_WR_Byte(0xA6, OLED_CMD); // Disable Inverse Display On (0xa6/a7)
+    OLED_WR_CMD(0xAE); //--turn off oled panel
+    OLED_WR_CMD(0x00); //---set low column address
+    OLED_WR_CMD(0x10); //---set high column address
+    OLED_WR_CMD(0x40); //--set start line address  Set Mapping RAM Display Start Line (0x00~0x3F)
+    OLED_WR_CMD(0x81); //--set contrast control register
+    OLED_WR_CMD(0xCF); // Set SEG Output Current Brightness
+    OLED_WR_CMD(0xA1); //--Set SEG/Column Mapping     0xa0左右反置 0xa1正常
+    OLED_WR_CMD(0xC8); // Set COM/Row Scan Direction   0xc0上下反置 0xc8正常
+    OLED_WR_CMD(0xA6); //--set normal display
+    OLED_WR_CMD(0xA8); //--set multiplex ratio(1 to 64)
+    OLED_WR_CMD(0x3f); //--1/64 duty
+    OLED_WR_CMD(0xD3); //-set display offset	Shift Mapping RAM Counter (0x00~0x3F)
+    OLED_WR_CMD(0x00); //-not offset
+    OLED_WR_CMD(0xd5); //--set display clock divide ratio/oscillator frequency
+    OLED_WR_CMD(0x80); //--set divide ratio, Set Clock as 100 Frames/Sec
+    OLED_WR_CMD(0xD9); //--set pre-charge period
+    OLED_WR_CMD(0xF1); // Set Pre-Charge as 15 Clocks & Discharge as 1 Clock
+    OLED_WR_CMD(0xDA); //--set com pins hardware configuration
+    OLED_WR_CMD(0x12);
+    OLED_WR_CMD(0xDB); //--set vcomh
+    OLED_WR_CMD(0x40); // Set VCOM Deselect Level
+    OLED_WR_CMD(0x20); //-Set Page Addressing Mode (0x00/0x01/0x02)
+    OLED_WR_CMD(0x02); //
+    OLED_WR_CMD(0x8D); //--set Charge Pump enable/disable
+    OLED_WR_CMD(0x14); //--set(0x10) disable
+    OLED_WR_CMD(0xA4); // Disable Entire Display On (0xa4/0xa5)
+    OLED_WR_CMD(0xA6); // Disable Inverse Display On (0xa6/a7)
     OLED_Clear();
-    OLED_WR_Byte(0xAF, OLED_CMD);
+    OLED_WR_CMD(0xAF);
 }
