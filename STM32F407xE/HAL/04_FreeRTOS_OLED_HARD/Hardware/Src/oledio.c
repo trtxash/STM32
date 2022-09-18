@@ -1,8 +1,19 @@
+/**
+ * @file	  oledio.c
+ * @brief 	OLED相关io配置
+ * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
+ *          突然吐血    https://space.bilibili.com/12890038;
+ * @version 1.00
+ * @date 	  2022年9月17号15点22分
+ */
+
 #include "oledio.h"
 
-#if _SOFT_OR_HARE == OLED_SOFT
+#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315 // 是否为SSD1306，SSD115
 
-#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+#if _SOFT_OR_HARE == OLED_SOFT // 是否为软件模拟
+
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE // 是否为IIC通信
 
 /**
  * @brief      硬件底层初始化.
@@ -117,7 +128,7 @@ void OledDrv_IICSendByte(uint8_t data)
   }
 }
 
-#else
+#elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
 
 /**
  * @brief      硬件底层初始化.
@@ -161,7 +172,7 @@ void OledDrv_Init(void)
 
 #endif
 
-#else
+#elif _SOFT_OR_HARE == OLED_HARD // 硬件
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
 
@@ -186,7 +197,7 @@ void OledDrv_Init(void)
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET);
 }
 
-#else
+#elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
 
 /**
  * @brief      硬件底层初始化.
@@ -221,5 +232,9 @@ void OledDrv_Init(void)
 }
 
 #endif
+
+#endif
+
+#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351 // 为SSD1351
 
 #endif
