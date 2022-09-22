@@ -63,6 +63,7 @@ User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
 Core/Src/timer.c \
+Core/Src/i2c.c \
 Core/Src/spi.c \
 Core/Src/dma.c \
 FreeRTOS/portable/Src/port.c \
@@ -74,6 +75,7 @@ FreeRTOS/Src/list.c \
 Hardware/Src/led.c \
 Hardware/Src/oled.c \
 Hardware/Src/oledio.c \
+Hardware/Src/speech_yabo.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 

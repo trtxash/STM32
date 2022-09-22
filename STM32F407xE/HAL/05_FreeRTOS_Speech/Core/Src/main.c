@@ -1,6 +1,6 @@
 /**
- * @file	  04_FreeRTOS_OLED_HARD
- * @brief 	移植FreeRTOS和OLED硬件
+ * @file	  05_FreeRTOS_Speech
+ * @brief 	移植FreeRTOS和语音播报，I2C+DMA
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.01
@@ -13,7 +13,7 @@
 // 硬件，未开启GCC优化
 // IIC最大20fps，延时TIM3_Init(2500 - 1, 840 - 1);
 // SPI最大495FPS，延时TIM3_Init(202 - 1, 840 - 1);
-// DMA下FPS不好测，估算5,126FPS，实际写入可能低一点
+// DMA下FPS不好测，估算5126FPS，实际写入可能低一点
 
 /**
  * 软件模拟优点：波特率高，速度快，可移植性好
@@ -41,6 +41,11 @@ void led0_task(void *pvParameters); //任务函数
 #define LED1_STK_SIZE 50            //任务堆栈大小
 TaskHandle_t LED1Task_Handler;      //任务句柄
 void led1_task(void *pvParameters); //任务函数
+
+#define SPEECH_TASK_PRIO 4            //任务优先级
+#define SPEECH_STK_SIZE 128           //任务堆栈大小
+TaskHandle_t SPEECHTask_Handler;      //任务句柄
+void speech_task(void *pvParameters); //任务函数
 
 /**
  * @brief   主函数,程序入口
@@ -95,6 +100,13 @@ void start_task(void *pvParameters)
               (void *)NULL,
               (UBaseType_t)LED1_TASK_PRIO,
               (TaskHandle_t *)&LED1Task_Handler);
+  //创建语音播报任务
+  xTaskCreate((TaskFunction_t)speech_task,
+              (const char *)"speech_task",
+              (uint16_t)SPEECH_STK_SIZE,
+              (void *)NULL,
+              (UBaseType_t)SPEECH_TASK_PRIO,
+              (TaskHandle_t *)&SPEECHTask_Handler);
   vTaskDelete(StartTask_Handler); //删除开始任务
   taskEXIT_CRITICAL();            //退出临界区
 }
@@ -116,6 +128,16 @@ void led1_task(void *pvParameters)
   {
     LED1_Reverse();
     vTaskDelay(5);
+  }
+}
+
+// 语音播报函数
+void speech_task(void *pvParameters)
+{
+  while (1)
+  {
+    speech_text("我去", UNICODE);
+    delay_ms(10000);
   }
 }
 

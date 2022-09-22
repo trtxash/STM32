@@ -33,12 +33,13 @@ extern "C"
 #include "delay.h"
 #include "usart.h"
 #include "timer.h"
-// #include "i2c.h"
+#include "i2c.h"
 #include "spi.h"
 #include "dma.h"
 #include "FreeRTOS.h"
 #include "led.h"
 #include "oled.h"
+#include "speech_yabo.h"
 
 #ifdef __cplusplus
 }
