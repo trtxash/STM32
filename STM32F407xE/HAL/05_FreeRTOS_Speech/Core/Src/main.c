@@ -64,7 +64,7 @@ int main(void)
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
   delay_init(168);                    // 初始化延时函数
   LED_Init();                         // 初始化LED
-                                      // MX_I2C1_Init();                    // 初始化i2c接口
+  MX_I2C1_Init();                     // 初始化i2c接口
   MX_DMA_Init();                      // 要先初始化DMA
   MX_SPI1_Init();                     // 初始化MDA后再初始话SPI
   OLED_Init();                        // 初始化OLED
@@ -136,6 +136,8 @@ void speech_task(void *pvParameters)
 {
   while (1)
   {
+    SetVolume(10);
+    SetReader(Reader_XiaoYan);
     speech_text("我去", UNICODE);
     delay_ms(10000);
   }

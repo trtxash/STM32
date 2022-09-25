@@ -75,7 +75,7 @@ FreeRTOS/Src/list.c \
 Hardware/Src/led.c \
 Hardware/Src/oled.c \
 Hardware/Src/oledio.c \
-Hardware/Src/speech_yabo.c \
+Hardware/Src/speech.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 
