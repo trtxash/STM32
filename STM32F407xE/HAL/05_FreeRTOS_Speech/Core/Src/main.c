@@ -43,7 +43,7 @@ TaskHandle_t LED1Task_Handler;      //任务句柄
 void led1_task(void *pvParameters); //任务函数
 
 #define SPEECH_TASK_PRIO 4            //任务优先级
-#define SPEECH_STK_SIZE 128           //任务堆栈大小
+#define SPEECH_STK_SIZE 256           //任务堆栈大小
 TaskHandle_t SPEECHTask_Handler;      //任务句柄
 void speech_task(void *pvParameters); //任务函数
 
@@ -64,9 +64,9 @@ int main(void)
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
   delay_init(168);                    // 初始化延时函数
   LED_Init();                         // 初始化LED
-  MX_I2C1_Init();                     // 初始化i2c接口
   MX_DMA_Init();                      // 要先初始化DMA
   MX_SPI1_Init();                     // 初始化MDA后再初始话SPI
+  MX_I2C1_Init();                     // 初始化i2c接口
   OLED_Init();                        // 初始化OLED
   uart_init(115200);                  // 初始化串口
   TIM3_Init(202 - 1, 840 - 1);
@@ -138,8 +138,9 @@ void speech_task(void *pvParameters)
   {
     SetVolume(10);
     SetReader(Reader_XiaoYan);
-    speech_text("我去", UNICODE);
-    delay_ms(10000);
+    speech_text("A", UNICODE);
+    printf("%d\n", GetChipStatus());
+    delay_ms(3000);
   }
 }
 

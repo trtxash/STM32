@@ -7,7 +7,7 @@
 #include "usart.h"
 #include <stdio.h>
 
-#define I2C_ADDR 0xa0 //语音识别模块地址,模块地址为0x50，由于最右边一位要做读写位，所以右移一位为0xa0
+#define I2C_ADDR 0xA0 //语音识别模块地址,模块地址为0x50，由于最右边一位要做读写位，所以zuo移一位为0xa0
 
 #define DATAHEAD 0xFD //帧头
 
@@ -136,7 +136,5 @@ void I2C_Writes_Bytes(u8 *buff, int number);
 
 void SetBase(u8 *str);
 void TextCtrl(char c, int d);
-
-void delay_(unsigned long uldata);
 
 #endif
