@@ -418,10 +418,10 @@ void TIM4_IRQHandler(void)
         u8 temp[32] = {0};
 
         sec++;
-        fps = fps_num;
-        fps_num = 0;
-        sprintf(temp, "%dfps", fps);
-        OLED_ShowString(92, 56, temp, 8, 1);
+        // fps = fps_num;
+        // fps_num = 0;
+        // sprintf(temp, "%dfps", fps);
+        // OLED_ShowString(0, 56, temp, 8, 1);
         sprintf(temp, "%dS", sec);
         OLED_ShowString(0, 0, temp, 8, 1);
         // u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区

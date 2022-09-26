@@ -37,7 +37,7 @@ extern "C"
 #include "spi.h"
 #include "adc.h"
 #include "dma.h"
-#include "FreeRTOS.h"
+// #include "FreeRTOS.h"
 #include "led.h"
 #include "oled.h"
 

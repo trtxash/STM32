@@ -1,5 +1,5 @@
 /**
- * @file	  05_FreeRTOS_ADC+OLED
+ * @file	  05_ADC+OLED
  * @brief 	移植FreeRTOS和OLED硬件
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
@@ -25,28 +25,6 @@
  */
 #include "main.h"
 
-#define Debug 1 // 控制Debug的一些相关函数
-
-#define START_TASK_PRIO 1            //任务优先级
-#define START_STK_SIZE 256           //任务堆栈大小
-TaskHandle_t StartTask_Handler;      //任务句柄
-void start_task(void *pvParameters); //任务函数
-
-#define LED0_TASK_PRIO 2            //任务优先级
-#define LED0_STK_SIZE 50            //任务堆栈大小
-TaskHandle_t LED0Task_Handler;      //任务句柄
-void led0_task(void *pvParameters); //任务函数
-
-#define LED1_TASK_PRIO 3            //任务优先级
-#define LED1_STK_SIZE 50            //任务堆栈大小
-TaskHandle_t LED1Task_Handler;      //任务句柄
-void led1_task(void *pvParameters); //任务函数
-
-#define ADC_TASK_PRIO 4            //任务优先级
-#define ADC_STK_SIZE 2048          //任务堆栈大小
-TaskHandle_t ADCTask_Handler;      //任务句柄
-void adc_task(void *pvParameters); //任务函数
-
 /**
  * @brief   主函数,程序入口
  * @param   none
@@ -56,7 +34,10 @@ void adc_task(void *pvParameters); //任务函数
  */
 int main(void)
 {
-  u32 i;
+  u8 i;
+  u32 Xvalue;
+  u8 temp[10] = {0};
+
   if (HAL_Init()) // 初始化HAL库
   {
     Error_Handler();
@@ -73,77 +54,14 @@ int main(void)
   // TIM3_Init(202 - 1, 840 - 1);
   TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
 
-  // printf("Init OK!");
   // HAL_ADC_Start_DMA(&hadc1, (u32 *)value, 10);
-
-  //创建开始任务
-  xTaskCreate((TaskFunction_t)start_task,          //任务函数
-              (const char *)"start_task",          //任务名称
-              (uint16_t)START_STK_SIZE,            //任务堆栈大小
-              (void *)NULL,                        //传递给任务函数的参数
-              (UBaseType_t)START_TASK_PRIO,        //任务优先级
-              (TaskHandle_t *)&StartTask_Handler); //任务句柄
-  vTaskStartScheduler();                           //开启任务调度
-}
-
-//开始任务任务函数
-void start_task(void *pvParameters)
-{
-  taskENTER_CRITICAL(); //进入临界区
-  //创建LED0任务
-  xTaskCreate((TaskFunction_t)led0_task,
-              (const char *)"led0_task",
-              (uint16_t)LED0_STK_SIZE,
-              (void *)NULL,
-              (UBaseType_t)LED0_TASK_PRIO,
-              (TaskHandle_t *)&LED0Task_Handler);
-  //创建LED1任务
-  xTaskCreate((TaskFunction_t)led1_task,
-              (const char *)"led1_task",
-              (uint16_t)LED1_STK_SIZE,
-              (void *)NULL,
-              (UBaseType_t)LED1_TASK_PRIO,
-              (TaskHandle_t *)&LED1Task_Handler);
-  //创建ADC任务
-  xTaskCreate((TaskFunction_t)adc_task,
-              (const char *)"adc_task",
-              (uint16_t)ADC_STK_SIZE,
-              (void *)NULL,
-              (UBaseType_t)ADC_TASK_PRIO,
-              (TaskHandle_t *)&ADCTask_Handler);
-  vTaskDelete(StartTask_Handler); //删除开始任务
-  taskEXIT_CRITICAL();            //退出临界区
-}
-
-// LED0任务函数
-void led0_task(void *pvParameters)
-{
   while (1)
   {
     LED0_Reverse();
-    vTaskDelay(500); // 1Hz
-  }
-}
-
-// LED1任务函数
-void led1_task(void *pvParameters)
-{
-  while (1)
-  {
+    delay_ms(400);
     LED1_Reverse();
-    vTaskDelay(50);
-  }
-}
+    delay_ms(100);
 
-// ADC任务函数
-void adc_task(void *pvParameters)
-{
-  u8 i;
-  u32 Xvalue;
-  u8 temp[10] = {0};
-
-  while (1)
-  {
     for (i = 0; i < 10; i++)
     {
       Xvalue += value[i];
@@ -152,42 +70,41 @@ void adc_task(void *pvParameters)
     sprintf(temp, "%f", (float)Xvalue * 3.3 / 4096);
     OLED_ShowString(88, 0, temp, 16, 1);
     // OLED_ShowNum(88, 16, Xvalue, 5, 16, 1);
-    vTaskDelay(5);
   }
 }
 
 #ifdef Debug
-/**
- * @brief   栈溢出钩子函数
- * @param   xTask
- * @arg		  the task that just exceeded its stack boundaries.
- * @param   pcTaskName
- * @arg		  A character string containing the name of the offending task.
- * @note    FreeRTOS打印栈溢出的任务，关联#define configCHECK_FOR_STACK_OVERFLOW 2，在FreeRTOSConfig.h下
- * @retval  void
- */
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
-{
-  /* Run time stack overflow checking is performed if
-  configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
-  called if a stack overflow is detected. */
-  printf("任务：%s 溢出\r\n", pcTaskName);
-}
+  /**
+   * @brief   栈溢出钩子函数
+   * @param   xTask
+   * @arg		  the task that just exceeded its stack boundaries.
+   * @param   pcTaskName
+   * @arg		  A character string containing the name of the offending task.
+   * @note    FreeRTOS打印栈溢出的任务，关联#define configCHECK_FOR_STACK_OVERFLOW 2，在FreeRTOSConfig.h下
+   * @retval  void
+   */
+  void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+  {
+    /* Run time stack overflow checking is performed if
+    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+    called if a stack overflow is detected. */
+    printf("任务：%s 溢出\r\n", pcTaskName);
+  }
 #endif
 
 #ifdef USE_FULL_ASSERT
-/**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
+  /**
+   * @brief  Reports the name of the source file and the source line number
+   *         where the assert_param error has occurred.
+   * @param  file: pointer to the source file name
+   * @param  line: assert_param error line source number
+   * @retval None
+   */
+  void assert_failed(uint8_t * file, uint32_t line)
+  {
+    /* USER CODE BEGIN 6 */
+    /* User can add his own implementation to report the file name and line number,
+       ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+    /* USER CODE END 6 */
+  }
 #endif /* USE_FULL_ASSERT */

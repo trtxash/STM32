@@ -67,12 +67,6 @@ Core/Src/timer.c \
 Core/Src/adc.c \
 Core/Src/spi.c \
 Core/Src/dma.c \
-FreeRTOS/portable/Src/port.c \
-FreeRTOS/portable/MemMang/Src/heap_4.c \
-FreeRTOS/Src/tasks.c \
-FreeRTOS/Src/timers.c \
-FreeRTOS/Src/queue.c \
-FreeRTOS/Src/list.c \
 Hardware/Src/led.c \
 Hardware/Src/oled.c \
 Hardware/Src/oledio.c \
