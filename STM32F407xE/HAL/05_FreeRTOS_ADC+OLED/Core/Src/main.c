@@ -28,7 +28,7 @@
 #define Debug 1 // 控制Debug的一些相关函数
 
 #define START_TASK_PRIO 1            //任务优先级
-#define START_STK_SIZE 128           //任务堆栈大小
+#define START_STK_SIZE 256           //任务堆栈大小
 TaskHandle_t StartTask_Handler;      //任务句柄
 void start_task(void *pvParameters); //任务函数
 
@@ -41,6 +41,11 @@ void led0_task(void *pvParameters); //任务函数
 #define LED1_STK_SIZE 50            //任务堆栈大小
 TaskHandle_t LED1Task_Handler;      //任务句柄
 void led1_task(void *pvParameters); //任务函数
+
+#define ADC_TASK_PRIO 4            //任务优先级
+#define ADC_STK_SIZE 2048          //任务堆栈大小
+TaskHandle_t ADCTask_Handler;      //任务句柄
+void adc_task(void *pvParameters); //任务函数
 
 /**
  * @brief   主函数,程序入口
@@ -67,6 +72,9 @@ int main(void)
   uart_init(115200);                  // 初始化串口
   // TIM3_Init(202 - 1, 840 - 1);
   TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
+
+  // printf("Init OK!");
+  // HAL_ADC_Start_DMA(&hadc1, (u32 *)value, 10);
 
   //创建开始任务
   xTaskCreate((TaskFunction_t)start_task,          //任务函数
@@ -96,6 +104,13 @@ void start_task(void *pvParameters)
               (void *)NULL,
               (UBaseType_t)LED1_TASK_PRIO,
               (TaskHandle_t *)&LED1Task_Handler);
+  //创建ADC任务
+  xTaskCreate((TaskFunction_t)adc_task,
+              (const char *)"adc_task",
+              (uint16_t)ADC_STK_SIZE,
+              (void *)NULL,
+              (UBaseType_t)ADC_TASK_PRIO,
+              (TaskHandle_t *)&ADCTask_Handler);
   vTaskDelete(StartTask_Handler); //删除开始任务
   taskEXIT_CRITICAL();            //退出临界区
 }
@@ -106,7 +121,7 @@ void led0_task(void *pvParameters)
   while (1)
   {
     LED0_Reverse();
-    vTaskDelay(50);
+    vTaskDelay(500); // 1Hz
   }
 }
 
@@ -116,6 +131,27 @@ void led1_task(void *pvParameters)
   while (1)
   {
     LED1_Reverse();
+    vTaskDelay(50);
+  }
+}
+
+// ADC任务函数
+void adc_task(void *pvParameters)
+{
+  u8 i;
+  u32 Xvalue;
+  u8 temp[10] = {0};
+
+  while (1)
+  {
+    for (i = 0; i < 10; i++)
+    {
+      Xvalue += value[i];
+    }
+    Xvalue /= 10;
+    sprintf(temp, "%f", (float)Xvalue * 3.3 / 4096);
+    OLED_ShowString(88, 0, temp, 16, 1);
+    // OLED_ShowNum(88, 16, Xvalue, 5, 16, 1);
     vTaskDelay(5);
   }
 }

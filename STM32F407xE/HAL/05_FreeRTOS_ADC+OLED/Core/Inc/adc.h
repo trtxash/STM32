@@ -33,6 +33,9 @@ extern "C"
 
   /* USER CODE END Includes */
 
+  extern u32 value[10];
+  extern u32 adcx;
+
   extern ADC_HandleTypeDef hadc1;
   extern DMA_HandleTypeDef hdma_adc1;
 
