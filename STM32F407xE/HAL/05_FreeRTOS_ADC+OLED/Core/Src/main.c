@@ -59,12 +59,13 @@ int main(void)
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
   delay_init(168);                    // 初始化延时函数
   LED_Init();                         // 初始化LED
-                                      // MX_I2C1_Init();                    // 初始化i2c接口
   MX_DMA_Init();                      // 要先初始化DMA
+                                      // MX_I2C1_Init();                    // 初始化i2c接口
   MX_SPI1_Init();                     // 初始化MDA后再初始话SPI
+  MX_ADC1_Init();                     // 初始化ADC1
   OLED_Init();                        // 初始化OLED
   uart_init(115200);                  // 初始化串口
-  TIM3_Init(202 - 1, 840 - 1);
+  // TIM3_Init(202 - 1, 840 - 1);
   TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
 
   //创建开始任务

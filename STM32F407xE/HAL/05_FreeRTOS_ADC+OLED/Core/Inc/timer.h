@@ -22,6 +22,7 @@
 // #include "infraredtobe.h"
 // #include "MLX90614.h"
 
+extern u32 fps_num;
 // extern u32 TIME_N5ms;
 // extern char infraredtobe_flag;
 // extern u8 infraredtobe_state;

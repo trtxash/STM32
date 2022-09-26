@@ -40,6 +40,7 @@ Core/Src/main.c \
 Core/Src/gpio.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
@@ -63,6 +64,7 @@ User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
 Core/Src/timer.c \
+Core/Src/adc.c \
 Core/Src/spi.c \
 Core/Src/dma.c \
 FreeRTOS/portable/Src/port.c \
