@@ -64,14 +64,15 @@ User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
 Core/Src/timer.c \
-Core/Src/adc.c \
-Core/Src/spi.c \
-Core/Src/dma.c \
 Hardware/Src/led.c \
-Hardware/Src/oled.c \
-Hardware/Src/oledio.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
+
+# Core/Src/adc.c \
+# Core/Src/spi.c \
+# Core/Src/dma.c \
+# Hardware/Src/oled.c \
+# Hardware/Src/oledio.c \
 
 # ASM sources
 ASM_SOURCES =  \
