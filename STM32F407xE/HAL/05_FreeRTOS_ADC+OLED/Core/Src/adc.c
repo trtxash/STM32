@@ -22,8 +22,8 @@
 
 /* USER CODE BEGIN 0 */
 
-u32 value[10] = {0};
 u32 adcx = 0;
+float value = 0;
 
 /* USER CODE END 0 */
 
