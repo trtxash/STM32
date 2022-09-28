@@ -51,6 +51,8 @@ int main(void)
   Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
   delay_init(168);                    // 初始化延时函数
   GPIOTest_Init();
+  uart_init(115200);
+  TIM3_Init(10000 - 1, 8400 - 1);
 
   while (1)
   {
