@@ -1,6 +1,6 @@
 /**
- * @file	07_Bluetooth_HC_05
- * @brief 	蓝牙HC-05模块驱动，蓝牙左右电机驱动
+ * @file	08_ADC+OLED+DMA
+ * @brief 	ADC采样，OLED显示，DMA发送
  * @author 	TRTX-gamer
  * @version 1.00
  * @date 	2022年7月21号18点53分
@@ -8,96 +8,47 @@
 
 #include "main.h"
 
-float tem;
+/**
+ * ADC采样注意参考电压VERF+接口，如果悬空，则一直为4095
+ */
 
 /**
  * @brief	主函数,程序入口
  * @param 	none
  * @arg		none
- * @note  	初始化函数后利用定时器5PWM发生器实现4路PWM发生器
+ * @note
  * @retval	int
  */
 int main(void)
 {
-	u16 arr = 500 - 1;
-	u16 psc = 84 - 1;
-
-	HAL_Init();
-	Stm32_Clock_Init(168, 25, 2, 4);
-	uart_init(115200); // 串口1初始化，作为从机，数据采集端
-	delay_init(84);	   //初始化延时函数
-	// Beep_Init();					 //初始化蜂鸣器
-	// Infraredtobe_Init();			 //初始化红外检测模块
-	OLED_Init();				 // OLED初始化
-	SMBus_Init();				 // SMBus初始化
-	TIM1_Init(5000 - 1, 84 - 1); // 200HZ,5ms
-								 // TIM2_Init(10000 - 1, 84 - 1);	 // 100Hz刷新OLED
-	/* TIM4，ch1右上反转，ch2右上正转，ch3左上反转，ch4左上正转 */
-	TIM4_PWM_Init(arr, psc, 0B1111); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
-	/* TIM5，ch1左下正转，ch2左下反转，ch3右下反转，ch4右下正转 */
-	TIM5_PWM_Init(arr, psc, 0B1111); // 2kHz，50%，4路,84M/84=1M的计数频率，自动重装载为500，那么PWM频率为1M/500=2kHZ
-									 // TIM_SetTIM4Compare_n(300, 2);
-									 // TIM_SetTIM4Compare_n(300, 4);
-									 // TIM_SetTIM5Compare_n(300, 1);
-									 // TIM_SetTIM5Compare_n(300, 3);
-									 // Encoder_Init(); // 初始化电机编码器
-									 // OLED_Display(); //显示初始化信息
-
-	plan_qibu();
-	while (TIME_N5ms - TIME_N5ms_old < 400) // 2s
+	if (HAL_Init()) // 初始化HAL库
 	{
+		Error_Handler();
 	}
-	TIME_N5ms_old = TIME_N5ms;
+	Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
+	delay_init(168);					// 初始化延时函数
+	LED_Init();							// 初始化LED
+	MX_DMA_Init();						// 要先初始化DMA
+	// MX_I2C1_Init();                     // 初始化i2c接口
+	MX_SPI1_Init();	   // 初始化MDA后再初始话SPI
+	MX_ADC1_Init();	   // 初始化ADC1
+	OLED_Init();	   // 初始化OLED
+	uart_init(115200); // 初始化串口
+	// TIM3_Init(202 - 1, 840 - 1);
+	TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
 
-	plan_v();
-	while (TIME_N5ms - TIME_N5ms_old < 600) // 3s
-	{
-		if (Now_pos_num == 5)
-		{
-			delay_ms(10);
-			plan_stop();
-			delay_ms(10);
-			break;
-		}
-	}
-	TIME_N5ms_old = TIME_N5ms;
+	printf("Inie OK!\n");
 
-	plan_you();
+	u8 temp[10] = {0};
 	while (1)
 	{
-		if (Now_pos_num == 0)
+		HAL_ADC_Start_DMA(&hadc1, (u32 *)&adcx, 1); // 启动ADC+DMA
+
+		while (1)
 		{
-			plan_stop();
-			delay_ms(10);
-			break;
+			printf("value=%d,%f\n", adcx, value);
+			sprintf(temp, "%f", value);
+			OLED_ShowString(64, 0, temp, 16, 1);
+			vTaskDelay(5);
 		}
 	}
-	TIME_N5ms_old = TIME_N5ms;
-
-	plan_qibu();
-	while (TIME_N5ms - TIME_N5ms_old < 400) // 2s
-	{
-	}
-	TIME_N5ms_old = TIME_N5ms;
-
-	plan_v();
-	Encoder_target_1 = Encoder_target_2 = Encoder_target_3 = Encoder_target_4 = Encoder_target = 250;
-	while (TIME_N5ms - TIME_N5ms_old < 400) // 2s
-	{
-		if (Now_pos_num == 5 || Now_pos_num == 9 || Now_pos_num == -5)
-		{
-			TIM_SetTIM4Compare_n(500, 2);
-			TIM_SetTIM4Compare_n(500, 4);
-			TIM_SetTIM5Compare_n(500, 1);
-			TIM_SetTIM5Compare_n(500, 3);
-			plan_stop();
-			delay_ms(10);
-			break;
-		}
-	}
-	TIME_N5ms_old = TIME_N5ms;
-
-	while (1)
-	{
-	}
-}
