@@ -10,14 +10,13 @@
                 "${workspaceFolder}/Drivers/CMSIS/Include",
                 "${workspaceFolder}/RTT",
                 "${workspaceFolder}/User/Inc",
-                "${workspaceFolder}/Hardware/Inc"
+                "${workspaceFolder}/Hardware/Inc",
+                "${workspaceFolder}/FreeRtos/Inc",
+                "${workspaceFolder}/FreeRtos/portable/Inc"
             ],
             "defines": [
                 "USE_HAL_DRIVER",
-                "STM32F401xC",
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
+                "STM32F401xC"
             ],
             "compilerPath": "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin/arm-none-eabi-gcc.exe",
             "cStandard": "c99",
