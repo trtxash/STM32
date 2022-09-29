@@ -2,8 +2,8 @@
 #define _USART_H
 #include "sys.h"
 #include "stdio.h"
-#include "oled.h"
-#include "pid.h"
+// #include "oled.h"
+// #include "pid.h"
 
 #define EN_USART1_RX 1 //使能（1）/禁止（0）串口1接收
 #define EN_USART6_RX 1 //使能（1）/禁止（0）串口1接收

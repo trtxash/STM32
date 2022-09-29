@@ -1,10 +1,4 @@
 #include "usart.h"
-#include "delay.h"
-//////////////////////////////////////////////////////////////////////////////////
-//如果使用os,则包括下面的头文件即可.
-#if SYSTEM_SUPPORT_OS
-#include "includes.h" //os 使用
-#endif
 
 //加入以下代码,支持printf函数,而不需要选择use MicroLIB
 // #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
@@ -64,6 +58,25 @@ unsigned char isok;
 
 UART_HandleTypeDef UART1_Handler; // UART1句柄
 UART_HandleTypeDef UART6_Handler; // UART6句柄
+
+#ifdef __GNUC__
+__attribute__((used)) int _write(int fd, char *ptr, int len)
+{
+	int i;
+	for (i = 0; i < len; i++)
+	{
+		USART1->DR = ptr[i];
+		while ((USART1->SR & 0x40) == 0)
+			;
+	}
+	return len;
+}
+// int _write(int fd, char *ptr, int len) // 重定向 _write() 函数
+// {
+// 	HAL_UART_Transmit(&UART1_Handler, (uint8_t *)ptr, len, 0xFFFF);
+// 	return len;
+// }
+#endif
 
 //------------------------------------------------------------------------------------------------------------------------
 // unsigned char readValuePack(RxPack *rx_pack_ptr)
@@ -203,7 +216,7 @@ unsigned char readValuePack(RxPack *rx_pack_ptr)
 			rdIndex++;
 			err++;
 		}
-		}
+	}
 	return isok;
 }
 
@@ -378,23 +391,23 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
 #if EN_USART1_RX
 		HAL_NVIC_EnableIRQ(USART1_IRQn);		 //使能USART1中断通道
-		HAL_NVIC_SetPriority(USART1_IRQn, 0, 1); //抢占优先级2，子优先级1
+		HAL_NVIC_SetPriority(USART1_IRQn, 0, 0); //抢占优先级0，子优先级0
 #endif
 	}
-	if (huart->Instance == USART6) //如果是串口1，进行串口1 MSP初始化
+	if (huart->Instance == USART6) //如果是串口6，进行串口1 MSP初始化
 	{
-		__HAL_RCC_GPIOA_CLK_ENABLE();  //使能GPIOA时钟
+		__HAL_RCC_GPIOC_CLK_ENABLE();  //使能GPIOA时钟
 		__HAL_RCC_USART6_CLK_ENABLE(); //使能USART6时钟
 
-		GPIO_Initure.Pin = GPIO_PIN_11;			  // PA11
+		GPIO_Initure.Pin = GPIO_PIN_6;			  // PA11
 		GPIO_Initure.Mode = GPIO_MODE_AF_PP;	  //复用推挽输出
 		GPIO_Initure.Pull = GPIO_PULLUP;		  //上拉
 		GPIO_Initure.Speed = GPIO_SPEED_FAST;	  //高速
 		GPIO_Initure.Alternate = GPIO_AF8_USART6; //复用为USART6
-		HAL_GPIO_Init(GPIOA, &GPIO_Initure);	  //初始化PA11
+		HAL_GPIO_Init(GPIOC, &GPIO_Initure);	  //初始化PA11
 
-		GPIO_Initure.Pin = GPIO_PIN_12;		 // PA12
-		HAL_GPIO_Init(GPIOA, &GPIO_Initure); //初始化PA12
+		GPIO_Initure.Pin = GPIO_PIN_7;		 // PA12
+		HAL_GPIO_Init(GPIOC, &GPIO_Initure); //初始化PA12
 
 #if EN_USART6_RX
 		HAL_NVIC_EnableIRQ(USART6_IRQn);		 //使能USART1中断通道
@@ -408,9 +421,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 void USART1_IRQHandler(void)
 {
 	u8 Res;
-#if SYSTEM_SUPPORT_OS //使用OS
-	OSIntEnter();
-#endif
+
 	if (__HAL_UART_GET_IT_SOURCE(&UART1_Handler, UART_IT_RXNE)) // 判断是否为接收中断
 	{
 		vp_rxbuff[rxIndex] = USART1->DR;	  //读取串口数据
@@ -487,49 +498,40 @@ void USART1_IRQHandler(void)
 	// 	else
 	// 		rxIndex = 0;
 	// }
-#if SYSTEM_SUPPORT_OS //使用OS
-	OSIntExit();
-#endif
 }
 
 //串口6中断服务程序
 void USART6_IRQHandler(void)
 {
-#if SYSTEM_SUPPORT_OS //使用OS
-	OSIntEnter();
-#endif
-	vp_rxbuff[rxIndex] = USART6->DR;	  //读取串口数据
-	if (USART6->DR == 0XA5)				  //接受到了开始数据，数据包头正确
-		rxIndex = 0;					  //接收累加器清零
-	rxIndex++;							  //接收累加器加1
-	if (rxIndex == VALUEPACK_BUFFER_SIZE) //接收完成了
-	{
-		if (vp_rxbuff[rxIndex - 1] = 0X5A) // 数据包尾接受正确
-		{
-			u8 temp;
-			rxIndex = 0;
-			for (int i = 0; i < VALUEPACK_BUFFER_SIZE - 3; i++)
-			{
-				temp += vp_rxbuff[i + 1];
-			}
-			if (temp == vp_rxbuff[VALUEPACK_BUFFER_SIZE - 2]) // 校验数据包和
-			{
-				move = vp_rxbuff[1] & 0X01;				//移动控制
-				bluetooth = (vp_rxbuff[1] >> 1) & 0X01; //蓝牙控制
-				beep = (vp_rxbuff[1] >> 2) & 0X01;		//蜂鸣器控制
-				Angle_Target = (float)(vp_rxbuff[2] + 0x100 * vp_rxbuff[3] + 0x10000 * vp_rxbuff[4] + 0x1000000 * vp_rxbuff[5]) / 100;
-				TargetSpeed = (float)(vp_rxbuff[6] + 0x100 * vp_rxbuff[7] + 0x10000 * vp_rxbuff[8] + 0x1000000 * vp_rxbuff[9]) / 100;
-			}
-			else
-			{
-				rxIndex = 0; // 数据包错误,重新开始接收
-			}
-		}
-		else
-			rxIndex = 0;
-	}
+	// vp_rxbuff[rxIndex] = USART6->DR;	  //读取串口数据
+	// if (USART6->DR == 0XA5)				  //接受到了开始数据，数据包头正确
+	// 	rxIndex = 0;					  //接收累加器清零
+	// rxIndex++;							  //接收累加器加1
+	// if (rxIndex == VALUEPACK_BUFFER_SIZE) //接收完成了
+	// {
+	// 	if (vp_rxbuff[rxIndex - 1] = 0X5A) // 数据包尾接受正确
+	// 	{
+	// 		u8 temp;
+	// 		rxIndex = 0;
+	// 		for (int i = 0; i < VALUEPACK_BUFFER_SIZE - 3; i++)
+	// 		{
+	// 			temp += vp_rxbuff[i + 1];
+	// 		}
+	// 		if (temp == vp_rxbuff[VALUEPACK_BUFFER_SIZE - 2]) // 校验数据包和
+	// 		{
+	// 			move = vp_rxbuff[1] & 0X01;				//移动控制
+	// 			bluetooth = (vp_rxbuff[1] >> 1) & 0X01; //蓝牙控制
+	// 			beep = (vp_rxbuff[1] >> 2) & 0X01;		//蜂鸣器控制
+	// 			Angle_Target = (float)(vp_rxbuff[2] + 0x100 * vp_rxbuff[3] + 0x10000 * vp_rxbuff[4] + 0x1000000 * vp_rxbuff[5]) / 100;
+	// 			TargetSpeed = (float)(vp_rxbuff[6] + 0x100 * vp_rxbuff[7] + 0x10000 * vp_rxbuff[8] + 0x1000000 * vp_rxbuff[9]) / 100;
+	// 		}
+	// 		else
+	// 		{
+	// 			rxIndex = 0; // 数据包错误,重新开始接收
+	// 		}
+	// 	}
+	// 	else
+	// 		rxIndex = 0;
+	// }
 	__HAL_UART_CLEAR_FLAG(&UART6_Handler, UART_FLAG_RXNE); //清除接收中断标志
-#if SYSTEM_SUPPORT_OS									   //使用OS
-	OSIntExit();
-#endif
 }
