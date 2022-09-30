@@ -29,38 +29,18 @@ extern "C"
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-
-  /* Private includes ----------------------------------------------------------*/
-  /* USER CODE BEGIN Includes */
-
-  /* USER CODE END Includes */
-
-  /* Exported types ------------------------------------------------------------*/
-  /* USER CODE BEGIN ET */
-
-  /* USER CODE END ET */
-
-  /* Exported constants --------------------------------------------------------*/
-  /* USER CODE BEGIN EC */
-
-  /* USER CODE END EC */
-
-  /* Exported macro ------------------------------------------------------------*/
-  /* USER CODE BEGIN EM */
-
-  /* USER CODE END EM */
-
-  /* Exported functions prototypes ---------------------------------------------*/
-  void Error_Handler(void);
-
-  /* USER CODE BEGIN EFP */
-
-  /* USER CODE END EFP */
-
-  /* Private defines -----------------------------------------------------------*/
-  /* USER CODE BEGIN Private defines */
-
-  /* USER CODE END Private defines */
+#include "sys.h"
+#include "delay.h"
+#include "usart.h"
+// #include "timer.h"
+// #include "i2c.h"
+// #include "spi.h"
+// #include "adc.h"
+// #include "dma.h"
+// #include "FreeRTOS.h"
+// #include "task.h"
+// #include "led.h"
+// #include "oled.h"
 
 #ifdef __cplusplus
 }

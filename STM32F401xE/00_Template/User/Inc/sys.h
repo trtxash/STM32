@@ -59,9 +59,9 @@ typedef __I uint8_t vuc8;
 #define GPIOF_ODR_Addr (GPIOF_BASE + 20) // 0x40021414
 #define GPIOG_ODR_Addr (GPIOG_BASE + 20) // 0x40021814
 #define GPIOH_ODR_Addr (GPIOH_BASE + 20) // 0x40021C14
-#define GPIOI_ODR_Addr (GPIOI_BASE + 20) // 0x40022014
-#define GPIOJ_ODR_ADDr (GPIOJ_BASE + 20) // 0x40022414
-#define GPIOK_ODR_ADDr (GPIOK_BASE + 20) // 0x40022814
+// #define GPIOI_ODR_Addr (GPIOI_BASE + 20) // 0x40022014
+// #define GPIOJ_ODR_ADDr (GPIOJ_BASE + 20) // 0x40022414
+// #define GPIOK_ODR_ADDr (GPIOK_BASE + 20) // 0x40022814
 
 #define GPIOA_IDR_Addr (GPIOA_BASE + 16) // 0x40020010
 #define GPIOB_IDR_Addr (GPIOB_BASE + 16) // 0x40020410
@@ -71,9 +71,9 @@ typedef __I uint8_t vuc8;
 #define GPIOF_IDR_Addr (GPIOF_BASE + 16) // 0x40021410
 #define GPIOG_IDR_Addr (GPIOG_BASE + 16) // 0x40021810
 #define GPIOH_IDR_Addr (GPIOH_BASE + 16) // 0x40021C10
-#define GPIOI_IDR_Addr (GPIOI_BASE + 16) // 0x40022010
-#define GPIOJ_IDR_Addr (GPIOJ_BASE + 16) // 0x40022410
-#define GPIOK_IDR_Addr (GPIOK_BASE + 16) // 0x40022810
+// #define GPIOI_IDR_Addr (GPIOI_BASE + 16) // 0x40022010
+// #define GPIOJ_IDR_Addr (GPIOJ_BASE + 16) // 0x40022410
+// #define GPIOK_IDR_Addr (GPIOK_BASE + 16) // 0x40022810
 
 // IO口操作,只对单一的IO口!
 //确保n的值小于16!
@@ -101,16 +101,16 @@ typedef __I uint8_t vuc8;
 #define PHout(n) BIT_ADDR(GPIOH_ODR_Addr, n) //输出
 #define PHin(n) BIT_ADDR(GPIOH_IDR_Addr, n)  //输入
 
-#define PIout(n) BIT_ADDR(GPIOI_ODR_Addr, n) //输出
-#define PIin(n) BIT_ADDR(GPIOI_IDR_Addr, n)  //输入
+// #define PIout(n) BIT_ADDR(GPIOI_ODR_Addr, n) //输出
+// #define PIin(n) BIT_ADDR(GPIOI_IDR_Addr, n)  //输入
 
-#define PJout(n) BIT_ADDR(GPIOJ_ODR_Addr, n) //输出
-#define PJin(n) BIT_ADDR(GPIOJ_IDR_Addr, n)  //输入
+// #define PJout(n) BIT_ADDR(GPIOJ_ODR_Addr, n) //输出
+// #define PJin(n) BIT_ADDR(GPIOJ_IDR_Addr, n)  //输入
 
-#define PKout(n) BIT_ADDR(GPIOK_ODR_Addr, n) //输出
-#define PKin(n) BIT_ADDR(GPIOK_IDR_Addr, n)  //输入
+// #define PKout(n) BIT_ADDR(GPIOK_ODR_Addr, n) //输出
+// #define PKin(n) BIT_ADDR(GPIOK_IDR_Addr, n)  //输入
 
-void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq); //时钟系统配置
+void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq); // 时钟系统配置
 void Error_Handler(void);                                      // 异常处理函数
 //以下为汇编函数
 void WFI_SET(void);      //执行WFI指令
