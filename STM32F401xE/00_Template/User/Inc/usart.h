@@ -86,28 +86,28 @@ typedef struct
 
 extern UART_HandleTypeDef UART1_Handler; // UART句柄
 extern UART_HandleTypeDef UART6_Handler; // UART句柄
-extern RxPack rxpack;
-extern u8 beep;
-extern u8 move;
-extern u8 bluetooth;
-extern short Encoder_1;      // 外部变量，当前1速度
-extern short Encoder_2;      // 外部变量，当前2速度
-extern short Encoder_3;      // 外部变量，当前3速度
-extern short Encoder_4;      // 外部变量，当前4速度
-extern short Encoder_target_1;
-extern short Encoder_target_2;
-extern short Encoder_target_3;
-extern short Encoder_target_4;
-extern int pwmval_1;    // 定时器5PWM占空比设置
-extern int pwmval_2;    // 定时器5PWM占空比设置
-extern int pwmval_3;    // 定时器5PWM占空比设置
-extern int pwmval_4;    // 定时器5PWM占空比设置
-extern double TargetSpeed_1; // 目标速度
-extern double TargetSpeed_2; // 目标速度
-extern double TargetSpeed;   // 目标和速度
-extern double Angle_Target;  // 目标速度
-extern int Now_pos;          // 当前位置
-extern float tem;            // 温度数组
+// extern RxPack rxpack;
+// extern u8 beep;
+// extern u8 move;
+// extern u8 bluetooth;
+// extern short Encoder_1; // 外部变量，当前1速度
+// extern short Encoder_2; // 外部变量，当前2速度
+// extern short Encoder_3; // 外部变量，当前3速度
+// extern short Encoder_4; // 外部变量，当前4速度
+// extern short Encoder_target_1;
+// extern short Encoder_target_2;
+// extern short Encoder_target_3;
+// extern short Encoder_target_4;
+// extern int pwmval_1;         // 定时器5PWM占空比设置
+// extern int pwmval_2;         // 定时器5PWM占空比设置
+// extern int pwmval_3;         // 定时器5PWM占空比设置
+// extern int pwmval_4;         // 定时器5PWM占空比设置
+// extern double TargetSpeed_1; // 目标速度
+// extern double TargetSpeed_2; // 目标速度
+// extern double TargetSpeed;   // 目标和速度
+// extern double Angle_Target;  // 目标速度
+// extern int Now_pos;          // 当前位置
+// extern float tem;            // 温度数组
 
 //如果想串口中断接收，请不要注释以下宏定义
 void uart_init(u32 bound);
