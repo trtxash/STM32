@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file           : main.h
- * @brief          : Header for main.c file.
- *                   This file contains the common defines of the application.
+ * @file    i2c.h
+ * @brief   This file contains all the function prototypes for
+ *          the i2c.c file
  ******************************************************************************
  * @attention
  *
@@ -17,10 +17,9 @@
  ******************************************************************************
  */
 /* USER CODE END Header */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __I2C_H__
+#define __I2C_H__
 
 #ifdef __cplusplus
 extern "C"
@@ -28,22 +27,26 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-#include "sys.h"
-#include "delay.h"
-#include "usart.h"
-#include "timer.h"
-// #include "i2c.h"
-#include "spi.h"
-#include "adc.h"
-#include "dma.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "led.h"
-#include "oled.h"
+#include "main.h"
+
+  /* USER CODE BEGIN Includes */
+
+  /* USER CODE END Includes */
+
+  extern I2C_HandleTypeDef hi2c1;
+
+  /* USER CODE BEGIN Private defines */
+
+  /* USER CODE END Private defines */
+
+  void MX_I2C1_Init(void);
+
+  /* USER CODE BEGIN Prototypes */
+
+  /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H */
+#endif /* __I2C_H__ */
