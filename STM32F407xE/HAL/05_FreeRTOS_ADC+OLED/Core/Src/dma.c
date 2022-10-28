@@ -40,18 +40,35 @@ void MX_DMA_Init(void)
 {
 
   /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
   __HAL_RCC_DMA2_CLK_ENABLE();
 
   /* DMA interrupt init */
+
+  /* DMA1_Stream6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 3, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
+
   /* DMA2_Stream0_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 3, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+
   /* DMA2_Stream3_IRQn interrupt configuration */
   // HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 15, 0);
   // HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 }
 
-void DMA2_Stream0_IRQHandler(void)
+void DMA1_Stream6_IRQHandler(void) // I2C1
+{
+  if (__HAL_DMA_GET_FLAG(&hdma_i2c1_tx, DMA_FLAG_TCIF2_6))
+  {
+    fps_num++;
+
+    __HAL_DMA_CLEAR_FLAG(&hdma_i2c1_tx, DMA_FLAG_TCIF2_6);
+  }
+}
+
+void DMA2_Stream0_IRQHandler(void) // ADC1
 {
   // if (__HAL_DMA_GET_FLAG(&hdma_adc1, DMA_FLAG_TCIF0_4))
   // {
@@ -60,7 +77,8 @@ void DMA2_Stream0_IRQHandler(void)
   __HAL_DMA_CLEAR_FLAG(&hdma_adc1, DMA_FLAG_TCIF0_4);
   // }
 }
-void DMA2_Stream3_IRQHandler(void)
+
+void DMA2_Stream3_IRQHandler(void) // SPI1
 {
   if (__HAL_DMA_GET_FLAG(&hdma_spi1_tx, DMA_FLAG_TCIF3_7))
   {

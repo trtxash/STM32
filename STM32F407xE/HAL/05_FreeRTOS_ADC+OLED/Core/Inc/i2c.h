@@ -34,6 +34,7 @@ extern "C"
   /* USER CODE END Includes */
 
   extern I2C_HandleTypeDef hi2c1;
+  extern DMA_HandleTypeDef hdma_i2c1_tx;
 
   /* USER CODE BEGIN Private defines */
 

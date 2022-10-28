@@ -4,8 +4,8 @@
  *          根据实际设备配置，硬件IIC，SPI相关配置在CORE中
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.01
- * @date 	2022年9月18号23点43分
+ * @version 1.1
+ * @date 	2022年10月28号14点07分
  */
 
 #ifndef __OLEDCONF_H
@@ -26,10 +26,10 @@
 #define OLED_DMA_DISABLE 0
 #define OLED_DMA_ABLE 1
 
-/* OLED 具体选择 */
+/* OLED 具体选择------------------------------------------------------------------------- */
 #define _OLED_DRIVER_IC_TYPE OLED_SSD1306_SSD1315 // 改SSD种类
 #define _SOFT_OR_HARE OLED_HARD                   // 改是否软件模拟
-#define _DRIVE_INTERFACE_TYPE OLED_SPI_INTERFACE  // 改接口类型
+#define _DRIVE_INTERFACE_TYPE OLED_IIC_INTERFACE  // 改接口类型
 #define _OLED_DMA OLED_DMA_ABLE                   // 改是否开启DMA
 
 /* OLED 的通信地址 */

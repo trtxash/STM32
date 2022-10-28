@@ -65,6 +65,7 @@ User/Src/delay.c \
 User/Src/usart.c \
 Core/Src/timer.c \
 Core/Src/adc.c \
+Core/Src/i2c.c \
 Core/Src/spi.c \
 Core/Src/dma.c \
 FreeRTOS/portable/Src/port.c \
