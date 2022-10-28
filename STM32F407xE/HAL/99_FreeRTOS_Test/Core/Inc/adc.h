@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file           : main.h
- * @brief          : Header for main.c file.
- *                   This file contains the common defines of the application.
+ * @file    adc.h
+ * @brief   This file contains all the function prototypes for
+ *          the adc.c file
  ******************************************************************************
  * @attention
  *
@@ -17,10 +17,9 @@
  ******************************************************************************
  */
 /* USER CODE END Header */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __ADC_H__
+#define __ADC_H__
 
 #ifdef __cplusplus
 extern "C"
@@ -28,22 +27,33 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-#include "sys.h"
-#include "delay.h"
-#include "usart.h"
-#include "timer.h"
-// #include "i2c.h"
-#include "spi.h"
-#include "adc.h"
-#include "dma.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "led.h"
-#include "oled.h"
+#include "main.h"
+
+  /* USER CODE BEGIN Includes */
+
+  /* USER CODE END Includes */
+
+  extern u32 adcx;
+  extern float value;
+
+  extern ADC_HandleTypeDef hadc1;
+  extern DMA_HandleTypeDef hdma_adc1;
+
+  /* USER CODE BEGIN Private defines */
+
+  /* USER CODE END Private defines */
+
+  void MX_ADC1_Init(void);
+
+  /* USER CODE BEGIN Prototypes */
+
+  u16 Get_Adc(u32 ch);
+  u16 Get_Adc_Average(u32 ch, u8 times);
+
+  /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H */
+#endif /* __ADC_H__ */

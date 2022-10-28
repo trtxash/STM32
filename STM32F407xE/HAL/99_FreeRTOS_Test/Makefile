@@ -37,8 +37,10 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Core/Src/main.c \
+Core/Src/gpio.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
@@ -55,22 +57,25 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
 Core/Src/system_stm32f4xx.c \
 User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
 Core/Src/timer.c \
+Core/Src/adc.c \
+Core/Src/spi.c \
+Core/Src/dma.c \
 FreeRTOS/portable/Src/port.c \
 FreeRTOS/portable/MemMang/Src/heap_4.c \
-FreeRTOS/Src/croutine.c \
-FreeRTOS/Src/event_groups.c \
-FreeRTOS/Src/list.c \
-FreeRTOS/Src/queue.c \
-FreeRTOS/Src/stream_buffer.c \
 FreeRTOS/Src/tasks.c \
 FreeRTOS/Src/timers.c \
+FreeRTOS/Src/queue.c \
+FreeRTOS/Src/list.c \
+Hardware/Src/oled.c \
+Hardware/Src/oledio.c \
 Hardware/Src/led.c \
-Hardware/Src/gpiotest.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 
