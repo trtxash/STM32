@@ -52,7 +52,7 @@ int main(void)
   LED_Init();                         // 初始化LED
   MX_DMA_Init();                      // 要先初始化DMA
   MX_I2C1_Init();                     // 初始化i2c接口
-  // MX_SPI1_Init();                     // 初始化MDA后再初始话SPI
+  MX_SPI1_Init();                     // 初始化MDA后再初始话SPI
   MX_ADC1_Init();    // 初始化ADC1
   OLED_Init();       // 初始化OLED
   uart_init(115200); // 初始化串口
