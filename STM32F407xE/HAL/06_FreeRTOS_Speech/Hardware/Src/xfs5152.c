@@ -1,3 +1,11 @@
+/**
+ * @file	xfs5152.h
+ * @brief 	移植Speech
+ * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
+ *          突然吐血    https://space.bilibili.com/12890038;
+ * @version 1.00
+ * @date 	2022年10月29号16点48分
+ */
 #include "xfs5152.h"
 // uft8编码下中文使用speech_text_utf8函数，其他用speech_text
 

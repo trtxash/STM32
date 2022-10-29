@@ -4,11 +4,7 @@
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.02
- * @date 	2022年9月28号20点54分
- */
-
-/**
- * ADC采样注意参考电压VERF+接口，如果悬空，则一直为4095
+ * @date 	2022年10月29号16点48分
  */
 #include "main.h"
 
