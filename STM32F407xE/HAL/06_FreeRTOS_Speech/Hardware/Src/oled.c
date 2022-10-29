@@ -4,15 +4,37 @@
  *          这是相关API
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.01
- * @date 	2022年9月18号23点43分
+ * @version 1.1
+ * @date 	2022年10月28号14点07分
+ */
+
+/**
+ * 软件模拟，未开启GCC优化
+ * IIC最大185fps，延时  TIM3_Init(540 - 1, 840 - 1);
+ * SPI最大720fps，延时  TIM3_Init(139 - 1, 840 - 1);
+ *
+ * 硬件，未开启GCC优化
+ * IIC最大126fps，延时  TIM3_Init(795 - 1, 840 - 1);I2C最大1.2Mbit/s
+ * SPI最大495FPS，延时  TIM3_Init(202 - 1, 840 - 1);SPI最大42Mbit/s。因为用了HAL，速度较慢
+ *
+ * DMA,未开启GCC优化
+ * I2C,DMA下FPS不好测，估算 126FPS，实际写入可能低一点,I2C最大1.2Mbit/s
+ * SPI,DMA下FPS不好测，估算 5,126FPS，实际写入可能低一点,SPI最大42Mbit/s
+ */
+
+/**
+ * 软件模拟优点：波特率高，速度快，可移植性好
+ *        缺点：占用管脚口，使用MCU资源多，不太稳定，编时序复杂
+ * 硬件优缺点和软件模拟相反
+ *
+ * 本次实验还可以继续优化
+ *    优化方向1：不用HAL的SPI发送，用寄存器；
  */
 
 #include "oled.h"
 #include "oledfont.h"
 
-static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布
-// static u8 OLED_GRAM[OLED_HEIGHT / 8][OLED_WIDTH] = {0}; // OLED画布
+static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布,与寻址方式初始化有关
 
 /* 相关选择-------------------------------------------------------------------------------------------------- */
 
@@ -128,16 +150,13 @@ void OLED_WR_DATA8(u8 dat)
 #endif
 }
 
-//更新显存到OLED
+// 更新显存到OLED
 void OLED_Refresh(void)
 {
 #if _OLED_DMA == OLED_DMA_DISABLE
     u8 i, n;
-    for (i = 0; i < 8; i++)
+    for (n = 0; n < 128; n++)
     {
-        // OLED_WR_CMD(0xb0 + i); //设置行起始地址
-        // OLED_WR_CMD(0x00);     //设置低列起始地址
-        // OLED_WR_CMD(0x10);     //设置高列起始地址
 #if _SOFT_OR_HARE == OLED_SOFT
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
@@ -146,33 +165,26 @@ void OLED_Refresh(void)
         OledDrv_IICWaitAck();
         OledDrv_IICSendByte(0x40);
         OledDrv_IICWaitAck();
-        for (n = 0; n < 128; n++)
+        for (i = 0; i < 8; i++)
         {
             OledDrv_IICSendByte(OLED_GRAM[n][i]);
             OledDrv_IICWaitAck();
         }
         OledDrv_IICStop();
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-        for (n = 0; n < 128; n++)
+        for (i = 0; i < 8; i++)
+        {
             OLED_WR_DATA8(OLED_GRAM[n][i]);
+        }
 #endif
 
 #elif _SOFT_OR_HARE == OLED_HARD
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
-        OledDrv_IICStart();
-        OledDrv_IICSendByte(OLED_ADDRESS);
-        OledDrv_IICWaitAck();
-        OledDrv_IICSendByte(0x40);
-        OledDrv_IICWaitAck();
-        for (n = 0; n < 128; n++)
-        {
-            OledDrv_IICSendByte(OLED_GRAM[n][i]);
-            OledDrv_IICWaitAck();
-        }
-        OledDrv_IICStop();
+        HAL_I2C_Mem_Write(&hi2c1, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8, 2000);
+        break;
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-        for (n = 0; n < 128; n++)
+        for (i = 0; i < 8; i++)
         {
             OLED_DC_Set();
             OLED_CS_Clr();
@@ -185,51 +197,52 @@ void OLED_Refresh(void)
 #endif
     }
 #elif _OLED_DMA == OLED_DMA_ABLE
+
+#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+    HAL_I2C_Mem_Write_DMA(&hi2c1, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8);
+#elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE
     OLED_CS_Clr();
     HAL_SPI_Transmit_DMA(&hspi1, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8); // DMA循环，运行一次就行
+#endif
+
 #endif
 }
 
 /* 公共部分-------------------------------------------------------------------------------------------------- */
 
-//开启OLED显示
+// 开启OLED显示
 void OLED_DisPlay_On(void)
 {
-    OLED_WR_CMD(0x8D); //电荷泵使能
-    OLED_WR_CMD(0x14); //开启电荷泵
-    OLED_WR_CMD(0xAF); //点亮屏幕
+    OLED_WR_CMD(0x8D); // 电荷泵使能
+    OLED_WR_CMD(0x14); // 开启电荷泵
+    OLED_WR_CMD(0xAF); // 点亮屏幕
 }
 
-//关闭OLED显示
+// 关闭OLED显示
 void OLED_DisPlay_Off(void)
 {
-    OLED_WR_CMD(0x8D); //电荷泵使能
-    OLED_WR_CMD(0x10); //关闭电荷泵
-    OLED_WR_CMD(0xAE); //关闭屏幕
+    OLED_WR_CMD(0x8D); // 电荷泵使能
+    OLED_WR_CMD(0x10); // 关闭电荷泵
+    OLED_WR_CMD(0xAE); // 关闭屏幕
 }
 
-//清屏函数
+// 清屏函数
 void OLED_Clear(void)
 {
     u8 i, n;
-    for (i = 0; i < 8; i++)
+    for (n = 0; n < 128; n++)
     {
-        for (n = 0; n < 128; n++)
+        for (i = 0; i < 8; i++)
         {
-            OLED_GRAM[n][i] = 0; //清除所有数据
-            OLED_DC_Set();
-            OLED_CS_Clr();
-            HAL_SPI_Transmit(&hspi1, &OLED_GRAM[n][i], 1, 100);
-            OLED_CS_Set();
-            OLED_DC_Set();
+            OLED_GRAM[n][i] = 0; // 清除所有数据
         }
     }
 }
 
-//画点
-// x:0~127
-// y:0~63
-// t:1 填充 0,清空
+// 画点
+//  x:0~127
+//  y:0~63
+//  t:1 填充 0,清空
 void OLED_DrawPoint(u8 x, u8 y, u8 t)
 {
     u8 i, m, n;
@@ -248,22 +261,22 @@ void OLED_DrawPoint(u8 x, u8 y, u8 t)
     }
 }
 
-//画线
-// x1,y1:起点坐标
-// x2,y2:结束坐标
+// 画线
+//  x1,y1:起点坐标
+//  x2,y2:结束坐标
 void OLED_DrawLine(u8 x1, u8 y1, u8 x2, u8 y2, u8 mode)
 {
     u16 t;
     int xerr = 0, yerr = 0, delta_x, delta_y, distance;
     int incx, incy, uRow, uCol;
-    delta_x = x2 - x1; //计算坐标增量
+    delta_x = x2 - x1; // 计算坐标增量
     delta_y = y2 - y1;
-    uRow = x1; //画线起点坐标
+    uRow = x1; // 画线起点坐标
     uCol = y1;
     if (delta_x > 0)
-        incx = 1; //设置单步方向
+        incx = 1; // 设置单步方向
     else if (delta_x == 0)
-        incx = 0; //垂直线
+        incx = 0; // 垂直线
     else
     {
         incx = -1;
@@ -272,19 +285,19 @@ void OLED_DrawLine(u8 x1, u8 y1, u8 x2, u8 y2, u8 mode)
     if (delta_y > 0)
         incy = 1;
     else if (delta_y == 0)
-        incy = 0; //水平线
+        incy = 0; // 水平线
     else
     {
         incy = -1;
         delta_y = -delta_x;
     }
     if (delta_x > delta_y)
-        distance = delta_x; //选取基本增量坐标轴
+        distance = delta_x; // 选取基本增量坐标轴
     else
         distance = delta_y;
     for (t = 0; t < distance + 1; t++)
     {
-        OLED_DrawPoint(uRow, uCol, mode); //画点
+        OLED_DrawPoint(uRow, uCol, mode); // 画点
         xerr += delta_x;
         yerr += delta_y;
         if (xerr > distance)
@@ -319,7 +332,7 @@ void OLED_DrawCircle(u8 x, u8 y, u8 r)
         OLED_DrawPoint(x - b, y + a, 1);
 
         a++;
-        num = (a * a + b * b) - r * r; //计算画的点离圆心的距离
+        num = (a * a + b * b) - r * r; // 计算画的点离圆心的距离
         if (num > 0)
         {
             b--;
@@ -328,11 +341,11 @@ void OLED_DrawCircle(u8 x, u8 y, u8 r)
     }
 }
 
-//在指定位置显示一个字符,包括部分字符
-// x:0~127
-// y:0~63
-// size1:选择字体 6x8/6x12/8x16/12x24
-// mode:0,反色显示;1,正常显示
+// 在指定位置显示一个字符,包括部分字符
+//  x:0~127
+//  y:0~63
+//  size1:选择字体 6x8/6x12/8x16/12x24
+//  mode:0,反色显示;1,正常显示
 void OLED_ShowChar(u8 x, u8 y, u8 chr, u8 size1, u8 mode)
 {
     u8 i, m, temp, size2, chr1;
@@ -340,26 +353,26 @@ void OLED_ShowChar(u8 x, u8 y, u8 chr, u8 size1, u8 mode)
     if (size1 == 8)
         size2 = 6;
     else
-        size2 = (size1 / 8 + ((size1 % 8) ? 1 : 0)) * (size1 / 2); //得到字体一个字符对应点阵集所占的字节数
-    chr1 = chr - ' ';                                              //计算偏移后的值
+        size2 = (size1 / 8 + ((size1 % 8) ? 1 : 0)) * (size1 / 2); // 得到字体一个字符对应点阵集所占的字节数
+    chr1 = chr - ' ';                                              // 计算偏移后的值
     for (i = 0; i < size2; i++)
     {
         if (size1 == 8)
         {
             temp = asc2_0806[chr1][i];
-        } //调用0806字体
+        } // 调用0806字体
         else if (size1 == 12)
         {
             temp = asc2_1206[chr1][i];
-        } //调用1206字体
+        } // 调用1206字体
         else if (size1 == 16)
         {
             temp = asc2_1608[chr1][i];
-        } //调用1608字体
+        } // 调用1608字体
         else if (size1 == 24)
         {
             temp = asc2_2412[chr1][i];
-        } //调用2412字体
+        } // 调用2412字体
         else
             return;
         for (m = 0; m < 8; m++)
@@ -381,14 +394,14 @@ void OLED_ShowChar(u8 x, u8 y, u8 chr, u8 size1, u8 mode)
     }
 }
 
-//显示字符串
-// x,y:起点坐标
-// size1:字体大小
+// 显示字符串
+//  x,y:起点坐标
+//  size1:字体大小
 //*chr:字符串起始地址
-// mode:0,反色显示;1,正常显示
+//  mode:0,反色显示;1,正常显示
 void OLED_ShowString(u8 x, u8 y, u8 *chr, u8 size1, u8 mode)
 {
-    while ((*chr >= ' ') && (*chr <= '~')) //判断是不是非法字符!
+    while ((*chr >= ' ') && (*chr <= '~')) // 判断是不是非法字符!
     {
         OLED_ShowChar(x, y, *chr, size1, mode);
         if (size1 == 8)
@@ -410,12 +423,12 @@ u32 OLED_Pow(u8 m, u8 n)
     return result;
 }
 
-//显示数字
-// x,y :起点坐标
-// num :要显示的数字
-// len :数字的位数
-// size:字体大小
-// mode:0,反色显示;1,正常显示
+// 显示数字
+//  x,y :起点坐标
+//  num :要显示的数字
+//  len :数字的位数
+//  size:字体大小
+//  mode:0,反色显示;1,正常显示
 void OLED_ShowNum(u8 x, u8 y, u32 num, u8 len, u8 size1, u8 mode)
 {
     u8 t, temp, m = 0;
@@ -435,33 +448,33 @@ void OLED_ShowNum(u8 x, u8 y, u32 num, u8 len, u8 size1, u8 mode)
     }
 }
 
-//显示汉字
-// x,y:起点坐标
-// num:汉字对应的序号
-// mode:0,反色显示;1,正常显示
+// 显示汉字
+//  x,y:起点坐标
+//  num:汉字对应的序号
+//  mode:0,反色显示;1,正常显示
 void OLED_ShowChinese(u8 x, u8 y, u8 num, u8 size1, u8 mode)
 {
     u8 m, temp;
     u8 x0 = x, y0 = y;
-    u16 i, size3 = (size1 / 8 + ((size1 % 8) ? 1 : 0)) * size1; //得到字体一个字符对应点阵集所占的字节数
+    u16 i, size3 = (size1 / 8 + ((size1 % 8) ? 1 : 0)) * size1; // 得到字体一个字符对应点阵集所占的字节数
     for (i = 0; i < size3; i++)
     {
         if (size1 == 16)
         {
             temp = Hzk1[num][i];
-        } //调用16*16字体
+        } // 调用16*16字体
         else if (size1 == 24)
         {
             temp = Hzk2[num][i];
-        } //调用24*24字体
+        } // 调用24*24字体
         else if (size1 == 32)
         {
             temp = Hzk3[num][i];
-        } //调用32*32字体
+        } // 调用32*32字体
         else if (size1 == 64)
         {
             temp = Hzk4[num][i];
-        } //调用64*64字体
+        } // 调用64*64字体
         else
             return;
         for (m = 0; m < 8; m++)
@@ -493,12 +506,12 @@ void OLED_ScrollDisplay(u8 num, u8 space, u8 mode)
     {
         if (m == 0)
         {
-            OLED_ShowChinese(128, 24, t, 16, mode); //写入一个汉字保存在OLED_GRAM[][]数组中
+            OLED_ShowChinese(128, 24, t, 16, mode); // 写入一个汉字保存在OLED_GRAM[][]数组中
             t++;
         }
         if (t == num)
         {
-            for (r = 0; r < 16 * space; r++) //显示间隔
+            for (r = 0; r < 16 * space; r++) // 显示间隔
             {
                 for (i = 1; i < 144; i++)
                 {
@@ -516,7 +529,7 @@ void OLED_ScrollDisplay(u8 num, u8 space, u8 mode)
         {
             m = 0;
         }
-        for (i = 1; i < 144; i++) //实现左移
+        for (i = 1; i < 144; i++) // 实现左移
         {
             for (n = 0; n < 8; n++)
             {
@@ -590,7 +603,7 @@ void OLED_Init(void)
     OLED_WR_CMD(0xDB); //--set vcomh
     OLED_WR_CMD(0x40); // Set VCOM Deselect Level
     OLED_WR_CMD(0x20); //-Set Page Addressing Mode (0x00/0x01/0x02)
-    OLED_WR_CMD(0x01);
+    OLED_WR_CMD(0x01); // 垂直寻址模式
     OLED_WR_CMD(0x8D); //--set Charge Pump enable/disable
     OLED_WR_CMD(0x14); //--set(0x10) disable
     OLED_WR_CMD(0xA4); // Disable Entire Display On (0xa4/0xa5)

@@ -3,8 +3,8 @@
  * @brief 	OLED相关io配置
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.00
- * @date 	  2022年9月17号15点22分
+ * @version 1.1
+ * @date 	  2022年10月28号14点07分
  */
 
 #include "oledio.h"
@@ -28,7 +28,7 @@ void OledDrv_Init(void)
   OLED_SCLK_Port_Clk_Enable();
   OLED_SDIN_Port_Clk_Enable();
 
-  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //推挽输出
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; // 推挽输出
   GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStructure.Pin = OLED_RST_Pin;
   HAL_GPIO_Init(OLED_RST_Port, &GPIO_InitStructure);
@@ -40,7 +40,7 @@ void OledDrv_Init(void)
   HAL_GPIO_WritePin(OLED_SCLK_Port, OLED_SCLK_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(OLED_SDIN_Port, OLED_SDIN_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET);
-  delay_ms(100);
+  delay_ms(200);
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET);
 }
 
@@ -96,7 +96,9 @@ void OledDrv_IICWaitAck(void)
   OLED_SDIN_Set();
   OledDrv_IICDelay();
   OLED_SCLK_Set();
-  OledDrv_IICDelay();
+  while (OLED_READ_SDIN()) // 等待应答信号
+  {
+  }
   OLED_SCLK_Clr();
   OledDrv_IICDelay();
 }
@@ -145,7 +147,7 @@ void OledDrv_Init(void)
   OLED_DIN_Port_Clk_Enable();
   OLED_CLK_Port_Clk_Enable();
 
-  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //推挽输出
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; // 推挽输出
   GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStructure.Pull = GPIO_PULLUP;
 
@@ -166,7 +168,7 @@ void OledDrv_Init(void)
   HAL_GPIO_WritePin(OLED_CLK_Port, OLED_CLK_Pin, GPIO_PIN_SET);
 
   OLED_RST_Clr();
-  delay_ms(100);
+  delay_ms(200);
   OLED_RST_Set();
 }
 
@@ -187,13 +189,13 @@ void OledDrv_Init(void)
   /* GPIO时钟开启 */
   OLED_RST_Port_Clk_Enable();
 
-  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //推挽输出
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; // 推挽输出
   GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStructure.Pin = OLED_RST_Pin;
   HAL_GPIO_Init(OLED_RST_Port, &GPIO_InitStructure);
 
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET);
-  delay_ms(100);
+  delay_ms(200);
   HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET);
 }
 
@@ -212,7 +214,7 @@ void OledDrv_Init(void)
   OLED_DC_Port_Clk_Enable();
   OLED_RST_Port_Clk_Enable();
 
-  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //推挽输出
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; // 推挽输出
   GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStructure.Pull = GPIO_PULLUP;
 
@@ -227,7 +229,7 @@ void OledDrv_Init(void)
   HAL_GPIO_WritePin(OLED_DC_Port, OLED_DC_Pin, GPIO_PIN_SET);
 
   OLED_RST_Clr();
-  delay_ms(100);
+  delay_ms(200);
   OLED_RST_Set();
 }
 

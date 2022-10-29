@@ -1,62 +1,53 @@
 /**
- * @file	  05_FreeRTOS_Speech
- * @brief 	移植FreeRTOS和语音播报，I2C+DMA
+ * @file	  06_FreeRTOS_Speech
+ * @brief 	移植FreeRTOS和Speech
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.01
- * @date 	2022年9月18号23点43分
+ * @version 1.02
+ * @date 	2022年9月28号20点54分
  */
 
-// 软件模拟，未开启GCC优化
-// IIC最大214fps，延时TIM3_Init(469 - 1, 840 - 1);
-// SPI最大720fps，延时TIM3_Init(139 - 1, 840 - 1);
-// 硬件，未开启GCC优化
-// IIC最大20fps，延时TIM3_Init(2500 - 1, 840 - 1);
-// SPI最大495FPS，延时TIM3_Init(202 - 1, 840 - 1);
-// DMA下FPS不好测，估算5126FPS，实际写入可能低一点
-
 /**
- * 软件模拟优点：波特率高，速度快，可移植性好
- *        缺点：占用管脚口，使用MCU资源多，不太稳定
- * 硬件优缺点和软件模拟相反
- *
- * 本次实验还可以继续优化
- *    优化方向1：不用HAL的SPI发送，用寄存器；
+ * ADC采样注意参考电压VERF+接口，如果悬空，则一直为4095
  */
 #include "main.h"
 
 #define Debug 1 // 控制Debug的一些相关函数
 
-#define START_TASK_PRIO 1            //任务优先级
-#define START_STK_SIZE 128           //任务堆栈大小
-TaskHandle_t StartTask_Handler;      //任务句柄
-void start_task(void *pvParameters); //任务函数
+#define START_TASK_PRIO 1            // 任务优先级
+#define START_STK_SIZE 128           // 任务堆栈大小
+TaskHandle_t StartTask_Handler;      // 任务句柄
+void start_task(void *pvParameters); // 任务函数
 
-#define LED0_TASK_PRIO 2            //任务优先级
-#define LED0_STK_SIZE 50            //任务堆栈大小
-TaskHandle_t LED0Task_Handler;      //任务句柄
-void led0_task(void *pvParameters); //任务函数
+#define LED0_TASK_PRIO 2            // 任务优先级
+#define LED0_STK_SIZE 50            // 任务堆栈大小
+TaskHandle_t LED0Task_Handler;      // 任务句柄
+void led0_task(void *pvParameters); // 任务函数
 
-#define LED1_TASK_PRIO 3            //任务优先级
-#define LED1_STK_SIZE 50            //任务堆栈大小
-TaskHandle_t LED1Task_Handler;      //任务句柄
-void led1_task(void *pvParameters); //任务函数
+#define LED1_TASK_PRIO 3            // 任务优先级
+#define LED1_STK_SIZE 50            // 任务堆栈大小
+TaskHandle_t LED1Task_Handler;      // 任务句柄
+void led1_task(void *pvParameters); // 任务函数
 
-#define SPEECH_TASK_PRIO 4            //任务优先级
-#define SPEECH_STK_SIZE 256           //任务堆栈大小
-TaskHandle_t SPEECHTask_Handler;      //任务句柄
-void speech_task(void *pvParameters); //任务函数
+#define ADC1_TASK_PRIO 4            // 任务优先级
+#define ADC1_STK_SIZE 256           // 任务堆栈大小
+TaskHandle_t ADC1Task_Handler;      // 任务句柄
+void adc1_task(void *pvParameters); // 任务函数
+
+#define Speech_TASK_PRIO 4            // 任务优先级
+#define Speech_STK_SIZE 256           // 任务堆栈大小
+TaskHandle_t SpeechTask_Handler;      // 任务句柄
+void Speech_task(void *pvParameters); // 任务函数
 
 /**
  * @brief   主函数,程序入口
  * @param   none
  * @arg		  none
- * @note    循环点亮和熄灭LED
+ * @note    ADC,OLED
  * @retval  int
  */
 int main(void)
 {
-  u32 i;
   if (HAL_Init()) // 初始化HAL库
   {
     Error_Handler();
@@ -65,50 +56,61 @@ int main(void)
   delay_init(168);                    // 初始化延时函数
   LED_Init();                         // 初始化LED
   MX_DMA_Init();                      // 要先初始化DMA
-  MX_SPI1_Init();                     // 初始化MDA后再初始话SPI
-  MX_I2C1_Init();                     // 初始化i2c接口
-  OLED_Init();                        // 初始化OLED
-  uart_init(115200);                  // 初始化串口
-  TIM3_Init(202 - 1, 840 - 1);
+  // MX_I2C1_Init();                     // 初始化i2c接口
+  xfs5152Drv_Init(); // 初始化xfs5152
+  MX_SPI1_Init();    // 初始化MDA后再初始话SPI
+  // MX_ADC1_Init();                     // 初始化ADC1
+  OLED_Init();       // 初始化OLED
+  uart_init(115200); // 初始化串口
+  // TIM3_Init(202 - 1, 840 - 1);
   TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
 
-  //创建开始任务
-  xTaskCreate((TaskFunction_t)start_task,          //任务函数
-              (const char *)"start_task",          //任务名称
-              (uint16_t)START_STK_SIZE,            //任务堆栈大小
-              (void *)NULL,                        //传递给任务函数的参数
-              (UBaseType_t)START_TASK_PRIO,        //任务优先级
-              (TaskHandle_t *)&StartTask_Handler); //任务句柄
-  vTaskStartScheduler();                           //开启任务调度
+  printf(" Init OK!\n");
+
+  // 创建开始任务
+  xTaskCreate((TaskFunction_t)start_task,          // 任务函数
+              (const char *)"start_task",          // 任务名称
+              (uint16_t)START_STK_SIZE,            // 任务堆栈大小
+              (void *)NULL,                        // 传递给任务函数的参数
+              (UBaseType_t)START_TASK_PRIO,        // 任务优先级
+              (TaskHandle_t *)&StartTask_Handler); // 任务句柄
+  vTaskStartScheduler();
 }
 
-//开始任务任务函数
+// 开始任务任务函数
 void start_task(void *pvParameters)
 {
-  taskENTER_CRITICAL(); //进入临界区
-  //创建LED0任务
+  taskENTER_CRITICAL(); // 进入临界区
+  // 创建LED0任务
   xTaskCreate((TaskFunction_t)led0_task,
               (const char *)"led0_task",
               (uint16_t)LED0_STK_SIZE,
               (void *)NULL,
               (UBaseType_t)LED0_TASK_PRIO,
               (TaskHandle_t *)&LED0Task_Handler);
-  //创建LED1任务
+  // 创建LED1任务
   xTaskCreate((TaskFunction_t)led1_task,
               (const char *)"led1_task",
               (uint16_t)LED1_STK_SIZE,
               (void *)NULL,
               (UBaseType_t)LED1_TASK_PRIO,
               (TaskHandle_t *)&LED1Task_Handler);
-  //创建语音播报任务
-  xTaskCreate((TaskFunction_t)speech_task,
-              (const char *)"speech_task",
-              (uint16_t)SPEECH_STK_SIZE,
+  // 创建ADC1任务
+  // xTaskCreate((TaskFunction_t)adc1_task,
+  //             (const char *)"adc1_task",
+  //             (uint16_t)ADC1_STK_SIZE,
+  //             (void *)NULL,
+  //             (UBaseType_t)ADC1_TASK_PRIO,
+  //             (TaskHandle_t *)&ADC1Task_Handler);
+  // 创建Speech任务
+  xTaskCreate((TaskFunction_t)Speech_task,
+              (const char *)"Speech_task",
+              (uint16_t)Speech_STK_SIZE,
               (void *)NULL,
-              (UBaseType_t)SPEECH_TASK_PRIO,
-              (TaskHandle_t *)&SPEECHTask_Handler);
-  vTaskDelete(StartTask_Handler); //删除开始任务
-  taskEXIT_CRITICAL();            //退出临界区
+              (UBaseType_t)Speech_TASK_PRIO,
+              (TaskHandle_t *)&SpeechTask_Handler);
+  vTaskDelete(StartTask_Handler); // 删除开始任务
+  taskEXIT_CRITICAL();            // 退出临界区
 }
 
 // LED0任务函数
@@ -117,7 +119,7 @@ void led0_task(void *pvParameters)
   while (1)
   {
     LED0_Reverse();
-    vTaskDelay(50);
+    vTaskDelay(1000);
   }
 }
 
@@ -127,24 +129,69 @@ void led1_task(void *pvParameters)
   while (1)
   {
     LED1_Reverse();
+    vTaskDelay(50);
+  }
+}
+
+// ADC1任务函数
+void adc1_task(void *pvParameters)
+{
+  u8 temp[10] = {0};
+  // sprintf(temp, "%s", "你好");
+  // OLED_ShowString(64, 0, temp, 16, 1);
+
+  // HAL_ADC_Start_DMA(&hadc1, (u32 *)&adcx, 1); // 启动ADC+DMA
+
+  while (1)
+  {
+    // printf("value=%d,%f\n", adcx, value);
+    // sprintf(temp, "%f", value);
+    // OLED_ShowString(64, 0, temp, 16, 1);
     vTaskDelay(5);
   }
 }
 
-// 语音播报函数
-void speech_task(void *pvParameters)
+// Speech任务函数
+void Speech_task(void *pvParameters)
 {
+  u8 i = 0;
+
   while (1)
   {
-    SetVolume(10);
-    SetReader(Reader_XiaoYan);
-    speech_text("A", UNICODE);
-    printf("%d\n", GetChipStatus());
-    delay_ms(3000);
+    speech_text("[v10]", 0);
+    vTaskDelay(500);
+
+    if (i)
+    {
+      speech_text("[m3]", 0);
+      vTaskDelay(500);
+      speech_text_utf8("切换女声");
+      vTaskDelay(3000);
+    }
+    else
+    {
+      speech_text("[m51]", 0);
+      vTaskDelay(500);
+      speech_text_utf8("切换男声");
+      vTaskDelay(3000);
+    }
+
+    i = !i;
+
+    speech_text_utf8("大声哒咩哒咩哒咩");
+    vTaskDelay(3000);
+    speech_text("123ABC", 0);
+    vTaskDelay(3000);
+    speech_text("[v3]", 0);
+    vTaskDelay(500);
+    speech_text_utf8("小声哒咩哒咩哒咩");
+    vTaskDelay(3000);
+    speech_text("123ABC", 0);
+    vTaskDelay(3000);
   }
 }
 
-#ifdef Debug
+#if Debug == 1
 /**
  * @brief   栈溢出钩子函数
  * @param   xTask

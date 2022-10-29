@@ -16,8 +16,7 @@
             ],
             "defines": [
                 "USE_HAL_DRIVER",
-                "STM32F407xx",
-                "_DEBUG"
+                "STM32F407xx"
             ],
             "compilerPath": "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin/arm-none-eabi-gcc.exe",
             "cStandard": "c99",

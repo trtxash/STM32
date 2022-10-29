@@ -15,13 +15,13 @@
 #include "sys.h"
 #include "stdio.h"
 #include "usart.h"
-#include "task.h"
 #include "oled.h"
 // #include "bspencoder.h"
 // #include "pid.h"
 // #include "infraredtobe.h"
 // #include "MLX90614.h"
 
+extern u32 fps_num;
 // extern u32 TIME_N5ms;
 // extern char infraredtobe_flag;
 // extern u8 infraredtobe_state;

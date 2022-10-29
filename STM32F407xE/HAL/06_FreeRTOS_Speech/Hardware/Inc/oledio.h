@@ -34,6 +34,7 @@
 
 #define OLED_SDIN_Clr() OLED_SDIN_Port->BSRR = (uint32_t)OLED_SDIN_Pin << 16U
 #define OLED_SDIN_Set() OLED_SDIN_Port->BSRR = OLED_SDIN_Pin
+#define OLED_READ_SDIN() OLED_SDIN_Port->IDR &OLED_SDIN_Pin // 0 or 1
 
 #define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
 #define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
