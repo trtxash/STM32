@@ -78,6 +78,7 @@ Hardware/Src/oled.c \
 Hardware/Src/oledio.c \
 Hardware/Src/led.c \
 Hardware/Src/xfs5152.c \
+Hardware/Src/w25qxx.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 

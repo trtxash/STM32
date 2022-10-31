@@ -42,6 +42,7 @@ extern "C"
 #include "led.h"
 #include "oled.h"
 #include "xfs5152.h"
+#include "w25qxx.h"
 
 #ifdef __cplusplus
 }

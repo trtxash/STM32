@@ -420,11 +420,21 @@ void TIM4_IRQHandler(void)
         sec++;
         // fps = fps_num;
         // fps_num = 0;
-        
+
         // sprintf(temp, "%dfps", fps);
         // OLED_ShowString(0, 48, temp, 16, 1);
         sprintf(temp, "%dS", sec);
         OLED_ShowString(0, 0, temp, 16, 1);
+
+        // W25QXX_TYPE = W25QXX_ReadID();       // 读取FLASH ID.
+        // W25QXX_SIZE = W25QXX_ReadCapacity(); // 读取容量
+        // W25QXX_ReadUniqueID(W25QXX_UID);     // 读取唯一ID
+        // printf("W25QXX_TYPE:%x\r\n", W25QXX_TYPE);
+        // printf("W25QXX_SIZE:%x\r\n", W25QXX_SIZE);
+        // for (u8 i = 0; i < 8; i++)
+        // {
+        //     printf("W25QXX_UID[%d]:%x\r\n", i, W25QXX_UID[i]);
+        // }
         // u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
         // printf("TIM4输出......\r\n");
         // taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区
