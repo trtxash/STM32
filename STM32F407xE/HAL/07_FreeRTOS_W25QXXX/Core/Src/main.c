@@ -3,7 +3,7 @@
  * @brief 	移植FreeRTOS和W25QXXX
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.02
+ * @version 1.00
  * @date 	2022年11月1号1点30分
  */
 #include "main.h"
