@@ -7,6 +7,7 @@
  * @date 	2022年11月1号1点30分
  */
 #include "main.h"
+#include "bmp.h"
 
 #define Debug 1 // 控制Debug的一些相关函数
 
@@ -38,7 +39,7 @@ void Speech_task(void *pvParameters); // 任务函数
 /**
  * @brief   主函数,程序入口
  * @param   none
- * @arg		  none
+ * @arg		none
  * @note    ADC,OLED
  * @retval  int
  */
@@ -48,19 +49,24 @@ int main(void)
 	{
 		Error_Handler();
 	}
-	Stm32_Clock_Init(168U, 4U, 2U, 4U); // 初始化时钟
-	delay_init(168);					// 初始化延时函数
-	uart_init(115200);					// 初始化串口
-	LED_Init();							// 初始化LED
-	MX_DMA_Init();						// 要先初始化DMA
+	// 因为OLED——RGB时钟周期不小于50ns，故降频
+	Stm32_Clock_Init(240, 4U, 2U, 4U); // 初始化时钟
+	delay_init(240);				   // 初始化延时函数
+	uart_init(115200);				   // 初始化串口
+	LED_Init();						   // 初始化LED
+	MX_DMA_Init();					   // 要先初始化DMA
 	// MX_I2C1_Init();                     // 初始化i2c接口
 	// xfs5152Drv_Init(); // 初始化xfs5152
 	MX_SPI1_Init(); // 初始化MDA后再初始话SPI
 	// W25QXX_Init();	   // 初始化w25qxx，里面初始化了spi3
-	MX_ADC1_Init(); // 初始化ADC1
+	// MX_ADC1_Init(); // 初始化ADC1
 	OLED_Init();	// 初始化OLED
-	TIM3_Init(202 - 1, 840 - 1);
-	TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
+	// OLED_ShowPicture(0, 0, 128, 64, BMP1, 1);
+	// OLED_Refresh();
+	// delay_ms(2000);
+
+	// TIM3_Init(66666 - 1, 1200 - 1);
+	TIM4_Init(10000 - 1, 12000 - 1); // 定时器3初始化，周期1s
 
 	printf(" Init OK!\r\n");
 
@@ -92,13 +98,13 @@ void start_task(void *pvParameters)
 				(void *)NULL,
 				(UBaseType_t)LED1_TASK_PRIO,
 				(TaskHandle_t *)&LED1Task_Handler);
-	// 创建ADC1任务
-	xTaskCreate((TaskFunction_t)adc1_task,
-				(const char *)"adc1_task",
-				(uint16_t)ADC1_STK_SIZE,
-				(void *)NULL,
-				(UBaseType_t)ADC1_TASK_PRIO,
-				(TaskHandle_t *)&ADC1Task_Handler);
+	// // 创建ADC1任务
+	// xTaskCreate((TaskFunction_t)adc1_task,
+	// 			(const char *)"adc1_task",
+	// 			(uint16_t)ADC1_STK_SIZE,
+	// 			(void *)NULL,
+	// 			(UBaseType_t)ADC1_TASK_PRIO,
+	// 			(TaskHandle_t *)&ADC1Task_Handler);
 	// // 创建Speech任务
 	// xTaskCreate((TaskFunction_t)Speech_task,
 	// 			(const char *)"Speech_task",
@@ -113,20 +119,27 @@ void start_task(void *pvParameters)
 // LED0任务函数
 void led0_task(void *pvParameters)
 {
+	TickType_t xLastWakeTime;
+	const TickType_t xDelay500ms = pdMS_TO_TICKS(500);
+	xLastWakeTime = xTaskGetTickCount();
+
 	while (1)
 	{
 		LED0_Reverse();
-		vTaskDelay(1000);
+		xTaskDelayUntil(&xLastWakeTime, xDelay500ms);
 	}
 }
 
 // LED1任务函数
 void led1_task(void *pvParameters)
 {
+	TickType_t xLastWakeTime;
+	const TickType_t xDelay50ms = pdMS_TO_TICKS(50);
+	xLastWakeTime = xTaskGetTickCount();
 	while (1)
 	{
 		LED1_Reverse();
-		vTaskDelay(50);
+		xTaskDelayUntil(&xLastWakeTime, xDelay50ms);
 	}
 }
 
@@ -142,8 +155,8 @@ void adc1_task(void *pvParameters)
 	{
 		// printf("value=%d,%f\n", adcx, value);
 		sprintf(temp, "%f", value);
-		OLED_ShowString(64, 0, temp, 16, 1);
-		vTaskDelay(5);
+		OLED_ShowString(64, 0, temp, 16, 1, WHITE);
+		vTaskDelay(10);
 	}
 }
 

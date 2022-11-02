@@ -9,8 +9,6 @@
 
 #include "oledio.h"
 
-#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315 // 是否为SSD1306，SSD115
-
 #if _SOFT_OR_HARE == OLED_SOFT // 是否为软件模拟
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE // 是否为IIC通信
@@ -234,9 +232,5 @@ void OledDrv_Init(void)
 }
 
 #endif
-
-#endif
-
-#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351 // 为SSD1351
 
 #endif

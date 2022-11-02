@@ -4,7 +4,7 @@
  *          这是相关API
  * @author 	TRTX-gamer       https://github.com/TRTX-gamer;
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.2
+ * @version 1.3
  * @date 	2022年11月2号13点02分
  */
 
@@ -23,6 +23,13 @@
  */
 
 /**
+ * 硬件
+ * SPI最大17FPS
+ * DMA
+ * SPI,DMA下FPS不好测，估算 57FPS
+ */
+
+/**
  * 软件模拟优点：波特率高，速度快，可移植性好
  *        缺点：占用管脚口，使用MCU资源多，不太稳定，编时序复杂
  * 硬件优缺点和软件模拟相反
@@ -34,10 +41,12 @@
 #include "oled.h"
 #include "oledfont.h"
 
+OLED_DrawData_HandleTypeDef DrawData;
+
 #if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
 static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布,与寻址方式初始化有关
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
-static u16 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT] = {0}; // OLED画布,与寻址方式初始化有关
+static u8 OLED_GRAM[OLED_HEIGHT][OLED_WIDTH * 2] = {0}; // OLED画布,与寻址方式初始化有关
 #endif
 /* 相关选择-------------------------------------------------------------------------------------------------- */
 
@@ -170,32 +179,47 @@ void OLED_WR_DATA16(u16 dat)
 void OLED_Refresh(void)
 {
 #if _OLED_DMA == OLED_DMA_DISABLE
-    u8 i, n;
-    for (n = 0; n < 128; n++)
+    u16 i, n;
+#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
+    for (n = 0; n < OLED_WIDTH; n++)
     {
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
-        for (i = 0; i < 8; i++)
+        for (i = 0; i < OLED_HEIGHT / 8; i++)
         {
             OLED_WR_DATA8(OLED_GRAM[n][i]);
         }
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-        for (i = 0; i < 8; i++)
+        for (i = 0; i < OLED_HEIGHT / 8; i++)
         {
-#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
+
             OLED_WR_DATA8(OLED_GRAM[n][i]);
-#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
-            OLED_WR_DATA16(OLED_GRAM[n][i]);
-#endif
         }
+
 #endif
     }
+#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+    for (i = 0; i < OLED_HEIGHT; i++)
+    {
+        for (n = 0; n < OLED_WIDTH * 2; n++)
+        {
+            OLED_WR_DATA8(OLED_GRAM[i][n]);
+        }
+    }
+#endif
 #elif _OLED_DMA == OLED_DMA_ABLE
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     HAL_I2C_Mem_Write_DMA(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE
+
+#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
     OLED_CS_Clr();
     HAL_SPI_Transmit_DMA(&OLED_SPI_HandleTypeDef, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8); // DMA循环，运行一次就行
+#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+    OLED_CS_Clr();
+    HAL_SPI_Transmit_DMA(&OLED_SPI_HandleTypeDef, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT * 2); // DMA循环，运行一次就行
+#endif
+
 #endif
 
 #endif
@@ -204,26 +228,32 @@ void OLED_Refresh(void)
 // 开启OLED显示
 void OLED_DisPlay_On(void)
 {
+#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
     OLED_WR_CMD(0x8D); // 电荷泵使能
     OLED_WR_CMD(0x14); // 开启电荷泵
     OLED_WR_CMD(0xAF); // 点亮屏幕
+#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+#endif
 }
 
 // 关闭OLED显示
 void OLED_DisPlay_Off(void)
 {
+#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
     OLED_WR_CMD(0x8D); // 电荷泵使能
     OLED_WR_CMD(0x10); // 关闭电荷泵
     OLED_WR_CMD(0xAE); // 关闭屏幕
+#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+#endif
 }
 
 // 清屏函数
 void OLED_Clear(void)
 {
     u8 i, n;
-    for (n = 0; n < 128; n++)
+    for (n = 0; n < OLED_WIDTH; n++)
     {
-        for (i = 0; i < 8; i++)
+        for (i = 0; i < OLED_HEIGHT / 8; i++)
         {
             OLED_GRAM[n][i] = 0; // 清除所有数据
         }
@@ -234,8 +264,9 @@ void OLED_Clear(void)
 //  x:0~127
 //  y:0~63
 //  t:1 填充 0,清空
-void OLED_DrawPoint(u8 x, u8 y, u8 t)
+void OLED_DrawPoint(u16 x, u8 y, u8 t, u16 color)
 {
+#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
     u8 i, m, n;
     i = y / 8;
     m = y % 8;
@@ -250,12 +281,24 @@ void OLED_DrawPoint(u8 x, u8 y, u8 t)
         OLED_GRAM[x][i] |= n;
         OLED_GRAM[x][i] = ~OLED_GRAM[x][i];
     }
+#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+    if (t)
+    {
+        OLED_GRAM[y][2 * x] = color >> 8;
+        OLED_GRAM[y][2 * x + 1] = color;
+    }
+    else
+    {
+        OLED_GRAM[y][2 * x] = BLACK >> 8;
+        OLED_GRAM[y][2 * x + 1] = BLACK;
+    }
+#endif
 }
 
 // 画线
 //  x1,y1:起点坐标
 //  x2,y2:结束坐标
-void OLED_DrawLine(u8 x1, u8 y1, u8 x2, u8 y2, u8 mode)
+void OLED_DrawLine(u16 x1, u8 y1, u16 x2, u8 y2, u8 mode, u16 color)
 {
     u16 t;
     int xerr = 0, yerr = 0, delta_x, delta_y, distance;
@@ -288,7 +331,7 @@ void OLED_DrawLine(u8 x1, u8 y1, u8 x2, u8 y2, u8 mode)
         distance = delta_y;
     for (t = 0; t < distance + 1; t++)
     {
-        OLED_DrawPoint(uRow, uCol, mode); // 画点
+        OLED_DrawPoint(uRow, uCol, mode, color); // 画点
         xerr += delta_x;
         yerr += delta_y;
         if (xerr > distance)
@@ -305,22 +348,22 @@ void OLED_DrawLine(u8 x1, u8 y1, u8 x2, u8 y2, u8 mode)
 }
 // x,y:圆心坐标
 // r:圆的半径
-void OLED_DrawCircle(u8 x, u8 y, u8 r)
+void OLED_DrawCircle(u16 x, u8 y, u8 r, u16 color)
 {
     int a, b, num;
     a = 0;
     b = r;
     while (2 * b * b >= r * r)
     {
-        OLED_DrawPoint(x + a, y - b, 1);
-        OLED_DrawPoint(x - a, y - b, 1);
-        OLED_DrawPoint(x - a, y + b, 1);
-        OLED_DrawPoint(x + a, y + b, 1);
+        OLED_DrawPoint(x + a, y - b, 1, color);
+        OLED_DrawPoint(x - a, y - b, 1, color);
+        OLED_DrawPoint(x - a, y + b, 1, color);
+        OLED_DrawPoint(x + a, y + b, 1, color);
 
-        OLED_DrawPoint(x + b, y + a, 1);
-        OLED_DrawPoint(x + b, y - a, 1);
-        OLED_DrawPoint(x - b, y - a, 1);
-        OLED_DrawPoint(x - b, y + a, 1);
+        OLED_DrawPoint(x + b, y + a, 1, color);
+        OLED_DrawPoint(x + b, y - a, 1, color);
+        OLED_DrawPoint(x - b, y - a, 1, color);
+        OLED_DrawPoint(x - b, y + a, 1, color);
 
         a++;
         num = (a * a + b * b) - r * r; // 计算画的点离圆心的距离
@@ -337,10 +380,10 @@ void OLED_DrawCircle(u8 x, u8 y, u8 r)
 //  y:0~63
 //  size1:选择字体 6x8/6x12/8x16/12x24
 //  mode:0,反色显示;1,正常显示
-void OLED_ShowChar(u8 x, u8 y, u8 chr, u8 size1, u8 mode)
+void OLED_ShowChar(u16 x, u8 y, u8 chr, u8 size1, u8 mode, u16 color)
 {
-    u8 i, m, temp, size2, chr1;
-    u8 x0 = x, y0 = y;
+    u16 i, m, temp, size2, chr1;
+    u16 x0 = x, y0 = y;
     if (size1 == 8)
         size2 = 6;
     else
@@ -369,9 +412,9 @@ void OLED_ShowChar(u8 x, u8 y, u8 chr, u8 size1, u8 mode)
         for (m = 0; m < 8; m++)
         {
             if (temp & 0x01)
-                OLED_DrawPoint(x, y, mode);
+                OLED_DrawPoint(x, y, mode, color);
             else
-                OLED_DrawPoint(x, y, !mode);
+                OLED_DrawPoint(x, y, !mode, color);
             temp >>= 1;
             y++;
         }
@@ -390,11 +433,11 @@ void OLED_ShowChar(u8 x, u8 y, u8 chr, u8 size1, u8 mode)
 //  size1:字体大小
 //*chr:字符串起始地址
 //  mode:0,反色显示;1,正常显示
-void OLED_ShowString(u8 x, u8 y, u8 *chr, u8 size1, u8 mode)
+void OLED_ShowString(u16 x, u8 y, u8 *chr, u8 size1, u8 mode, u16 color)
 {
     while ((*chr >= ' ') && (*chr <= '~')) // 判断是不是非法字符!
     {
-        OLED_ShowChar(x, y, *chr, size1, mode);
+        OLED_ShowChar(x, y, *chr, size1, mode, color);
         if (size1 == 8)
             x += 6;
         else
@@ -420,7 +463,7 @@ u32 OLED_Pow(u8 m, u8 n)
 //  len :数字的位数
 //  size:字体大小
 //  mode:0,反色显示;1,正常显示
-void OLED_ShowNum(u8 x, u8 y, u32 num, u8 len, u8 size1, u8 mode)
+void OLED_ShowNum(u16 x, u8 y, u32 num, u8 len, u8 size1, u8 mode, u16 color)
 {
     u8 t, temp, m = 0;
     if (size1 == 8)
@@ -430,11 +473,11 @@ void OLED_ShowNum(u8 x, u8 y, u32 num, u8 len, u8 size1, u8 mode)
         temp = (num / OLED_Pow(10, len - t - 1)) % 10;
         if (temp == 0)
         {
-            OLED_ShowChar(x + (size1 / 2 + m) * t, y, '0', size1, mode);
+            OLED_ShowChar(x + (size1 / 2 + m) * t, y, '0', size1, mode, color);
         }
         else
         {
-            OLED_ShowChar(x + (size1 / 2 + m) * t, y, temp + '0', size1, mode);
+            OLED_ShowChar(x + (size1 / 2 + m) * t, y, temp + '0', size1, mode, color);
         }
     }
 }
@@ -443,7 +486,7 @@ void OLED_ShowNum(u8 x, u8 y, u32 num, u8 len, u8 size1, u8 mode)
 //  x,y:起点坐标
 //  num:汉字对应的序号
 //  mode:0,反色显示;1,正常显示
-void OLED_ShowChinese(u8 x, u8 y, u8 num, u8 size1, u8 mode)
+void OLED_ShowChinese(u16 x, u8 y, u8 num, u8 size1, u8 mode, u16 color)
 {
     u8 m, temp;
     u8 x0 = x, y0 = y;
@@ -471,9 +514,9 @@ void OLED_ShowChinese(u8 x, u8 y, u8 num, u8 size1, u8 mode)
         for (m = 0; m < 8; m++)
         {
             if (temp & 0x01)
-                OLED_DrawPoint(x, y, mode);
+                OLED_DrawPoint(x, y, mode, color);
             else
-                OLED_DrawPoint(x, y, !mode);
+                OLED_DrawPoint(x, y, !mode, color);
             temp >>= 1;
             y++;
         }
@@ -490,14 +533,14 @@ void OLED_ShowChinese(u8 x, u8 y, u8 num, u8 size1, u8 mode)
 // num 显示汉字的个数
 // space 每一遍显示的间隔
 // mode:0,反色显示;1,正常显示
-void OLED_ScrollDisplay(u8 num, u8 space, u8 mode)
+void OLED_ScrollDisplay(u8 num, u8 space, u8 mode, u16 color)
 {
     u8 i, n, t = 0, m = 0, r;
     while (1)
     {
         if (m == 0)
         {
-            OLED_ShowChinese(128, 24, t, 16, mode); // 写入一个汉字保存在OLED_GRAM[][]数组中
+            OLED_ShowChinese(128, 24, t, 16, mode, color); // 写入一个汉字保存在OLED_GRAM[][]数组中
             t++;
         }
         if (t == num)
@@ -535,7 +578,7 @@ void OLED_ScrollDisplay(u8 num, u8 space, u8 mode)
 // sizex,sizey,图片长宽
 // BMP[]：要写入的图片数组
 // mode:0,反色显示;1,正常显示
-void OLED_ShowPicture(u8 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode)
+void OLED_ShowPicture(u16 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode)
 {
     u16 j = 0;
     u8 i, n, temp, m;
@@ -550,9 +593,9 @@ void OLED_ShowPicture(u8 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode)
             for (m = 0; m < 8; m++)
             {
                 if (temp & 0x01)
-                    OLED_DrawPoint(x, y, mode);
+                    OLED_DrawPoint(x, y, mode, temp);
                 else
-                    OLED_DrawPoint(x, y, !mode);
+                    OLED_DrawPoint(x, y, !mode, temp);
                 temp >>= 1;
                 y++;
             }
@@ -602,37 +645,101 @@ void OLED_Init(void)
     OLED_Clear();
     OLED_WR_CMD(0xAF);
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
-    OLED_WR_CMD(0xFD);
-    OLED_WR_DATA8(0x12);
-    OLED_WR_CMD(0xFD);
-    OLED_WR_DATA8(0xB1);
-    OLED_WR_CMD(0xAE);
-    OLED_WR_CMD(0xB3);
-    OLED_WR_DATA8(0xF1);
-    OLED_WR_CMD(0xCA);
-    OLED_WR_DATA8(0x7F);
-    OLED_WR_CMD(0xA2);
-    OLED_WR_DATA8(0x00);
-    OLED_WR_CMD(0xA1);
-    OLED_WR_DATA8(0x00);
-    OLED_WR_CMD(0xA0);
+    OLED_WR_CMD(0xFD);   // Set Command Lock
+    OLED_WR_DATA8(0x12); // Unlock OLED driver IC MCU interface from entering command [reset]
+    OLED_WR_CMD(0xFD);   // Set Command Lock
+    OLED_WR_DATA8(0xB1); // Command A2,B1,B3,BB,BE accessible if inunlock state
+    OLED_WR_CMD(0xAE);   // Set Sleep mode ON/OFF，Sleep mode On (Display OFF)
+    OLED_WR_CMD(0xB3);   // Front Clock Divider(DivSet)/ Oscillator Frequency
+    OLED_WR_DATA8(0xF0); // A[7:4]Oscillator frequency, frequency increases as level increases [reset=1101b]，A[3:0]divide by 1；
+    OLED_WR_CMD(0xCA);   // Set MUX Ratio
+    OLED_WR_DATA8(0x7F); // A[6:0] MUX ratio 16MUX ~ 128MUX, [reset=127],(Range from 15 to 127)
+    OLED_WR_CMD(0xA2);   // Set Display Offset
+    OLED_WR_DATA8(0x00); // Set vertical scroll by Row from 0-127. [reset=60h] Note (1) This command is locked by Command FDh by default. To unlock it, please refer to Command FDh.
+    OLED_WR_CMD(0xA1);   // Set Display Start Line
+    OLED_WR_DATA8(0x00); // Set vertical scroll by RAM from 0~127. [reset=00h]
+    OLED_WR_CMD(0xA0);   // Set Re-map / Color Depth(Display RAM to Panel)
     OLED_WR_DATA8(0x74);
-    OLED_WR_CMD(0xB5);
+    /*
+    A[0]=0b, Horizontal address increment [reset]
+    A[0]=1b, Vertical address increment
+    A[1]=0b, Column address 0 is mapped to SEG0 [reset]
+    A[1]=1b, Column address 127 is mapped to SEG0
+    A[2]=0b, Color sequence: A → B → C [reset]
+    A[2]=1b, Color sequence is swapped: C → B → A
+    A[3]=0b, Reserved
+    A[3]=1b, Reserved
+    A[4]=0b, Scan from COM0 to COM[N –1] [reset]
+    A[4]=1b, Scan from COM[N-1] to COM0. Where N is the
+    Multiplex ratio.
+    A[5]=0b, Disable COM Split Odd Even [reset]
+    A[5]=1b, Enable COM Split Odd Even
+    A[7:6] Set Color Depth,
+    00b 256 color
+    01b 65K color, [reset]
+    10b 262k color, 8/18-bit,16 bit (1st option) MCU interface
+    11b 262k color, 16 - bit MCU interface (2nd option)
+    Refer to section for 8.3.2 details.
+    */
+    OLED_WR_CMD(0xB5); // Set GPIO
     OLED_WR_DATA8(0x00);
-    OLED_WR_CMD(0xAB);
+    /*
+    A[1:0] GPIO0: 00 pin HiZ, Input disabled
+    01 pin HiZ, Input enabled
+    10 pin output LOW [reset]
+    11 pin output HIGH
+    A[3:2] GPIO1: 00 pin HiZ, Input disabled
+    01 pin HiZ, Input enabled
+    10 pin output LOW [reset]
+    11 pin output HIGH
+    */
+    OLED_WR_CMD(0xAB); // Function Selection
     OLED_WR_DATA8(0x01);
-    OLED_WR_CMD(0xB4);
+    /*
+    A[0]=0b, Select external VDD
+    A[0]=1b, Enable internal VDD regulator [reset]
+    A[7:6]=00b, Select 8-bit parallel interface [reset]
+    A[7:6]=01b, Select 16-bit parallel interface
+    A[7:6]=11b, Select 18-bit parallel interface
+    */
+    OLED_WR_CMD(0xB4); // Set Segment Low Voltage (VSL)
     OLED_WR_DATA8(0xA0);
-    OLED_WR_DATA8(0xB5);
-    OLED_WR_DATA8(0x55);
-    OLED_WR_CMD(0xC1);
+    OLED_WR_DATA8(0xB5); // 固定值
+    OLED_WR_DATA8(0x55); // 固定值
+    /*
+    A[3:0] sets the VSL voltage as follow:
+    A[1:0]=00 External VSL [reset]
+    A[1:0]=10 Internal VSL (kept VSL pin NC)
+    Note
+    (1) When external VSL is enabled, in order to avoid distortion
+    in display pattern, an external circuit is needed to connect
+    between VSL and VSS as shown in Figure 14-1.
+    */
+    OLED_WR_CMD(0xC1); // Set Contrast Current for Color A,B,C
     OLED_WR_DATA8(0xC8);
     OLED_WR_DATA8(0x80);
     OLED_WR_DATA8(0xC8);
-    OLED_WR_CMD(0xC7);
+    /*
+    A[7:0] Contrast Value Color A [reset=10001010b]
+    B[7:0] Contrast Value Color B [reset=01010001b]
+    C[7:0] Contrast Value Color C [reset=10001010b]
+    */
+    OLED_WR_CMD(0xC7); // Master Contrast Current Control
     OLED_WR_DATA8(0x0F);
-
-    OLED_WR_CMD(0xB8);
+    /*
+    A[3:0] :
+    0000b reduce output currents for all colors to 1/16
+    0001b reduce output currents for all colors to 2/16
+    ....
+    1110b reduce output currents for all colors to 15/16
+    1111b no change [reset = 1111b]
+    */
+    OLED_WR_CMD(0xB8); // Look Up Table for Gray Scale Pulse width
+    /*
+    The next 63 data bytes define Gray Scale (GS) Table by
+    setting the gray scale pulse width in unit of DCLK’s
+    (ranges from 0d ~ 180d)
+    */
     OLED_WR_DATA8(0x02); // Gray Scale Level 1
     OLED_WR_DATA8(0x03); // Gray Scale Level 2
     OLED_WR_DATA8(0x04); // Gray Scale Level 3
@@ -697,20 +804,52 @@ void OLED_Init(void)
     OLED_WR_DATA8(0xAF); // Gray Scale Level 62
     OLED_WR_DATA8(0xB4); // Gray Scale Level 63
 
-    OLED_WR_CMD(0xB1);
+    OLED_WR_CMD(0xB1); // Set Reset (Phase 1) / Precharge (Phase2) period
     OLED_WR_DATA8(0x32);
-    OLED_WR_CMD(0xBB);
+    /*
+    A[3:0] Phase 1 period of 5~31 DCLK(s) clocks
+    [reset=0010b]
+    A[3:0]:
+    0-1 invalid
+    2 = 5 DCLKs
+    3 = 7 DCLKs
+    :
+    15 =31DCLKs
+    A[7:4] Phase 2 period of 3~15 DCLK(s) clocks
+    [reset=1000b]
+    A[7:4]:
+    0-2 invalid
+    3 = 3 DCLKs
+    4 = 4 DCLKs
+    :
+    15 =15DCLKs
+    Note
+    (1) 0 DCLK is invalid in phase 1 & phase 2
+    (2)This command is locked by Command FDh by default. To
+    unlock it, please refer to Command FDh.
+    */
+    OLED_WR_CMD(0xBB); // Set Pre-charge voltage
     OLED_WR_DATA8(0x17);
-    OLED_WR_CMD(0xB2);
-    OLED_WR_DATA8(0xA4);
-    OLED_WR_DATA8(0x00);
-    OLED_WR_DATA8(0x00);
-    OLED_WR_CMD(0xB6);
+    // OLED_WR_CMD(0xB2);
+    // OLED_WR_DATA8(0xA4);
+    // OLED_WR_DATA8(0x00);
+    // OLED_WR_DATA8(0x00);
+    OLED_WR_CMD(0xB6); // Set Second Precharge Period
     OLED_WR_DATA8(0x01);
-    OLED_WR_CMD(0xBE);
+    OLED_WR_CMD(0xBE); // Set VCOMH Voltage
     OLED_WR_DATA8(0x05);
-    OLED_WR_CMD(0xA6);
-    OLED_WR_CMD(0xAF);
+    OLED_WR_CMD(0xA6); // Set Display Mode
+    /*
+    A4h: All OFF
+    A5h: All ON (All pixels have GS63)
+    A6h : Reset to normal display [reset]
+    A7h: Inverse Display (GS0 -> GS63, GS1 -> GS62, ....)
+    */
+    OLED_WR_CMD(0xAF); // Set Sleep mode ON/OFF，AFh = Sleep mode OFF (Display ON)
+    OLED_WR_CMD(0x5C); // Enable MCU to write Data into RAM
+                       // After entering this single byte command, data entries will be written into the display RAM until another
+                       // command is written. Address pointer is increased accordingly. This command must be sent before write data
+                       // into RAM.
 #endif
 
     OLED_Refresh();
