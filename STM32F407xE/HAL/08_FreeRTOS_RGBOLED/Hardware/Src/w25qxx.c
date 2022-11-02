@@ -1,4 +1,3 @@
-
 /**
  * @file  w25qxx.c
  *
@@ -46,13 +45,24 @@ int W25QXX_Init(void)
 
 	W25QXX_CS_L(); /* 拉低选中 */
 	W25QXX_SPI_ReadWriteByte(0XFF);
-	W25QXX_CS_H();						 /* 拉高取消 */
-	W25QXX_TYPE = W25QXX_ReadID();		 // 读取FLASH ID.
-	W25QXX_SIZE = W25QXX_ReadCapacity(); // 读取容量
-	W25QXX_ReadUniqueID(W25QXX_UID);	 // 读取唯一ID
-	if ((W25QXX_TYPE & 0XEF00) != 0XEF00)
+	W25QXX_CS_H();						  /* 拉高取消 */
+	W25QXX_TYPE = W25QXX_ReadID();		  // 读取FLASH ID.
+	W25QXX_SIZE = W25QXX_ReadCapacity();  // 读取容量
+	W25QXX_ReadUniqueID(W25QXX_UID);	  // 读取唯一ID
+	if ((W25QXX_TYPE & 0XEF00) != 0XEF00) // 串口打印相关数据
 	{
+		printf(" W25QXX_Init error!\r\n");
 		return -1;
+	}
+	else
+	{
+		printf(" W25QXX_Init ok!\r\n");
+		printf("W25QXX_TYPE:%x\r\n", W25QXX_TYPE);
+		printf("W25QXX_SIZE:%x\r\n", W25QXX_SIZE);
+		for (u8 i = 0; i < 8; i++)
+		{
+			printf("W25QXX_UID[%d]:%x\r\n", i, W25QXX_UID[i]);
+		}
 	}
 	return 0;
 }
@@ -203,12 +213,8 @@ void W25QXX_ReadUniqueID(uint8_t UID[8])
 void W25QXX_Read(uint8_t *pBuffer, uint32_t ReadAddr, uint16_t NumByteToRead)
 {
 	uint16_t i;
-	W25QXX_CS_L();							 // 使能器件
-	W25QXX_SPI_ReadWriteByte(W25X_ReadData); // 发送读取命令
-	if (W25QXX_TYPE == W25Q256)				 // 如果是W25Q256的话地址为4字节的，要发送最高8位
-	{
-		SPI1_ReadWriteByte((u8)((ReadAddr) >> 24));
-	}
+	W25QXX_CS_L();										   // 使能器件
+	W25QXX_SPI_ReadWriteByte(W25X_ReadData);			   // 发送读取命令
 	W25QXX_SPI_ReadWriteByte((uint8_t)((ReadAddr) >> 16)); // 发送24bit地址
 	W25QXX_SPI_ReadWriteByte((uint8_t)((ReadAddr) >> 8));
 	W25QXX_SPI_ReadWriteByte((uint8_t)ReadAddr);
@@ -226,13 +232,9 @@ void W25QXX_Read(uint8_t *pBuffer, uint32_t ReadAddr, uint16_t NumByteToRead)
 void W25QXX_Write_Page(uint8_t *pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite)
 {
 	uint16_t i;
-	W25QXX_Write_Enable();						// SET WEL
-	W25QXX_CS_L();								// 使能器件
-	W25QXX_SPI_ReadWriteByte(W25X_PageProgram); // 发送写页命令
-	if (W25QXX_TYPE == W25Q256)					// 如果是W25Q256的话地址为4字节的，要发送最高8位
-	{
-		SPI1_ReadWriteByte((u8)((WriteAddr) >> 24));
-	}
+	W25QXX_Write_Enable();									// SET WEL
+	W25QXX_CS_L();											// 使能器件
+	W25QXX_SPI_ReadWriteByte(W25X_PageProgram);				// 发送写页命令
 	W25QXX_SPI_ReadWriteByte((uint8_t)((WriteAddr) >> 16)); // 发送24bit地址
 	W25QXX_SPI_ReadWriteByte((uint8_t)((WriteAddr) >> 8));
 	W25QXX_SPI_ReadWriteByte((uint8_t)WriteAddr);
@@ -350,12 +352,8 @@ void W25QXX_Erase_Sector(uint32_t Dst_Addr)
 	Dst_Addr *= 4096;
 	W25QXX_Write_Enable(); // SET WEL
 	W25QXX_Wait_Busy();
-	W25QXX_CS_L();								// 使能器件
-	W25QXX_SPI_ReadWriteByte(W25X_SectorErase); // 发送扇区擦除指令
-	if (W25QXX_TYPE == W25Q256)					// 如果是W25Q256的话地址为4字节的，要发送最高8位
-	{
-		SPI1_ReadWriteByte((u8)((Dst_Addr) >> 24));
-	}
+	W25QXX_CS_L();										   // 使能器件
+	W25QXX_SPI_ReadWriteByte(W25X_SectorErase);			   // 发送扇区擦除指令
 	W25QXX_SPI_ReadWriteByte((uint8_t)((Dst_Addr) >> 16)); // 发送24bit地址
 	W25QXX_SPI_ReadWriteByte((uint8_t)((Dst_Addr) >> 8));
 	W25QXX_SPI_ReadWriteByte((uint8_t)Dst_Addr);

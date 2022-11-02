@@ -3,6 +3,7 @@
 
 #include "sys.h"
 #include "delay.h"
+#include "usart.h"
 #include "spi.h"
 
 // W25X系列/Q系列芯片列表

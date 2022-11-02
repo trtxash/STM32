@@ -7,6 +7,8 @@
 #include "oledconf.h"
 
 void OLED_WR_Byte(u8 dat, u8 mode);
+void OLED_WR_DATA8(u8 dat);
+void OLED_WR_DATA16(u16 dat);
 void OLED_DisPlay_On(void);
 void OLED_DisPlay_Off(void);
 void OLED_Refresh(void);

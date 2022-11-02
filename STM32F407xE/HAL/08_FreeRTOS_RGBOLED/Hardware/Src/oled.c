@@ -2,10 +2,10 @@
  * @file	oled.c
  * @brief 	OLED相关驱动
  *          这是相关API
- * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
+ * @author 	TRTX-gamer       https://github.com/TRTX-gamer;
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.1
- * @date 	2022年10月28号14点07分
+ * @version 1.2
+ * @date 	2022年11月2号13点02分
  */
 
 /**
@@ -34,8 +34,11 @@
 #include "oled.h"
 #include "oledfont.h"
 
+#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
 static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布,与寻址方式初始化有关
-
+#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+static u16 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT] = {0}; // OLED画布,与寻址方式初始化有关
+#endif
 /* 相关选择-------------------------------------------------------------------------------------------------- */
 
 /**
@@ -84,11 +87,11 @@ void OLED_WR_CMD(u8 dat)
 #elif _SOFT_OR_HARE == OLED_HARD
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
-    HAL_I2C_Mem_Write(&hi2c1, OLED_ADDRESS, 0x00, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
+    HAL_I2C_Mem_Write(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x00, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
     OLED_DC_Clr();
     OLED_CS_Clr();
-    HAL_SPI_Transmit(&hspi1, &dat, 1, 100);
+    HAL_SPI_Transmit(&OLED_SPI_HandleTypeDef, &dat, 1, 100);
     OLED_CS_Set();
     OLED_DC_Set();
 #endif
@@ -119,7 +122,6 @@ void OLED_WR_DATA8(u8 dat)
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
     char i = 8;
 
-    OLED_DC_Set();
     OLED_CS_Clr();
     while (i--)
     {
@@ -136,18 +138,32 @@ void OLED_WR_DATA8(u8 dat)
         dat <<= 1;
     }
     OLED_CS_Set();
-    OLED_DC_Set();
 #endif
 
 #elif _SOFT_OR_HARE == OLED_HARD
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
-    HAL_I2C_Mem_Write(&hi2c1, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
+    HAL_I2C_Mem_Write(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-    HAL_SPI_Transmit(&hspi1, &dat, 1, 100);
+    OLED_CS_Clr();
+    HAL_SPI_Transmit(&OLED_SPI_HandleTypeDef, &dat, 1, 100);
+    OLED_CS_Set();
 #endif
 
 #endif
+}
+
+/**
+ * @brief   OLED发送数据
+ * @param   dat
+ * @arg		u16，数据
+ * @note
+ * @retval  void
+ */
+void OLED_WR_DATA16(u16 dat)
+{
+    OLED_WR_DATA8(dat >> 8); // 先发高八位
+    OLED_WR_DATA8(dat);
 }
 
 // 更新显存到OLED
@@ -157,58 +173,33 @@ void OLED_Refresh(void)
     u8 i, n;
     for (n = 0; n < 128; n++)
     {
-#if _SOFT_OR_HARE == OLED_SOFT
-
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
-        OledDrv_IICStart();
-        OledDrv_IICSendByte(OLED_ADDRESS);
-        OledDrv_IICWaitAck();
-        OledDrv_IICSendByte(0x40);
-        OledDrv_IICWaitAck();
-        for (i = 0; i < 8; i++)
-        {
-            OledDrv_IICSendByte(OLED_GRAM[n][i]);
-            OledDrv_IICWaitAck();
-        }
-        OledDrv_IICStop();
-#elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
         for (i = 0; i < 8; i++)
         {
             OLED_WR_DATA8(OLED_GRAM[n][i]);
         }
-#endif
-
-#elif _SOFT_OR_HARE == OLED_HARD
-
-#if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
-        HAL_I2C_Mem_Write(&hi2c1, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8, 2000);
-        break;
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
         for (i = 0; i < 8; i++)
         {
-            OLED_DC_Set();
-            OLED_CS_Clr();
-            HAL_SPI_Transmit(&hspi1, &OLED_GRAM[n][i], 1, 100);
-            OLED_CS_Set();
-            OLED_DC_Set();
-        }
+#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
+            OLED_WR_DATA8(OLED_GRAM[n][i]);
+#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+            OLED_WR_DATA16(OLED_GRAM[n][i]);
 #endif
-
+        }
 #endif
     }
 #elif _OLED_DMA == OLED_DMA_ABLE
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
-    HAL_I2C_Mem_Write_DMA(&hi2c1, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8);
+    HAL_I2C_Mem_Write_DMA(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE
     OLED_CS_Clr();
-    HAL_SPI_Transmit_DMA(&hspi1, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8); // DMA循环，运行一次就行
+    HAL_SPI_Transmit_DMA(&OLED_SPI_HandleTypeDef, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8); // DMA循环，运行一次就行
 #endif
 
 #endif
 }
-
-/* 公共部分-------------------------------------------------------------------------------------------------- */
 
 // 开启OLED显示
 void OLED_DisPlay_On(void)
@@ -580,7 +571,7 @@ void OLED_ShowPicture(u8 x, u8 y, u8 sizex, u8 sizey, u8 BMP[], u8 mode)
 void OLED_Init(void)
 {
     OledDrv_Init();
-
+#if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
     OLED_WR_CMD(0xAE); //--turn off oled panel
     OLED_WR_CMD(0x00); //---set low column address
     OLED_WR_CMD(0x10); //---set high column address
@@ -610,6 +601,117 @@ void OLED_Init(void)
     OLED_WR_CMD(0xA6); // Disable Inverse Display On (0xa6/a7)
     OLED_Clear();
     OLED_WR_CMD(0xAF);
+#elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+    OLED_WR_CMD(0xFD);
+    OLED_WR_DATA8(0x12);
+    OLED_WR_CMD(0xFD);
+    OLED_WR_DATA8(0xB1);
+    OLED_WR_CMD(0xAE);
+    OLED_WR_CMD(0xB3);
+    OLED_WR_DATA8(0xF1);
+    OLED_WR_CMD(0xCA);
+    OLED_WR_DATA8(0x7F);
+    OLED_WR_CMD(0xA2);
+    OLED_WR_DATA8(0x00);
+    OLED_WR_CMD(0xA1);
+    OLED_WR_DATA8(0x00);
+    OLED_WR_CMD(0xA0);
+    OLED_WR_DATA8(0x74);
+    OLED_WR_CMD(0xB5);
+    OLED_WR_DATA8(0x00);
+    OLED_WR_CMD(0xAB);
+    OLED_WR_DATA8(0x01);
+    OLED_WR_CMD(0xB4);
+    OLED_WR_DATA8(0xA0);
+    OLED_WR_DATA8(0xB5);
+    OLED_WR_DATA8(0x55);
+    OLED_WR_CMD(0xC1);
+    OLED_WR_DATA8(0xC8);
+    OLED_WR_DATA8(0x80);
+    OLED_WR_DATA8(0xC8);
+    OLED_WR_CMD(0xC7);
+    OLED_WR_DATA8(0x0F);
+
+    OLED_WR_CMD(0xB8);
+    OLED_WR_DATA8(0x02); // Gray Scale Level 1
+    OLED_WR_DATA8(0x03); // Gray Scale Level 2
+    OLED_WR_DATA8(0x04); // Gray Scale Level 3
+    OLED_WR_DATA8(0x05); // Gray Scale Level 4
+    OLED_WR_DATA8(0x06); // Gray Scale Level 5
+    OLED_WR_DATA8(0x07); // Gray Scale Level 6
+    OLED_WR_DATA8(0x08); // Gray Scale Level 7
+    OLED_WR_DATA8(0x09); // Gray Scale Level 8
+    OLED_WR_DATA8(0x0A); // Gray Scale Level 9
+    OLED_WR_DATA8(0x0B); // Gray Scale Level 10
+    OLED_WR_DATA8(0x0C); // Gray Scale Level 11
+    OLED_WR_DATA8(0x0D); // Gray Scale Level 12
+    OLED_WR_DATA8(0x0E); // Gray Scale Level 13
+    OLED_WR_DATA8(0x0F); // Gray Scale Level 14
+    OLED_WR_DATA8(0x10); // Gray Scale Level 15
+    OLED_WR_DATA8(0x11); // Gray Scale Level 16
+    OLED_WR_DATA8(0x12); // Gray Scale Level 17
+    OLED_WR_DATA8(0x13); // Gray Scale Level 18
+    OLED_WR_DATA8(0x15); // Gray Scale Level 19
+    OLED_WR_DATA8(0x17); // Gray Scale Level 20
+    OLED_WR_DATA8(0x19); // Gray Scale Level 21
+    OLED_WR_DATA8(0x1B); // Gray Scale Level 22
+    OLED_WR_DATA8(0x1D); // Gray Scale Level 23
+    OLED_WR_DATA8(0x1F); // Gray Scale Level 24
+    OLED_WR_DATA8(0x21); // Gray Scale Level 25
+    OLED_WR_DATA8(0x23); // Gray Scale Level 26
+    OLED_WR_DATA8(0x25); // Gray Scale Level 27
+    OLED_WR_DATA8(0x27); // Gray Scale Level 28
+    OLED_WR_DATA8(0x2A); // Gray Scale Level 29
+    OLED_WR_DATA8(0x2D); // Gray Scale Level 30
+    OLED_WR_DATA8(0x30); // Gray Scale Level 31
+    OLED_WR_DATA8(0x33); // Gray Scale Level 32
+    OLED_WR_DATA8(0x36); // Gray Scale Level 33
+    OLED_WR_DATA8(0x39); // Gray Scale Level 34
+    OLED_WR_DATA8(0x3C); // Gray Scale Level 35
+    OLED_WR_DATA8(0x3F); // Gray Scale Level 36
+    OLED_WR_DATA8(0x42); // Gray Scale Level 37
+    OLED_WR_DATA8(0x45); // Gray Scale Level 38
+    OLED_WR_DATA8(0x48); // Gray Scale Level 39
+    OLED_WR_DATA8(0x4C); // Gray Scale Level 40
+    OLED_WR_DATA8(0x50); // Gray Scale Level 41
+    OLED_WR_DATA8(0x54); // Gray Scale Level 42
+    OLED_WR_DATA8(0x58); // Gray Scale Level 43
+    OLED_WR_DATA8(0x5C); // Gray Scale Level 44
+    OLED_WR_DATA8(0x60); // Gray Scale Level 45
+    OLED_WR_DATA8(0x64); // Gray Scale Level 46
+    OLED_WR_DATA8(0x68); // Gray Scale Level 47
+    OLED_WR_DATA8(0x6C); // Gray Scale Level 48
+    OLED_WR_DATA8(0x70); // Gray Scale Level 49
+    OLED_WR_DATA8(0x74); // Gray Scale Level 50
+    OLED_WR_DATA8(0x78); // Gray Scale Level 51
+    OLED_WR_DATA8(0x7D); // Gray Scale Level 52
+    OLED_WR_DATA8(0x82); // Gray Scale Level 53
+    OLED_WR_DATA8(0x87); // Gray Scale Level 54
+    OLED_WR_DATA8(0x8C); // Gray Scale Level 55
+    OLED_WR_DATA8(0x91); // Gray Scale Level 56
+    OLED_WR_DATA8(0x96); // Gray Scale Level 57
+    OLED_WR_DATA8(0x9B); // Gray Scale Level 58
+    OLED_WR_DATA8(0xA0); // Gray Scale Level 59
+    OLED_WR_DATA8(0xA5); // Gray Scale Level 60
+    OLED_WR_DATA8(0xAA); // Gray Scale Level 61
+    OLED_WR_DATA8(0xAF); // Gray Scale Level 62
+    OLED_WR_DATA8(0xB4); // Gray Scale Level 63
+
+    OLED_WR_CMD(0xB1);
+    OLED_WR_DATA8(0x32);
+    OLED_WR_CMD(0xBB);
+    OLED_WR_DATA8(0x17);
+    OLED_WR_CMD(0xB2);
+    OLED_WR_DATA8(0xA4);
+    OLED_WR_DATA8(0x00);
+    OLED_WR_DATA8(0x00);
+    OLED_WR_CMD(0xB6);
+    OLED_WR_DATA8(0x01);
+    OLED_WR_CMD(0xBE);
+    OLED_WR_DATA8(0x05);
+    OLED_WR_CMD(0xA6);
+    OLED_WR_CMD(0xAF);
+#endif
 
     OLED_Refresh();
 }

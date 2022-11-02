@@ -54,23 +54,12 @@ int main(void)
 	LED_Init();							// 初始化LED
 	MX_DMA_Init();						// 要先初始化DMA
 	// MX_I2C1_Init();                     // 初始化i2c接口
-	xfs5152Drv_Init();		 // 初始化xfs5152
-	MX_SPI1_Init();			 // 初始化MDA后再初始话SPI
-	if (W25QXX_Init() == -1) // 初始化w25qxx，里面初始化了spi3
-		printf(" W25QXX_Init error!\r\n");
-	else
-	{
-		printf(" W25QXX_Init ok!\r\n");
-		printf("W25QXX_TYPE:%x\r\n", W25QXX_TYPE);
-		printf("W25QXX_SIZE:%x\r\n", W25QXX_SIZE);
-		for (u8 i = 0; i < 8; i++)
-		{
-			printf("W25QXX_UID[%d]:%x\r\n", i, W25QXX_UID[i]);
-		}
-	}
-	// MX_ADC1_Init();                     // 初始化ADC1
-	OLED_Init(); // 初始化OLED
-	// TIM3_Init(202 - 1, 840 - 1);
+	// xfs5152Drv_Init(); // 初始化xfs5152
+	MX_SPI1_Init(); // 初始化MDA后再初始话SPI
+	// W25QXX_Init();	   // 初始化w25qxx，里面初始化了spi3
+	MX_ADC1_Init(); // 初始化ADC1
+	OLED_Init();	// 初始化OLED
+	TIM3_Init(202 - 1, 840 - 1);
 	TIM4_Init(10000 - 1, 8400 - 1); // 定时器3初始化，周期1s
 
 	printf(" Init OK!\r\n");
@@ -104,19 +93,19 @@ void start_task(void *pvParameters)
 				(UBaseType_t)LED1_TASK_PRIO,
 				(TaskHandle_t *)&LED1Task_Handler);
 	// 创建ADC1任务
-	// xTaskCreate((TaskFunction_t)adc1_task,
-	//             (const char *)"adc1_task",
-	//             (uint16_t)ADC1_STK_SIZE,
-	//             (void *)NULL,
-	//             (UBaseType_t)ADC1_TASK_PRIO,
-	//             (TaskHandle_t *)&ADC1Task_Handler);
-	// 创建Speech任务
+	xTaskCreate((TaskFunction_t)adc1_task,
+				(const char *)"adc1_task",
+				(uint16_t)ADC1_STK_SIZE,
+				(void *)NULL,
+				(UBaseType_t)ADC1_TASK_PRIO,
+				(TaskHandle_t *)&ADC1Task_Handler);
+	// // 创建Speech任务
 	// xTaskCreate((TaskFunction_t)Speech_task,
-	//             (const char *)"Speech_task",
-	//             (uint16_t)Speech_STK_SIZE,
-	//             (void *)NULL,
-	//             (UBaseType_t)Speech_TASK_PRIO,
-	//             (TaskHandle_t *)&SpeechTask_Handler);
+	// 			(const char *)"Speech_task",
+	// 			(uint16_t)Speech_STK_SIZE,
+	// 			(void *)NULL,
+	// 			(UBaseType_t)Speech_TASK_PRIO,
+	// 			(TaskHandle_t *)&SpeechTask_Handler);
 	vTaskDelete(StartTask_Handler); // 删除开始任务
 	taskEXIT_CRITICAL();			// 退出临界区
 }
@@ -148,13 +137,12 @@ void adc1_task(void *pvParameters)
 	// sprintf(temp, "%s", "你好");
 	// OLED_ShowString(64, 0, temp, 16, 1);
 
-	// HAL_ADC_Start_DMA(&hadc1, (u32 *)&adcx, 1); // 启动ADC+DMA
-
+	HAL_ADC_Start_DMA(&hadc1, (u32 *)&adcx, 1); // 启动ADC+DMA
 	while (1)
 	{
 		// printf("value=%d,%f\n", adcx, value);
-		// sprintf(temp, "%f", value);
-		// OLED_ShowString(64, 0, temp, 16, 1);
+		sprintf(temp, "%f", value);
+		OLED_ShowString(64, 0, temp, 16, 1);
 		vTaskDelay(5);
 	}
 }

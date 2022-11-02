@@ -44,7 +44,7 @@ void MX_SPI1_Init(void)
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;            // 双线模式
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;                // 设置SPI数据大小：8位帧结构
   hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;             // 串行同步时钟空闲时SCLK位高电平
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;                  // 串行同步时钟空第一个时钟沿捕获
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;                  // 串行同步时钟空第2个时钟沿捕获
   hspi1.Init.NSS = SPI_NSS_SOFT;                          // NSS信号由软件管理
   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2; // 波特率预分频值：波特率预分频值为2
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;                 // 数据传输高位先行
