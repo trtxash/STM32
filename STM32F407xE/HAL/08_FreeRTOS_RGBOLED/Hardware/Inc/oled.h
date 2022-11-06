@@ -5,21 +5,7 @@
 #include "delay.h"
 #include "oledio.h"
 #include "oledconf.h"
-
-/* 储存绘画信息的结构体 */
-typedef struct __OLED_DrawData_HandleTypeDef
-{
-    u8 x;      // x位置
-    u8 y;      // y位置
-    u8 x1;     // x位置
-    u8 y1;     // y位置
-    u8 r;      // 画圆半径
-    u8 size;   // 显示大小
-    u8 mode;   // 显示模式
-    u16 color; // 显示颜色
-} OLED_DrawData_HandleTypeDef;
-
-extern OLED_DrawData_HandleTypeDef DrawData;
+#include "spi.h"
 
 // 颜色
 #define WHITE 0xFFFF
@@ -48,6 +34,9 @@ extern OLED_DrawData_HandleTypeDef DrawData;
 
 #define LGRAYBLUE 0XA651 // 浅灰蓝色(中间层颜色)
 #define LBBLUE 0X2B12    // 浅棕蓝色(选择条目的反色)
+
+// 背景色
+#define BACKGROUND BLACK
 
 void OLED_WR_Byte(u8 dat, u8 mode);
 void OLED_WR_DATA8(u8 dat);

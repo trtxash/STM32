@@ -426,7 +426,7 @@ void TIM4_IRQHandler(void)
         OLED_ShowString(0, 64, temp, 16, 1, GREEN);
         OLED_ShowString(0, 80, temp, 16, 1, BLUE);
         sprintf(temp, "%dS", sec);
-        OLED_ShowString(0, 0, temp, 16, 1, WHITE);
+        OLED_ShowString(0, 0, temp, 16, 1, ~BACKGROUND);
 
         // W25QXX_TYPE = W25QXX_ReadID();       // 读取FLASH ID.
         // W25QXX_SIZE = W25QXX_ReadCapacity(); // 读取容量

@@ -60,7 +60,7 @@ int main(void)
 	MX_SPI1_Init(); // 初始化MDA后再初始话SPI
 	// W25QXX_Init();	   // 初始化w25qxx，里面初始化了spi3
 	// MX_ADC1_Init(); // 初始化ADC1
-	OLED_Init();	// 初始化OLED
+	OLED_Init(); // 初始化OLED
 	// OLED_ShowPicture(0, 0, 128, 64, BMP1, 1);
 	// OLED_Refresh();
 	// delay_ms(2000);
@@ -155,7 +155,7 @@ void adc1_task(void *pvParameters)
 	{
 		// printf("value=%d,%f\n", adcx, value);
 		sprintf(temp, "%f", value);
-		OLED_ShowString(64, 0, temp, 16, 1, WHITE);
+		OLED_ShowString(64, 0, temp, 16, 1, ~BACKGROUND);
 		vTaskDelay(10);
 	}
 }
