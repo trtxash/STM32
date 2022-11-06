@@ -1,6 +1,6 @@
 /**
- * @file	09_FreeRTOS_RTC
- * @brief 	移植FreeRTOS和RTC
+ * @file	09_FreeRTOS_USMART
+ * @brief 	移植FreeRTOS和USMART
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
