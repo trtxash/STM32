@@ -146,6 +146,7 @@ C_INCLUDES =  \
 -IFreeRTOS/portable/Inc \
 -IRTT \
 -IUser/Inc \
+-IUSMART/Inc \
 -IHardware/Inc \
 
 # compile gcc flags

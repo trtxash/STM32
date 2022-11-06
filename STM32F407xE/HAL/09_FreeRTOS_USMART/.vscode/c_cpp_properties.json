@@ -10,6 +10,7 @@
                 "${workspaceFolder}/Drivers/CMSIS/Include",
                 "${workspaceFolder}/RTT",
                 "${workspaceFolder}/User/Inc",
+                "${workspaceFolder}/USMART/Inc",
                 "${workspaceFolder}/Hardware/Inc",
                 "${workspaceFolder}/FreeRtos/Inc",
                 "${workspaceFolder}/FreeRtos/portable/Inc"
