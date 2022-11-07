@@ -4,7 +4,7 @@
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
- * @date 	2022年11月1号1点30分
+ * @date 	2022年11月7号15点22分
  */
 #include "main.h"
 #include "bmp.h"
