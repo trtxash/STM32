@@ -79,6 +79,9 @@ Hardware/Src/oledio.c \
 Hardware/Src/led.c \
 Hardware/Src/xfs5152.c \
 Hardware/Src/w25qxx.c \
+USMART/Src/usmart_config.c \
+USMART/Src/usmart_str.c \
+USMART/Src/usmart.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 

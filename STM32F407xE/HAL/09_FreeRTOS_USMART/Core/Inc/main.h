@@ -33,6 +33,7 @@ extern "C"
 #include "delay.h"
 #include "usart.h"
 #include "timer.h"
+#include "usmart.h"
 #include "i2c.h"
 #include "spi.h"
 #include "adc.h"
@@ -41,8 +42,8 @@ extern "C"
 #include "task.h"
 #include "led.h"
 #include "oled.h"
-#include "xfs5152.h"
-#include "w25qxx.h"
+// #include "xfs5152.h"
+// #include "w25qxx.h"
 
 #ifdef __cplusplus
 }

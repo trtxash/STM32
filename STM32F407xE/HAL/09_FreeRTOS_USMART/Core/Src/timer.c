@@ -20,12 +20,12 @@ TIM_HandleTypeDef TIM2_Handler;     // 定时器2句柄
 TIM_OC_InitTypeDef TIM2_CHxHandler; // 定时器2通道句柄，4路
 TIM_HandleTypeDef TIM3_Handler;     // 定时器3句柄
 TIM_OC_InitTypeDef TIM3_CHxHandler; // 定时器3通道句柄，4路
-TIM_HandleTypeDef TIM4_Handler;     // 定时器4句柄，用来发生PWM波
-TIM_OC_InitTypeDef TIM4_CHxHandler; // 定时器5通道句柄，4路
+TIM_HandleTypeDef TIM4_Handler;     // 定时器4句柄
+TIM_OC_InitTypeDef TIM4_CHxHandler; // 定时器4通道句柄，4路
 TIM_HandleTypeDef TIM5_Handler;     // 定时器5句柄，用来发生PWM波
 TIM_OC_InitTypeDef TIM5_CHxHandler; // 定时器5通道句柄，4路
-
-RxPack rxpack;
+TIM_HandleTypeDef TIM13_Handler;    // 定时器13句柄
+TIM_HandleTypeDef TIM14_Handler;    // 定时器14句柄
 
 // 通用定时器2中断初始化
 //  arr：自动重装值。
@@ -87,19 +87,10 @@ void TIM3_Init(u16 arr, u16 psc)
     {
         Error_Handler();
     }
-    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-    if (HAL_TIM_ConfigClockSource(&TIM3_Handler, &sClockSourceConfig) != HAL_OK)
+    if (HAL_TIM_Base_Start_IT(&TIM3_Handler) != HAL_OK) // 也可以用这个，使能定时器3和定时器3更新中断：TIM_IT_UPDATE
     {
         Error_Handler();
     }
-    sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-    if (HAL_TIMEx_MasterConfigSynchronization(&TIM3_Handler, &sMasterConfig) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    __HAL_TIM_ENABLE_IT(&TIM3_Handler, TIM_IT_UPDATE);
-    __HAL_TIM_ENABLE(&TIM3_Handler);
 }
 
 // 通用定时器4中断初始化
@@ -107,7 +98,7 @@ void TIM3_Init(u16 arr, u16 psc)
 //  psc：时钟预分频数
 // 定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
 //  Ft=定时器工作频率,单位:Mhz
-// 这里使用的是定时器3!(定时器3挂在APB1上，时钟为HCLK/2)(F407)
+// 这里使用的是定时器4!(定时器4挂在APB1上，时钟为HCLK/2)(F407)
 //  F401 Timer clock is  APB1 clock.
 void TIM4_Init(u16 arr, u16 psc)
 {
@@ -124,19 +115,68 @@ void TIM4_Init(u16 arr, u16 psc)
     {
         Error_Handler();
     }
-    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-    if (HAL_TIM_ConfigClockSource(&TIM4_Handler, &sClockSourceConfig) != HAL_OK)
+    if (HAL_TIM_Base_Start_IT(&TIM4_Handler) != HAL_OK) // 也可以用这个，使能定时器3和定时器3更新中断：TIM_IT_UPDATE
     {
         Error_Handler();
     }
-    sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-    if (HAL_TIMEx_MasterConfigSynchronization(&TIM4_Handler, &sMasterConfig) != HAL_OK)
+}
+
+// 通用定时器13中断初始化
+// !!!用作了USMART定时!!!
+//  arr：自动重装值。
+//  psc：时钟预分频数
+// 定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+//  Ft=定时器工作频率,单位:Mhz
+// 这里使用的是定时器13!(定时器13挂在APB1上，时钟为HCLK/2)(F407)
+//  F401 Timer clock is  APB1 clock.
+void TIM13_Init(u16 arr, u16 psc)
+{
+    TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+    TIM13_Handler.Instance = TIM13;                            // 定时器13
+    TIM13_Handler.Init.Prescaler = psc;                        // 分频系数
+    TIM13_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       // 向上计数器
+    TIM13_Handler.Init.Period = arr;                           // 装载值
+    TIM13_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // 时钟分频因子
+    // TIM13_Handler.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE; // ARPE,1有更新事件才自动重装他的上限值,如果用OS尽量要打开
+    if (HAL_TIM_Base_Init(&TIM13_Handler) != HAL_OK)
     {
         Error_Handler();
     }
-    __HAL_TIM_ENABLE_IT(&TIM4_Handler, TIM_IT_UPDATE);
-    __HAL_TIM_ENABLE(&TIM4_Handler);
+    if (HAL_TIM_Base_Start_IT(&TIM13_Handler) != HAL_OK) // 也可以用这个，使能定时器3和定时器3更新中断：TIM_IT_UPDATE
+    {
+        Error_Handler();
+    }
+}
+
+// 通用定时器14中断初始化
+// !!!用作了时间定时!!!
+//  arr：自动重装值。
+//  psc：时钟预分频数
+// 定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+//  Ft=定时器工作频率,单位:Mhz
+// 这里使用的是定时器14!(定时器14挂在APB1上，时钟为HCLK/2)(F407)
+//  F401 Timer clock is  APB1 clock.
+void TIM14_Init(u16 arr, u16 psc)
+{
+    TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+    TIM14_Handler.Instance = TIM14;                                       // 定时器11
+    TIM14_Handler.Init.Prescaler = psc;                                   // 分频系数
+    TIM14_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;                  // 向上计数器
+    TIM14_Handler.Init.Period = arr;                                      // 自动装载值
+    TIM14_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;            // 时钟分频因子
+    TIM14_Handler.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE; // ARPE,1有更新事件才自动重装他的上限值,如果用OS尽量要打开
+    if (HAL_TIM_Base_Init(&TIM14_Handler) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    if (HAL_TIM_Base_Start_IT(&TIM14_Handler) != HAL_OK) // 也可以用这个，使能定时器3和定时器3更新中断：TIM_IT_UPDATE
+    {
+        Error_Handler();
+    }
 }
 
 // TIM5 PWM部分初始化
@@ -254,6 +294,18 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
         __HAL_RCC_TIM5_CLK_ENABLE();
         HAL_NVIC_SetPriority(TIM5_IRQn, 3, 0);
         HAL_NVIC_EnableIRQ(TIM5_IRQn);
+    }
+    else if (htim->Instance == TIM13)
+    {
+        __HAL_RCC_TIM13_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
+    }
+    else if (htim->Instance == TIM14)
+    {
+        __HAL_RCC_TIM14_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM8_TRG_COM_TIM14_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM8_TRG_COM_TIM14_IRQn);
     }
 }
 
@@ -402,18 +454,46 @@ void TIM1_UP_TIM10_IRQHandler(void)
 // 定时器3中断服务函数
 void TIM3_IRQHandler(void)
 {
-    if (__HAL_TIM_GET_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE))
-    {
-        OLED_Refresh();
-        fps_num++;
-
-        __HAL_TIM_CLEAR_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE); // 清除更新标志
-    }
+    HAL_TIM_IRQHandler(&TIM3_Handler);
+    // if (__HAL_TIM_GET_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE))
+    // {
+    //     __HAL_TIM_CLEAR_FLAG(&TIM3_Handler, TIM_FLAG_UPDATE); // 清除更新标志
+    // }
 }
 // 定时器4中断服务函数
 void TIM4_IRQHandler(void)
 {
-    if (__HAL_TIM_GET_FLAG(&TIM4_Handler, TIM_FLAG_UPDATE))
+    HAL_TIM_IRQHandler(&TIM4_Handler);
+}
+// 定时器5中断服务函数
+void TIM5_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&TIM5_Handler);
+}
+// 定时器8up,13中断服务函数
+void TIM8_UP_TIM13_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&TIM13_Handler);
+}
+// 定时器8com,14中断服务函数
+void TIM8_TRG_COM_TIM14_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&TIM14_Handler);
+}
+
+// 回调函数，定时器中断服务函数调用
+// 中断回调函数会自动清除中断标志
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim == (&TIM2_Handler))
+    {
+    }
+    else if (htim == (&TIM3_Handler))
+    {
+        OLED_Refresh();
+        fps_num++;
+    }
+    else if (htim == (&TIM4_Handler))
     {
         u8 temp[32] = {0};
 
@@ -427,42 +507,49 @@ void TIM4_IRQHandler(void)
         OLED_ShowString(0, 80, temp, 16, 1, BLUE);
         sprintf(temp, "%dS", sec);
         OLED_ShowString(0, 0, temp, 16, 1, ~BACKGROUND);
-
-        // W25QXX_TYPE = W25QXX_ReadID();       // 读取FLASH ID.
-        // W25QXX_SIZE = W25QXX_ReadCapacity(); // 读取容量
-        // W25QXX_ReadUniqueID(W25QXX_UID);     // 读取唯一ID
-        // printf("W25QXX_TYPE:%x\r\n", W25QXX_TYPE);
-        // printf("W25QXX_SIZE:%x\r\n", W25QXX_SIZE);
-        // for (u8 i = 0; i < 8; i++)
-        // {
-        //     printf("W25QXX_UID[%d]:%x\r\n", i, W25QXX_UID[i]);
-        // }
-        // u32 status_value = taskENTER_CRITICAL_FROM_ISR(); //进入临界区
-        // printf("TIM4输出......\r\n");
-        // taskEXIT_CRITICAL_FROM_ISR(status_value);             //退出临界区
-        __HAL_TIM_CLEAR_FLAG(&TIM4_Handler, TIM_FLAG_UPDATE); // 清除更新标志
-    }
-}
-// 定时器5中断服务函数
-void TIM5_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&TIM5_Handler);
-}
-
-// 回调函数，定时器中断服务函数调用
-// 中断回调函数会自动清除中断标志
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if (htim == (&TIM2_Handler))
-    {
-    }
-    else if (htim == (&TIM3_Handler))
-    {
-    }
-    else if (htim == (&TIM4_Handler))
-    {
     }
     else if (htim == (&TIM5_Handler))
     {
+    }
+    else if (htim == (&TIM13_Handler))
+    {
+        usmart_dev.scan();                                              // 执行usmart扫描
+        __HAL_TIM_SET_COUNTER(&USMARTTimer_HandleTypeDef, 0);           // 清空定时器的CNT
+        __HAL_TIM_SET_AUTORELOAD(&USMARTTimer_HandleTypeDef, 1000 - 1); // 恢复原来的设置
+    }
+    else if (htim == (&TIM14_Handler))
+    {
+        static u16 x1ms = 0;
+        u8 temp[32] = {0};
+
+        x1ms++;
+
+        if (x1ms % 10 == 0) // 10ms
+        {
+        }
+        if (x1ms % 100 == 0) // 100ms
+        {
+        }
+        if (x1ms % 1000 == 0) // 1000ms
+        {
+            sec++;
+            fps = fps_num;
+            fps_num = 0;
+
+            sprintf(temp, "%dfps", fps);
+            OLED_ShowString(0, 48, temp, 16, 1, RED);
+            OLED_ShowString(0, 64, temp, 16, 1, GREEN);
+            OLED_ShowString(0, 80, temp, 16, 1, BLUE);
+            sprintf(temp, "%dS", sec);
+            OLED_ShowString(0, 0, temp, 16, 1, ~BACKGROUND);
+        }
+        if (x1ms % 10000 == 0) // 10000ms
+        {
+        }
+
+        if (x1ms >= 60000)
+        {
+            x1ms = 0; // 归零
+        }
     }
 }

@@ -29,7 +29,7 @@ SPI_HandleTypeDef hspi3;
 DMA_HandleTypeDef hdma_spi1_tx;
 
 /* SPI1 init function */
-void MX_SPI1_Init(void)
+void MX_SPI1_Init(void) // 因为OLED——RGB时钟周期不小于50ns，故降频
 {
 
 	/* USER CODE BEGIN SPI1_Init 0 */
@@ -40,9 +40,9 @@ void MX_SPI1_Init(void)
 
 	/* USER CODE END SPI1_Init 1 */
 	hspi1.Instance = SPI1;
-	hspi1.Init.Mode = SPI_MODE_MASTER;			 // 设置SPI工作模式：主机模式
-	hspi1.Init.Direction = SPI_DIRECTION_2LINES; // 双线模式
-	hspi1.Init.DataSize = SPI_DATASIZE_8BIT; // 设置SPI数据大小：8位帧结构
+	hspi1.Init.Mode = SPI_MODE_MASTER;						// 设置SPI工作模式：主机模式
+	hspi1.Init.Direction = SPI_DIRECTION_2LINES;			// 双线模式
+	hspi1.Init.DataSize = SPI_DATASIZE_8BIT;				// 设置SPI数据大小：8位帧结构
 	hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;				// 串行同步时钟空闲时SCLK位高电平
 	hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;					// 串行同步时钟空第2个时钟沿捕获
 	hspi1.Init.NSS = SPI_NSS_SOFT;							// NSS信号由软件管理

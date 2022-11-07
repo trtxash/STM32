@@ -49,7 +49,6 @@ int main(void)
 	{
 		Error_Handler();
 	}
-	// 因为OLED——RGB时钟周期不小于50ns，故降频
 	Stm32_Clock_Init(240, 4U, 2U, 4U); // 初始化时钟
 	delay_init(240);				   // 初始化延时函数
 	uart_init(115200);				   // 初始化串口
@@ -61,14 +60,13 @@ int main(void)
 	// W25QXX_Init();	   // 初始化w25qxx，里面初始化了spi3
 	// MX_ADC1_Init(); // 初始化ADC1
 	OLED_Init(); // 初始化OLED
-	// OLED_ShowPicture(0, 0, 128, 64, BMP1, 1);
-	// OLED_Refresh();
-	// delay_ms(2000);
-
 	// TIM3_Init(66666 - 1, 1200 - 1);
-	TIM4_Init(10000 - 1, 12000 - 1); // 定时器3初始化，周期1s
+	// TIM4_Init(10000 - 1, 12000 - 1); // 定时器3初始化，周期1s
+	// TIM13_Init(1000 - 1, 12000 - 1); // 定时器14初始化，周期100ms
+	usmart_dev.init(240);		   // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
+	TIM14_Init(100 - 1, 1200 - 1); // 定时器14初始化，周期1ms
 
-	printf(" Init OK!\r\n");
+	printf("\r\nInit OK!\r\n");
 
 	// 创建开始任务
 	xTaskCreate((TaskFunction_t)start_task,			 // 任务函数
@@ -91,13 +89,13 @@ void start_task(void *pvParameters)
 				(void *)NULL,
 				(UBaseType_t)LED0_TASK_PRIO,
 				(TaskHandle_t *)&LED0Task_Handler);
-	// 创建LED1任务
-	xTaskCreate((TaskFunction_t)led1_task,
-				(const char *)"led1_task",
-				(uint16_t)LED1_STK_SIZE,
-				(void *)NULL,
-				(UBaseType_t)LED1_TASK_PRIO,
-				(TaskHandle_t *)&LED1Task_Handler);
+	// // 创建LED1任务
+	// xTaskCreate((TaskFunction_t)led1_task,
+	// 			(const char *)"led1_task",
+	// 			(uint16_t)LED1_STK_SIZE,
+	// 			(void *)NULL,
+	// 			(UBaseType_t)LED1_TASK_PRIO,
+	// 			(TaskHandle_t *)&LED1Task_Handler);
 	// // 创建ADC1任务
 	// xTaskCreate((TaskFunction_t)adc1_task,
 	// 			(const char *)"adc1_task",
@@ -147,13 +145,10 @@ void led1_task(void *pvParameters)
 void adc1_task(void *pvParameters)
 {
 	u8 temp[10] = {0};
-	// sprintf(temp, "%s", "你好");
-	// OLED_ShowString(64, 0, temp, 16, 1);
 
 	HAL_ADC_Start_DMA(&hadc1, (u32 *)&adcx, 1); // 启动ADC+DMA
 	while (1)
 	{
-		// printf("value=%d,%f\n", adcx, value);
 		sprintf(temp, "%f", value);
 		OLED_ShowString(64, 0, temp, 16, 1, ~BACKGROUND);
 		vTaskDelay(10);
