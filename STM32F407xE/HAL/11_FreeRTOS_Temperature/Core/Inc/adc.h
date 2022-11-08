@@ -29,12 +29,10 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-  /* USER CODE BEGIN Includes */
+#define ADC_Sec 128
+#define ADC_Ch 2
 
-  /* USER CODE END Includes */
-
-  extern u32 adcx;
-  extern float value;
+  extern u32 adcx[ADC_Sec][2];
 
   extern ADC_HandleTypeDef hadc1;
   extern DMA_HandleTypeDef hdma_adc1;

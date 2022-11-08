@@ -4,7 +4,7 @@
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
- * @date 	2022年11月8号12点14分
+ * @date 	2022年11月8号21点46分
  */
 #include "main.h"
 #include "bmp.h"
@@ -58,8 +58,8 @@ int main(void)
 	// xfs5152Drv_Init(); // 初始化xfs5152
 	MX_SPI1_Init(); // 初始化MDA后再初始话SPI
 	// W25QXX_Init();	   // 初始化w25qxx，里面初始化了spi3
-	// MX_ADC1_Init(); // 初始化ADC1
-	OLED_Init(); // 初始化OLED
+	MX_ADC1_Init(); // 初始化ADC1
+	OLED_Init();	// 初始化OLED
 	// TIM3_Init(66666 - 1, 1200 - 1);
 	// TIM4_Init(10000 - 1, 12000 - 1); // 定时器3初始化，周期1s
 	// TIM13_Init(1000 - 1, 12000 - 1); // 定时器14初始化，周期100ms
@@ -98,13 +98,13 @@ void start_task(void *pvParameters)
 	// 			(void *)NULL,
 	// 			(UBaseType_t)LED1_TASK_PRIO,
 	// 			(TaskHandle_t *)&LED1Task_Handler);
-	// // 创建ADC1任务
-	// xTaskCreate((TaskFunction_t)adc1_task,
-	// 			(const char *)"adc1_task",
-	// 			(uint16_t)ADC1_STK_SIZE,
-	// 			(void *)NULL,
-	// 			(UBaseType_t)ADC1_TASK_PRIO,
-	// 			(TaskHandle_t *)&ADC1Task_Handler);
+	// 创建ADC1任务
+	xTaskCreate((TaskFunction_t)adc1_task,
+				(const char *)"adc1_task",
+				(uint16_t)ADC1_STK_SIZE,
+				(void *)NULL,
+				(UBaseType_t)ADC1_TASK_PRIO,
+				(TaskHandle_t *)&ADC1Task_Handler);
 	// // 创建Speech任务
 	// xTaskCreate((TaskFunction_t)Speech_task,
 	// 			(const char *)"Speech_task",
@@ -147,12 +147,30 @@ void led1_task(void *pvParameters)
 void adc1_task(void *pvParameters)
 {
 	u8 temp[10] = {0};
+	u32 i, j;
+	float value;
+	float value_v, value_t;
+	float value_v1, value_t1; // 一定空间2分后，每份相乘最大,即 ADC_Sec*ADC_Sec 次采样
 
-	HAL_ADC_Start_DMA(&hadc1, (u32 *)&adcx, 1); // 启动ADC+DMA
+	HAL_ADC_Start_DMA(&hadc1, adcx, ADC_Sec * ADC_Ch); // 启动ADC+DMA
 	while (1)
 	{
-		sprintf(temp, "%f", value);
-		OLED_ShowString(64, 0, temp, 16, 1, ~BACKGROUND);
+		for (j = 0, value_v1 = 0, value_t1 = 0; j < ADC_Sec; j++)
+		{
+			for (i = 0, value_v = 0, value_t = 0; i < ADC_Sec; i++)
+			{
+				value_v += (float)adcx[i][0] * 3.3 / 4096;							// 电压值
+				value_t += ((float)adcx[i][1] * (3.3 / 4096) - 0.76) / 0.0025 + 20; // 转换为温度值
+			}
+			value_v1 += value_v / i;
+			value_t1 += value_t / i;
+		}
+
+		sprintf(temp, "%f", value_v1 / j);
+		OLED_ShowString(0, 64, temp, 16, 1, ~BACKGROUND);
+		sprintf(temp, "%f", value_t1 / j);
+		OLED_ShowString(0, 80, temp, 16, 1, ~BACKGROUND);
+
 		vTaskDelay(10);
 	}
 }
