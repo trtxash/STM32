@@ -4,7 +4,7 @@
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
- * @date 	2022年11月7号15点22分
+ * @date 	2022年11月8号12点14分
  */
 #include "main.h"
 #include "bmp.h"
@@ -63,8 +63,10 @@ int main(void)
 	// TIM3_Init(66666 - 1, 1200 - 1);
 	// TIM4_Init(10000 - 1, 12000 - 1); // 定时器3初始化，周期1s
 	// TIM13_Init(1000 - 1, 12000 - 1); // 定时器14初始化，周期100ms
-	usmart_dev.init(240);		   // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
-	TIM14_Init(100 - 1, 1200 - 1); // 定时器14初始化，周期1ms
+	usmart_dev.init(240);							   // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
+	RTC_Init();										   // 初始化 RTC
+	RTC_Set_WakeUp(RTC_WAKEUPCLOCK_CK_SPRE_16BITS, 0); // RTC周期唤醒
+	TIM14_Init(100 - 1, 1200 - 1);					   // 定时器14初始化，周期1ms
 
 	printf("\r\nInit OK!\r\n");
 

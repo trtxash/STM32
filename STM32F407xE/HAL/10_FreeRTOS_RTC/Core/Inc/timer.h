@@ -17,6 +17,7 @@
 #include "usart.h"
 #include "oled.h"
 #include "usmart.h"
+#include "rtc.h"
 
 extern TIM_HandleTypeDef TIM13_Handler; // 定时器13句柄
 extern TIM_HandleTypeDef TIM14_Handler; // 定时器4句柄

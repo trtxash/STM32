@@ -6,6 +6,7 @@
 #include "sys.h"
 #include "oled.h"
 #include "led.h"
+#include "rtc.h"
 
 // 函数名列表初始化(用户自己添加)
 // 用户直接在这里输入要执行的函数名及其查找串
@@ -44,6 +45,15 @@ struct _m_usmart_nametab usmart_nametab[] =
 		"void LED0_Reverse(void)",
 		(void *)LED1_Reverse,
 		"void LED1_Reverse(void)",
+
+		(void *)RTC_Set_Time,
+		"HAL_StatusTypeDef RTC_Set_Time(u8 hour, u8 min, u8 sec, u8 ampm)",
+		(void *)RTC_Set_Date,
+		"HAL_StatusTypeDef RTC_Set_Date(u8 year, u8 month, u8 date, u8 week)",
+		(void *)RTC_Set_AlarmA,
+		"void RTC_Set_AlarmA(u8 week, u8 hour, u8 min, u8 sec)",
+		(void *)RTC_Set_WakeUp,
+		"void RTC_Set_WakeUp(u32 wksel, u16 cnt)",
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

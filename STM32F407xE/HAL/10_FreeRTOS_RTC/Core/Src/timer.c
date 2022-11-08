@@ -495,18 +495,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     else if (htim == (&TIM4_Handler))
     {
-        u8 temp[32] = {0};
-
-        sec++;
-        fps = fps_num;
-        fps_num = 0;
-
-        sprintf(temp, "%dfps", fps);
-        OLED_ShowString(0, 48, temp, 16, 1, RED);
-        OLED_ShowString(0, 64, temp, 16, 1, GREEN);
-        OLED_ShowString(0, 80, temp, 16, 1, BLUE);
-        sprintf(temp, "%dS", sec);
-        OLED_ShowString(0, 0, temp, 16, 1, ~BACKGROUND);
     }
     else if (htim == (&TIM5_Handler))
     {
@@ -529,17 +517,25 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         }
         if (x1ms % 100 == 0) // 100ms
         {
+            HAL_RTC_GetTime(&RTC_Handler, &RTC_TimeStruct, RTC_FORMAT_BIN);
+            sprintf(temp, "Time:%02d:%02d:%02d", RTC_TimeStruct.Hours, RTC_TimeStruct.Minutes, RTC_TimeStruct.Seconds);
+            OLED_ShowString(0, 16, temp, 16, 1, ~BACKGROUND);
+            HAL_RTC_GetDate(&RTC_Handler, &RTC_DateStruct, RTC_FORMAT_BIN);
+            sprintf(temp, "Date:20%02d-%02d-%02d", RTC_DateStruct.Year, RTC_DateStruct.Month, RTC_DateStruct.Date);
+            OLED_ShowString(0, 32, temp, 16, 1, ~BACKGROUND);
+            sprintf(temp, "Week:%d", RTC_DateStruct.WeekDay);
+            OLED_ShowString(0, 48, temp, 16, 1, ~BACKGROUND);
         }
         if (x1ms % 1000 == 0) // 1000ms
         {
             sec++;
-            fps = fps_num;
-            fps_num = 0;
+            // fps = fps_num;
+            // fps_num = 0;
 
-            sprintf(temp, "%dfps", fps);
-            OLED_ShowString(0, 48, temp, 16, 1, RED);
-            OLED_ShowString(0, 64, temp, 16, 1, GREEN);
-            OLED_ShowString(0, 80, temp, 16, 1, BLUE);
+            // sprintf(temp, "%dfps", fps);
+            // OLED_ShowString(0, 48, temp, 16, 1, RED);
+            // OLED_ShowString(0, 64, temp, 16, 1, GREEN);
+            // OLED_ShowString(0, 80, temp, 16, 1, BLUE);
             sprintf(temp, "%dS", sec);
             OLED_ShowString(0, 0, temp, 16, 1, ~BACKGROUND);
         }
