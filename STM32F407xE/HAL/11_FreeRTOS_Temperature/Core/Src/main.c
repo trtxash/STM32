@@ -148,7 +148,6 @@ void adc1_task(void *pvParameters)
 {
 	u8 temp[10] = {0};
 	u32 i, j;
-	float value;
 	float value_v, value_t;
 	float value_v1, value_t1; // 一定空间2分后，每份相乘最大,即 ADC_Sec*ADC_Sec 次采样
 
