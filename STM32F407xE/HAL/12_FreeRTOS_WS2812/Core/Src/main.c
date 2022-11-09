@@ -1,6 +1,6 @@
 /**
- * @file	12_FreeRTOS_DAC
- * @brief 	移植FreeRTOS和内置DAC
+ * @file	12_FreeRTOS_WS2812
+ * @brief 	移植FreeRTOS和WS2812
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
