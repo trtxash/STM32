@@ -22,8 +22,7 @@ TARGET = Template
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -O3 -g
-
+OPT = -Og
 
 #######################################
 # paths
@@ -82,6 +81,7 @@ Hardware/Src/oledio.c \
 Hardware/Src/led.c \
 Hardware/Src/xfs5152.c \
 Hardware/Src/w25qxx.c \
+Hardware/Src/ws2812.c \
 USMART/Src/usmart_config.c \
 USMART/Src/usmart_str.c \
 USMART/Src/usmart.c \

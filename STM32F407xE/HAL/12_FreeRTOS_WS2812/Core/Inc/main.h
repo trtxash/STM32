@@ -43,6 +43,7 @@ extern "C"
 #include "task.h"
 #include "led.h"
 #include "oled.h"
+#include "ws2812.h"
 // #include "xfs5152.h"
 // #include "w25qxx.h"
 

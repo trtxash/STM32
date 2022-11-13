@@ -60,13 +60,14 @@ int main(void)
 	// W25QXX_Init();	   // 初始化w25qxx，里面初始化了spi3
 	MX_ADC1_Init(); // 初始化ADC1
 	OLED_Init();	// 初始化OLED
+	ws2812init();	// 初始化ws2812，用了tim4
 	// TIM3_Init(66666 - 1, 1200 - 1);
 	// TIM4_Init(10000 - 1, 12000 - 1); // 定时器3初始化，周期1s
 	// TIM13_Init(1000 - 1, 12000 - 1); // 定时器14初始化，周期100ms
-	usmart_dev.init(240);							   // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
-	RTC_Init();										   // 初始化 RTC
-	RTC_Set_WakeUp(RTC_WAKEUPCLOCK_CK_SPRE_16BITS, 0); // RTC周期唤醒
-	TIM14_Init(100 - 1, 1200 - 1);					   // 定时器14初始化，周期1ms
+	usmart_dev.init(240); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
+	RTC_Init();			  // 初始化 RTC
+	// RTC_Set_WakeUp(RTC_WAKEUPCLOCK_CK_SPRE_16BITS, 0); // RTC周期唤醒
+	TIM14_Init(100 - 1, 1200 - 1); // 定时器14初始化，周期1ms
 
 	printf("\r\nInit OK!\r\n");
 
@@ -91,13 +92,13 @@ void start_task(void *pvParameters)
 				(void *)NULL,
 				(UBaseType_t)LED0_TASK_PRIO,
 				(TaskHandle_t *)&LED0Task_Handler);
-	// // 创建LED1任务
-	// xTaskCreate((TaskFunction_t)led1_task,
-	// 			(const char *)"led1_task",
-	// 			(uint16_t)LED1_STK_SIZE,
-	// 			(void *)NULL,
-	// 			(UBaseType_t)LED1_TASK_PRIO,
-	// 			(TaskHandle_t *)&LED1Task_Handler);
+	// 创建LED1任务
+	xTaskCreate((TaskFunction_t)led1_task,
+				(const char *)"led1_task",
+				(uint16_t)LED1_STK_SIZE,
+				(void *)NULL,
+				(UBaseType_t)LED1_TASK_PRIO,
+				(TaskHandle_t *)&LED1Task_Handler);
 	// 创建ADC1任务
 	xTaskCreate((TaskFunction_t)adc1_task,
 				(const char *)"adc1_task",
@@ -136,9 +137,13 @@ void led1_task(void *pvParameters)
 	TickType_t xLastWakeTime;
 	const TickType_t xDelay50ms = pdMS_TO_TICKS(50);
 	xLastWakeTime = xTaskGetTickCount();
+
+	u8 i;
+	WS_WriteAll_RGB(0, 255, 0);
+	WS_Load();
 	while (1)
 	{
-		LED1_Reverse();
+
 		xTaskDelayUntil(&xLastWakeTime, xDelay50ms);
 	}
 }

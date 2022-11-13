@@ -19,6 +19,9 @@
 #include "usmart.h"
 #include "rtc.h"
 
+extern TIM_HandleTypeDef TIM8_Handler;  // 定时器12句柄
+extern TIM_HandleTypeDef TIM4_Handler;  // 定时器4句柄
+extern TIM_HandleTypeDef TIM12_Handler; // 定时器12句柄
 extern TIM_HandleTypeDef TIM13_Handler; // 定时器13句柄
 extern TIM_HandleTypeDef TIM14_Handler; // 定时器4句柄
 
@@ -28,13 +31,21 @@ void TIM1_Init(u16 arr, u16 psc);
 void TIM2_Init(u16 arr, u16 psc);
 void TIM3_Init(u16 arr, u16 psc);
 void TIM4_Init(u16 arr, u16 psc);
+void TIM8_Init(u16 arr, u16 psc);
+void TIM12_Init(u16 arr, u16 psc);
 void TIM13_Init(u16 arr, u16 psc);
 void TIM14_Init(u16 arr, u16 psc);
 void TIM4_PWM_Init(u16 arr, u16 psc, u8 ways);
 void TIM5_PWM_Init(u16 arr, u16 psc, u8 ways);
+void TIM8_PWM_Init(u16 arr, u16 psc, u8 ways);
+void TIM12_PWM_Init(u16 arr, u16 psc, u8 ways);
 void TIM_SetTIM4Compare_n(u32 compare, u8 n);
 void TIM_SetTIM5Compare_n(u32 compare, u8 n);
+void TIM_SetTIM8Compare_n(u32 compare, u8 n);
+void TIM_SetTIM12Compare_n(u32 compare, u8 n);
 void TIM_SetTIM4_DutyCycle_n(u8 DutyCycle, u8 n);
 void TIM_SetTIM5_DutyCycle_n(u8 DutyCycle, u8 n);
+void TIM_SetTIM8_DutyCycle_n(u8 DutyCycle, u8 n);
+void TIM_SetTIM12_DutyCycle_n(u8 DutyCycle, u8 n);
 
 #endif
