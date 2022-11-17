@@ -140,10 +140,11 @@ void led1_task(void *pvParameters)
 
 	u8 i;
 	WS_WriteAll_RGB(0, 255, 0);
+	// HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_1);
+	// TIM_SetTIM4_DutyCycle_n(50, 1);
 	WS_Load();
 	while (1)
 	{
-
 		xTaskDelayUntil(&xLastWakeTime, xDelay50ms);
 	}
 }

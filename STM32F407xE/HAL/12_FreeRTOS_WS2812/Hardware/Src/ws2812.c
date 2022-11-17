@@ -1,6 +1,6 @@
 #include "WS2812.h"
 
-u16 send_Buf[NUM];
+u32 send_Buf[NUM];
 
 // 用了TIM8产生PWM波
 void ws2812init()
@@ -11,13 +11,13 @@ void ws2812init()
 // 启动DMA载入数据
 void WS_Load(void)
 {
-    HAL_TIM_PWM_Start_DMA(&WS2812_PWM_TIM_Hand, WS2812_PWM_TIM_Ch, (uint32_t *)send_Buf, NUM);
+    HAL_TIM_PWM_Start_DMA(&WS2812_PWM_TIM_Hand, WS2812_PWM_TIM_Ch, (u32 *)send_Buf, NUM);
 }
 
 // 关闭所有LED灯
 void WS_CloseAll(void)
 {
-    uint16_t i;
+    u16 i;
 
     for (i = 0; i < PIXEL_NUM * 24; i++)
         send_Buf[i] = WS0; // 写入逻辑0的占空比
@@ -30,10 +30,10 @@ void WS_CloseAll(void)
  * @brief 全部led灯设置成一样的亮度，其中RGB分别设置亮度
  * WS2812的写入顺序是GRB，高位在前面
  */
-void WS_WriteAll_RGB(uint8_t n_R, uint8_t n_G, uint8_t n_B)
+void WS_WriteAll_RGB(u8 n_R, u8 n_G, u8 n_B)
 {
-    uint16_t i, j;
-    uint8_t dat[24];
+    u16 i, j;
+    u32 dat[24];
 
     // 将RGB数据进行转换
     for (i = 0; i < 8; i++)
@@ -66,7 +66,7 @@ void WS_WriteAll_RGB(uint8_t n_R, uint8_t n_G, uint8_t n_B)
     }
 }
 
-uint32_t WS281x_Color(uint8_t red, uint8_t green, uint8_t blue)
+u32 WS281x_Color(u8 red, u8 green, u8 blue)
 {
     return green << 16 | red << 8 | blue;
 }
@@ -78,9 +78,9 @@ uint32_t WS281x_Color(uint8_t red, uint8_t green, uint8_t blue)
  * @param  GRBColor: color value of No.n light in 24bit-format(8 bit G + 8 bit R +8 bit B)
  * @retval None
  */
-void WS281x_SetPixelColor(uint16_t n, uint32_t GRBColor)
+void WS281x_SetPixelColor(u16 n, u32 GRBColor)
 {
-    uint8_t i;
+    u8 i;
     if (n < PIXEL_NUM)
     {
         for (i = 0; i < 24; ++i)
@@ -99,9 +99,9 @@ void WS281x_SetPixelColor(uint16_t n, uint32_t GRBColor)
  * @param  blue: blue color value of No.n light in RGB-format
  * @retval None
  */
-void WS281x_SetPixelRGB(uint16_t n, uint8_t red, uint8_t green, uint8_t blue)
+void WS281x_SetPixelRGB(u16 n, u8 red, u8 green, u8 blue)
 {
-    uint8_t i;
+    u8 i;
 
     if (n < PIXEL_NUM)
     {
@@ -112,7 +112,7 @@ void WS281x_SetPixelRGB(uint16_t n, uint8_t red, uint8_t green, uint8_t blue)
     }
 }
 
-uint32_t Wheel(uint8_t WheelPos)
+u32 Wheel(u8 WheelPos)
 {
     WheelPos = 255 - WheelPos;
     if (WheelPos < 85)
@@ -128,14 +128,14 @@ uint32_t Wheel(uint8_t WheelPos)
     return WS281x_Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-void rainbow(uint8_t wait)
+void rainbow(u8 wait)
 {
-    uint32_t timestamp = HAL_GetTick();
-    uint16_t i;
-    static uint8_t j;
-    static uint32_t next_time = 0;
+    u32 timestamp = HAL_GetTick();
+    u16 i;
+    static u8 j;
+    static u32 next_time = 0;
 
-    uint32_t flag = 0;
+    u32 flag = 0;
     if (next_time < wait)
     {
         if ((uint64_t)timestamp + wait - next_time > 0)
@@ -156,14 +156,14 @@ void rainbow(uint8_t wait)
     }
 }
 
-void rainbowCycle(uint8_t wait)
+void rainbowCycle(u8 wait)
 {
-    uint32_t timestamp = HAL_GetTick();
-    uint16_t i;
-    static uint8_t j;
-    static uint32_t next_time = 0;
+    u32 timestamp = HAL_GetTick();
+    u16 i;
+    static u8 j;
+    static u32 next_time = 0;
 
-    static uint8_t loop = 0;
+    static u8 loop = 0;
     if (loop == 0)
         next_time = timestamp;
     loop = 1; // 首次调用初始化

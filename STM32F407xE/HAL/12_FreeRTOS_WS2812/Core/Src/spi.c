@@ -114,7 +114,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *spiHandle)
 		hdma_spi1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE; // 外设数据大小
 		hdma_spi1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;	 // 内存数据大小
 		hdma_spi1_tx.Init.Mode = DMA_CIRCULAR;						 // 模式选择
-		hdma_spi1_tx.Init.Priority = DMA_PRIORITY_MEDIUM;			 // 优先级
+		hdma_spi1_tx.Init.Priority = DMA_PRIORITY_HIGH;				 // 优先级
 		hdma_spi1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;			 // FIFO
 		if (HAL_DMA_Init(&hdma_spi1_tx) != HAL_OK)
 		{

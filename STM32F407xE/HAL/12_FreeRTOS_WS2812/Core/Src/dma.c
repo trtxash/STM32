@@ -35,7 +35,7 @@ void MX_DMA_Init(void)
   /* DMA1_Stream0_IRQn interrupt configuration */
   // HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
   // HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-  
+
   /* DMA1_Stream6_IRQn interrupt configuration */
   // HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 3, 0);
   // HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
@@ -47,6 +47,14 @@ void MX_DMA_Init(void)
   /* DMA2_Stream3_IRQn interrupt configuration */
   // HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 3, 1);
   // HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+}
+
+void DMA1_Stream0_IRQHandler(void)
+{
+  if (__HAL_DMA_GET_FLAG(&TIM4_Handler, DMA_FLAG_TCIF2_6))
+  {
+    __HAL_DMA_CLEAR_FLAG(&TIM4_Handler, DMA_FLAG_TCIF2_6);
+  }
 }
 
 void DMA1_Stream6_IRQHandler(void) // I2C1

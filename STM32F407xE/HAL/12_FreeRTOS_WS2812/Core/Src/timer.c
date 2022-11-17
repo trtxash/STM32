@@ -14,24 +14,25 @@ u32 sec;
 u32 fps;
 u32 fps_num;
 
-TIM_HandleTypeDef TIM1_Handler;      // 定时器1句柄
-TIM_OC_InitTypeDef TIM1_CHxHandler;  // 定时器1通道句柄，4路
-TIM_HandleTypeDef TIM2_Handler;      // 定时器2句柄
-TIM_OC_InitTypeDef TIM2_CHxHandler;  // 定时器2通道句柄，4路
-TIM_HandleTypeDef TIM3_Handler;      // 定时器3句柄
-TIM_OC_InitTypeDef TIM3_CHxHandler;  // 定时器3通道句柄，4路
-TIM_HandleTypeDef TIM4_Handler;      // 定时器4句柄
-TIM_OC_InitTypeDef TIM4_CHxHandler;  // 定时器4通道句柄，4路
-DMA_HandleTypeDef hdma_tim4_ch1;     // 定时器4，ch1
-TIM_HandleTypeDef TIM5_Handler;      // 定时器5句柄，用来发生PWM波
-TIM_OC_InitTypeDef TIM5_CHxHandler;  // 定时器5通道句柄，4路
-TIM_HandleTypeDef TIM8_Handler;      // 定时器8句柄，用来发生PWM波
-TIM_OC_InitTypeDef TIM8_CHxHandler;  // 定时器8通道句柄，4路
-DMA_HandleTypeDef hdma_tim8_ch1;     // 定时器CH1，PWM+DMA
-TIM_HandleTypeDef TIM12_Handler;     // 定时器12句柄，用来发生PWM波
-TIM_OC_InitTypeDef TIM12_CHxHandler; // 定时器12通道句柄，1路
-TIM_HandleTypeDef TIM13_Handler;     // 定时器13句柄
-TIM_HandleTypeDef TIM14_Handler;     // 定时器14句柄
+TIM_HandleTypeDef TIM1_Handler;            // 定时器1句柄
+TIM_OC_InitTypeDef TIM1_CHxHandler;        // 定时器1通道句柄，4路
+TIM_HandleTypeDef TIM2_Handler;            // 定时器2句柄
+TIM_OC_InitTypeDef TIM2_CHxHandler;        // 定时器2通道句柄，4路
+TIM_HandleTypeDef TIM3_Handler;            // 定时器3句柄
+TIM_OC_InitTypeDef TIM3_CHxHandler;        // 定时器3通道句柄，4路
+TIM_HandleTypeDef TIM4_Handler;            // 定时器4句柄
+TIM_MasterConfigTypeDef TIM4_MasterConfig; // 定时器4主配置
+TIM_OC_InitTypeDef TIM4_CHxHandler;        // 定时器4通道句柄，4路
+DMA_HandleTypeDef hdma_tim4_ch1;           // 定时器4，ch1
+TIM_HandleTypeDef TIM5_Handler;            // 定时器5句柄，用来发生PWM波
+TIM_OC_InitTypeDef TIM5_CHxHandler;        // 定时器5通道句柄，4路
+TIM_HandleTypeDef TIM8_Handler;            // 定时器8句柄，用来发生PWM波
+TIM_OC_InitTypeDef TIM8_CHxHandler;        // 定时器8通道句柄，4路
+DMA_HandleTypeDef hdma_tim8_ch1;           // 定时器CH1，PWM+DMA
+TIM_HandleTypeDef TIM12_Handler;           // 定时器12句柄，用来发生PWM波
+TIM_OC_InitTypeDef TIM12_CHxHandler;       // 定时器12通道句柄，1路
+TIM_HandleTypeDef TIM13_Handler;           // 定时器13句柄
+TIM_HandleTypeDef TIM14_Handler;           // 定时器14句柄
 
 // 通用定时器2中断初始化
 //  arr：自动重装值。
@@ -254,31 +255,54 @@ void TIM4_PWM_Init(u16 arr, u16 psc, u8 ways)
     TIM4_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       // 向上计数模式
     TIM4_Handler.Init.Period = arr;                           // 自动重装载值
     TIM4_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // 数字分频因子,数字分频因子为1时，TIMxCLK = PCLKx,其他值时，TIMxCLK = PCLKx/2^(数字分频因子)
-    HAL_TIM_PWM_Init(&TIM4_Handler);                          // 初始化PWM
+    TIM4_Handler.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_PWM_Init(&TIM4_Handler) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    TIM4_MasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    TIM4_MasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&TIM4_Handler, &TIM4_MasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    // HAL_TIM_PWM_Init(&TIM4_Handler); // 初始化PWM
 
     TIM4_CHxHandler.OCMode = TIM_OCMODE_PWM1;         // 模式选择PWM1
     TIM4_CHxHandler.Pulse = 0;                        // 设置比较值,此值用来确定占空比，默认比较值为自动重装载值的一半,即占空比为50%
-    TIM4_CHxHandler.OCPolarity = TIM_OCPOLARITY_LOW; // 输出比较极性为低
+    TIM4_CHxHandler.OCPolarity = TIM_OCPOLARITY_HIGH; // 输出比较极性为高
+    // TIM4_CHxHandler.OCIdleState = TIM_OCIDLESTATE_RESET;
+    // TIM4_CHxHandler.OCNIdleState = TIM_OCNIDLESTATE_RESET;
     TIM4_CHxHandler.OCFastMode = TIM_OCFAST_DISABLE;
     if (ways & 0B0001)
     {
-        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_1); // 配置TIM5通道1
-        // HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_1);                           // 启动TIM5通道1的PWM输出
+        if (HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_1) != HAL_OK)
+        {
+            Error_Handler();
+        }; // 配置TIM5通道1
+           // HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_1);                           // 启动TIM5通道1的PWM输出
     }
     if (ways & 0B0010)
     {
-        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_2); // 配置TIM5通道2
-        HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_2);                           // 启动TIM5通道2的PWM输出
+        if (HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_2) != HAL_OK)
+        {
+            Error_Handler();
+        }; // 配置TIM5通道2
     }
     if (ways & 0B0100)
     {
-        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_3); // 配置TIM5通道3
-        HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_3);                           // 启动TIM5通道3的PWM输出
+        if (HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_3) != HAL_OK)
+        {
+            Error_Handler();
+        }; // 配置TIM5通道3
     }
     if (ways & 0B1000)
     {
-        HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_4); // 配置TIM5通道4
-        HAL_TIM_PWM_Start(&TIM4_Handler, TIM_CHANNEL_4);                           // 启动TIM5通道4的PWM输出
+        if (HAL_TIM_PWM_ConfigChannel(&TIM4_Handler, &TIM4_CHxHandler, TIM_CHANNEL_4) != HAL_OK)
+        {
+            Error_Handler();
+        }; // 配置TIM5通道4
     }
 }
 
@@ -485,10 +509,10 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
         hdma_tim4_ch1.Init.Direction = DMA_MEMORY_TO_PERIPH;
         hdma_tim4_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
         hdma_tim4_ch1.Init.MemInc = DMA_MINC_ENABLE;
-        hdma_tim4_ch1.Init.PeriphDataAlignment = DMA_MDATAALIGN_HALFWORD;
-        hdma_tim4_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+        hdma_tim4_ch1.Init.PeriphDataAlignment = DMA_MDATAALIGN_WORD;
+        hdma_tim4_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
         hdma_tim4_ch1.Init.Mode = DMA_CIRCULAR;
-        hdma_tim4_ch1.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+        hdma_tim4_ch1.Init.Priority = DMA_PRIORITY_HIGH;
         hdma_tim4_ch1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
         if (HAL_DMA_Init(&hdma_tim4_ch1) != HAL_OK)
         {

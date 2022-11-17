@@ -29,22 +29,26 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-  /* USER CODE BEGIN Includes */
+	/* USER CODE BEGIN Includes */
 
-  /* USER CODE END Includes */
+	/* USER CODE END Includes */
 
-  extern SPI_HandleTypeDef hspi1;
-  extern DMA_HandleTypeDef hdma_spi1_tx;
+	extern SPI_HandleTypeDef hspi1;
+	extern SPI_HandleTypeDef hspi3;
+	extern DMA_HandleTypeDef hdma_spi1_tx;
 
-  /* USER CODE BEGIN Private defines */
+#define SPI1_DataSize SPI_DATASIZE_8BIT // 选择SPI1数据大小选择
 
-  /* USER CODE END Private defines */
+	/* USER CODE BEGIN Private defines */
 
-  void MX_SPI1_Init(void);
+	/* USER CODE END Private defines */
 
-  /* USER CODE BEGIN Prototypes */
+	void MX_SPI1_Init(void);
+	void MX_SPI3_Init(void);
 
-  /* USER CODE END Prototypes */
+	/* USER CODE BEGIN Prototypes */
+
+	/* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }

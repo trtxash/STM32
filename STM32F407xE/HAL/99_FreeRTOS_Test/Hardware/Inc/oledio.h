@@ -34,9 +34,10 @@
 
 #define OLED_SDIN_Clr() OLED_SDIN_Port->BSRR = (uint32_t)OLED_SDIN_Pin << 16U
 #define OLED_SDIN_Set() OLED_SDIN_Port->BSRR = OLED_SDIN_Pin
+#define OLED_READ_SDIN() OLED_SDIN_Port->IDR &OLED_SDIN_Pin // 0 or 1
 
-#define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
-#define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
+#define OLED_RST_Clr() OLED_RST_Port->BSRR = (uint32_t)OLED_RST_Pin << 16U
+#define OLED_RST_Set() OLED_RST_Port->BSRR = OLED_RST_Pin
 /*************************************************** OLED IIC 端口定义 ************************************************/
 #else
 /*************************************************** OLED SPI 端口定义 ************************************************/
@@ -97,8 +98,8 @@ void OledDrv_IICSendByte(uint8_t data);
 #define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define OLED_RST_Pin GPIO_PIN_0
 
-#define OLED_RST_Clr() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_RESET)
-#define OLED_RST_Set() HAL_GPIO_WritePin(OLED_RST_Port, OLED_RST_Pin, GPIO_PIN_SET)
+#define OLED_RST_Clr() OLED_RST_Port->BSRR = (uint32_t)OLED_RST_Pin << 16U
+#define OLED_RST_Set() OLED_RST_Port->BSRR = OLED_RST_Pin
 
 #else // SPI
 

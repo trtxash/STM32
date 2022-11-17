@@ -15,18 +15,18 @@
 #define WS1 (u32)(sys_clock / 2 / 0.8 * 2 / 3) // 1码比较值为61-->850us
 #define WS0 (u32)(sys_clock / 2 / 0.8) - WS1   // 0码比较值为28-->400us
 
-extern u16 send_Buf[NUM];
+extern u32 send_Buf[NUM];
 
 void ws2812init();
 
 void WS_Load(void);
-void WS_WriteAll_RGB(uint8_t n_R, uint8_t n_G, uint8_t n_B);
+void WS_WriteAll_RGB(u8 n_R, u8 n_G, u8 n_B);
 void WS_CloseAll(void);
 
-uint32_t WS281x_Color(uint8_t red, uint8_t green, uint8_t blue);
-void WS281x_SetPixelColor(uint16_t n, uint32_t GRBColor);
-void WS281x_SetPixelRGB(uint16_t n, uint8_t red, uint8_t green, uint8_t blue);
+u32 WS281x_Color(u8 red, u8 green, u8 blue);
+void WS281x_SetPixelColor(uint16_t n, u32 GRBColor);
+void WS281x_SetPixelRGB(uint16_t n, u8 red, u8 green, u8 blue);
 
-uint32_t Wheel(uint8_t WheelPos);
-void rainbow(uint8_t wait);
-void rainbowCycle(uint8_t wait);
+u32 Wheel(u8 WheelPos);
+void rainbow(u8 wait);
+void rainbowCycle(u8 wait);

@@ -114,7 +114,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *adcHandle)
     hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD; // 外设数据大小
     hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;    // 内存数据大小
     hdma_adc1.Init.Mode = DMA_CIRCULAR;                       // 模式选择
-    hdma_adc1.Init.Priority = DMA_PRIORITY_HIGH;              // 优先级
+    hdma_adc1.Init.Priority = DMA_PRIORITY_MEDIUM;            // 优先级
     hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;           // FIFO
     if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
     {

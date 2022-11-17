@@ -4,8 +4,8 @@
  *          根据实际设备配置，硬件IIC，SPI相关配置在CORE中
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.01
- * @date 	2022年9月18号23点43分
+ * @version 1.1
+ * @date 	2022年10月28号14点07分
  */
 
 #ifndef __OLEDCONF_H
@@ -26,18 +26,27 @@
 #define OLED_DMA_DISABLE 0
 #define OLED_DMA_ABLE 1
 
-/* OLED 具体选择 */
-#define _OLED_DRIVER_IC_TYPE OLED_SSD1306_SSD1315 // 改SSD种类
-#define _SOFT_OR_HARE OLED_HARD                   // 改是否软件模拟
-#define _DRIVE_INTERFACE_TYPE OLED_SPI_INTERFACE  // 改接口类型
-#define _OLED_DMA OLED_DMA_ABLE                   // 改是否开启DMA
+/* OLED RGB颜色深度定义 */
+#define K65 0  // RGB565
+#define K262 1 // RGB666
+
+/* I2C,SPI 句柄选择------------------------------------------------------------------------- */
+#define OLED_I2C_HandleTypeDef hi2c1 // I2C句柄选择
+#define OLED_SPI_HandleTypeDef hspi1 // SPI句柄选择
+
+/* OLED 具体选择------------------------------------------------------------------------- */
+#define _OLED_DRIVER_IC_TYPE OLED_SSD1351        // 改SSD种类
+#define _SOFT_OR_HARE OLED_HARD                  // 改是否软件模拟
+#define _DRIVE_INTERFACE_TYPE OLED_SPI_INTERFACE // 改接口类型
+#define _OLED_DMA OLED_DMA_ABLE                  // 改是否开启DMA
+#define _OLED_RGB_COLOR_DEPTH K65                // RGB颜色深度选择
 
 /* OLED 的通信地址 */
 #define OLED_ADDRESS 0x78
 
 /* OLED 的宽度和高度 */
 #define OLED_WIDTH 128
-#define OLED_HEIGHT 64
+#define OLED_HEIGHT 128
 
 /* OLED 软件IIC延时时间 */
 #define OledDrv_IICDelay_Time 0
