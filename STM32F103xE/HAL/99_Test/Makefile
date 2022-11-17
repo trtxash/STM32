@@ -38,6 +38,7 @@ BUILD_DIR = build
 C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/gpio.c \
+Core/Src/dma.c \
 Core/Src/stm32f1xx_it.c \
 Core/Src/stm32f1xx_hal_msp.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
@@ -59,7 +60,6 @@ RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 User/Src/delay.c \
 User/Src/sys.c \
-User/Src/usart.c 
 
 # ASM sources
 ASM_SOURCES =  \

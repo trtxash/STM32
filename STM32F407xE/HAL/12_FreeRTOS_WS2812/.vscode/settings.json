@@ -1,6 +1,0 @@
-{
-    "cortex-debug.variableUseNaturalFormat": false,
-    "files.associations": {
-        "timer.h": "c"
-    }
-}

@@ -1,280 +1,338 @@
+/* USER CODE BEGIN Header */
 /**
- * @file	99_Test
- * @brief 	用于工程模板
- * @author 	TRTX-gamer
- * @version 1.00
- * @date 	2022年3月26号13点07分
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
 
-#include "sys.h"
-#include "delay.h"
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 
-void GPIOA_Init(void);
-void PWM_MG90S(u32 nusa, u32 nusb, u32 nusc);
-void Beep_Init(void);
-void LED_Init(void);
-void Key_Init(void);
-u8 Key_Scan(u8 MODE);
+/* USER CODE END Includes */
 
-/**
- * @brief	利用HAL库函数进行GPIO初始化
- * @param 	none
- * @arg		none
- * @note  	先开启GPIO时钟，再利用HAL_GPIO_Init();函数进行管脚初始化
- * @retval	none
- */
-void GPIOA_Init(void)
-{
-	GPIO_InitTypeDef GPIO_InitTure;
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
 
-	__HAL_RCC_GPIOA_CLK_ENABLE(); // 开启GPIOB时钟
-	/*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
+/* USER CODE END PTD */
 
-	/*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
-	GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;	// 推挽输出
-	GPIO_InitTure.Pull = GPIO_PULLUP;			// 上拉
-	GPIO_InitTure.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+/* USER CODE END PD */
 
-	GPIO_InitTure.Pin = GPIO_PIN_5;		  // 设置GPIOx的5口
-	HAL_GPIO_Init(GPIOA, &GPIO_InitTure); // 先在上面四行设置GPIOX的模式，上下拉，速度，再对GPIOX管脚初始化
-	GPIO_InitTure.Pin = GPIO_PIN_6;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitTure);
-	GPIO_InitTure.Pin = GPIO_PIN_7;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitTure);
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
 
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置1，默认初始化后灯灭
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
-}
+/* USER CODE END PM */
 
-void PWM_MG90S(u32 nusa, u32 nusb, u32 nusc)
-{
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
-	delay_us(nusa); // 利用delay_us(u32 nus)延迟nus ms
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
-	delay_us(20000 - nusa); // 利用delay_us(u32 nus)延迟
+/* Private variables ---------------------------------------------------------*/
+TIM_HandleTypeDef htim2;
+DMA_HandleTypeDef hdma_tim2_ch2_ch4;
+DMA_HandleTypeDef hdma_tim2_ch1;
+DMA_HandleTypeDef hdma_tim2_ch3;
 
-	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
-	// delay_us(nusb); // 利用delay_us(u32 nus)延迟nus ms
-	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
-	// delay_us(20000 - nusb); // 利用delay_us(u32 nus)延迟
+/* USER CODE BEGIN PV */
 
-	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
-	// delay_us(nusc); // 利用delay_us(u32 nus)延迟nus ms
-	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
-	// delay_us(20000 - nusc); // 利用delay_us(u32 nus)延迟
-}
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
+static void MX_TIM2_Init(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+#define NUM 21
+uint16_t send_Buf[NUM] = {0};
+
+/* USER CODE END 0 */
 
 /**
- * @brief	利用HAL库函数进行Beep初始化
- * @param 	none
- * @arg		none
- * @note  	先开启GPIO时钟，再利用HAL_GPIO_Init();函数进行管脚初始化，再设置默认初始化后不响
- * @retval	none
- */
-void Beep_Init(void)
-{
-	GPIO_InitTypeDef GPIO_InitTure;
-
-	__HAL_RCC_GPIOB_CLK_ENABLE(); // 开启GPIOB时钟
-	/*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
-
-	/*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
-	GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;	// 推挽输出
-	GPIO_InitTure.Pull = GPIO_PULLUP;			// 上拉
-	GPIO_InitTure.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
-	GPIO_InitTure.Pin = GPIO_PIN_8;				// 设置GPIOx的5口
-
-	HAL_GPIO_Init(GPIOB, &GPIO_InitTure); // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
-
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // PB8置0，默认初始化后不响
-}
-
-/**
- * @brief	利用HAL库函数进行LED初始化
- * @param 	none
- * @arg		none
- * @note  	先开启GPIO时钟，再利用HAL_GPIO_Init();函数进行管脚初始化，再设置默认初始化后灯灭
- * @retval	none
- */
-void LED_Init(void)
-{
-	GPIO_InitTypeDef GPIO_InitTure;
-
-	__HAL_RCC_GPIOB_CLK_ENABLE(); // 开启GPIOB时钟
-	__HAL_RCC_GPIOE_CLK_ENABLE(); // 开启GPIOE时钟
-	/*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
-
-	/*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
-	GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;	// 推挽输出
-	GPIO_InitTure.Pull = GPIO_PULLUP;			// 上拉
-	GPIO_InitTure.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
-	GPIO_InitTure.Pin = GPIO_PIN_5;				// 设置GPIOx的5口
-
-	HAL_GPIO_Init(GPIOB, &GPIO_InitTure); // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
-	HAL_GPIO_Init(GPIOE, &GPIO_InitTure); // GPIOE管脚初始化
-
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET); // PE5置1，默认初始化后灯灭
-}
-
-/**
- * @brief	利用HAL库函数进行Key初始化
- * @param 	none
- * @arg		none
- * @note  	先开启GPIO时钟，再利用HAL_GPIO_Init();函数进行管脚初始化,注意上下拉
- * @retval	none
- */
-void Key_Init(void)
-{
-	GPIO_InitTypeDef GPIO_InitTure;
-
-	__HAL_RCC_GPIOA_CLK_ENABLE(); // 开启GPIOA时钟
-	__HAL_RCC_GPIOE_CLK_ENABLE(); // 开启GPIOE时钟
-	/*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
-
-	/*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
-	GPIO_InitTure.Mode = GPIO_MODE_INPUT;		// 输入
-	GPIO_InitTure.Pull = GPIO_PULLDOWN;			// 下拉
-	GPIO_InitTure.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
-	GPIO_InitTure.Pin = GPIO_PIN_0;				// 设置GPIOx的0口
-
-	HAL_GPIO_Init(GPIOA, &GPIO_InitTure);		 // GPIOA管脚初始化
-	GPIO_InitTure.Pull = GPIO_PULLUP;			 // 上拉
-	GPIO_InitTure.Pin = GPIO_PIN_3 | GPIO_PIN_4; // 设置GPIOx的3口,设置GPIOx的4口
-	HAL_GPIO_Init(GPIOE, &GPIO_InitTure);		 // GPIOE管脚初始化
-}
-
-/**
- * @brief	按键扫描输出
- * @param 	MODE;KEY;
- * @arg		MODE = 0为单次扫描， MODE = 1为连续扫描；Keyx为扫描x按键
- * @note
- * @retval	Key_up,按键是否松开，0否，1是
- */
-u8 Key_Scan(u8 MODE)
-{
-	static u8 Key_up = 1; // 默认赋值为松开,static变量只初始化一次
-	u16 Key_Number;		  // 检查按下几个按键
-
-	Key_Number = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) * 4 + !HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_3) * 2 + !HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_4); // 记录哪些键按下
-	if (MODE == 1)																															// 支持连按
-	{
-		Key_up = 1;
-	}
-	else if (Key_Number == 0) // 支持单次点按
-	{
-		Key_up = 1;
-	}
-
-	if (Key_Number && Key_up != 0) // 按下检测和连按检测
-	{
-		Key_up = 0;			// 记录按下
-		switch (Key_Number) // 按位发送哪些按键按下
-		{
-		case 0B0001u:
-			return 1;
-		case 0B0010u:
-			return 2;
-		case 0B0011u:
-			return 3;
-		case 0B0100u:
-			return 4;
-		case 0B0101u:
-			return 5;
-		case 0B0110u:
-			return 6;
-		case 0B0111u:
-			return 7;
-		default:
-			break;
-		}
-		if (MODE == 0)
-		{
-			delay_ms(10); // 延迟10ms按键消抖，按下和松开都要
-		}
-	}
-	else
-		return 0; // 无按键按下
-}
-
-/**
- * @brief	PA5输出pwm
- * @param 	none
- * @arg		none
- * @note  	初始化函数后利用HAL_GPIO_WritePin和HAL_Delay进行控制
- * @retval	int
+ * @brief  The application entry point.
+ * @retval int
  */
 int main(void)
 {
-	HAL_Init();						//初始化HAL库
-	Stm32_Clock_Init(RCC_PLL_MUL9); //设置时钟,72M，因为几乎都要用时钟，最先考虑设置时钟,后面再详细学习时钟相关HAL库函数，先用
-	GPIOA_Init();					//初始化GPIOA
-	Beep_Init();					// 初始化Beep
-	LED_Init();						// 初始化LED
-	Key_Init();						// 初始化Key
-	delay_init(72);					//初始化延时函数
+  /* USER CODE BEGIN 1 */
+  int i;
+  /* USER CODE END 1 */
 
-	u32 nus = 1500;
+  /* MCU Configuration--------------------------------------------------------*/
 
-	while (1)
-	{
-		PWM_MG90S(nus, nus, nus);
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-		// delay_ms(10);		 // 延迟10ms按键消抖，按下和松开都要
-		switch (Key_Scan(1)) // 按键扫描模式
-		{
-		case 0:
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);	  // PB5置1，灯灭
-			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);	  // PE5置1，灯灭
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // PB8置0，不响
-			break;
-		case 1:
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0，灯亮
-			nus += 10;
-			// nus = 500;
-			break;
-		case 2:
-			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0，灯亮
-			nus -= 10;
-			// nus = 2500;
-			break;
-		case 3:
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0，灯亮
-			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0，灯亮
-			break;
-		case 4:
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET); // PB8置1，响
-			nus = 1500;
-			break;
-		case 5:
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0，灯亮
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);	  // PB8置1，响
-			break;
-		case 6:
-			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0，灯亮
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);	  // PB8置1，响
-			break;
-		case 7:
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET); // PB5置0，灯亮
-			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET); // PE5置0，灯亮
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);	  // PB8置1，响
-			break;
-		}
+  /* USER CODE BEGIN Init */
 
-		if (nus < 500)
-		{
-			nus += 10;
-		}
-		else if (nus > 2500)
-		{
-			nus -= 10;
-		}
+  /* USER CODE END Init */
 
-		
-	}
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  // MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_TIM2_Init();
+  /* USER CODE BEGIN 2 */
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 500);
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 500);
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 500);
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 500);
+
+  // 调用以下四行就能输出连续的PWM波了,这里用CH1 CH3 CH4输出连续PWM波，CH2使用DMA方式输出PWM
+  // HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  // //	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  // HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+  // HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+
+  send_Buf[NUM - 1] = 0;
+
+  for (i = 0; i < NUM; i++)
+  {
+    send_Buf[i] = 30 * (i + 1);
+  }
+
+  HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_2, (uint32_t *)send_Buf, NUM);
+  while (1)
+  {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+    // HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+    // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET);
+
+    // HAL_Delay(200);
+    // HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+    // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);
+
+    // HAL_Delay(200);
+  }
+  /* USER CODE END 3 */
 }
+
+/**
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+   * in the RCC_OscInitTypeDef structure.
+   */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Initializes the CPU, AHB and APB buses clocks
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+ * @brief TIM2 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 0;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 1000;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  // if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  // {
+  //   Error_Handler();
+  // }
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  // if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  // {
+  //   Error_Handler();
+  // }
+  // sConfigOC.OCMode = TIM_OCMODE_PWM2;
+  // sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
+  // if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+  // {
+  //   Error_Handler();
+  // }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+  HAL_TIM_MspPostInit(&htim2);
+}
+
+/**
+ * Enable DMA controller clock
+ */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  // HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  // HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  // /* DMA1_Channel5_IRQn interrupt configuration */
+  // HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
+  // HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+  /* DMA1_Channel7_IRQn interrupt configuration */
+  // HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
+  // HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
+}
+
+/**
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PE5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
+
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
+/**
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+
+  /* USER CODE END Error_Handler_Debug */
+}
+
+#ifdef USE_FULL_ASSERT
+/**
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+   tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
