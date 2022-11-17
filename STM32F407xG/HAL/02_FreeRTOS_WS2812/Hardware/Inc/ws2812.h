@@ -2,19 +2,18 @@
 #define _WS2812_H
 #endif
 
-#include "timer.h"
+#include "tim.h"
 #include "delay.h"
 
-#define WS2812_PWM_TIM_Init TIM4_PWM_Init
-#define WS2812_PWM_TIM_Hand TIM4_Handler
+#define WS2812_PWM_TIM_Init MX_TIM4_Init
+#define WS2812_PWM_TIM_Hand htim4
 #define WS2812_PWM_TIM_Ch TIM_CHANNEL_1
 
 #define sys_clock 240 // 240M
-#define PIXEL_NUM 2
-// #define NUM (24 * PIXEL_NUM + 300)             // Reset 280us / 1.25us = 224
-#define NUM 8
-#define WS1 (u32)(sys_clock / 2 / 0.8 * 2 / 3) // 1码比较值为61-->850us
-#define WS0 (u32)(sys_clock / 2 / 0.8) - WS1   // 0码比较值为28-->400us
+#define PIXEL_NUM 8
+#define NUM (24 * PIXEL_NUM + 300)             // Reset 280us / 1.25us = 224
+#define WS1 (u32)(sys_clock / 2 / 0.8 * 2 / 3) // 1码比较值
+#define WS0 (u32)(sys_clock / 2 / 0.8) - WS1   // 0码比较值
 
 extern u16 send_Buf[NUM];
 

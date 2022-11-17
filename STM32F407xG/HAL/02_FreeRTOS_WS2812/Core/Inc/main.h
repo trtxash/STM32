@@ -40,6 +40,8 @@ extern "C"
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "ws2812.h"
+
 #ifdef __cplusplus
 }
 #endif

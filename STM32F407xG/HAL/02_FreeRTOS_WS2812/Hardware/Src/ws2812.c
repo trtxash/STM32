@@ -5,7 +5,7 @@ u16 send_Buf[NUM];
 // 用了TIM8产生PWM波
 void ws2812init()
 {
-    WS2812_PWM_TIM_Init((u32)(sys_clock / 2 / 0.8) - 1, 1 - 1, 0B0001); // PWM 频率 800K,通道1
+    WS2812_PWM_TIM_Init((u32)(sys_clock / 2 / 0.8) - 1, 1 - 1); // PWM 频率 800K,通道1
 }
 
 // 启动DMA载入数据
