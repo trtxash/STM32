@@ -30,8 +30,15 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "sys.h"
-#include "tim.h"
+#include "delay.h"
+#include "usart.h"
+#include "usmart.h"
+
 #include "dma.h"
+#include "tim.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,7 @@ TARGET = Template
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -Og
+OPT = -O3 -g
 
 
 #######################################
@@ -66,6 +66,18 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
 Core/Src/system_stm32f4xx.c \
 User/Src/sys.c \
 User/Src/delay.c \
+User/Src/usart.c \
+USMART/Src/usmart_config.c \
+USMART/Src/usmart_str.c \
+USMART/Src/usmart.c \
+FreeRTOS/portable/Src/port.c \
+FreeRTOS/portable/MemMang/Src/heap_4.c \
+FreeRTOS/Src/tasks.c \
+FreeRTOS/Src/timers.c \
+FreeRTOS/Src/queue.c \
+FreeRTOS/Src/list.c \
+RTT/SEGGER_RTT_printf.c \
+RTT/SEGGER_RTT.c \
 
 # ASM sources
 ASM_SOURCES =  \

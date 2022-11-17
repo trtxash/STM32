@@ -13,22 +13,25 @@
 
 TIM_HandleTypeDef htim4;
 DMA_HandleTypeDef hdma_tim4_ch1;
+TIM_HandleTypeDef htim13;
+TIM_HandleTypeDef htim14;
 
 /**
  * @brief TIM4 Initialization Function
+ * @note 定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
  * @param None
  * @retval None
  */
-void MX_TIM4_Init(void)
+void MX_TIM4_Init(u16 arr, u16 psc)
 {
     TIM_ClockConfigTypeDef sClockSourceConfig = {0};
     TIM_MasterConfigTypeDef sMasterConfig = {0};
     TIM_OC_InitTypeDef sConfigOC = {0};
 
     htim4.Instance = TIM4;
-    htim4.Init.Prescaler = 0;
+    htim4.Init.Prescaler = psc;
     htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim4.Init.Period = 149;
+    htim4.Init.Period = arr;
     htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
     if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -63,6 +66,64 @@ void MX_TIM4_Init(void)
 }
 
 /**
+ * @brief   TIM13 Initialization Function
+ * @note    !!!用作了USMART定时!!!，
+ *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+ * @param   None
+ * @retval  None
+ */
+void MX_TIM13_Init(u16 arr, u16 psc)
+{
+    TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_OC_InitTypeDef sConfigOC = {0};
+
+    htim13.Instance = TIM13;
+    htim13.Init.Prescaler = psc;
+    htim13.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim13.Init.Period = arr;
+    htim13.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim13.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+    if (HAL_TIM_Base_Init(&htim13) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    if (HAL_TIM_Base_Start_IT(&htim13) != HAL_OK) // 也可以用这个，使能定时器3和定时器3更新中断：TIM_IT_UPDATE
+    {
+        Error_Handler();
+    }
+}
+
+/**
+ * @brief   TIM14 Initialization Function
+ * @note    !!!用作了计数定时!!!，
+ *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+ * @param   None
+ * @retval  None
+ */
+void MX_TIM14_Init(u16 arr, u16 psc)
+{
+    TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_OC_InitTypeDef sConfigOC = {0};
+
+    htim14.Instance = TIM14;
+    htim14.Init.Prescaler = psc;
+    htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim14.Init.Period = arr;
+    htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+    if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    if (HAL_TIM_Base_Start_IT(&htim14) != HAL_OK) // 也可以用这个，使能定时器3和定时器3更新中断：TIM_IT_UPDATE
+    {
+        Error_Handler();
+    }
+}
+
+/**
  * @brief TIM_Base MSP Initialization
  * This function configures the hardware resources used in this example
  * @param htim_base: TIM_Base handle pointer
@@ -94,6 +155,18 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim_base)
         /* Several peripheral DMA handle pointers point to the same DMA handle.
          Be aware that there is only one channel to perform all the requested DMAs. */
         __HAL_LINKDMA(htim_base, hdma[TIM_DMA_ID_CC1], hdma_tim4_ch1);
+    }
+    else if (htim_base->Instance == TIM13)
+    {
+        __HAL_RCC_TIM13_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
+    }
+    else if (htim_base->Instance == TIM14)
+    {
+        __HAL_RCC_TIM14_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM8_TRG_COM_TIM14_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM8_TRG_COM_TIM14_IRQn);
     }
 }
 

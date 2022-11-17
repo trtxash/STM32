@@ -1,6 +1,6 @@
 /**
- * @file	00_FreeRTOS_Template
- * @brief 	移植FreeRTOS和作为工程模板
+ * @file	01_FreeRTOS_PWM+DMA
+ * @brief 	FreeRTOS，和进行TIM4 Ch1的pwm+dma传输
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00

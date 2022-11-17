@@ -2,7 +2,7 @@
 #define __USMART_H
 #include "sys.h"
 #include "usart.h"
-#include "timer.h"
+#include "tim.h"
 #include "usmart_str.h"
 //////////////////////////////////////////////////////////////////////////////////
 // 本程序只供学习使用，未经作者许可，不得用于其它任何用途
@@ -94,8 +94,8 @@
 #define SP_TYPE_DEC 0 // 10进制参数显示
 #define SP_TYPE_HEX 1 // 16进制参数显示
 
-#define USMARTTimer_HandleTypeDef TIM13_Handler
-#define USMARTTimer_FunInit TIM13_Init
+#define USMARTTimer_HandleTypeDef htim13
+#define USMARTTimer_FunInit MX_TIM13_Init
 
 // 函数名列表
 struct _m_usmart_nametab
