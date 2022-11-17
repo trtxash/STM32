@@ -4,7 +4,7 @@
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
- * @date 	2022年11月17号14点08分
+ * @date 	2022年11月17号20点51分
  */
 #include "main.h"
 
@@ -91,7 +91,7 @@ void test_task(void *pvParameters)
 		{
 			k = 0;
 		}
-		vTaskDelay(1);
+		vTaskDelay(100);
 	}
 }
 

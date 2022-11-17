@@ -10,7 +10,7 @@
 #define WS2812_PWM_TIM_Ch TIM_CHANNEL_1
 
 #define sys_clock 240 // 240M
-#define PIXEL_NUM 8
+#define PIXEL_NUM 64
 #define NUM (24 * PIXEL_NUM + 300)             // Reset 280us / 1.25us = 224
 #define WS1 (u32)(sys_clock / 2 / 0.8 * 2 / 3) // 1码比较值
 #define WS0 (u32)(sys_clock / 2 / 0.8) - WS1   // 0码比较值
