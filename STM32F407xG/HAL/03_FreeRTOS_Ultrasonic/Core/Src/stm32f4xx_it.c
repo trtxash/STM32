@@ -204,6 +204,12 @@ void TIM4_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim4);
 }
 
+// 定时器5中断服务函数
+void TIM5_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&htim5);
+}
+
 // 定时器8up,13中断服务函数
 void TIM8_UP_TIM13_IRQHandler(void)
 {
@@ -222,6 +228,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim == (&htim4))
   {
+  }
+  if (htim == (&htim5))
+  {
+    
   }
   else if (htim == (&htim13))
   {
