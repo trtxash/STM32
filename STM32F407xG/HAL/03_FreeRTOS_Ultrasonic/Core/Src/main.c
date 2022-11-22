@@ -37,9 +37,9 @@ int main(void)
 	delay_init(240);				   // 初始化延时函数
 	uart_init(115200);				   // 初始化串口
 	MX_DMA_Init();					   // 要先初始化DMA
-	ws2812init();					   // ws2812初始化，PWM输出脚PD12
 	usmart_dev.init(240);			   // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
 	MX_TIM14_Init(100 - 1, 1200 - 1);  // 定时器14初始化，周期1ms
+	ultrasonic_init();
 
 	// 创建开始任务
 	xTaskCreate((TaskFunction_t)start_task,			 // 任务函数
@@ -69,29 +69,10 @@ void start_task(void *pvParameters)
 // 测试任务函数
 void test_task(void *pvParameters)
 {
-	u16 i = 0, j = 0, k = 0;
-	WS_WriteAll_RGB(0, 0, 0);
-	WS_Load();
 	while (1)
 	{
-		WS_WriteAll_RGB(i, j, k);
-		// WS281x_SetPixelRGB(0, i, j, k);
-		i++;
-		if (i == 256)
-		{
-			i = 0;
-			j++;
-		}
-		if (j == 256)
-		{
-			j = 0;
-			k++;
-		}
-		if (k == 256)
-		{
-			k = 0;
-		}
-		vTaskDelay(100);
+		printf("%fmm\r\n", ultrasonic_task());
+		vTaskDelay(500);
 	}
 }
 

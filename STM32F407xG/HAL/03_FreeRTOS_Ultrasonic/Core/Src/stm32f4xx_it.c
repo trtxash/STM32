@@ -56,6 +56,9 @@
 
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_tim4_ch1;
+
+extern u8 ULTRASONIC_CAPTURE_STA;  // 输入捕获状态
+extern u32 ULTRASONIC_CAPTURE_VAL; // 输入捕获值 (TIM2/TIM5是 32位 )
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -68,14 +71,14 @@ extern DMA_HandleTypeDef hdma_tim4_ch1;
  */
 void NMI_Handler(void)
 {
-  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
+	/* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
-  /* USER CODE END NonMaskableInt_IRQn 0 */
-  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
-  while (1)
-  {
-  }
-  /* USER CODE END NonMaskableInt_IRQn 1 */
+	/* USER CODE END NonMaskableInt_IRQn 0 */
+	/* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+	while (1)
+	{
+	}
+	/* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
 /**
@@ -83,14 +86,14 @@ void NMI_Handler(void)
  */
 void HardFault_Handler(void)
 {
-  /* USER CODE BEGIN HardFault_IRQn 0 */
+	/* USER CODE BEGIN HardFault_IRQn 0 */
 
-  /* USER CODE END HardFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_HardFault_IRQn 0 */
-    /* USER CODE END W1_HardFault_IRQn 0 */
-  }
+	/* USER CODE END HardFault_IRQn 0 */
+	while (1)
+	{
+		/* USER CODE BEGIN W1_HardFault_IRQn 0 */
+		/* USER CODE END W1_HardFault_IRQn 0 */
+	}
 }
 
 /**
@@ -98,14 +101,14 @@ void HardFault_Handler(void)
  */
 void MemManage_Handler(void)
 {
-  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+	/* USER CODE BEGIN MemoryManagement_IRQn 0 */
 
-  /* USER CODE END MemoryManagement_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
-    /* USER CODE END W1_MemoryManagement_IRQn 0 */
-  }
+	/* USER CODE END MemoryManagement_IRQn 0 */
+	while (1)
+	{
+		/* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
+		/* USER CODE END W1_MemoryManagement_IRQn 0 */
+	}
 }
 
 /**
@@ -113,14 +116,14 @@ void MemManage_Handler(void)
  */
 void BusFault_Handler(void)
 {
-  /* USER CODE BEGIN BusFault_IRQn 0 */
+	/* USER CODE BEGIN BusFault_IRQn 0 */
 
-  /* USER CODE END BusFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_BusFault_IRQn 0 */
-    /* USER CODE END W1_BusFault_IRQn 0 */
-  }
+	/* USER CODE END BusFault_IRQn 0 */
+	while (1)
+	{
+		/* USER CODE BEGIN W1_BusFault_IRQn 0 */
+		/* USER CODE END W1_BusFault_IRQn 0 */
+	}
 }
 
 /**
@@ -128,14 +131,14 @@ void BusFault_Handler(void)
  */
 void UsageFault_Handler(void)
 {
-  /* USER CODE BEGIN UsageFault_IRQn 0 */
+	/* USER CODE BEGIN UsageFault_IRQn 0 */
 
-  /* USER CODE END UsageFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
-    /* USER CODE END W1_UsageFault_IRQn 0 */
-  }
+	/* USER CODE END UsageFault_IRQn 0 */
+	while (1)
+	{
+		/* USER CODE BEGIN W1_UsageFault_IRQn 0 */
+		/* USER CODE END W1_UsageFault_IRQn 0 */
+	}
 }
 
 /**
@@ -143,12 +146,12 @@ void UsageFault_Handler(void)
  */
 __weak void SVC_Handler(void)
 {
-  /* USER CODE BEGIN SVCall_IRQn 0 */
+	/* USER CODE BEGIN SVCall_IRQn 0 */
 
-  /* USER CODE END SVCall_IRQn 0 */
-  /* USER CODE BEGIN SVCall_IRQn 1 */
+	/* USER CODE END SVCall_IRQn 0 */
+	/* USER CODE BEGIN SVCall_IRQn 1 */
 
-  /* USER CODE END SVCall_IRQn 1 */
+	/* USER CODE END SVCall_IRQn 1 */
 }
 
 /**
@@ -156,12 +159,12 @@ __weak void SVC_Handler(void)
  */
 void DebugMon_Handler(void)
 {
-  /* USER CODE BEGIN DebugMonitor_IRQn 0 */
+	/* USER CODE BEGIN DebugMonitor_IRQn 0 */
 
-  /* USER CODE END DebugMonitor_IRQn 0 */
-  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
+	/* USER CODE END DebugMonitor_IRQn 0 */
+	/* USER CODE BEGIN DebugMonitor_IRQn 1 */
 
-  /* USER CODE END DebugMonitor_IRQn 1 */
+	/* USER CODE END DebugMonitor_IRQn 1 */
 }
 
 /**
@@ -169,12 +172,12 @@ void DebugMon_Handler(void)
  */
 __weak void PendSV_Handler(void)
 {
-  /* USER CODE BEGIN PendSV_IRQn 0 */
+	/* USER CODE BEGIN PendSV_IRQn 0 */
 
-  /* USER CODE END PendSV_IRQn 0 */
-  /* USER CODE BEGIN PendSV_IRQn 1 */
+	/* USER CODE END PendSV_IRQn 0 */
+	/* USER CODE BEGIN PendSV_IRQn 1 */
 
-  /* USER CODE END PendSV_IRQn 1 */
+	/* USER CODE END PendSV_IRQn 1 */
 }
 
 /**
@@ -182,13 +185,13 @@ __weak void PendSV_Handler(void)
  */
 __weak void SysTick_Handler(void)
 {
-  /* USER CODE BEGIN SysTick_IRQn 0 */
+	/* USER CODE BEGIN SysTick_IRQn 0 */
 
-  /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
-  /* USER CODE BEGIN SysTick_IRQn 1 */
+	/* USER CODE END SysTick_IRQn 0 */
+	HAL_IncTick();
+	/* USER CODE BEGIN SysTick_IRQn 1 */
 
-  /* USER CODE END SysTick_IRQn 1 */
+	/* USER CODE END SysTick_IRQn 1 */
 }
 
 /******************************************************************************/
@@ -198,71 +201,130 @@ __weak void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
 
-// 定时器4中断服务函数
+/**
+ * @brief 定时器4中断服务函数
+ */
 void TIM4_IRQHandler(void)
 {
-  HAL_TIM_IRQHandler(&htim4);
+	HAL_TIM_IRQHandler(&htim4);
 }
 
-// 定时器5中断服务函数
+/**
+ * @brief 定时器5中断服务函数
+ */
 void TIM5_IRQHandler(void)
 {
-  HAL_TIM_IRQHandler(&htim5);
+	HAL_TIM_IRQHandler(&htim5);
 }
 
-// 定时器8up,13中断服务函数
+/**
+ * @brief 定时器8up,13中断服务函数
+ */
 void TIM8_UP_TIM13_IRQHandler(void)
 {
-  HAL_TIM_IRQHandler(&htim13);
+	HAL_TIM_IRQHandler(&htim13);
 }
 
-// 定时器8com,14中断服务函数
+/**
+ * @brief 定时器8com,14中断服务函数
+ */
 void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
-  HAL_TIM_IRQHandler(&htim14);
+	HAL_TIM_IRQHandler(&htim14);
 }
 
-// 回调函数，定时器中断服务函数调用
-// 中断回调函数会自动清除中断标志
+/**
+ * @brief   定时器更新回调函数
+ * @note    void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)；调用，其会自动清除中断标志
+ * @param   *htim
+ * @retval  None
+ */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if (htim == (&htim4))
-  {
-  }
-  if (htim == (&htim5))
-  {
-    
-  }
-  else if (htim == (&htim13))
-  {
-    usmart_dev.scan();                                              // 执行usmart扫描
-    __HAL_TIM_SET_COUNTER(&USMARTTimer_HandleTypeDef, 0);           // 清空定时器的CNT
-    __HAL_TIM_SET_AUTORELOAD(&USMARTTimer_HandleTypeDef, 1000 - 1); // 恢复原来的设置
-  }
-  else if (htim == (&htim14))
-  {
-    static u16 x1ms = 0;
+	if (htim == (&htim4))
+	{
+	}
+	else if (htim == (&htim5))
+	{
+		if ((ULTRASONIC_CAPTURE_STA & 0X80) == 0) // 还未成功捕获
+		{
+			if (ULTRASONIC_CAPTURE_STA & 0X40) // 已经捕获到高电平了
+			{
+				if ((ULTRASONIC_CAPTURE_STA & 0X3F) == 0X3F) // 高电平太长了
+				{
+					ULTRASONIC_CAPTURE_STA |= 0X80; // 强制标记成功捕获了一次
+					ULTRASONIC_CAPTURE_VAL = 0XFFFFFFFF;
+				}
+				else
+					ULTRASONIC_CAPTURE_STA++;
+			}
+		}
+	}
+	else if (htim == (&htim13))
+	{
+		usmart_dev.scan();												// 执行usmart扫描
+		__HAL_TIM_SET_COUNTER(&USMARTTimer_HandleTypeDef, 0);			// 清空定时器的CNT
+		__HAL_TIM_SET_AUTORELOAD(&USMARTTimer_HandleTypeDef, 1000 - 1); // 恢复原来的设置
+	}
+	else if (htim == (&htim14))
+	{
+		static u16 x1ms = 0;
 
-    x1ms++;
+		x1ms++;
 
-    if (x1ms % 10 == 0) // 10ms
-    {
-    }
-    if (x1ms % 100 == 0) // 100ms
-    {
-    }
-    if (x1ms % 1000 == 0) // 1000ms
-    {
-    }
-    if (x1ms % 10000 == 0) // 10000ms
-    {
-    }
+		if (x1ms % 10 == 0) // 10ms
+		{
+		}
+		if (x1ms % 100 == 0) // 100ms
+		{
+		}
+		if (x1ms % 1000 == 0) // 1000ms
+		{
+		}
+		if (x1ms % 10000 == 0) // 10000ms
+		{
+		}
 
-    if (x1ms >= 60000)
-    {
-      x1ms = 0; // 归零
-    }
-  }
+		if (x1ms >= 60000)
+		{
+			x1ms = 0; // 归零
+		}
+	}
+}
+
+/**
+ * @brief   定时器捕获回调函数
+ * @note    void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)；调用，其会自动清除中断标志
+ * @param   *htim
+ * @retval  None
+ */
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+	if (htim == (&htim5))
+	{
+		if ((ULTRASONIC_CAPTURE_STA & 0X80) == 0) // 还未成功捕获
+		{
+
+			if (ULTRASONIC_CAPTURE_STA & 0X40) // 捕获到一个下降沿
+			{
+				ULTRASONIC_CAPTURE_STA |= 0X80;											 // 标记成功捕获到一次高电平脉宽
+				ULTRASONIC_CAPTURE_VAL = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1); // 获取当前的捕获值
+				TIM_RESET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1);							 // 一定要先清除原来的设置！！
+				TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_ICPOLARITY_RISING);	 // 配置 TIM5通道 1上升沿捕获
+			}
+			else // 还未开始 ,第一次捕获上升沿
+			{
+				ULTRASONIC_CAPTURE_STA = 0; // 清空
+				ULTRASONIC_CAPTURE_VAL = 0;
+				ULTRASONIC_CAPTURE_STA |= 0X40; // 标记捕获到了上升沿
+				__HAL_TIM_DISABLE(htim);		// 关闭定时器 5
+				__HAL_TIM_SET_COUNTER(htim, 0);
+				TIM_RESET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1);						  // 一定要先清除原来的设置！！
+				TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_ICPOLARITY_FALLING); // 定时器 5通道 1设置为下降沿捕获
+				__HAL_TIM_ENABLE(htim);												  // 使能定时器 5
+			}
+		}
+	}
 }
 
 /**
@@ -270,13 +332,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
  */
 void DMA1_Stream0_IRQHandler(void)
 {
-  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
+	/* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
 
-  /* USER CODE END DMA1_Stream0_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_tim4_ch1);
-  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
+	/* USER CODE END DMA1_Stream0_IRQn 0 */
+	HAL_DMA_IRQHandler(&hdma_tim4_ch1);
+	/* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
 
-  /* USER CODE END DMA1_Stream0_IRQn 1 */
+	/* USER CODE END DMA1_Stream0_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

@@ -40,7 +40,10 @@ extern "C"
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "ws2812.h"
+#include "ultrasonic.h"
+
+    extern u8 TIM5CH1_CAPTURE_STA;  // 输入捕获状态
+    extern u32 TIM5CH1_CAPTURE_VAL; // 输入捕获值
 
 #ifdef __cplusplus
 }

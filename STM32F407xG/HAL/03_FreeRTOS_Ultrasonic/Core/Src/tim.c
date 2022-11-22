@@ -123,6 +123,13 @@ void MX_TIM5_Init(u32 arr, u16 psc)
 
 	/* USER CODE END TIM5_Init 2 */
 	HAL_TIM_MspPostInit(&htim5);
+
+	if (HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1) != HAL_OK) // 开启 TIM5的捕获通道 1，并且开启捕获中断
+	{
+		Error_Handler();
+	}
+
+	__HAL_TIM_ENABLE_IT(&htim5, TIM_IT_UPDATE); // 使能更新中断
 }
 
 /**
@@ -261,7 +268,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim)
 		GPIO_InitStruct.Pin = GPIO_PIN_0;
 		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 		GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	}

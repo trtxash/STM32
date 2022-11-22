@@ -5,7 +5,7 @@
 #include "delay.h"
 #include "sys.h"
 
-#include "ws2812.h"
+// #include "ws2812.h"
 
 // 函数名列表初始化(用户自己添加)
 // 用户直接在这里输入要执行的函数名及其查找串
@@ -24,18 +24,18 @@ struct _m_usmart_nametab usmart_nametab[] =
 		(void *)delay_us,
 		"void delay_us(u32 nus)",
 
-		(void *) WS_WriteAll_RGB,
-		"void WS_WriteAll_RGB(u8 n_R, u8 n_G, u8 n_B)",
-		(void *) WS_CloseAll,
-		"void WS_CloseAll(void)",
-		(void *) WS281x_SetPixelColor,
-		"void WS281x_SetPixelColor(uint16_t n, u32 GRBColor)",
-		(void *) WS281x_SetPixelRGB,
-		"void WS281x_SetPixelRGB(uint16_t n, u8 red, u8 green, u8 blue)",
-		(void *) rainbow,
-		"void rainbow(u8 wait)",
-		(void *) rainbowCycle,
-		"void rainbowCycle(u8 wait)",
+		// (void *) WS_WriteAll_RGB,
+		// "void WS_WriteAll_RGB(u8 n_R, u8 n_G, u8 n_B)",
+		// (void *) WS_CloseAll,
+		// "void WS_CloseAll(void)",
+		// (void *) WS281x_SetPixelColor,
+		// "void WS281x_SetPixelColor(uint16_t n, u32 GRBColor)",
+		// (void *) WS281x_SetPixelRGB,
+		// "void WS281x_SetPixelRGB(uint16_t n, u8 red, u8 green, u8 blue)",
+		// (void *) rainbow,
+		// "void rainbow(u8 wait)",
+		// (void *) rainbowCycle,
+		// "void rainbowCycle(u8 wait)",
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

@@ -61,6 +61,7 @@ extern "C"
 	void TIM8_UP_TIM13_IRQHandler(void);
 	void TIM8_TRG_COM_TIM14_IRQHandler(void);
 	void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+	void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 	void DMA1_Stream0_IRQHandler(void);
 	/* USER CODE BEGIN EFP */
 

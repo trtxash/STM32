@@ -78,7 +78,7 @@ FreeRTOS/Src/queue.c \
 FreeRTOS/Src/list.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
-Hardware/Src/ws2812.c \
+Hardware/Src/ultrasonic.c \
 
 # ASM sources
 ASM_SOURCES =  \
