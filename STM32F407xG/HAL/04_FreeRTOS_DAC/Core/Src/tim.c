@@ -14,6 +14,7 @@
 TIM_HandleTypeDef htim4;
 DMA_HandleTypeDef hdma_tim4_ch1;
 TIM_HandleTypeDef htim5;
+TIM_HandleTypeDef htim7;
 TIM_HandleTypeDef htim13;
 TIM_HandleTypeDef htim14;
 
@@ -133,6 +134,46 @@ void MX_TIM5_Init(u32 arr, u16 psc)
 }
 
 /**
+ * @brief   TIM7 Initialization Function
+ * @note    !!!用作了DAC触发器!!!，
+ *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+ * @param   None
+ * @retval  None
+ */
+void MX_TIM7_Init(u16 arr, u16 psc)
+{
+
+	/* USER CODE BEGIN TIM7_Init 0 */
+
+	/* USER CODE END TIM7_Init 0 */
+
+	TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+	/* USER CODE BEGIN TIM7_Init 1 */
+
+	/* USER CODE END TIM7_Init 1 */
+	htim7.Instance = TIM7;
+	htim7.Init.Prescaler = psc;
+	htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim7.Init.Period = arr;
+	htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+	if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	/* USER CODE BEGIN TIM7_Init 2 */
+
+	/* USER CODE END TIM7_Init 2 */
+	HAL_TIM_Base_Start(&htim7);
+}
+
+/**
  * @brief   TIM13 Initialization Function
  * @note    !!!用作了USMART定时!!!，
  *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
@@ -230,16 +271,23 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim_base)
 		HAL_NVIC_SetPriority(TIM5_IRQn, 3, 0);
 		HAL_NVIC_EnableIRQ(TIM5_IRQn);
 	}
+	else if (htim_base->Instance == TIM7)
+	{
+		/* TIM7 clock enable */
+		__HAL_RCC_TIM7_CLK_ENABLE();
+		HAL_NVIC_SetPriority(TIM5_IRQn, 3, 0);
+		HAL_NVIC_EnableIRQ(TIM5_IRQn);
+	}
 	else if (htim_base->Instance == TIM13)
 	{
 		__HAL_RCC_TIM13_CLK_ENABLE();
-		HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 3, 0);
+		HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 4, 0);
 		HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
 	}
 	else if (htim_base->Instance == TIM14)
 	{
 		__HAL_RCC_TIM14_CLK_ENABLE();
-		HAL_NVIC_SetPriority(TIM8_TRG_COM_TIM14_IRQn, 3, 0);
+		HAL_NVIC_SetPriority(TIM8_TRG_COM_TIM14_IRQn, 4, 0);
 		HAL_NVIC_EnableIRQ(TIM8_TRG_COM_TIM14_IRQn);
 	}
 }

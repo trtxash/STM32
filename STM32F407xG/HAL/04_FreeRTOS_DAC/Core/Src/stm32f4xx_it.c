@@ -56,6 +56,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_tim4_ch1;
+extern DMA_HandleTypeDef hdma_dac1;
 
 extern u8 ULTRASONIC_CAPTURE_STA;  // 输入捕获状态
 extern u32 ULTRASONIC_CAPTURE_VAL; // 输入捕获值 (TIM2/TIM5是 32位 )
@@ -339,6 +340,20 @@ void DMA1_Stream0_IRQHandler(void)
 	/* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
 
 	/* USER CODE END DMA1_Stream0_IRQn 1 */
+}
+
+/**
+ * @brief This function handles DMA1 stream5 global interrupt.
+ */
+void DMA1_Stream5_IRQHandler(void)
+{
+	/* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
+
+	/* USER CODE END DMA1_Stream5_IRQn 0 */
+	HAL_DMA_IRQHandler(&hdma_dac1);
+	/* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
+
+	/* USER CODE END DMA1_Stream5_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

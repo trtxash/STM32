@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file           : main.h
- * @brief          : Header for main.c file.
- *                   This file contains the common defines of the application.
+ * @file    dac.h
+ * @brief   This file contains all the function prototypes for
+ *          the dac.c file
  ******************************************************************************
  * @attention
  *
@@ -17,10 +17,9 @@
  ******************************************************************************
  */
 /* USER CODE END Header */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __DAC_H__
+#define __DAC_H__
 
 #ifdef __cplusplus
 extern "C"
@@ -28,23 +27,26 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-#include "sys.h"
-#include "delay.h"
-#include "usart.h"
-#include "usmart.h"
+#include "main.h"
 
-#include "dma.h"
-#include "dac.h"
-#include "tim.h"
+	/* USER CODE BEGIN Includes */
 
-#include "FreeRTOS.h"
-#include "task.h"
+	/* USER CODE END Includes */
 
-// #include "ultrasonic.h"
+	extern DAC_HandleTypeDef hdac;
+
+	/* USER CODE BEGIN Private defines */
+
+	/* USER CODE END Private defines */
+
+	void MX_DAC_Init(void);
+
+	/* USER CODE BEGIN Prototypes */
+
+	/* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H */
+#endif /* __DAC_H__ */

@@ -7,6 +7,7 @@
  * @date 	2022年11月23号9点6分
  */
 #include "main.h"
+#include "math.h"
 
 #define Debug 1 // 控制Debug的一些相关函数
 
@@ -19,6 +20,8 @@ void start_task(void *pvParameters); // 任务函数
 #define TEST_STK_SIZE 256			// 任务堆栈大小
 TaskHandle_t TESTTask_Handler;		// 任务句柄
 void test_task(void *pvParameters); // 任务函数
+
+u16 buf[4096] = {0};
 
 /**
  * @brief   主函数,程序入口
@@ -39,7 +42,14 @@ int main(void)
 	MX_DMA_Init();					   // 要先初始化DMA
 	usmart_dev.init(240);			   // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
 	MX_TIM14_Init(100 - 1, 1200 - 1);  // 定时器14初始化，周期1ms
-	ultrasonic_init();
+
+	MX_DAC_Init();
+	MX_TIM7_Init(120 - 1, 1 - 1); // 120M/120=1MHz,1us
+
+	for (u16 i = 0; i <= 4095; i++)
+	{
+		buf[i] = 2047 * sin(2 * 3.14159265358979323846264338327950288419716939937510 * i / 4095) + 2048;
+	}
 
 	// 创建开始任务
 	xTaskCreate((TaskFunction_t)start_task,			 // 任务函数
@@ -55,7 +65,7 @@ int main(void)
 void start_task(void *pvParameters)
 {
 	taskENTER_CRITICAL(); // 进入临界区
-	// 创建LED0任务
+	// 创建test任务
 	xTaskCreate((TaskFunction_t)test_task,
 				(const char *)"test_task",
 				(uint16_t)TEST_STK_SIZE,
@@ -69,9 +79,11 @@ void start_task(void *pvParameters)
 // 测试任务函数
 void test_task(void *pvParameters)
 {
+	HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
+	HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (u32 *)buf, 4096, DAC_ALIGN_12B_R);
+
 	while (1)
 	{
-		printf("%fmm\r\n", ultrasonic_task());
 		vTaskDelay(500);
 	}
 }
@@ -80,9 +92,9 @@ void test_task(void *pvParameters)
 /**
  * @brief   栈溢出钩子函数
  * @param   xTask
- * @arg		  the task that just exceeded its stack boundaries.
+ * @arg		the task that just exceeded its stack boundaries.
  * @param   pcTaskName
- * @arg		  A character string containing the name of the offending task.
+ * @arg		A character string containing the name of the offending task.
  * @note    FreeRTOS打印栈溢出的任务，关联#define configCHECK_FOR_STACK_OVERFLOW 2，在FreeRTOSConfig.h下
  * @retval  void
  */
