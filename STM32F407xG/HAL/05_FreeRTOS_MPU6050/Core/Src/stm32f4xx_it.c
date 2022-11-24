@@ -56,10 +56,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_tim4_ch1;
-extern DMA_HandleTypeDef hdma_dac1;
 
-extern u8 ULTRASONIC_CAPTURE_STA;  // 输入捕获状态
-extern u32 ULTRASONIC_CAPTURE_VAL; // 输入捕获值 (TIM2/TIM5是 32位 )
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -247,19 +244,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 	else if (htim == (&htim5))
 	{
-		if ((ULTRASONIC_CAPTURE_STA & 0X80) == 0) // 还未成功捕获
-		{
-			if (ULTRASONIC_CAPTURE_STA & 0X40) // 已经捕获到高电平了
-			{
-				if ((ULTRASONIC_CAPTURE_STA & 0X3F) == 0X3F) // 高电平太长了
-				{
-					ULTRASONIC_CAPTURE_STA |= 0X80; // 强制标记成功捕获了一次
-					ULTRASONIC_CAPTURE_VAL = 0XFFFFFFFF;
-				}
-				else
-					ULTRASONIC_CAPTURE_STA++;
-			}
-		}
+		// if ((ULTRASONIC_CAPTURE_STA & 0X80) == 0) // 还未成功捕获
+		// {
+		// 	if (ULTRASONIC_CAPTURE_STA & 0X40) // 已经捕获到高电平了
+		// 	{
+		// 		if ((ULTRASONIC_CAPTURE_STA & 0X3F) == 0X3F) // 高电平太长了
+		// 		{
+		// 			ULTRASONIC_CAPTURE_STA |= 0X80; // 强制标记成功捕获了一次
+		// 			ULTRASONIC_CAPTURE_VAL = 0XFFFFFFFF;
+		// 		}
+		// 		else
+		// 			ULTRASONIC_CAPTURE_STA++;
+		// 	}
+		// }
 	}
 	else if (htim == (&htim13))
 	{
@@ -303,28 +300,28 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim == (&htim5))
 	{
-		if ((ULTRASONIC_CAPTURE_STA & 0X80) == 0) // 还未成功捕获
-		{
+		// if ((ULTRASONIC_CAPTURE_STA & 0X80) == 0) // 还未成功捕获
+		// {
 
-			if (ULTRASONIC_CAPTURE_STA & 0X40) // 捕获到一个下降沿
-			{
-				ULTRASONIC_CAPTURE_STA |= 0X80;											 // 标记成功捕获到一次高电平脉宽
-				ULTRASONIC_CAPTURE_VAL = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1); // 获取当前的捕获值
-				TIM_RESET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1);							 // 一定要先清除原来的设置！！
-				TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_ICPOLARITY_RISING);	 // 配置 TIM5通道 1上升沿捕获
-			}
-			else // 还未开始 ,第一次捕获上升沿
-			{
-				ULTRASONIC_CAPTURE_STA = 0; // 清空
-				ULTRASONIC_CAPTURE_VAL = 0;
-				ULTRASONIC_CAPTURE_STA |= 0X40; // 标记捕获到了上升沿
-				__HAL_TIM_DISABLE(htim);		// 关闭定时器 5
-				__HAL_TIM_SET_COUNTER(htim, 0);
-				TIM_RESET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1);						  // 一定要先清除原来的设置！！
-				TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_ICPOLARITY_FALLING); // 定时器 5通道 1设置为下降沿捕获
-				__HAL_TIM_ENABLE(htim);												  // 使能定时器 5
-			}
-		}
+		// 	if (ULTRASONIC_CAPTURE_STA & 0X40) // 捕获到一个下降沿
+		// 	{
+		// 		ULTRASONIC_CAPTURE_STA |= 0X80;											 // 标记成功捕获到一次高电平脉宽
+		// 		ULTRASONIC_CAPTURE_VAL = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1); // 获取当前的捕获值
+		// 		TIM_RESET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1);							 // 一定要先清除原来的设置！！
+		// 		TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_ICPOLARITY_RISING);	 // 配置 TIM5通道 1上升沿捕获
+		// 	}
+		// 	else // 还未开始 ,第一次捕获上升沿
+		// 	{
+		// 		ULTRASONIC_CAPTURE_STA = 0; // 清空
+		// 		ULTRASONIC_CAPTURE_VAL = 0;
+		// 		ULTRASONIC_CAPTURE_STA |= 0X40; // 标记捕获到了上升沿
+		// 		__HAL_TIM_DISABLE(htim);		// 关闭定时器 5
+		// 		__HAL_TIM_SET_COUNTER(htim, 0);
+		// 		TIM_RESET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1);						  // 一定要先清除原来的设置！！
+		// 		TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_ICPOLARITY_FALLING); // 定时器 5通道 1设置为下降沿捕获
+		// 		__HAL_TIM_ENABLE(htim);												  // 使能定时器 5
+		// 	}
+		// }
 	}
 }
 
@@ -342,19 +339,19 @@ void DMA1_Stream0_IRQHandler(void)
 	/* USER CODE END DMA1_Stream0_IRQn 1 */
 }
 
-/**
- * @brief This function handles DMA1 stream5 global interrupt.
- */
-void DMA1_Stream5_IRQHandler(void)
-{
-	/* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
+// /**
+//  * @brief This function handles DMA1 stream5 global interrupt.
+//  */
+// void DMA1_Stream5_IRQHandler(void)
+// {
+// 	/* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
 
-	/* USER CODE END DMA1_Stream5_IRQn 0 */
-	HAL_DMA_IRQHandler(&hdma_dac1);
-	/* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
+// 	/* USER CODE END DMA1_Stream5_IRQn 0 */
+// 	HAL_DMA_IRQHandler(&hdma_dac1);
+// 	/* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
 
-	/* USER CODE END DMA1_Stream5_IRQn 1 */
-}
+// 	/* USER CODE END DMA1_Stream5_IRQn 1 */
+// }
 
 /* USER CODE BEGIN 1 */
 

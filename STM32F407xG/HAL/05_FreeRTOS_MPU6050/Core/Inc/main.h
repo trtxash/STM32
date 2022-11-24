@@ -35,7 +35,6 @@ extern "C"
 #include "usmart.h"
 
 #include "dma.h"
-#include "dac.h"
 #include "tim.h"
 
 #include "FreeRTOS.h"

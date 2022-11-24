@@ -38,7 +38,6 @@ BUILD_DIR = build
 C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/gpio.c \
-Core/Src/dac.c \
 Core/Src/dma.c \
 Core/Src/tim.c \
 Core/Src/stm32f4xx_it.c \
