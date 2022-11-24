@@ -28,5 +28,6 @@ void WS281x_SetPixelColor(uint16_t n, u32 GRBColor);
 void WS281x_SetPixelRGB(uint16_t n, u8 red, u8 green, u8 blue);
 
 u32 Wheel(u8 WheelPos);
+void rgb_cycle(void);
 void rainbow(u8 wait);
 void rainbowCycle(u8 wait);

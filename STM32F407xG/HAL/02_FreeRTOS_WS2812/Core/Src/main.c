@@ -4,7 +4,7 @@
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
- * @date 	2022年11月17号20点51分
+ * @date 	2022年11月24号20点27分
  */
 #include "main.h"
 
@@ -74,24 +74,8 @@ void test_task(void *pvParameters)
 	WS_Load();
 	while (1)
 	{
-		WS_WriteAll_RGB(i, j, k);
-		// WS281x_SetPixelRGB(0, i, j, k);
-		i++;
-		if (i == 256)
-		{
-			i = 0;
-			j++;
-		}
-		if (j == 256)
-		{
-			j = 0;
-			k++;
-		}
-		if (k == 256)
-		{
-			k = 0;
-		}
-		vTaskDelay(100);
+		rgb_cycle();
+		vTaskDelay(10);
 	}
 }
 

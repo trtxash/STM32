@@ -128,6 +128,54 @@ u32 Wheel(u8 WheelPos)
     return WS281x_Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
+void rgb_cycle(void)
+{
+    static u16 i = 0, j = 0, k = 0, temp = 0;
+
+    WS_WriteAll_RGB(i, j, k);
+
+    if (temp == 0)
+    {
+        i++;
+    }
+    else if (temp == 1)
+    {
+        i--;
+        j++;
+    }
+    else if (temp == 2)
+    {
+        j--;
+        k++;
+    }
+    else if (temp == 3)
+    {
+        k--;
+        i++;
+    }
+
+    if (i == 256)
+    {
+        temp = 1;
+        k = 0;
+        i = 255;
+    }
+
+    if (j == 256)
+    {
+        temp = 2;
+        i = 0;
+        j = 255;
+    }
+
+    if (k == 256)
+    {
+        temp = 3;
+        j = 0;
+        k = 255;
+    }
+}
+
 void rainbow(u8 wait)
 {
     u32 timestamp = HAL_GetTick();
