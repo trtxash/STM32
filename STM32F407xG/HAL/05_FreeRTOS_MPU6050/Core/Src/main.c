@@ -36,9 +36,13 @@ int main(void)
 	Stm32_Clock_Init(240, 4U, 2U, 4U); // 初始化时钟
 	delay_init(240);				   // 初始化延时函数
 	uart_init(115200);				   // 初始化串口
-	// MX_DMA_Init();					   // 要先初始化DMA
-	usmart_dev.init(240);			   // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
-	MX_TIM14_Init(100 - 1, 1200 - 1);  // 定时器14初始化，周期1ms
+	printf("\r\n初始化中...\r\n");
+
+	MX_DMA_Init();					  // 要先初始化DMA
+	usmart_dev.init(240);			  // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
+	MX_TIM14_Init(100 - 1, 1200 - 1); // 定时器14初始化，周期1ms
+
+	printf("\r\nMPU6050_Init:%d\r\n", MPU6050_Init());
 
 	// 创建开始任务
 	xTaskCreate((TaskFunction_t)start_task,			 // 任务函数

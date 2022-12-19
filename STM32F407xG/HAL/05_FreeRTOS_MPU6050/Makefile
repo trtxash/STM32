@@ -80,7 +80,7 @@ FreeRTOS/Src/queue.c \
 FreeRTOS/Src/list.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
-Hardware/Src/ultrasonic.c \
+Hardware/Src/mpu6050.c \
 
 # ASM sources
 ASM_SOURCES =  \
