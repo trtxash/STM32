@@ -2,43 +2,24 @@
 #define __MPU6050_H
 #include "sys.h"
 #include "delay.h"
+#include "usart.h"
 
-/*************************************************** MPU6050 IIC 端口定义 ************************************************/
-#define MPU6050_SCLK_Port GPIOB
-#define MPU6050_SCLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define MPU6050_SCLK_Pin GPIO_PIN_6
-
-#define MPU6050_SDIN_Port GPIOB
-#define MPU6050_SDIN_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define MPU6050_SDIN_Pin GPIO_PIN_7
-
-#define MPU6050_RST_Port GPIOB
-#define MPU6050_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define MPU6050_RST_Pin GPIO_PIN_0
-
-#define MPU6050_SCLK_Clr() MPU6050_SCLK_Port->BSRR = (uint32_t)MPU6050_SCLK_Pin << 16U
-#define MPU6050_SCLK_Set() MPU6050_SCLK_Port->BSRR = MPU6050_SCLK_Pin
-
-#define MPU6050_SDIN_Clr() MPU6050_SDIN_Port->BSRR = (uint32_t)MPU6050_SDIN_Pin << 16U
-#define MPU6050_SDIN_Set() MPU6050_SDIN_Port->BSRR = MPU6050_SDIN_Pin
-
-#define MPU6050_SDIN_IN()                                           \
-    {                                                               \
-        MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-        MPU6050_SDIN_Port->MODER |= 0 << 7 * 2;      \
+// IO方向设置
+#define MPU_SDA_IN()                     \
+    {                                    \
+        GPIOB->MODER &= ~(3 << (7 * 2)); \
+        GPIOB->MODER |= 0 << 7 * 2;      \
     } // PB9输入模式
-#define MPU6050_SDIN_OUT()                                           \
-    {                                                               \
-        MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-        MPU6050_SDIN_Port->MODER |= 1 << 7 * 2;      \
-    }                                                                // PB9输出模式
-#define MPU6050_READ_SDIN() MPU6050_SDIN_Port->IDR &MPU6050_SDIN_Pin // 0 or 1
+#define MPU_SDA_OUT()                    \
+    {                                    \
+        GPIOB->MODER &= ~(3 << (7 * 2)); \
+        GPIOB->MODER |= 1 << 7 * 2;      \
+    } // PB9输出模式
 
-#define MPU6050_RST_Clr() MPU6050_RST_Port->BSRR = (uint32_t)MPU6050_RST_Pin << 16U
-#define MPU6050_RST_Set() MPU6050_RST_Port->BSRR = MPU6050_RST_Pin
-
-/* MPU6050 软件IIC延时时间 */
-#define MPU6050Drv_IICDelay_Time 0
+// IO操作函数
+#define MPU_IIC_SCL PBout(6) // SCL
+#define MPU_IIC_SDA PBout(7) // SDA
+#define MPU_READ_SDA PBin(7) // 输入SDA
 
 // #define MPU_ACCEL_OFFS_REG		0X06	//accel_offs寄存器,可读取版本号,寄存器手册未提到
 // #define MPU_PROD_ID_REG			0X0C	//prod id寄存器,在寄存器手册未提到
@@ -113,11 +94,25 @@
 // 如果接V3.3,则IIC地址为0X69(不包含最低位).
 #define MPU_ADDR 0X68
 
-////因为开发板接GND,所以转为读写地址后,为0XD1和0XD0(如果接GND,则为0XD3和0XD2)
-// #define MPU_READ    0XD1
-// #define MPU_WRITE   0XD0
+// 因为模块AD0默认接GND,所以转为读写地址后,为0XD1和0XD0(如果接VCC,则为0XD3和0XD2)
+// #define MPU_READ    				0XD1
+// #define MPU_WRITE   				0XD0
 
-u8 MPU6050_Init(void);                              // 初始化MPU6050
+// IIC所有操作函数
+void MPU_IIC_Delay(void);                // IIC延时2ms函数
+void MPU_IIC_Init(void);                 // 初始化IIC的IO口
+void MPU_IIC_Start(void);                // 发送IIC开始信号
+void MPU_IIC_Stop(void);                 // 发送IIC停止信号
+void MPU_IIC_Send_Byte(u8 txd);          // IIC发送一个字节
+u8 MPU_IIC_Read_Byte(unsigned char ack); // IIC读取一个字节
+u8 MPU_IIC_Wait_Ack(void);               // IIC等待ACK信号
+void MPU_IIC_Ack(void);                  // IIC发送ACK信号
+void MPU_IIC_NAck(void);                 // IIC不发送ACK信号
+void IMPU_IC_Write_One_Byte(u8 daddr, u8 addr, u8 data);
+u8 MPU_IIC_Read_One_Byte(u8 daddr, u8 addr);
+
+// MPU所有操作函数
+u8 MPU_Init(void);                                  // 初始化MPU6050
 u8 MPU_Write_Len(u8 addr, u8 reg, u8 len, u8 *buf); // IIC连续写
 u8 MPU_Read_Len(u8 addr, u8 reg, u8 len, u8 *buf);  // IIC连续读
 u8 MPU_Write_Byte(u8 reg, u8 data);                 // IIC写一个字节
@@ -132,15 +127,5 @@ u8 MPU_Set_Fifo(u8 sens);
 short MPU_Get_Temperature(void);
 u8 MPU_Get_Gyroscope(short *gx, short *gy, short *gz);
 u8 MPU_Get_Accelerometer(short *ax, short *ay, short *az);
-
-void MPU6050Drv_Init(void);
-void MPU6050Drv_IICDelay(void);
-void MPU6050Drv_IICStart(void);
-void MPU6050Drv_IICStop(void);
-u8 MPU6050Drv_IICWaitAck(void);
-void MPU6050Drv_IICSendByte(uint8_t data);
-u8 MPU6050Drv_IICReadByte(unsigned char ack);
-void MPU6050Drv_IIC_Ack(void);
-void MPU6050Drv_IIC_NAck(void);
 
 #endif

@@ -11,9 +11,9 @@
                 "${workspaceFolder}/RTT",
                 "${workspaceFolder}/User/Inc",
                 "${workspaceFolder}/USMART/Inc",
-                "${workspaceFolder}/Hardware/Inc",
                 "${workspaceFolder}/FreeRtos/Inc",
-                "${workspaceFolder}/FreeRtos/portable/Inc"
+                "${workspaceFolder}/FreeRtos/portable/Inc",
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "USE_HAL_DRIVER",

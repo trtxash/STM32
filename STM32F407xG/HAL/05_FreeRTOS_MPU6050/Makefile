@@ -80,7 +80,9 @@ FreeRTOS/Src/queue.c \
 FreeRTOS/Src/list.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
-Hardware/Src/mpu6050.c \
+Hardware/MPU6050/Src/mpu6050.c \
+Hardware/MPU6050/eMPL/Src/inv_mpu.c \
+Hardware/MPU6050/eMPL/Src/inv_mpu_dmp_motion_driver.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -147,7 +149,8 @@ C_INCLUDES =  \
 -IRTT \
 -IUser/Inc \
 -IUSMART/Inc \
--IHardware/Inc \
+-IHardware/MPU6050/Inc \
+-IHardware/MPU6050/eMPL/Inc \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
