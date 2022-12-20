@@ -278,6 +278,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		if (x1ms % 1000 == 0) // 1000ms
 		{
+			printf("Pitch:  %f\r\n", (float)pitch);
+			printf("Roll:  %f\r\n", (float)roll);
+			printf("yaw:  %f\r\n", (float)yaw);
+			printf("temp:  %f\r\n", (float)temp);
+			printf("next \r\n");
 		}
 		if (x1ms % 10000 == 0) // 10000ms
 		{

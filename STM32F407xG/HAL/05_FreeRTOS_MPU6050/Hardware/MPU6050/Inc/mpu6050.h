@@ -4,22 +4,32 @@
 #include "delay.h"
 #include "usart.h"
 
+#define MPU6050_SCLK_Port GPIOB
+#define MPU6050_SCLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define MPU6050_SCLK_Pin GPIO_PIN_6
+
+#define MPU6050_SDIN_Port GPIOB
+#define MPU6050_SDIN_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define MPU6050_SDIN_Pin GPIO_PIN_7
+
 // IO方向设置
-#define MPU_SDA_IN()                     \
-    {                                    \
-        GPIOB->MODER &= ~(3 << (7 * 2)); \
-        GPIOB->MODER |= 0 << 7 * 2;      \
+#define MPU_SDA_IN()                                 \
+    {                                                \
+        MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
+        MPU6050_SDIN_Port->MODER |= 0 << 7 * 2;      \
     } // PB9输入模式
-#define MPU_SDA_OUT()                    \
-    {                                    \
-        GPIOB->MODER &= ~(3 << (7 * 2)); \
-        GPIOB->MODER |= 1 << 7 * 2;      \
+#define MPU_SDA_OUT()                                \
+    {                                                \
+        MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
+        MPU6050_SDIN_Port->MODER |= 1 << 7 * 2;      \
     } // PB9输出模式
 
-// IO操作函数
-#define MPU_IIC_SCL PBout(6) // SCL
-#define MPU_IIC_SDA PBout(7) // SDA
-#define MPU_READ_SDA PBin(7) // 输入SDA
+#define MPU6050_SCLK_Clr() MPU6050_SCLK_Port->BSRR = (uint32_t)MPU6050_SCLK_Pin << 16U
+#define MPU6050_SCLK_Set() MPU6050_SCLK_Port->BSRR = MPU6050_SCLK_Pin
+
+#define MPU6050_SDIN_Clr() MPU6050_SDIN_Port->BSRR = (uint32_t)MPU6050_SDIN_Pin << 16U
+#define MPU6050_SDIN_Set() MPU6050_SDIN_Port->BSRR = MPU6050_SDIN_Pin
+#define MPU6050_READ_SDIN() MPU6050_SDIN_Port->IDR &MPU6050_SDIN_Pin // 0 or 1
 
 // #define MPU_ACCEL_OFFS_REG		0X06	//accel_offs寄存器,可读取版本号,寄存器手册未提到
 // #define MPU_PROD_ID_REG			0X0C	//prod id寄存器,在寄存器手册未提到

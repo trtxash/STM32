@@ -4,7 +4,7 @@
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
- * @date 	2022年11月24号19点20分
+ * @date 	2022年12月21号0点22分
  */
 #include "main.h"
 
@@ -19,6 +19,11 @@ void start_task(void *pvParameters); // 任务函数
 #define TEST_STK_SIZE 512			// 任务堆栈大小
 TaskHandle_t TESTTask_Handler;		// 任务句柄
 void test_task(void *pvParameters); // 任务函数
+
+float pitch, roll, yaw;	   // 欧拉角
+short aacx, aacy, aacz;	   // 加速度传感器原始数据
+short gyrox, gyroy, gyroz; // 陀螺仪原始数据
+short temp;				   // 温度
 
 /**
  * @brief   主函数,程序入口
@@ -39,11 +44,10 @@ int main(void)
 	printf("\r\n初始化中...\r\n");
 
 	// MX_DMA_Init();					  // 要先初始化DMA
-	// usmart_dev.init(240);			  // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
-	// MX_TIM14_Init(100 - 1, 1200 - 1); // 定时器14初始化，周期1ms
+	usmart_dev.init(240);			  // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
+	MX_TIM14_Init(100 - 1, 1200 - 1); // 定时器14初始化，周期1ms
 
-	printf("\r\nMPU_6050_init_state:%d\r\n", MPU_Init()); // 初始化MPU6050
-	// mpu_dmp_init();
+	printf("\r\nMPU_6050_init_state:%d\r\n", mpu_dmp_init()); // 初始化MPU6050
 
 	// 创建开始任务
 	xTaskCreate((TaskFunction_t)start_task,			 // 任务函数
@@ -73,28 +77,21 @@ void start_task(void *pvParameters)
 // 测试任务函数
 void test_task(void *pvParameters)
 {
-	float pitch, roll, yaw;	   // 欧拉角
-	short aacx, aacy, aacz;	   // 加速度传感器原始数据
-	short gyrox, gyroy, gyroz; // 陀螺仪原始数据
-	short temp;				   // 温度
-
 	while (1)
 	{
-		printf("program running......\r\n");
-
 		if (mpu_dmp_get_data(&pitch, &roll, &yaw) == 0)
 		{
 			temp = MPU_Get_Temperature();				// 得到温度值
 			MPU_Get_Accelerometer(&aacx, &aacy, &aacz); // 得到加速度传感器数据
 			MPU_Get_Gyroscope(&gyrox, &gyroy, &gyroz);	// 得到陀螺仪数据
 
-			printf("Pitch:  %f\r\n", (float)pitch);
-			printf("Roll:  %f\r\n", (float)roll);
-			printf("yaw:  %f\r\n", (float)yaw);
-			printf("temp:  %f\r\n", (float)temp);
-			printf("next \r\n");
+			// printf("Pitch:  %f\r\n", (float)pitch);
+			// printf("Roll:  %f\r\n", (float)roll);
+			// printf("yaw:  %f\r\n", (float)yaw);
+			// printf("temp:  %f\r\n", (float)temp);
+			// printf("next \r\n");
 		}
-		vTaskDelay(1000);
+		// vTaskDelay(10000);
 	}
 }
 

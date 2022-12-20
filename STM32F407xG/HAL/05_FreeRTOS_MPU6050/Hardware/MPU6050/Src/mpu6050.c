@@ -29,17 +29,21 @@ void MPU_IIC_Init(void)
 {
 	GPIO_InitTypeDef GPIO_Initure;
 
-	__HAL_RCC_GPIOB_CLK_ENABLE(); // 使能GPIOB时钟
+	MPU6050_SCLK_Port_Clk_Enable();
+	MPU6050_SDIN_Port_Clk_Enable();
 
 	// PH4,5初始化设置
-	GPIO_Initure.Pin = GPIO_PIN_6 | GPIO_PIN_7;
-	GPIO_Initure.Mode = GPIO_MODE_OUTPUT_OD;		// MPU6050要开漏输出
-	GPIO_Initure.Pull = GPIO_PULLUP;				// 上拉
+	GPIO_Initure.Pin = MPU6050_SCLK_Pin;
+	GPIO_Initure.Mode = GPIO_MODE_OUTPUT_OD;   // MPU6050要开漏输出
+	GPIO_Initure.Pull = GPIO_PULLUP;		   // 上拉
 	GPIO_Initure.Speed = GPIO_SPEED_FREQ_HIGH; // 快速
-	HAL_GPIO_Init(GPIOB, &GPIO_Initure);
+	HAL_GPIO_Init(MPU6050_SCLK_Port, &GPIO_Initure);
+	GPIO_Initure.Pin = MPU6050_SDIN_Pin;
+	HAL_GPIO_Init(MPU6050_SDIN_Port, &GPIO_Initure);
 
-	// MPU_IIC_SDA = 1;
-	// MPU_IIC_SCL = 1;
+	MPU6050_SDIN_Set();
+	MPU6050_SCLK_Set();
+	// delay_ms(100);
 }
 
 /**********************************************
@@ -51,12 +55,14 @@ void MPU_IIC_Init(void)
 void MPU_IIC_Start(void)
 {
 	MPU_SDA_OUT(); // SDA线 输出
-	MPU_IIC_SDA = 1;
-	MPU_IIC_SCL = 1;
+	MPU6050_SDIN_Set();
 	MPU_IIC_Delay();
-	MPU_IIC_SDA = 0; // START:当SCL线处于高电平时,SDA线突然从高变低,发送起始信号
 	MPU_IIC_Delay();
-	MPU_IIC_SCL = 0; // 钳住I2C总线，准备发送或接收数据
+	MPU6050_SCLK_Set();
+	MPU_IIC_Delay();
+	MPU6050_SDIN_Clr(); // START:当SCL线处于高电平时,SDA线突然从高变低,发送起始信号
+	MPU_IIC_Delay();
+	MPU6050_SCLK_Clr(); // 钳住I2C总线，准备发送或接收数据
 }
 
 /**********************************************
@@ -68,11 +74,11 @@ void MPU_IIC_Start(void)
 void MPU_IIC_Stop(void)
 {
 	MPU_SDA_OUT(); // SDA线输出
-	MPU_IIC_SCL = 0;
-	MPU_IIC_SDA = 0; // STOP:当SCL线处于高电平时,SDA线突然从低变高,发送停止信号
+	MPU6050_SCLK_Clr();
+	MPU6050_SDIN_Clr(); // STOP:当SCL线处于高电平时,SDA线突然从低变高,发送停止信号
 	MPU_IIC_Delay();
-	MPU_IIC_SCL = 1;
-	MPU_IIC_SDA = 1; // 发送I2C总线结束信号
+	MPU6050_SCLK_Set();
+	MPU6050_SDIN_Set(); // 发送I2C总线结束信号
 	MPU_IIC_Delay();
 }
 
@@ -85,12 +91,13 @@ void MPU_IIC_Stop(void)
 u8 MPU_IIC_Wait_Ack(void)
 {
 	u8 ucErrTime = 0;
+	// MPU6050_SDIN_Set();
 	MPU_SDA_IN(); // SDA设置为输入
-	MPU_IIC_SDA = 1;
 	MPU_IIC_Delay();
-	MPU_IIC_SCL = 1;
 	MPU_IIC_Delay();
-	while (MPU_READ_SDA)
+	MPU6050_SCLK_Set();
+	MPU_IIC_Delay();
+	while (MPU6050_READ_SDIN())
 	{
 		ucErrTime++;
 		if (ucErrTime > 250)
@@ -99,7 +106,8 @@ u8 MPU_IIC_Wait_Ack(void)
 			return 1;
 		}
 	}
-	MPU_IIC_SCL = 0; // 时钟输出0
+	MPU_IIC_Delay();
+	MPU6050_SCLK_Clr(); // 时钟输出0
 	return 0;
 }
 
@@ -111,13 +119,15 @@ u8 MPU_IIC_Wait_Ack(void)
 **********************************************/
 void MPU_IIC_Ack(void)
 {
-	MPU_IIC_SCL = 0;
+	MPU6050_SCLK_Clr();
 	MPU_SDA_OUT();
-	MPU_IIC_SDA = 0;
 	MPU_IIC_Delay();
-	MPU_IIC_SCL = 1;
+	MPU6050_SDIN_Clr();
 	MPU_IIC_Delay();
-	MPU_IIC_SCL = 0;
+	MPU6050_SCLK_Set();
+	MPU_IIC_Delay();
+	MPU_IIC_Delay();
+	MPU6050_SCLK_Clr();
 }
 
 /**********************************************
@@ -128,13 +138,15 @@ void MPU_IIC_Ack(void)
 **********************************************/
 void MPU_IIC_NAck(void)
 {
-	MPU_IIC_SCL = 0;
+	MPU6050_SCLK_Clr();
 	MPU_SDA_OUT();
-	MPU_IIC_SDA = 1;
 	MPU_IIC_Delay();
-	MPU_IIC_SCL = 1;
+	MPU6050_SDIN_Set();
 	MPU_IIC_Delay();
-	MPU_IIC_SCL = 0;
+	MPU6050_SCLK_Set();
+	MPU_IIC_Delay();
+	MPU_IIC_Delay();
+	MPU6050_SCLK_Clr();
 }
 
 /**********************************************
@@ -148,16 +160,20 @@ void MPU_IIC_Send_Byte(u8 txd)
 {
 	u8 t;
 	MPU_SDA_OUT();
-	MPU_IIC_Delay();
-	MPU_IIC_SCL = 0; // 拉低时钟开始数据传输
+	MPU6050_SCLK_Clr(); // 拉低时钟开始数据传输
 	for (t = 0; t < 8; t++)
 	{
-		MPU_IIC_SDA = (txd & 0x80) >> 7;
+		MPU_IIC_Delay();
+		if ((txd & 0x80) >> 7)
+			MPU6050_SDIN_Set();
+		else
+			MPU6050_SDIN_Clr();
 		txd <<= 1;
-		MPU_IIC_SCL = 1;
 		MPU_IIC_Delay();
-		MPU_IIC_SCL = 0;
+		MPU6050_SCLK_Set();
 		MPU_IIC_Delay();
+		MPU_IIC_Delay();
+		MPU6050_SCLK_Clr();
 	}
 }
 
@@ -174,11 +190,13 @@ u8 MPU_IIC_Read_Byte(unsigned char ack)
 	MPU_SDA_IN(); // SDA设置为输入
 	for (i = 0; i < 8; i++)
 	{
-		MPU_IIC_SCL = 0;
+		MPU6050_SCLK_Clr();
 		MPU_IIC_Delay();
-		MPU_IIC_SCL = 1;
+		MPU_IIC_Delay();
+		MPU6050_SCLK_Set();
+		MPU_IIC_Delay();
 		receive <<= 1;
-		if (MPU_READ_SDA)
+		if (MPU6050_READ_SDIN())
 			receive++; // 如果读到了数据
 		MPU_IIC_Delay();
 	}
