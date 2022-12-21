@@ -45,6 +45,7 @@
 #include <stdint.h>
 #include "stdio.h"
 extern uint32_t SystemCoreClock;
+extern volatile unsigned long long FreeRTOSRunTimeTicks;
 #endif
 
 #define configUSE_PREEMPTION 1						   // 为1时使用抢占式调度器，为0时使用协程，抢断式调度器的话内核会在每个时钟节拍中断中进行任务切换，
@@ -66,7 +67,11 @@ extern uint32_t SystemCoreClock;
 #define configUSE_MALLOC_FAILED_HOOK 0				   // 为1时使用内存分配失败钩子函数，vApplicationMallocFailedHook(void)
 #define configUSE_APPLICATION_TASK_TAG 0			   // 为1则configUSE_APPLICATION_TASK_TAGF()和xTaskCallApplicationTaskHook()会被编译
 #define configUSE_COUNTING_SEMAPHORES 1				   // 为1启动计数型信号量，相关的API函数会被编译
-#define configGENERATE_RUN_TIME_STATS 0				   // 为1开启时间统计功能，相应API函数会被编译，为1还要定义额外的宏，见开发手册
+
+#define configGENERATE_RUN_TIME_STATS 1										  // 为1开启时间统计功能，相应API函数会被编译，为1还要定义额外的宏，见开发手册
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ConfigureTimerForTimeStats() // 定义定时器初始化函数以提供统计的“时基”
+#define portGET_RUN_TIME_COUNTER_VALUE() FreeRTOSRunTimeTicks				  // 定义变量以读取统计定时器的值
+#define configRECORD_STACK_HIGH_ADDRESS 1									  // 检查堆栈？
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 0				// 为1启用协程，节省开销，但功能有限

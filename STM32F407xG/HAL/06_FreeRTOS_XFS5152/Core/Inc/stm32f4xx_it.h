@@ -47,6 +47,7 @@ extern "C"
 	/* USER CODE END EM */
 
 	/* Exported functions prototypes ---------------------------------------------*/
+	/* USER CODE BEGIN EFP */
 	void NMI_Handler(void);
 	void HardFault_Handler(void);
 	void MemManage_Handler(void);
@@ -58,14 +59,13 @@ extern "C"
 	void SysTick_Handler(void);
 	void TIM4_IRQHandler(void);
 	void TIM5_IRQHandler(void);
+	void TIM1_TRG_COM_TIM11_IRQHandler(void);
 	void TIM8_UP_TIM13_IRQHandler(void);
 	void TIM8_TRG_COM_TIM14_IRQHandler(void);
 	void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 	void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 	void DMA1_Stream0_IRQHandler(void);
 	// void DMA1_Stream5_IRQHandler(void);
-	/* USER CODE BEGIN EFP */
-
 	/* USER CODE END EFP */
 
 #ifdef __cplusplus

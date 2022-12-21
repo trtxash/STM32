@@ -15,7 +15,7 @@ void MPU_IIC_Delay(void)
 	// while (t--)
 	// {
 	// }
-	delay_us(2);
+	delay_us(1);
 }
 // #pragma GCC pop_options
 
