@@ -55,9 +55,8 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern DMA_HandleTypeDef hdma_tim4_ch1;
-
 /* USER CODE BEGIN EV */
+extern DMA_HandleTypeDef hdma_tim4_ch1;
 
 /* USER CODE END EV */
 
@@ -216,6 +215,14 @@ void TIM5_IRQHandler(void)
 }
 
 /**
+ * @brief 定时器1com,11中断服务函数
+ */
+void TIM1_TRG_COM_TIM11_IRQHandler(void)
+{
+	HAL_TIM_IRQHandler(&htim11);
+}
+
+/**
  * @brief 定时器8up,13中断服务函数
  */
 void TIM8_UP_TIM13_IRQHandler(void)
@@ -257,6 +264,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		// 			ULTRASONIC_CAPTURE_STA++;
 		// 	}
 		// }
+	}
+	else if (htim == (&htim11))
+	{
+		FreeRTOSRunTimeTicks++; // important
 	}
 	else if (htim == (&htim13))
 	{

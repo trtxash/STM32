@@ -15,8 +15,13 @@ TIM_HandleTypeDef htim4;
 DMA_HandleTypeDef hdma_tim4_ch1;
 TIM_HandleTypeDef htim5;
 TIM_HandleTypeDef htim7;
+TIM_HandleTypeDef htim11;
 TIM_HandleTypeDef htim13;
 TIM_HandleTypeDef htim14;
+
+volatile unsigned long long FreeRTOSRunTimeTicks;
+
+extern uint32_t SystemCoreClock;
 
 /**
  * @brief TIM4 Initialization Function
@@ -174,6 +179,35 @@ void MX_TIM7_Init(u16 arr, u16 psc)
 }
 
 /**
+ * @brief   TIM11 Initialization Function
+ * @note    !!!用作了FreeRTOS获取时间定时!!!，
+ *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+ * @param   None
+ * @retval  None
+ */
+void MX_TIM11_Init(u16 arr, u16 psc)
+{
+	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+	TIM_MasterConfigTypeDef sMasterConfig = {0};
+	TIM_OC_InitTypeDef sConfigOC = {0};
+
+	htim11.Instance = TIM11;
+	htim11.Init.Prescaler = psc;
+	htim11.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim11.Init.Period = arr;
+	htim11.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	htim11.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+	if (HAL_TIM_Base_Init(&htim11) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	if (HAL_TIM_Base_Start_IT(&htim11) != HAL_OK) // 也可以用这个，使能定时器11和定时器11更新中断：TIM_IT_UPDATE
+	{
+		Error_Handler();
+	}
+}
+
+/**
  * @brief   TIM13 Initialization Function
  * @note    !!!用作了USMART定时!!!，
  *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
@@ -196,7 +230,7 @@ void MX_TIM13_Init(u16 arr, u16 psc)
 	{
 		Error_Handler();
 	}
-	if (HAL_TIM_Base_Start_IT(&htim13) != HAL_OK) // 也可以用这个，使能定时器3和定时器3更新中断：TIM_IT_UPDATE
+	if (HAL_TIM_Base_Start_IT(&htim13) != HAL_OK) // 也可以用这个，使能定时器13和定时器13更新中断：TIM_IT_UPDATE
 	{
 		Error_Handler();
 	}
@@ -204,7 +238,7 @@ void MX_TIM13_Init(u16 arr, u16 psc)
 
 /**
  * @brief   TIM14 Initialization Function
- * @note    !!!用作了计数定时!!!，
+ * @note    !!!用作了任务ms计数定时!!!，
  *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
  * @param   None
  * @retval  None
@@ -225,7 +259,7 @@ void MX_TIM14_Init(u16 arr, u16 psc)
 	{
 		Error_Handler();
 	}
-	if (HAL_TIM_Base_Start_IT(&htim14) != HAL_OK) // 也可以用这个，使能定时器3和定时器3更新中断：TIM_IT_UPDATE
+	if (HAL_TIM_Base_Start_IT(&htim14) != HAL_OK) // 也可以用这个，使能定时器14和定时器14更新中断：TIM_IT_UPDATE
 	{
 		Error_Handler();
 	}
@@ -278,6 +312,12 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim_base)
 		HAL_NVIC_SetPriority(TIM5_IRQn, 3, 0);
 		HAL_NVIC_EnableIRQ(TIM5_IRQn);
 	}
+	else if (htim_base->Instance == TIM11)
+	{
+		__HAL_RCC_TIM11_CLK_ENABLE();
+		HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn, 4, 0);
+		HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
+	}
 	else if (htim_base->Instance == TIM13)
 	{
 		__HAL_RCC_TIM13_CLK_ENABLE();
@@ -320,4 +360,27 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim)
 		GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	}
+}
+
+/**
+ * @brief   FreeRTOS计数初始化
+ * @note    用了Tim11，20KHz
+ * @param   None
+ * @retval  None
+ */
+void ConfigureTimerForTimeStats(void)
+{
+	FreeRTOSRunTimeTicks = 0;
+	MX_TIM11_Init(50 - 1, (u16)(SystemCoreClock / 1000000 / 2 - 1)); // 定时器11初始化，120分频，计数50，为20KHz
+}
+
+/**
+ * @brief   定时任务计数初始化
+ * @note    用了Tim14，1ms
+ * @param   None
+ * @retval  None
+ */
+void ConfigureTimerForTask(void)
+{
+	MX_TIM14_Init(100 - 1, (u16)(SystemCoreClock / 100000 / 2 - 1)); // 定时器14初始化，周期1ms
 }

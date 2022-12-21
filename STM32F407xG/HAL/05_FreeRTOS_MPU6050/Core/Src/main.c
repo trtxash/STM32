@@ -1,10 +1,11 @@
 /**
  * @file	05_FreeRTOS_MPU6050
  * @brief 	FreeRTOS，MPU6050
+ * @note  	FreeRTOS任务计时用了Tim11，USMART用了TIM13，定时任务用了TIM14
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.00
- * @date 	2022年12月21号0点22分
+ * @version 1.01
+ * @date 	2022年12月21号16点27分
  */
 #include "main.h"
 
@@ -25,6 +26,8 @@ short aacx, aacy, aacz;	   // 加速度传感器原始数据
 short gyrox, gyroy, gyroz; // 陀螺仪原始数据
 short temp;				   // 温度
 
+extern uint32_t SystemCoreClock;
+
 /**
  * @brief   主函数,程序入口
  * @param   none
@@ -39,15 +42,23 @@ int main(void)
 		Error_Handler();
 	}
 	Stm32_Clock_Init(240, 4U, 2U, 4U); // 初始化时钟
-	delay_init(240);				   // 初始化延时函数
-	uart_init(115200);				   // 初始化串口
+
+	delay_init(SystemCoreClock / 1000000); // 初始化延时函数
+	uart_init(115200);					   // 初始化串口
 	printf("\r\n初始化中...\r\n");
 
 	// MX_DMA_Init();					  // 要先初始化DMA
-	usmart_dev.init(240);			  // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
-	MX_TIM14_Init(100 - 1, 1200 - 1); // 定时器14初始化，周期1ms
+	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
+	ConfigureTimerForTask();					// 定时任务，定时器14初始化，周期1ms
 
-	printf("\r\nMPU_6050_init_state:%d\r\n", mpu_dmp_init()); // 初始化MPU6050
+	while (1)
+	{
+		u8 temp = mpu_dmp_init();
+		if (temp)
+			printf("mpu_dmp_init error:%d\r\n", temp);
+		else
+			break;
+	}
 
 	// 创建开始任务
 	xTaskCreate((TaskFunction_t)start_task,			 // 任务函数
