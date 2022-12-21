@@ -37,7 +37,12 @@ void LED_Init(void)
  */
 void LED0_Reverse(void)
 {
-	HAL_GPIO_WritePin(LED0_GPIO, LED0_PIN, !HAL_GPIO_ReadPin(LED0_GPIO, LED0_PIN)); // 取反
+	static u8 i = 0;
+	if (i)
+		LED0_Clr();
+	else
+		LED0_Set();
+	i = !i;
 }
 
 /**
@@ -49,5 +54,10 @@ void LED0_Reverse(void)
  */
 void LED1_Reverse(void)
 {
-	HAL_GPIO_WritePin(LED1_GPIO, LED1_PIN, !HAL_GPIO_ReadPin(LED1_GPIO, LED1_PIN)); // 取反
+	static u8 i = 0;
+	if (i)
+		LED1_Clr();
+	else
+		LED1_Set();
+	i = !i;
 }

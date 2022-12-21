@@ -444,8 +444,12 @@ u8 MPU_Write_Byte(u8 reg, u8 data)
 		MPU_IIC_Stop();
 		return 1;
 	}
-	MPU_IIC_Send_Byte(reg);	 // 写寄存器地址
-	MPU_IIC_Wait_Ack();		 // 等待应答
+	MPU_IIC_Send_Byte(reg); // 写寄存器地址
+	if (MPU_IIC_Wait_Ack()) // 等待ACK
+	{
+		MPU_IIC_Stop();
+		return 1;
+	}
 	MPU_IIC_Send_Byte(data); // 发送数据
 	if (MPU_IIC_Wait_Ack())	 // 等待ACK
 	{

@@ -22,7 +22,7 @@ TARGET = Template
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -g
+OPT = -O3 -g
 
 
 #######################################
@@ -80,9 +80,8 @@ FreeRTOS/Src/queue.c \
 FreeRTOS/Src/list.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
-Hardware/MPU6050/Src/mpu6050.c \
-Hardware/MPU6050/eMPL/Src/inv_mpu.c \
-Hardware/MPU6050/eMPL/Src/inv_mpu_dmp_motion_driver.c \
+Hardware/LED/Src/led.c \
+Hardware/XFS5152/Src/xfs5152.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -149,8 +148,8 @@ C_INCLUDES =  \
 -IRTT \
 -IUser/Inc \
 -IUSMART/Inc \
--IHardware/MPU6050/Inc \
--IHardware/MPU6050/eMPL/Inc \
+-IHardware/LED/Inc \
+-IHardware/XFS5152/Inc \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

@@ -40,9 +40,7 @@ extern "C"
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "mpu6050.h"
-#include "inv_mpu.h"
-#include "inv_mpu_dmp_motion_driver.h"
+#include "led.h"
 
     extern float pitch, roll, yaw;    // 欧拉角
     extern short aacx, aacy, aacz;    // 加速度传感器原始数据

@@ -16,15 +16,15 @@
 TaskHandle_t StartTask_Handler;		 // 任务句柄
 void start_task(void *pvParameters); // 任务函数
 
-#define TEST_TASK_PRIO 4			// 任务优先级
+#define TEST_TASK_PRIO 3			// 任务优先级
 #define TEST_STK_SIZE 512			// 任务堆栈大小
 TaskHandle_t TESTTask_Handler;		// 任务句柄
 void test_task(void *pvParameters); // 任务函数
 
-float pitch, roll, yaw;	   // 欧拉角
-short aacx, aacy, aacz;	   // 加速度传感器原始数据
-short gyrox, gyroy, gyroz; // 陀螺仪原始数据
-short temp;				   // 温度
+#define LED_TASK_PRIO 4			   // 任务优先级
+#define LED_STK_SIZE 32			   // 任务堆栈大小
+TaskHandle_t LEDTask_Handler;	   // 任务句柄
+void led_task(void *pvParameters); // 任务函数
 
 extern uint32_t SystemCoreClock;
 
@@ -42,23 +42,18 @@ int main(void)
 		Error_Handler();
 	}
 	Stm32_Clock_Init(240, 4U, 2U, 4U); // 初始化时钟
-
 	delay_init(SystemCoreClock / 1000000); // 初始化延时函数
 	uart_init(115200);					   // 初始化串口
+
 	printf("\r\n初始化中...\r\n");
 
 	// MX_DMA_Init();					  // 要先初始化DMA
 	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
 	ConfigureTimerForTask();					// 定时任务，定时器14初始化，周期1ms
+	LED_Init();
+	xfs5152Drv_Init();
 
-	while (1)
-	{
-		u8 temp = mpu_dmp_init();
-		if (temp)
-			printf("mpu_dmp_init error:%d\r\n", temp);
-		else
-			break;
-	}
+	printf("\r\n初始化完成\r\n");
 
 	// 创建开始任务
 	xTaskCreate((TaskFunction_t)start_task,			 // 任务函数
@@ -74,6 +69,13 @@ int main(void)
 void start_task(void *pvParameters)
 {
 	taskENTER_CRITICAL(); // 进入临界区
+	// 创建led任务
+	xTaskCreate((TaskFunction_t)led_task,
+				(const char *)"led_task",
+				(uint16_t)LED_STK_SIZE,
+				(void *)NULL,
+				(UBaseType_t)LED_TASK_PRIO,
+				(TaskHandle_t *)&LEDTask_Handler);
 	// 创建test任务
 	xTaskCreate((TaskFunction_t)test_task,
 				(const char *)"test_task",
@@ -85,24 +87,53 @@ void start_task(void *pvParameters)
 	taskEXIT_CRITICAL();			// 退出临界区
 }
 
-// 测试任务函数
-void test_task(void *pvParameters)
+// LED任务函数
+void led_task(void *pvParameters)
 {
 	while (1)
 	{
-		if (mpu_dmp_get_data(&pitch, &roll, &yaw) == 0)
-		{
-			temp = MPU_Get_Temperature();				// 得到温度值
-			MPU_Get_Accelerometer(&aacx, &aacy, &aacz); // 得到加速度传感器数据
-			MPU_Get_Gyroscope(&gyrox, &gyroy, &gyroz);	// 得到陀螺仪数据
+		LED0_Reverse();
+		vTaskDelay(500);
+	}
+}
 
-			// printf("Pitch:  %f\r\n", (float)pitch);
-			// printf("Roll:  %f\r\n", (float)roll);
-			// printf("yaw:  %f\r\n", (float)yaw);
-			// printf("temp:  %f\r\n", (float)temp);
-			// printf("next \r\n");
+// 测试任务函数
+void test_task(void *pvParameters)
+{
+	u8 i = 0;
+
+	while (1)
+	{
+		speech_text("[v10]", 0);
+		vTaskDelay(500);
+
+		if (i)
+		{
+			speech_text("[m3]", 0);
+			vTaskDelay(500);
+			speech_text_utf8("切换女声");
+			vTaskDelay(3000);
 		}
-		// vTaskDelay(10000);
+		else
+		{
+			speech_text("[m51]", 0);
+			vTaskDelay(500);
+			speech_text_utf8("切换男声");
+			vTaskDelay(3000);
+		}
+
+		i = !i;
+
+		speech_text_utf8("大声");
+		vTaskDelay(3000);
+		speech_text("123ABC", 0);
+		vTaskDelay(3000);
+		speech_text("[v3]", 0);
+		vTaskDelay(500);
+		speech_text_utf8("小声");
+		vTaskDelay(3000);
+		speech_text("123ABC", 0);
+		vTaskDelay(3000);
 	}
 }
 
