@@ -4,8 +4,8 @@
  * @note  	FreeRTOS任务计时用了Tim11，USMART用了TIM13，定时任务用了TIM14
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.00
- * @date 	2022年12月21号15点24分
+ * @version 1.01
+ * @date 	2022年12月21号16点27分
  */
 #include "main.h"
 
