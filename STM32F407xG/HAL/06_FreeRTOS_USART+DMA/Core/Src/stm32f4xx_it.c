@@ -199,6 +199,100 @@ __weak void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+ * @brief 串口1中断服务程序
+ */
+void USART1_IRQHandler(void)
+{
+	// if (__HAL_UART_GET_FLAG(&UART1_Handler, UART_FLAG_RXNE))
+	// {
+	// 	aRxBuffer[0] = USART1->DR;		  // 读取可以自动清楚RXNE
+	// 	if ((USART_RX_STA & 0x8000) == 0) // 接收未完成
+	// 	{
+	// 		if (USART_RX_STA & 0x4000) // 接收到了0x0d
+	// 		{
+	// 			if (aRxBuffer[0] != 0x0a)
+	// 				USART_RX_STA = 0; // 接收错误,重新开始
+	// 			else
+	// 				USART_RX_STA |= 0x8000; // 接收完成了
+	// 		}
+	// 		else // 还没收到0X0D
+	// 		{
+	// 			if (aRxBuffer[0] == 0x0d)
+	// 				USART_RX_STA |= 0x4000;
+	// 			else
+	// 			{
+	// 				USART_RX_BUF[USART_RX_STA & 0X3FFF] = aRxBuffer[0];
+	// 				USART_RX_STA++;
+	// 				if (USART_RX_STA > (USART_REC_LEN - 1))
+	// 				{
+	// 					USART_RX_STA = 0; // 接收数据错误,重新开始接收
+	// 					Error_sum++;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	HAL_UART_IRQHandler(&UART1_Handler);
+}
+
+/**
+ * @brief 串口6中断服务程序
+ */
+void USART6_IRQHandler(void)
+{
+	HAL_UART_IRQHandler(&UART6_Handler);
+}
+
+/*
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);//发送完成回调函数
+void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart);//发送完成过半
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);//接收完成回调函数
+void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart);//接收完成过半
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);//错误处理回调函数
+*/
+/**
+ * @brief 串口接收完成回调函数
+ */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart->Instance == USART1) // 如果是串口1
+	{
+		// aRxBuffer[0] = USART1->DR;		  // 读取可以自动清楚RXNE,这里用了HAL_UART_Receive_IT函数，这里不需要
+		if ((USART_RX_STA & 0x8000) == 0) // 接收未完成
+		{
+			if (USART_RX_STA & 0x4000) // 接收到了0x0d
+			{
+				if (aRxBuffer[0] != 0x0a)
+					USART_RX_STA = 0; // 接收错误,重新开始
+				else
+					USART_RX_STA |= 0x8000; // 接收完成了
+			}
+			else // 还没收到0X0D
+			{
+				if (aRxBuffer[0] == 0x0d)
+					USART_RX_STA |= 0x4000;
+				else
+				{
+					USART_RX_BUF[USART_RX_STA & 0X3FFF] = aRxBuffer[0];
+					USART_RX_STA++;
+					if (USART_RX_STA > (USART_REC_LEN - 1))
+					{
+						USART_RX_STA = 0; // 接收数据错误,重新开始接收
+						Error_sum++;
+					}
+				}
+			}
+		}
+
+		HAL_UART_Receive_IT(&UART1_Handler, aRxBuffer, RXBUFFERSIZE); // Receive_IT中会关闭中断，需要重开
+	}
+	else if (huart->Instance == USART6) // 如果是串口6
+	{
+	}
+}
+
+/**
  * @brief 定时器4中断服务函数
  */
 void TIM4_IRQHandler(void)

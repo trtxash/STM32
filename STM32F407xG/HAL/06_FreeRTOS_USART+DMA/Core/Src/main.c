@@ -1,10 +1,10 @@
 /**
- * @file	06_FreeRTOS_XFS5152
- * @brief 	FreeRTOS，XFS5152
+ * @file	06_FreeRTOS_USART+DMA
+ * @brief 	FreeRTOS，USART+DMA
  * @note  	FreeRTOS任务计时用了Tim11，USMART用了TIM13，定时任务用了TIM14
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.01
+ * @version 1.00
  * @date 	2022年12月21号20点21分
  */
 #include "main.h"

@@ -57,6 +57,9 @@ extern "C"
 	void DebugMon_Handler(void);
 	void PendSV_Handler(void);
 	void SysTick_Handler(void);
+	void USART1_IRQHandler(void);
+	void USART6_IRQHandler(void);
+	void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 	void TIM4_IRQHandler(void);
 	void TIM5_IRQHandler(void);
 	void TIM1_TRG_COM_TIM11_IRQHandler(void);

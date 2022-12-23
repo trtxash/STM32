@@ -42,11 +42,6 @@ extern "C"
 
 #include "led.h"
 
-    extern float pitch, roll, yaw;    // 欧拉角
-    extern short aacx, aacy, aacz;    // 加速度传感器原始数据
-    extern short gyrox, gyroy, gyroz; // 陀螺仪原始数据
-    extern short temp;                // 温度
-
 #ifdef __cplusplus
 }
 #endif
