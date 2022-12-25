@@ -6,7 +6,7 @@
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
- * @date 	2022年12月21号20点21分
+ * @date 	2022年12月25号20点51分
  */
 #include "main.h"
 
@@ -45,12 +45,12 @@ int main(void)
 		Error_Handler();
 	}
 	Stm32_Clock_Init(240, 4U, 2U, 4U);	   // 初始化时钟
+	MX_DMA_Init();						   // 要先初始化DMA
 	delay_init(SystemCoreClock / 1000000); // 初始化延时函数
 	uart_init(BOUND);					   // 初始化串口
 
 	printf("\r\n初始化中...\r\n");
 
-	MX_DMA_Init();								// 要先初始化DMA
 	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
 	ConfigureTimerForTask();					// 定时任务，定时器14初始化，周期1ms

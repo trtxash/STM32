@@ -69,6 +69,7 @@ Core/Src/system_stm32f4xx.c \
 User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
+User/Src/valuepack.c \
 USMART/Src/usmart_config.c \
 USMART/Src/usmart_str.c \
 USMART/Src/usmart.c \
@@ -81,7 +82,6 @@ FreeRTOS/Src/list.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 Hardware/LED/Src/led.c \
-Hardware/XFS5152/Src/xfs5152.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -149,7 +149,6 @@ C_INCLUDES =  \
 -IUser/Inc \
 -IUSMART/Inc \
 -IHardware/LED/Inc \
--IHardware/XFS5152/Inc \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

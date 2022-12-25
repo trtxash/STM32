@@ -4,7 +4,8 @@ TxPack txvaluepack;
 RxPack rxvaluepack;
 
 // 发送数据包的字节长度
-const unsigned short TXPACK_BYTE_SIZE = ((TX_BOOL_NUM + 7) >> 3) + TX_BYTE_NUM + (TX_SHORT_NUM << 1) + (TX_INT_NUM << 2) + (TX_FLOAT_NUM << 2);
+// const unsigned short TXPACK_BYTE_SIZE = ((TX_BOOL_NUM + 7) >> 3) + TX_BYTE_NUM + (TX_SHORT_NUM << 1) + (TX_INT_NUM << 2) + (TX_FLOAT_NUM << 2);
+#define TXPACK_BYTE_SIZE ((TX_BOOL_NUM + 7) >> 3) + TX_BYTE_NUM + (TX_SHORT_NUM << 1) + (TX_INT_NUM << 2) + (TX_FLOAT_NUM << 2)
 
 // 接收数据包的字节长度
 const unsigned short RXPACK_BYTE_SIZE = ((RX_BOOL_NUM + 7) >> 3) + RX_BYTE_NUM + (RX_SHORT_NUM << 1) + (RX_INT_NUM << 2) + (RX_FLOAT_NUM << 2);
@@ -29,9 +30,10 @@ unsigned char vp_txbuff[TXPACK_BYTE_SIZE + 3];
 //---------------------------------------------------------------------------------------------------------------------
 // 初始化DMA和串口USART0 可设置串口波特率
 // DMA将串口接收寄存器和接收缓冲数组连接，将DMA设置为循环模式，实现环形缓冲区
-void initValuePack(int baudrate)
+void initValuePack(u32 baudrate)
 {
     uart6_init(baudrate);
+    HAL_UART_Receive_DMA(&UART6_Handler, (uint32_t)vp_rxbuff, VALUEPACK_BUFFER_SIZE);
 }
 
 // 数据读取涉及到的变量

@@ -81,7 +81,7 @@ typedef struct
 extern TxPack txvaluepack;
 extern RxPack rxvaluepack;
 
-void initValuePack(int baudrate);
+void initValuePack(u32 baudrate);
 
 // 需要保证至少每秒执行10次该函数
 // 该函数的主要过程是先解析接收的缓冲区，如果接收到完整的RX数据包，则解析RX数据包中的数据，然后开始串口发送TX数据包 。

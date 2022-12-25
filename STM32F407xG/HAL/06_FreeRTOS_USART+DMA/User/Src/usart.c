@@ -172,6 +172,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
 		__HAL_LINKDMA(huart, hdmarx, hdma_usart6_rx);
 
+		/* USART6 interrupt Init */
+		HAL_NVIC_SetPriority(USART6_IRQn, 0, 0); // 这里开中断是因为stm32f4xx_hal_uart.c里面的介绍，用于校验完成最后一个字节的发送完成
+		HAL_NVIC_EnableIRQ(USART6_IRQn);
 		/* USER CODE BEGIN USART6_MspInit 1 */
 
 		/* USER CODE END USART6_MspInit 1 */
