@@ -1,7 +1,10 @@
 #ifndef _USART_H
 #define _USART_H
+
 #include "sys.h"
 #include "stdio.h"
+
+#define VALUEPACK 1 // 使能valuepack
 
 #define USART_REC_LEN 200 // 定义最大接收字节数 200
 

@@ -32,6 +32,7 @@ extern "C"
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
+#include "valuepack.h"
 #include "usmart.h"
 
 #include "dma.h"

@@ -2,6 +2,8 @@
 
 UART_HandleTypeDef UART1_Handler; // UART1句柄
 UART_HandleTypeDef UART6_Handler; // UART6句柄
+DMA_HandleTypeDef hdma_usart6_tx;
+DMA_HandleTypeDef hdma_usart6_rx;
 
 u32 Error_sum = 0;
 
@@ -41,7 +43,10 @@ void uart_init(u32 bound)
 	UART1_Handler.Init.Parity = UART_PARITY_NONE;		// 无奇偶校验位
 	UART1_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE; // 无硬件流控
 	UART1_Handler.Init.Mode = UART_MODE_TX_RX;			// 收发模式
-	HAL_UART_Init(&UART1_Handler);						// HAL_UART_Init()会使能UART1
+	if (HAL_UART_Init(&UART1_Handler) != HAL_OK)		// HAL_UART_Init()会使能UART1
+	{
+		Error_Handler();
+	}
 
 	HAL_UART_Receive_IT(&UART1_Handler, aRxBuffer, RXBUFFERSIZE); // 如果要调用处理回调函数，用这个函数使能接收中断
 }
@@ -50,6 +55,20 @@ void uart_init(u32 bound)
 //  bound:波特率
 void uart6_init(u32 bound)
 {
+#if VALUEPACK
+	UART6_Handler.Instance = USART6;
+	UART6_Handler.Init.BaudRate = bound;
+	UART6_Handler.Init.WordLength = UART_WORDLENGTH_8B;
+	UART6_Handler.Init.StopBits = UART_STOPBITS_1;
+	UART6_Handler.Init.Parity = UART_PARITY_NONE;
+	UART6_Handler.Init.Mode = UART_MODE_TX_RX;
+	UART6_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	UART6_Handler.Init.OverSampling = UART_OVERSAMPLING_16; // 过采样16倍
+	if (HAL_UART_Init(&UART6_Handler) != HAL_OK)
+	{
+		Error_Handler();
+	}
+#else
 	// UART 初始化设置
 	UART6_Handler.Instance = USART6;					// USART6
 	UART6_Handler.Init.BaudRate = bound;				// 波特率
@@ -58,9 +77,13 @@ void uart6_init(u32 bound)
 	UART6_Handler.Init.Parity = UART_PARITY_NONE;		// 无奇偶校验位
 	UART6_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE; // 无硬件流控
 	UART6_Handler.Init.Mode = UART_MODE_TX_RX;			// 收发模式
-	HAL_UART_Init(&UART6_Handler);						// HAL_UART_Init()会使能UART6
+	if (HAL_UART_Init(&UART6_Handler) != HAL_OK)		// HAL_UART_Init()会使能UART6
+	{
+		Error_Handler();
+	}
 
 	HAL_UART_Receive_IT(&UART6_Handler, (u8 *)aRxBuffer, RXBUFFERSIZE); // 该函数会开启接收中断：标志位UART_IT_RXNE，并且设置接收缓冲以及接收缓冲接收最大数据量
+#endif
 }
 
 // UART底层初始化，时钟使能，引脚配置，中断配置
@@ -91,10 +114,70 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 		HAL_NVIC_SetPriority(USART1_IRQn, 7, 0); // 抢占优先级0，子优先级0
 #endif
 	}
-	if (huart->Instance == USART6) // 如果是串口6，进行串口1 MSP初始化
+	if (huart->Instance == USART6) // 如果是串口6，进行串口6 MSP初始化
 	{
-		__HAL_RCC_GPIOC_CLK_ENABLE();  // 使能GPIOA时钟
-		__HAL_RCC_USART6_CLK_ENABLE(); // 使能USART6时钟
+#if VALUEPACK
+		/* USER CODE BEGIN USART6_MspInit 0 */
+
+		/* USER CODE END USART6_MspInit 0 */
+		/* USART6 clock enable */
+		__HAL_RCC_USART6_CLK_ENABLE();
+
+		__HAL_RCC_GPIOC_CLK_ENABLE();
+		/**USART6 GPIO Configuration
+		PC6     ------> USART6_TX
+		PC7     ------> USART6_RX
+		*/
+		GPIO_Initure.Pin = GPIO_PIN_6 | GPIO_PIN_7;
+		GPIO_Initure.Mode = GPIO_MODE_AF_PP;
+		GPIO_Initure.Pull = GPIO_NOPULL;
+		GPIO_Initure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+		GPIO_Initure.Alternate = GPIO_AF8_USART6;
+		HAL_GPIO_Init(GPIOC, &GPIO_Initure);
+
+		/* USART6 DMA Init */
+		/* USART6_TX Init */
+		hdma_usart6_tx.Instance = DMA2_Stream6;
+		hdma_usart6_tx.Init.Channel = DMA_CHANNEL_5;
+		hdma_usart6_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+		hdma_usart6_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+		hdma_usart6_tx.Init.MemInc = DMA_MINC_ENABLE;
+		hdma_usart6_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+		hdma_usart6_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+		hdma_usart6_tx.Init.Mode = DMA_NORMAL;
+		hdma_usart6_tx.Init.Priority = DMA_PRIORITY_MEDIUM;
+		hdma_usart6_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+		if (HAL_DMA_Init(&hdma_usart6_tx) != HAL_OK)
+		{
+			Error_Handler();
+		}
+
+		__HAL_LINKDMA(huart, hdmatx, hdma_usart6_tx);
+
+		/* USART6_RX Init */
+		hdma_usart6_rx.Instance = DMA2_Stream1;
+		hdma_usart6_rx.Init.Channel = DMA_CHANNEL_5;
+		hdma_usart6_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+		hdma_usart6_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+		hdma_usart6_rx.Init.MemInc = DMA_MINC_ENABLE;
+		hdma_usart6_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+		hdma_usart6_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+		hdma_usart6_rx.Init.Mode = DMA_CIRCULAR;
+		hdma_usart6_rx.Init.Priority = DMA_PRIORITY_MEDIUM;
+		hdma_usart6_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+		if (HAL_DMA_Init(&hdma_usart6_rx) != HAL_OK)
+		{
+			Error_Handler();
+		}
+
+		__HAL_LINKDMA(huart, hdmarx, hdma_usart6_rx);
+
+		/* USER CODE BEGIN USART6_MspInit 1 */
+
+		/* USER CODE END USART6_MspInit 1 */
+#else
+		__HAL_RCC_GPIOC_CLK_ENABLE();									// 使能GPIOA时钟
+		__HAL_RCC_USART6_CLK_ENABLE();									// 使能USART6时钟
 
 		GPIO_Initure.Pin = GPIO_PIN_6;			  // PA11
 		GPIO_Initure.Mode = GPIO_MODE_AF_PP;	  // 复用推挽输出
@@ -103,12 +186,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 		GPIO_Initure.Alternate = GPIO_AF8_USART6; // 复用为USART6
 		HAL_GPIO_Init(GPIOC, &GPIO_Initure);	  // 初始化PA11
 
-		GPIO_Initure.Pin = GPIO_PIN_7;		 // PA12
-		HAL_GPIO_Init(GPIOC, &GPIO_Initure); // 初始化PA12
+		GPIO_Initure.Pin = GPIO_PIN_7;			 // PA12
+		HAL_GPIO_Init(GPIOC, &GPIO_Initure);	 // 初始化PA12
 
 #if EN_USART6_RX
-		HAL_NVIC_EnableIRQ(USART6_IRQn);		 // 使能USART1中断通道
-		HAL_NVIC_SetPriority(USART6_IRQn, 8, 0); // 抢占优先级1，子优先级1
+		HAL_NVIC_EnableIRQ(USART6_IRQn);		 // 使能USART6中断通道
+		HAL_NVIC_SetPriority(USART6_IRQn, 8, 0); // 抢占优先级6，子优先级1
+#endif
+
 #endif
 	}
 }

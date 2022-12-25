@@ -1,7 +1,8 @@
 /**
  * @file	06_FreeRTOS_USART+DMA
  * @brief 	FreeRTOS，USART+DMA
- * @note  	FreeRTOS任务计时用了Tim11，USMART用了TIM13，定时任务用了TIM14
+ * @note  	Printf函数对应UART1，Vlauepack对应UART6
+ * 			FreeRTOS任务计时用了Tim11，USMART用了TIM13，定时任务用了TIM14
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
@@ -10,6 +11,8 @@
 #include "main.h"
 
 #define Debug 1 // 控制Debug的一些相关函数
+
+#define BOUND 115200 // 串口波特率
 
 #define START_TASK_PRIO 1			 // 任务优先级
 #define START_STK_SIZE 128			 // 任务堆栈大小
@@ -41,17 +44,17 @@ int main(void)
 	{
 		Error_Handler();
 	}
-	Stm32_Clock_Init(240, 4U, 2U, 4U); // 初始化时钟
+	Stm32_Clock_Init(240, 4U, 2U, 4U);	   // 初始化时钟
 	delay_init(SystemCoreClock / 1000000); // 初始化延时函数
-	uart_init(115200);					   // 初始化串口
+	uart_init(BOUND);					   // 初始化串口
 
 	printf("\r\n初始化中...\r\n");
 
-	// MX_DMA_Init();					  // 要先初始化DMA
+	MX_DMA_Init();								// 要先初始化DMA
+	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
 	ConfigureTimerForTask();					// 定时任务，定时器14初始化，周期1ms
 	LED_Init();
-	xfs5152Drv_Init();
 
 	printf("\r\n初始化完成\r\n");
 
@@ -100,40 +103,17 @@ void led_task(void *pvParameters)
 // 测试任务函数
 void test_task(void *pvParameters)
 {
-	u8 i = 0;
+	txvaluepack.bools[0] = 1;
+	txvaluepack.bools[1] = 0;
+	txvaluepack.bools[2] = 1;
+	txvaluepack.integers[0] = 666;
+	txvaluepack.integers[1] = 999;
 
 	while (1)
 	{
-		speech_text("[v10]", 0);
-		vTaskDelay(500);
-
-		if (i)
-		{
-			speech_text("[m3]", 0);
-			vTaskDelay(500);
-			speech_text_utf8("切换女声");
-			vTaskDelay(3000);
-		}
-		else
-		{
-			speech_text("[m51]", 0);
-			vTaskDelay(500);
-			speech_text_utf8("切换男声");
-			vTaskDelay(3000);
-		}
-
-		i = !i;
-
-		speech_text_utf8("大声");
-		vTaskDelay(3000);
-		speech_text("123ABC", 0);
-		vTaskDelay(3000);
-		speech_text("[v3]", 0);
-		vTaskDelay(500);
-		speech_text_utf8("小声");
-		vTaskDelay(3000);
-		speech_text("123ABC", 0);
-		vTaskDelay(3000);
+		sendValuePack(&txvaluepack);
+		printf("RX:%d,%d,%d,%d,%d\r\n", rxvaluepack.bools[0], rxvaluepack.bools[1], rxvaluepack.bools[2], rxvaluepack.integers[0], rxvaluepack.integers[1]);
+		vTaskDelay(5000);
 	}
 }
 
