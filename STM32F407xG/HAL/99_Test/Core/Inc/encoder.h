@@ -1,5 +1,5 @@
-#ifndef __BSP_ENCOEDER_H
-#define __BSP_ENCOEDER_H
+#ifndef _ENCOEDER_H
+#define _ENCOEDER_H
 
 #include "stm32f4xx.h"
 #include "sys.h"

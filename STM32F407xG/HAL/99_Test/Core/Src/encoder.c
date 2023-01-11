@@ -1,4 +1,4 @@
-#include "bspencoder.h"
+#include "encoder.h"
 
 /**
  * @brief  配置TIMx编码器模式
