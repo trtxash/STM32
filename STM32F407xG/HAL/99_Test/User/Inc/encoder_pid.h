@@ -1,5 +1,5 @@
-#ifndef _PID_H
-#define _PID_H
+#ifndef _ENCODER_PID_H
+#define _ENCODER_PID_H
 
 #include "sys.h"
 

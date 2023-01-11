@@ -1,4 +1,4 @@
-#include "pid.h"
+#include "encoder_pid.h"
 
 double P_V_1 = 0.2, I_V_1 = 0.000005, D_V_1 = 0.20; // PID constants
 double P_V_2 = 0.2, I_V_2 = 0.000005, D_V_2 = 0.20; // PID constants
