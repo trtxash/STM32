@@ -44,7 +44,8 @@ int main(void)
 	{
 		Error_Handler();
 	}
-	Stm32_Clock_Init(240, 4U, 2U, 4U);	   // 初始化时钟
+	Stm32_Clock_Init(240, 4U, 2U, 4U); // 初始化时钟
+
 	MX_DMA_Init();						   // 要先初始化DMA
 	delay_init(SystemCoreClock / 1000000); // 初始化延时函数
 	uart_init(BOUND);					   // 初始化串口
@@ -93,9 +94,16 @@ void start_task(void *pvParameters)
 // LED任务函数
 void led_task(void *pvParameters)
 {
+	u8 i = 0;
 	while (1)
 	{
+		i++;
 		LED0_Reverse();
+		if (i == 2)
+		{
+			i = 0;
+			LED1_Reverse();
+		}
 		vTaskDelay(500);
 	}
 }
@@ -103,16 +111,8 @@ void led_task(void *pvParameters)
 // 测试任务函数
 void test_task(void *pvParameters)
 {
-	txvaluepack.bools[0] = 1;
-	txvaluepack.bools[1] = 0;
-	txvaluepack.bools[2] = 1;
-	txvaluepack.integers[0] = 666;
-	txvaluepack.integers[1] = 999;
-
 	while (1)
 	{
-		sendValuePack(&txvaluepack);
-		printf("RX:%d,%d,%d,%d,%d\r\n", rxvaluepack.bools[0], rxvaluepack.bools[1], rxvaluepack.bools[2], rxvaluepack.integers[0], rxvaluepack.integers[1]);
 		vTaskDelay(5000);
 	}
 }
