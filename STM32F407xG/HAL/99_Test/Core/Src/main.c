@@ -54,7 +54,9 @@ int main(void)
 
 	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
-	ConfigureTimerForTask();					// 定时任务，定时器14初始化，周期1ms
+	Tim_ConfigureTimerForTask();					// 定时任务，定时器14初始化，周期1ms
+	Tim_Encoder_Init();
+	Tim_Motor_Init();
 	LED_Init();
 
 	printf("\r\n初始化完成\r\n");

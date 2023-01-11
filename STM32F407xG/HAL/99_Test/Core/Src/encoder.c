@@ -5,7 +5,7 @@
  * @param  无
  * @retval 无
  */
-void TIM_Encoder_Init(void)
+void Tim_Encoder_Init(void)
 {
     MX_TIM2_Init(ENCODER_TIM_PERIOD_0, ENCODER_TIM_PRESCALER_0, ENCODER_FILTER_VALUE_0);
     HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL); // 使能编码器接口

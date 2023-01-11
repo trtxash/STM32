@@ -37,11 +37,13 @@ extern "C"
 
 #include "dma.h"
 #include "tim.h"
+#include "encoder.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
 
 #include "led.h"
+
 
 #ifdef __cplusplus
 }

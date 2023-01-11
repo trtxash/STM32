@@ -28,6 +28,6 @@ void MX_TIM13_Init(u16 arr, u16 psc);
 void MX_TIM14_Init(u16 arr, u16 psc);
 
 void ConfigureTimerForTimeStats(void);
-void ConfigureTimerForTask(void);
+void Tim_ConfigureTimerForTask(void);
 
 #endif

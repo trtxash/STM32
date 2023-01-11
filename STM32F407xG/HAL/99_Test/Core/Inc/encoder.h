@@ -23,13 +23,13 @@
 #define ENCODER_TIM_PRESCALER_3 0
 
 /* 编码器软件滤波值 */
-#define ENCODER_FILTER_VALUE_0 30
+#define ENCODER_FILTER_VALUE_0 15
 
-#define ENCODER_FILTER_VALUE_1 30
+#define ENCODER_FILTER_VALUE_1 15
 
-#define ENCODER_FILTER_VALUE_2 30
+#define ENCODER_FILTER_VALUE_2 15
 
-#define ENCODER_FILTER_VALUE_3 30
+#define ENCODER_FILTER_VALUE_3 15
 
 /* 读取编码器的频率 单位Hz */
 #define READ_ENCODER_FREQU 100
@@ -49,7 +49,7 @@
 /* 计算转一圈的距离 单位M */
 #define ONE_WHEEL_CIRCUMFERENCE (3.14159265358979323846 * TIRE_DIAMETER)
 
-void TIM_Encoder_Init(void);
+void Tim_Encoder_Init(void);
 int Read_Encoder(u8 tim);
 double Calculate_Velocity(int encoder_value);
 

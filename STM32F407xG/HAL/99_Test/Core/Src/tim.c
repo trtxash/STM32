@@ -949,7 +949,7 @@ void ConfigureTimerForTimeStats(void)
  * @param   None
  * @retval  None
  */
-void ConfigureTimerForTask(void)
+void Tim_ConfigureTimerForTask(void)
 {
 	MX_TIM14_Init(100 - 1, (u16)(SystemCoreClock / 100000 / 2 - 1)); // 定时器14初始化，周期1ms
 }
