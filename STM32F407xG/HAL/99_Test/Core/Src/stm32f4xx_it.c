@@ -373,9 +373,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	else if (htim == (&htim14))
 	{
 		static u16 x1ms = 0;
+		u8 i;
 
 		x1ms++;
 
+		for (i = 2; i < 6; i++)
+		{
+			printf("Encoder%d=%d\r\n", i - 2, Read_Encoder(i));
+		}
 		if (x1ms % 10 == 0) // 10ms
 		{
 			readValuePack(&rxvaluepack);

@@ -54,7 +54,7 @@ int main(void)
 
 	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
-	Tim_ConfigureTimerForTask();					// 定时任务，定时器14初始化，周期1ms
+	Tim_ConfigureTimerForTask();				// 定时任务，定时器14初始化，周期1ms
 	Tim_Encoder_Init();
 	Tim_Motor_Init();
 	LED_Init();
@@ -113,9 +113,17 @@ void led_task(void *pvParameters)
 // 测试任务函数
 void test_task(void *pvParameters)
 {
+	u16 i = 10000;
 	while (1)
 	{
-		vTaskDelay(5000);
+		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_ALL, i - 1);
+		__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_ALL, i - 1);
+		i--;
+		if (i == 1)
+		{
+			i = 10000;
+		}
+		vTaskDelay(5);
 	}
 }
 
