@@ -12,7 +12,7 @@
 
 #define Debug 1 // 控制Debug的一些相关函数
 
-#define BOUND 115200 // 串口波特率
+#define BOUND 256000 // 串口波特率
 
 #define START_TASK_PRIO 1			 // 任务优先级
 #define START_STK_SIZE 128			 // 任务堆栈大小
@@ -113,16 +113,36 @@ void led_task(void *pvParameters)
 // 测试任务函数
 void test_task(void *pvParameters)
 {
-	u16 i = 10000;
+	u8 s = 0;
+	u16 i = 600;
 	while (1)
 	{
-		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_ALL, i - 1);
-		__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_ALL, i - 1);
-		i--;
-		if (i == 1)
+		switch (s)
 		{
-			i = 10000;
+		case 0:
+			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i-- - 1);
+			break;
+		case 1:
+			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, ++i - 1);
+			break;
+		case 2:
+			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i-- - 1);
+			break;
+		case 3:
+			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, ++i - 1);
+			break;
+		default:
+			s = 0;
+			break;
 		}
+
+		if (i == 0 || i == 600)
+		{
+			s++;
+			if (s > 3)
+				s = 0;
+		}
+
 		vTaskDelay(5);
 	}
 }

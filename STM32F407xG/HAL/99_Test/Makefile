@@ -40,6 +40,7 @@ Core/Src/main.c \
 Core/Src/gpio.c \
 Core/Src/dma.c \
 Core/Src/tim.c \
+Core/Src/encoder.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c \
@@ -82,6 +83,7 @@ FreeRTOS/Src/list.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 Hardware/LED/Src/led.c \
+Hardware/Car/Src/mecanum_wheel.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -149,6 +151,7 @@ C_INCLUDES =  \
 -IUser/Inc \
 -IUSMART/Inc \
 -IHardware/LED/Inc \
+-IHardware/Car/Inc \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

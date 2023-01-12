@@ -653,7 +653,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim_base)
 	else if (htim_base->Instance == TIM14)
 	{
 		__HAL_RCC_TIM14_CLK_ENABLE();
-		HAL_NVIC_SetPriority(TIM8_TRG_COM_TIM14_IRQn, 4, 0);
+		HAL_NVIC_SetPriority(TIM8_TRG_COM_TIM14_IRQn, 2, 0);
 		HAL_NVIC_EnableIRQ(TIM8_TRG_COM_TIM14_IRQn);
 	}
 }

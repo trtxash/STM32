@@ -279,7 +279,7 @@ u32 usmart_get_runtime(void)
 void usmart_init(u8 sysclk)
 {
 #if USMART_ENTIMX_SCAN == 1
-	USMARTTimer_FunInit(1000 - 1, (u32)sysclk / 2 * 100 - 1); // 定时器13初始化，周期100ms,注意,计数频率必须为10Khz,以和runtime单位(0.1ms)同步.
+	USMARTTimer_FunInit((u32)(sysclk * 1000 / 240 - 1), (u32)(sysclk / 2 * 100 - 1)); // 定时器13初始化，周期100ms,注意,计数频率必须为10Khz,以和runtime单位(0.1ms)同步.
 #endif
 	usmart_dev.sptype = 1; // 十六进制显示参数
 }
