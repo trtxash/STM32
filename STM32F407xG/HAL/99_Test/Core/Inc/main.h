@@ -43,6 +43,7 @@ extern "C"
 #include "task.h"
 
 #include "led.h"
+#include "key.h"
 #include "mecanum_wheel.h"
 
 #ifdef __cplusplus

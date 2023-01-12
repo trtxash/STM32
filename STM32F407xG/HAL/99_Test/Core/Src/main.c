@@ -58,6 +58,7 @@ int main(void)
 	Tim_Encoder_Init();
 	Tim_Motor_Init();
 	LED_Init();
+	KEY_Init();
 
 	printf("\r\n初始化完成\r\n");
 
@@ -117,30 +118,40 @@ void test_task(void *pvParameters)
 	u16 i = 600;
 	while (1)
 	{
-		switch (s)
+		if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0))
 		{
-		case 0:
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i-- - 1);
-			break;
-		case 1:
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, ++i - 1);
-			break;
-		case 2:
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i-- - 1);
-			break;
-		case 3:
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, ++i - 1);
-			break;
-		default:
 			s = 0;
-			break;
+			i = 600;
+			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1 - 1);
+			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 600 - 1);
 		}
-
-		if (i == 0 || i == 600)
+		else
 		{
-			s++;
-			if (s > 3)
+			switch (s)
+			{
+			case 0:
+				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i-- - 1);
+				break;
+			case 1:
+				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, ++i - 1);
+				break;
+			case 2:
+				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i-- - 1);
+				break;
+			case 3:
+				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, ++i - 1);
+				break;
+			default:
 				s = 0;
+				break;
+			}
+
+			if (i == 0 || i == 600)
+			{
+				s++;
+				if (s > 3)
+					s = 0;
+			}
 		}
 
 		vTaskDelay(5);

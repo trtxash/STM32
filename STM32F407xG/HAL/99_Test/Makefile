@@ -83,6 +83,7 @@ FreeRTOS/Src/list.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 Hardware/LED/Src/led.c \
+Hardware/Key/Src/key.c \
 Hardware/Car/Src/mecanum_wheel.c \
 
 # ASM sources
@@ -151,6 +152,7 @@ C_INCLUDES =  \
 -IUser/Inc \
 -IUSMART/Inc \
 -IHardware/LED/Inc \
+-IHardware/Key/Inc \
 -IHardware/Car/Inc \
 
 # compile gcc flags
