@@ -23,13 +23,6 @@
  */
 
 /**
- * 硬件
- * SPI最大17FPS
- * DMA
- * SPI,DMA下FPS不好测，估算 57FPS
- */
-
-/**
  * 软件模拟优点：波特率高，速度快，可移植性好
  *        缺点：占用管脚口，使用MCU资源多，不太稳定，编时序复杂
  * 硬件优缺点和软件模拟相反
@@ -42,7 +35,9 @@
 #include "oledfont.h"
 
 #if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
+
 static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布,与寻址方式初始化有关
+
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
 
 #if SPI1_DataSize == SPI_DATASIZE_8BIT
@@ -50,6 +45,11 @@ static u8 OLED_GRAM[OLED_HEIGHT][OLED_WIDTH * 2] = {0}; // OLED画布,与寻址�
 #elif SPI1_DataSize == SPI_DATASIZE_16BIT
 static u16 OLED_GRAM[OLED_HEIGHT][OLED_WIDTH] = {0}; // OLED画布,与寻址方式初始化有关
 #endif
+
+#elif _OLED_DRIVER_IC_TYPE == OLED_SH1106
+
+u8 OLED_GRAM[OLED_HEIGHT / 8][OLED_WIDTH] = {0}; // OLED画布,与寻址方式初始化有关
+u8 OLED_CMDbuf[OLED_HEIGHT / 8][3];
 
 #endif
 /* 相关选择-------------------------------------------------------------------------------------------------- */
@@ -76,7 +76,6 @@ void OLED_WR_CMD(u8 dat)
 	OledDrv_IICStop();
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
 	char i = 8;
-
 	OLED_DC_Clr();
 	OLED_CS_Clr();
 	while (i--)
@@ -134,7 +133,6 @@ void OLED_WR_DATA8(u8 dat)
 	OledDrv_IICStop();
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
 	char i = 8;
-
 	OLED_CS_Clr();
 	while (i--)
 	{
@@ -183,8 +181,10 @@ void OLED_WR_DATA16(u16 dat)
 void OLED_Refresh(void)
 {
 #if _OLED_DMA == OLED_DMA_DISABLE
+
 	u16 i, n;
 #if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
+
 	for (n = 0; n < OLED_WIDTH; n++)
 	{
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
@@ -195,13 +195,13 @@ void OLED_Refresh(void)
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
 		for (i = 0; i < OLED_HEIGHT / 8; i++)
 		{
-
 			OLED_WR_DATA8(OLED_GRAM[n][i]);
 		}
-
 #endif
 	}
+
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+
 	for (i = 0; i < OLED_HEIGHT; i++)
 	{
 		for (n = 0; n < OLED_WIDTH * 2; n++)
@@ -209,15 +209,38 @@ void OLED_Refresh(void)
 			OLED_WR_DATA8(OLED_GRAM[i][n]);
 		}
 	}
+
+#elif _OLED_DRIVER_IC_TYPE == OLED_SH1106
+	u8 j;
+	for (i = 0; i < OLED_HEIGHT / 8; i++)
+	{
+
+		for (j = 0; j < 3; j++)
+		{
+			OLED_WR_CMD(OLED_CMDbuf[i][j]);
+		}
+		OLED_WR_DATA8(0X00); // 屏幕第一列不显示，多写一列
+		for (n = 0; n < OLED_WIDTH; n++)
+		{
+			OLED_WR_DATA8(OLED_GRAM[i][n]);
+		}
+	}
+
 #endif
+
 #elif _OLED_DMA == OLED_DMA_ABLE
 
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
+
 	HAL_I2C_Mem_Write_DMA(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8);
+
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE
-	OLED_CS_Clr();																			// 选中
+
+	OLED_CS_Clr(); // 选中
 #if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
+
 	HAL_SPI_Transmit_DMA(&OLED_SPI_HandleTypeDef, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8); // DMA循环，运行一次就行
+
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
 
 #if SPI1_DataSize == SPI_DATASIZE_8BIT
@@ -253,10 +276,17 @@ void OLED_Refresh(void)
 void OLED_DisPlay_On(void)
 {
 #if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
+
 	OLED_WR_CMD(0x8D); // 电荷泵使能
 	OLED_WR_CMD(0x14); // 开启电荷泵
 	OLED_WR_CMD(0xAF); // 点亮屏幕
+
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+
+#elif _OLED_DRIVER_IC_TYPE == OLED_SH1106
+
+	OLED_WR_CMD(0xAF);
+
 #endif
 }
 
@@ -268,6 +298,11 @@ void OLED_DisPlay_Off(void)
 	OLED_WR_CMD(0x10); // 关闭电荷泵
 	OLED_WR_CMD(0xAE); // 关闭屏幕
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
+
+#elif _OLED_DRIVER_IC_TYPE == OLED_SH1106
+
+	OLED_WR_CMD(0xAE);
+
 #endif
 }
 
@@ -291,6 +326,7 @@ void OLED_Clear(void)
 void OLED_DrawPoint(u16 x, u8 y, u8 t, u16 color)
 {
 #if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
+
 	u8 i, m, n;
 	i = y / 8;
 	m = y % 8;
@@ -305,6 +341,7 @@ void OLED_DrawPoint(u16 x, u8 y, u8 t, u16 color)
 		OLED_GRAM[x][i] |= n;
 		OLED_GRAM[x][i] = ~OLED_GRAM[x][i];
 	}
+
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
 
 #if SPI1_DataSize == SPI_DATASIZE_8BIT
@@ -328,6 +365,23 @@ void OLED_DrawPoint(u16 x, u8 y, u8 t, u16 color)
 		OLED_GRAM[y][x] = BACKGROUND;
 	}
 #endif
+
+#elif _OLED_DRIVER_IC_TYPE == OLED_SH1106
+
+	u8 i, m, n;
+	i = y / 8;
+	m = y % 8;
+	n = 1 << m;
+	if (t)
+	{
+		OLED_GRAM[i][x] |= n;
+	}
+	else
+	{
+		OLED_GRAM[i][x] = ~OLED_GRAM[i][x];
+		OLED_GRAM[i][x] |= n;
+		OLED_GRAM[i][x] = ~OLED_GRAM[i][x];
+	}
 
 #endif
 }
@@ -891,7 +945,64 @@ void OLED_Init(void)
 					   // After entering this single byte command, data entries will be written into the display RAM until another
 					   // command is written. Address pointer is increased accordingly. This command must be sent before write data
 					   // into RAM.
-#endif
+#elif _OLED_DRIVER_IC_TYPE == OLED_SH1106
+	u8 i;
+	for (i = 0; i < OLED_HEIGHT / 8; i++)
+	{
+		OLED_CMDbuf[i][0] = 0x00;
+		OLED_CMDbuf[i][1] = 0x10;
+		OLED_CMDbuf[i][2] = 0xB0 + i;
+	}
+	OLED_WR_CMD(0xAE); // set display display ON/OFF,AFH/AEH
+					   // Turns on OLED panel (1) or turns off (0). (POR = AEH)
+	OLED_WR_CMD(0x00); // Sets 4 lower bits of column address of display RAM in register. (POR = 00H)
+	OLED_WR_CMD(0x10); // Sets 4 higher bits of column address of display RAM in register. (POR = 10H)
+	OLED_WR_CMD(0x40); // set display start line:COM0
+					   // Specifies RAM display line for COM0. (POR = 40H)
+	OLED_WR_CMD(0xB0); // Specifies page address to load display RAM data to page address register. (POR = B0H)
 
+	OLED_WR_CMD(0x81); // The Contrast Control Mode Set
+					   // This command is to set Contrast Setting of the display. The chip has 256 contrast steps from 00 to FF. (POR = 80H)
+	OLED_WR_CMD(0xFF); // Contrast Data Register Set
+
+	OLED_WR_CMD(0xA1); // Set Segment Re-map (ADC),The right (0) or left (1) rotation. (POR = A0H)
+	OLED_WR_CMD(0xA4); // Set Entire Display OFF/ON,Selects normal display (0) or Entire Display ON (1). (POR = A4H)
+					   // entire display on: A4H:OFF/A5H:ON
+	OLED_WR_CMD(0xA6); // Set Normal/Reverse Display,Normal indication (0) when low, but reverse indication (1) when high. (POR = A6H)
+					   // 设置反显
+
+	OLED_WR_CMD(0xA8); // set multiplex ratio
+					   // Multiplex Ration Mode Set
+					   // This command switches default 63 multiplex mode to any multiplex ratio from 1 to 64. (POR = 3FH)
+	OLED_WR_CMD(0x3F); // 1/64duty
+					   // Multiplex Ration Data Set
+
+	OLED_WR_CMD(0xC8); // 该指令控制显示方向显示方向0xc8或者0xc0
+					   // Set Common Output Scan Direction,Scan from COM0 to COM [N - 1] (0) or Scan from COM [N-1] to COM0 (1). (POR = C0H)
+
+	OLED_WR_CMD(0xD3); // Display Offset Mode Set
+					   // This is a double byte command which specifies the mapping of display start line to one of COM0-63. (POR = 00H)
+	OLED_WR_CMD(0x00); // Display Offset Data Set
+
+	OLED_WR_CMD(0xD5); // Set Display Divide Ratio/Oscillator Frequency Mode Set
+					   // This command is used to set the frequency of the internal display clocks. (POR = 50H)
+	OLED_WR_CMD(0x80); // Divide Ratio/Oscillator Frequency Data Set
+					   // 105Hz
+
+	OLED_WR_CMD(0xD9); // Dis-charge /Pre-charge Period Mode Set
+					   // This command is used to set the duration of the dis-charge and pre-charge period. (POR = 22H)
+	OLED_WR_CMD(0x11); // Dis-charge/Pre-charge Period Data Set
+
+	OLED_WR_CMD(0xDA); // Common Pads Hardware Configuration Mode Set
+					   // This command is to set the common signals pad configuration. (POR = 12H)
+	OLED_WR_CMD(0x12); // Sequential/Alternat ive Mode Set
+
+	OLED_WR_CMD(0xDB); // VCOM Deselect Level Mode Set
+					   // This command is to set the common pad output voltage level at deselect stage. (POR = 35H)
+	OLED_WR_CMD(0x40); // VCOM Deselect Level Data Set
+					   // VCOM = β X VREF = (0.430 + A[7:0] X 0.006415) X VREF
+
+	OLED_WR_CMD(0xAF);
+#endif
 	OLED_Refresh();
 }

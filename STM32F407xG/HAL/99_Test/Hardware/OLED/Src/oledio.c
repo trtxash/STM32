@@ -26,7 +26,8 @@ void OledDrv_Init(void)
   OLED_SCLK_Port_Clk_Enable();
   OLED_SDIN_Port_Clk_Enable();
 
-  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; // 推挽输出
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStructure.Pull = GPIO_PULLUP;
   GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStructure.Pin = OLED_RST_Pin;
   HAL_GPIO_Init(OLED_RST_Port, &GPIO_InitStructure);
@@ -64,13 +65,15 @@ void OledDrv_IICDelay(void)
  */
 void OledDrv_IICStart(void)
 {
+  OLED_SDA_OUT(); // SDA线 输出
   OLED_SDIN_Set();
+  OledDrv_IICDelay();
+  OledDrv_IICDelay();
   OLED_SCLK_Set();
   OledDrv_IICDelay();
-  OLED_SDIN_Clr();
+  OLED_SDIN_Clr(); // START:当SCL线处于高电平时,SDA线突然从高变低,发送起始信号
   OledDrv_IICDelay();
-  OLED_SCLK_Clr();
-  OledDrv_IICDelay();
+  OLED_SCLK_Clr(); // 钳住I2C总线，准备发送或接收数据
 }
 
 /**
@@ -79,26 +82,74 @@ void OledDrv_IICStart(void)
  */
 void OledDrv_IICStop(void)
 {
-  OLED_SDIN_Clr();
+  OLED_SDA_OUT(); // SDA线输出
   OLED_SCLK_Clr();
+  OLED_SDIN_Clr(); // STOP:当SCL线处于高电平时,SDA线突然从低变高,发送停止信号
   OledDrv_IICDelay();
-  OLED_SDIN_Set();
+  OLED_SCLK_Set();
+  OLED_SDIN_Set(); // 发送I2C总线结束信号
+  OledDrv_IICDelay();
 }
 
 /**
  * @brief      IIC 等待信号响应.
  * @retval     None.
  */
-void OledDrv_IICWaitAck(void)
+u8 OledDrv_IICWaitAck(void)
 {
+  u8 ucErrTime = 0;
+  // OLED_SDIN_Set();
+  OLED_SDA_IN(); // SDA设置为输入
+  OledDrv_IICDelay();
+  OledDrv_IICDelay();
+  OLED_SCLK_Set();
+  OledDrv_IICDelay();
+  while (OLED_READ_SDIN())
+  {
+    ucErrTime++;
+    if (ucErrTime > 250)
+    {
+      OledDrv_IICStop();
+      return 1;
+    }
+  }
+  OledDrv_IICDelay();
+  OLED_SCLK_Clr(); // 时钟输出0
+  return 0;
+}
+
+/**
+ * @brief      IIC产生应答信号
+ * @retval     None.
+ */
+void OledDrv_IICAck(void)
+{
+  OLED_SCLK_Clr();
+  OLED_SDA_OUT();
+  OledDrv_IICDelay();
+  OLED_SDIN_Clr();
+  OledDrv_IICDelay();
+  OLED_SCLK_Set();
+  OledDrv_IICDelay();
+  OledDrv_IICDelay();
+  OLED_SCLK_Clr();
+}
+
+/**
+ * @brief      IIC不产生应答信号
+ * @retval     None.
+ */
+void OledDrv_IICNAck(void)
+{
+  OLED_SCLK_Clr();
+  OLED_SDA_OUT();
+  OledDrv_IICDelay();
   OLED_SDIN_Set();
   OledDrv_IICDelay();
   OLED_SCLK_Set();
-  while (OLED_READ_SDIN()) // 等待应答信号
-  {
-  }
-  OLED_SCLK_Clr();
   OledDrv_IICDelay();
+  OledDrv_IICDelay();
+  OLED_SCLK_Clr();
 }
 
 /**
@@ -108,24 +159,51 @@ void OledDrv_IICWaitAck(void)
  */
 void OledDrv_IICSendByte(uint8_t data)
 {
-  u8 i;
-
-  for (i = 0; i < 8; i++)
+  u8 t;
+  OLED_SDA_OUT();
+  OLED_SCLK_Clr(); // 拉低时钟开始数据传输
+  for (t = 0; t < 8; t++)
   {
-    if (data & 0x80)
-    {
+    OledDrv_IICDelay();
+    if ((data & 0x80) >> 7)
       OLED_SDIN_Set();
-    }
     else
-    {
       OLED_SDIN_Clr();
-    }
+    data <<= 1;
     OledDrv_IICDelay();
     OLED_SCLK_Set();
     OledDrv_IICDelay();
+    OledDrv_IICDelay();
     OLED_SCLK_Clr();
-    data <<= 1;
   }
+}
+
+/**
+ * @brief      IIC 读以一个字节.
+ * @param[in]  ack 1,发送ACK   0,发送NACK.
+ * @retval     接收到的数据.
+ */
+u8 OledDrv_IICReadByte(u8 ack)
+{
+  u8 i, receive = 0;
+  OLED_SDA_IN(); // SDA设置为输入
+  for (i = 0; i < 8; i++)
+  {
+    OLED_SCLK_Clr();
+    OledDrv_IICDelay();
+    OledDrv_IICDelay();
+    OLED_SCLK_Set();
+    OledDrv_IICDelay();
+    receive <<= 1;
+    if (OLED_READ_SDIN())
+      receive++; // 如果读到了数据
+    OledDrv_IICDelay();
+  }
+  if (!ack)
+    OledDrv_IICNAck(); // 发送nACK
+  else
+    OledDrv_IICAck(); // 发送ACK
+  return receive;
 }
 
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信

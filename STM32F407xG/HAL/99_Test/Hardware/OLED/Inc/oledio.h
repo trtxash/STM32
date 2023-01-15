@@ -14,7 +14,7 @@
 #endif
 
 #if _SOFT_OR_HARE == OLED_SOFT // 是否软件模拟
-/* Exported constants ------------------------------------------------------------------------------------------------*/
+
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
 /*************************************************** OLED IIC 端口定义 ************************************************/
 #define OLED_SCLK_Port GPIOB
@@ -28,6 +28,18 @@
 #define OLED_RST_Port GPIOB
 #define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define OLED_RST_Pin GPIO_PIN_0
+
+// IO方向设置
+#define OLED_SDA_IN()                             \
+    {                                             \
+        OLED_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
+        OLED_SDIN_Port->MODER |= 0 << 7 * 2;      \
+    } // PB9输入模式，括号内数字为几号管脚
+#define OLED_SDA_OUT()                            \
+    {                                             \
+        OLED_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
+        OLED_SDIN_Port->MODER |= 1 << 7 * 2;      \
+    } // PB9输出模式，括号内数字为几号管脚
 
 #define OLED_SCLK_Clr() OLED_SCLK_Port->BSRR = (uint32_t)OLED_SCLK_Pin << 16U
 #define OLED_SCLK_Set() OLED_SCLK_Port->BSRR = OLED_SCLK_Pin
@@ -85,10 +97,13 @@ void OledDrv_Init(void);
 
 /* IIC 通信接口函数 ***************************************************************************************************/
 void OledDrv_IICDelay(void);
-void OledDrv_IICWaitAck(void);
 void OledDrv_IICStart(void);
 void OledDrv_IICStop(void);
+u8 OledDrv_IICWaitAck(void);
+void OledDrv_IICAck(void);
+void OledDrv_IICNAck(void);
 void OledDrv_IICSendByte(uint8_t data);
+u8 OledDrv_IICReadByte(u8 ack);
 
 #else // 硬件
 

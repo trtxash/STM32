@@ -34,16 +34,18 @@ extern "C"
 #include "usart.h"
 #include "valuepack.h"
 #include "usmart.h"
+#include "encoder_pid.h"
 
 #include "dma.h"
+#include "i2c.h"
 #include "tim.h"
-#include "encoder.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
 
 #include "led.h"
 #include "key.h"
+#include "oled.h"
 #include "mecanum_wheel.h"
 
 #ifdef __cplusplus

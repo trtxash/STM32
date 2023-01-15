@@ -40,27 +40,31 @@ extern uint32_t SystemCoreClock;
  */
 int main(void)
 {
+	u8 temp[21] = {0};
+
 	if (HAL_Init()) // 初始化HAL库
 	{
 		Error_Handler();
 	}
-	Stm32_Clock_Init(240, 4U, 2U, 4U); // 初始化时钟
-
+	Stm32_Clock_Init(240, 4U, 2U, 4U);	   // 初始化时钟
 	MX_DMA_Init();						   // 要先初始化DMA
 	delay_init(SystemCoreClock / 1000000); // 初始化延时函数
 	uart_init(BOUND);					   // 初始化串口
 
 	printf("\r\n初始化中...\r\n");
-
+	// MX_I2C1_Init();
 	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
 	Tim_ConfigureTimerForTask();				// 定时任务，定时器14初始化，周期1ms
 	Tim_Encoder_Init();
 	Tim_Motor_Init();
-	LED_Init();
-	KEY_Init();
-
+	LED0_Init();
+	LED1_Init();
+	KEY0_Init();
+	OLED_Init();
 	printf("\r\n初始化完成\r\n");
+	sprintf(temp, "OK!");
+	OLED_ShowString(0, 0, temp, 8, 1, WHITE);
 
 	// 创建开始任务
 	xTaskCreate((TaskFunction_t)start_task,			 // 任务函数
@@ -102,7 +106,7 @@ void led_task(void *pvParameters)
 	{
 		i++;
 		LED0_Reverse();
-		if (i == 2)
+		if (i >= 2)
 		{
 			i = 0;
 			LED1_Reverse();
@@ -116,9 +120,31 @@ void test_task(void *pvParameters)
 {
 	u8 s = 0;
 	u16 i = 600;
+	u8 temp[21] = {0};
 	while (1)
 	{
-		if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0))
+		if (Encoder_1 < 0)
+			sprintf(temp, "-%d", Encoder_1);
+		else
+			sprintf(temp, "+%d", Encoder_1);
+		OLED_ShowString(0, 8, temp, 8, 1, WHITE);
+		if (Encoder_2 < 0)
+			sprintf(temp, "-%d", Encoder_2);
+		else
+			sprintf(temp, "+%d", Encoder_2);
+		OLED_ShowString(0, 16, temp, 8, 1, WHITE);
+		if (Encoder_3 < 0)
+			sprintf(temp, "-%d", Encoder_3);
+		else
+			sprintf(temp, "+%d", Encoder_3);
+		OLED_ShowString(0, 24, temp, 8, 1, WHITE);
+		if (Encoder_4 < 0)
+			sprintf(temp, "-%d", Encoder_4);
+		else
+			sprintf(temp, "+%d", Encoder_4);
+		OLED_ShowString(0, 32, temp, 8, 1, WHITE);
+
+		if (KEY0_READ())
 		{
 			s = 0;
 			i = 600;
@@ -154,7 +180,7 @@ void test_task(void *pvParameters)
 			}
 		}
 
-		vTaskDelay(5);
+		vTaskDelay(10);
 	}
 }
 

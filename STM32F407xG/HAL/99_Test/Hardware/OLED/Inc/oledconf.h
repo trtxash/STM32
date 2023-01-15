@@ -14,6 +14,7 @@
 /* OLED 设备IC定义 */
 #define OLED_SSD1306_SSD1315 0 // 设备IC为1306或1315，我的设备是单色
 #define OLED_SSD1351 1         // 设备IC为1351，我的设备是RGB
+#define OLED_SH1106 2          // 设备IC为1306或1315，我的设备是单色
 
 /* OLED 驱动接口定义 */
 #define OLED_SOFT 0 // 软件模拟通信
@@ -35,18 +36,19 @@
 #define OLED_SPI_HandleTypeDef hspi1 // SPI句柄选择
 
 /* OLED 具体选择------------------------------------------------------------------------- */
-#define _OLED_DRIVER_IC_TYPE OLED_SSD1306_SSD1315 // 改SSD种类
-#define _SOFT_OR_HARE OLED_SOFT                   // 改是否软件模拟
-#define _DRIVE_INTERFACE_TYPE OLED_IIC_INTERFACE  // 改接口类型
-#define _OLED_DMA OLED_DMA_DISABLE                // 改是否开启DMA
-#define _OLED_RGB_COLOR_DEPTH K65                 // RGB颜色深度选择
+#define _OLED_DRIVER_IC_TYPE OLED_SH1106         // 改SSD种类
+#define _SOFT_OR_HARE OLED_SOFT                  // 改是否软件模拟
+#define _DRIVE_INTERFACE_TYPE OLED_IIC_INTERFACE // 改接口类型
+#define _OLED_DMA OLED_DMA_DISABLE               // 改是否开启DMA
+#define _OLED_RGB_COLOR_DEPTH K65                // RGB颜色深度选择
 
 /* OLED 的通信地址 */
 #define OLED_ADDRESS 0x78
+#define OLED_RAM_ADDRESS 0x00 // 暂时未用到
 
 /* OLED 的宽度和高度 */
 #define OLED_WIDTH 128
-#define OLED_HEIGHT 128
+#define OLED_HEIGHT 64
 
 /* OLED 软件IIC延时时间 */
 #define OledDrv_IICDelay_Time 0

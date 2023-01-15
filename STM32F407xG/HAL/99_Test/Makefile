@@ -39,6 +39,7 @@ C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/gpio.c \
 Core/Src/dma.c \
+Core/Src/i2c.c \
 Core/Src/tim.c \
 Core/Src/encoder.c \
 Core/Src/stm32f4xx_it.c \
@@ -71,6 +72,7 @@ User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
 User/Src/valuepack.c \
+User/Src/encoder_pid.c \
 USMART/Src/usmart_config.c \
 USMART/Src/usmart_str.c \
 USMART/Src/usmart.c \
@@ -84,6 +86,8 @@ RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 Hardware/LED/Src/led.c \
 Hardware/Key/Src/key.c \
+Hardware/OLED/Src/oled.c \
+Hardware/OLED/Src/oledio.c \
 Hardware/Car/Src/mecanum_wheel.c \
 
 # ASM sources
@@ -153,6 +157,7 @@ C_INCLUDES =  \
 -IUSMART/Inc \
 -IHardware/LED/Inc \
 -IHardware/Key/Inc \
+-IHardware/OLED/Inc \
 -IHardware/Car/Inc \
 
 # compile gcc flags

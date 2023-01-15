@@ -2,24 +2,23 @@
 #define _KEY_H
 #include "sys.h"
 
-// 下面的方式是通过位带操作方式读取IO
-// #define KEY0        PHin(3) //KEY0按键PH3
-// #define KEY1        PHin(2) //KEY1按键PH2
-// #define KEY2        PCin(13)//KEY2按键PC13
-// #define WK_UP       PAin(0) //WKUP按键PA0
+/* KEY GPIO */
+#define KEY0_Port GPIOE
+#define KEY1_Port GPIOE
 
-// 下面的方式是通过直接操作HAL库函数方式读取IO
-//  #define KEY0        HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4)  //KEY0按键PE4
-//  #define KEY1        HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_3)  //KEY1按键PE3
-//  #define KEY2        HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2) 	//KEY2按键PE2
-#define WK_UP HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) // WKUP按键PA0
+/* KEY CLK */
+#define KEY0_Port_CLK_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
+#define KEY1_Port_CLK_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
 
-// #define KEY0_PRES 	1
-// #define KEY1_PRES	2
-// #define KEY2_PRES	3
-// #define WKUP_PRES    4
+/* KEY PIN */
+#define KEY0_PIN GPIO_PIN_2
+#define KEY1_PIN GPIO_PIN_3
 
-void KEY_Init(void);
-u8 KEY_Scan(u8 mode);
+/* KEY 操作 */
+#define KEY0_READ() KEY0_Port->IDR &KEY0_PIN // 0 or 1
+#define KEY1_READ() KEY1_Port->IDR &KEY1_PIN // 0 or 1
+
+void KEY0_Init(void);
+void KEY1_Init(void);
 
 #endif

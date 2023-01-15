@@ -28,7 +28,8 @@
 #define LED1_Clr() LED1_GPIO->BSRR = (uint32_t)LED1_PIN << 16U
 #define LED1_Set() LED1_GPIO->BSRR = LED1_PIN
 
-void LED_Init(void);
+void LED0_Init(void);
+void LED1_Init(void);
 void LED0_Reverse(void);
 void LED1_Reverse(void);
 
