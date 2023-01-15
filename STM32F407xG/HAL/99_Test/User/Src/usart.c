@@ -123,17 +123,17 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 		/* USART6 clock enable */
 		__HAL_RCC_USART6_CLK_ENABLE();
 
-		__HAL_RCC_GPIOC_CLK_ENABLE();
+		__HAL_RCC_GPIOG_CLK_ENABLE();
 		/**USART6 GPIO Configuration
-		PC6     ------> USART6_TX
-		PC7     ------> USART6_RX
+		PG9     ------> USART6_RX
+		PG14     ------> USART6_TX
 		*/
-		GPIO_Initure.Pin = GPIO_PIN_6 | GPIO_PIN_7;
+		GPIO_Initure.Pin = GPIO_PIN_9 | GPIO_PIN_14;
 		GPIO_Initure.Mode = GPIO_MODE_AF_PP;
 		GPIO_Initure.Pull = GPIO_NOPULL;
 		GPIO_Initure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 		GPIO_Initure.Alternate = GPIO_AF8_USART6;
-		HAL_GPIO_Init(GPIOC, &GPIO_Initure);
+		HAL_GPIO_Init(GPIOG, &GPIO_Initure);
 
 		/* USART6 DMA Init */
 		/* USART6_TX Init */
