@@ -12,10 +12,7 @@ short pwmval_1;             // 定时器PWM占空比设置
 short pwmval_2;             // 定时器PWM占空比设置
 short pwmval_3;             // 定时器PWM占空比设置
 short pwmval_4;             // 定时器PWM占空比设置
-short Encoder_1;            // 当前1速度
-short Encoder_2;            // 当前2速度
-short Encoder_3;            // 当前3速度
-short Encoder_4;            // 当前4速度
+short Encoder[Encoder_NUM]; // 当前编码器速度
 short Encoder_target_1 = 0; // 目标速度
 short Encoder_target_2 = 0; // 目标速度
 short Encoder_target_3 = 0; // 目标速度

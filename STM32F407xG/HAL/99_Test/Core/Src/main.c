@@ -53,15 +53,15 @@ int main(void)
 
 	printf("\r\n初始化中...\r\n");
 	// MX_I2C1_Init();
-	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
-	Tim_ConfigureTimerForTask();				// 定时任务，定时器14初始化，周期1ms
+	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	Tim_Encoder_Init();
 	Tim_Motor_Init();
 	LED0_Init();
 	LED1_Init();
 	KEY0_Init();
 	OLED_Init();
+	Tim_ConfigureTimerForTask(); // 定时任务，定时器14初始化，周期1ms,最后初始化
 	printf("\r\n初始化完成\r\n");
 	sprintf(temp, "OK!");
 	OLED_ShowString(0, 0, temp, 8, 1, WHITE);
@@ -119,40 +119,23 @@ void led_task(void *pvParameters)
 void test_task(void *pvParameters)
 {
 	u8 s = 0;
+	u8 j;
 	u16 i = 600;
 	u8 temp[21] = {0};
 	while (1)
 	{
-		if (Encoder_1 < 0)
-			sprintf(temp, "-%d", Encoder_1);
-		else
-			sprintf(temp, "+%d", Encoder_1);
-		OLED_ShowString(0, 8, temp, 8, 1, WHITE);
-		if (Encoder_2 < 0)
-			sprintf(temp, "-%d", Encoder_2);
-		else
-			sprintf(temp, "+%d", Encoder_2);
-		OLED_ShowString(0, 16, temp, 8, 1, WHITE);
-		if (Encoder_3 < 0)
-			sprintf(temp, "-%d", Encoder_3);
-		else
-			sprintf(temp, "+%d", Encoder_3);
-		OLED_ShowString(0, 24, temp, 8, 1, WHITE);
-		if (Encoder_4 < 0)
-			sprintf(temp, "-%d", Encoder_4);
-		else
-			sprintf(temp, "+%d", Encoder_4);
-		OLED_ShowString(0, 32, temp, 8, 1, WHITE);
+		for (j = 0; j < 4; j++)
+		{
+			if (Encoder[j] < 0)
+				sprintf(temp, "-%5d", -Encoder[j]);
+			else
+				sprintf(temp, "+%5d", Encoder[j]);
+			OLED_ShowString(0, 8 * (j + 1), temp, 8, 1, WHITE);
+		}
 
 		if (KEY0_READ())
 		{
-			s = 0;
-			i = 600;
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1 - 1);
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 600 - 1);
-		}
-		else
-		{
+
 			switch (s)
 			{
 			case 0:
@@ -178,6 +161,13 @@ void test_task(void *pvParameters)
 				if (s > 3)
 					s = 0;
 			}
+		}
+		else
+		{
+			s = 0;
+			i = 600;
+			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1 - 1);
+			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 600 - 1);
 		}
 
 		vTaskDelay(10);

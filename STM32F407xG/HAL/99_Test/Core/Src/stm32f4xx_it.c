@@ -57,6 +57,7 @@
 /* External variables --------------------------------------------------------*/
 /* USER CODE BEGIN EV */
 // extern DMA_HandleTypeDef hdma_tim4_ch1;
+// extern DMA_HandleTypeDef hdma_i2c1_tx;
 extern DMA_HandleTypeDef hdma_usart6_tx;
 extern DMA_HandleTypeDef hdma_usart6_rx;
 /* USER CODE END EV */
@@ -376,7 +377,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		u8 i;
 
 		x1ms++;
-		printf("Encoder=%d\r\n", Read_Encoder(2));
+		/* 每毫秒读取编码器数值 */
+		for (i = 0; i < 4; i++)
+		{
+			Encoder[i] = Read_Encoder(2 + i);
+		}
 
 		if (x1ms % 10 == 0) // 10ms
 		{
@@ -384,6 +389,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 			if (x1ms % 100 == 0) // 100ms
 			{
+				OLED_Refresh();
+
 				if (x1ms % 1000 == 0) // 1000ms
 				{
 					// for (i = 2; i < 6; i++)
@@ -460,6 +467,34 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 // 	/* USER CODE END DMA1_Stream0_IRQn 1 */
 // }
 
+// /**
+//  * @brief This function handles DMA1 stream5 global interrupt.
+//  */
+// void DMA1_Stream5_IRQHandler(void)
+// {
+// 	/* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
+
+// 	/* USER CODE END DMA1_Stream5_IRQn 0 */
+// 	HAL_DMA_IRQHandler(&hdma_dac1);
+// 	/* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
+
+// 	/* USER CODE END DMA1_Stream5_IRQn 1 */
+// }
+
+// /**
+//  * @brief This function handles DMA1 stream6 global interrupt.
+//  */
+// void DMA1_Stream6_IRQHandler(void)
+// {
+// 	/* USER CODE BEGIN DMA2_Stream6_IRQn 0 */
+
+// 	/* USER CODE END DMA2_Stream6_IRQn 0 */
+// 	HAL_DMA_IRQHandler(&hdma_i2c1_tx);
+// 	/* USER CODE BEGIN DMA2_Stream6_IRQn 1 */
+
+// 	/* USER CODE END DMA2_Stream6_IRQn 1 */
+// }
+
 /**
  * @brief This function handles DMA2 stream1 global interrupt.
  */
@@ -488,19 +523,17 @@ void DMA2_Stream6_IRQHandler(void)
 	/* USER CODE END DMA2_Stream6_IRQn 1 */
 }
 
-// /**
-//  * @brief This function handles DMA1 stream5 global interrupt.
-//  */
-// void DMA1_Stream5_IRQHandler(void)
-// {
-// 	/* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
+/**
+ * @brief	HAL_I2C_Mem_Write_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,uint16_t MemAddSize, uint8_t *pData, uint16_t Size)完成回调函数
+ * 			保证DMA传输完成后，开启下次DMA
+ */
+void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+}
 
-// 	/* USER CODE END DMA1_Stream5_IRQn 0 */
-// 	HAL_DMA_IRQHandler(&hdma_dac1);
-// 	/* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
-
-// 	/* USER CODE END DMA1_Stream5_IRQn 1 */
-// }
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+}
 
 /* USER CODE BEGIN 1 */
 

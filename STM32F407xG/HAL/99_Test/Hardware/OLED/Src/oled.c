@@ -2,10 +2,11 @@
  * @file	oled.c
  * @brief 	OLED相关驱动
  *          这是相关API
+ * 			实现1.SSD1306/SSD1315-全通信实现。2.SSD1351-SPI通信实现。3.SH1106-软件I2C实现 -- V1.5
  * @author 	TRTX-gamer       https://github.com/TRTX-gamer;
  *          突然吐血    https://space.bilibili.com/12890038;
- * @version 1.4
- * @date 	2022年11月6号13点36分
+ * @version 1.5
+ * @date 	2023年1月15号20点02分
  */
 
 /**
@@ -48,8 +49,8 @@ static u16 OLED_GRAM[OLED_HEIGHT][OLED_WIDTH] = {0}; // OLED画布,与寻址方�
 
 #elif _OLED_DRIVER_IC_TYPE == OLED_SH1106
 
-u8 OLED_GRAM[OLED_HEIGHT / 8][OLED_WIDTH] = {0}; // OLED画布,与寻址方式初始化有关
-u8 OLED_CMDbuf[OLED_HEIGHT / 8][3];
+static u8 OLED_GRAM[OLED_HEIGHT / 8][OLED_WIDTH] = {0}; // OLED画布,与寻址方式初始化有关
+static u8 OLED_CMDbuf[OLED_HEIGHT / 8][3] = {0};
 
 #endif
 /* 相关选择-------------------------------------------------------------------------------------------------- */
@@ -986,7 +987,7 @@ void OLED_Init(void)
 
 	OLED_WR_CMD(0xD5); // Set Display Divide Ratio/Oscillator Frequency Mode Set
 					   // This command is used to set the frequency of the internal display clocks. (POR = 50H)
-	OLED_WR_CMD(0x80); // Divide Ratio/Oscillator Frequency Data Set
+	OLED_WR_CMD(0xF0); // Divide Ratio/Oscillator Frequency Data Set
 					   // 105Hz
 
 	OLED_WR_CMD(0xD9); // Dis-charge /Pre-charge Period Mode Set

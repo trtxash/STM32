@@ -37,7 +37,6 @@ extern "C"
 #include "encoder_pid.h"
 
 #include "dma.h"
-#include "i2c.h"
 #include "tim.h"
 
 #include "FreeRTOS.h"

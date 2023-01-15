@@ -4,10 +4,9 @@
 #include "sys.h"
 #include "encoder.h"
 
-extern short Encoder_1;            // 当前1速度
-extern short Encoder_2;            // 当前2速度
-extern short Encoder_3;            // 当前3速度
-extern short Encoder_4;            // 当前4速度
+#define Encoder_NUM 4 // 编码器数量
+
+extern short Encoder[Encoder_NUM]; // 当前编码器速度
 
 short Velocity_FeedbackControl_1(float TargetVelocity, float CurrentVelocity);
 short Velocity_FeedbackControl_2(float TargetVelocity, float CurrentVelocity);

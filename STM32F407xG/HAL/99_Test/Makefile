@@ -39,7 +39,6 @@ C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/gpio.c \
 Core/Src/dma.c \
-Core/Src/i2c.c \
 Core/Src/tim.c \
 Core/Src/encoder.c \
 Core/Src/stm32f4xx_it.c \
