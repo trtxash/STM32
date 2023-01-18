@@ -5,23 +5,24 @@
  *          顺序为，句柄，定时器初始化，定时器PWM初始化，定时器底层驱动，定时器PWM底层驱动，定时器PWM占空比设置，中断服务，中断回调函数
  *          中断服务函数名可在 “startup_stm32f40_41xxx.s”文件中找到
  *          中断定义在stm32f4xx_it.c中
- * 			FreeRTOS任务计时用了Tim11，USMART用了TIM13，定时任务用了TIM14
+ * 			USMART用了TIM6，定时任务用了TIM17,FreeRTOS任务计时用了Tim14
  * @author 	TRTX-gamer
- * @version 1.00
- * @date 	2022年11月17号12点50分
+ * @version 1.05
+ * @date 	2023年1月19号23点42分
  */
 #include "tim.h"
 
-TIM_HandleTypeDef htim1;  // 4通道PWM
-TIM_HandleTypeDef htim2;  // 编码器0
-TIM_HandleTypeDef htim3;  // 编码器1
-TIM_HandleTypeDef htim4;  // 编码器2
-TIM_HandleTypeDef htim5;  // 编码器3
-TIM_HandleTypeDef htim7;  // DAC触发
-TIM_HandleTypeDef htim8;  // 4通道PWM
-TIM_HandleTypeDef htim11; // FreeRTOS任务计时
-TIM_HandleTypeDef htim13; // USMART
-TIM_HandleTypeDef htim14; // 定时任务
+TIM_HandleTypeDef htim1; // 4通道PWM
+TIM_HandleTypeDef htim2; // 编码器0
+TIM_HandleTypeDef htim3; // 编码器1
+TIM_HandleTypeDef htim4; // 编码器2
+TIM_HandleTypeDef htim5; // 编码器3
+TIM_HandleTypeDef htim6; // USMART
+TIM_HandleTypeDef htim7; // 定时任务
+TIM_HandleTypeDef htim8; // 4通道PWM
+TIM_HandleTypeDef htim11;
+TIM_HandleTypeDef htim13;
+TIM_HandleTypeDef htim14; // FreeRTOS任务计时C
 
 volatile unsigned long long FreeRTOSRunTimeTicks; // 易变量，FreeRTOS运行计时
 
@@ -386,10 +387,54 @@ void MX_TIM5_Init(u32 arr, u16 psc, u16 fil)
 // }
 
 /**
- * @brief   TIM7 Initialization Function
- * @note    !!!用作了DAC触发器!!!，
+ * @brief   TIM6 Initialization Function
+ * @note    !!!用作了USMART计时定时器!!!，
  *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
- * @param   None
+ * @param 	arr-Period
+ * 			psc-Prescaler
+ * @retval  None
+ */
+void MX_TIM6_Init(u16 arr, u16 psc)
+{
+
+	/* USER CODE BEGIN TIM6_Init 0 */
+
+	/* USER CODE END TIM6_Init 0 */
+
+	TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+	/* USER CODE BEGIN TIM6_Init 1 */
+
+	/* USER CODE END TIM6_Init 1 */
+	htim6.Instance = TIM6;
+	htim6.Init.Prescaler = psc;
+	htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim6.Init.Period = arr;
+	htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+	if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	/* USER CODE BEGIN TIM6_Init 2 */
+	if (HAL_TIM_Base_Start_IT(&htim6) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	/* USER CODE END TIM6_Init 2 */
+}
+
+/**
+ * @brief   TIM7 Initialization Function
+ * @note    !!!用作了  !!!，
+ *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+ * @param 	arr-Period
+ * 			psc-Prescaler
  * @retval  None
  */
 void MX_TIM7_Init(u16 arr, u16 psc)
@@ -413,17 +458,59 @@ void MX_TIM7_Init(u16 arr, u16 psc)
 	{
 		Error_Handler();
 	}
-	sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
 	if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
 	{
 		Error_Handler();
 	}
 	/* USER CODE BEGIN TIM7_Init 2 */
-
+	if (HAL_TIM_Base_Start_IT(&htim7) != HAL_OK)
+	{
+		Error_Handler();
+	}
 	/* USER CODE END TIM7_Init 2 */
-	HAL_TIM_Base_Start(&htim7);
 }
+
+// /**
+//  * @brief   TIM7 Initialization Function
+//  * @note    !!!用作了DAC触发器!!!，
+//  *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+//  * @param   None
+//  * @retval  None
+//  */
+// void MX_TIM7_Init(u16 arr, u16 psc)
+// {
+
+// 	/* USER CODE BEGIN TIM7_Init 0 */
+
+// 	/* USER CODE END TIM7_Init 0 */
+
+// 	TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+// 	/* USER CODE BEGIN TIM7_Init 1 */
+
+// 	/* USER CODE END TIM7_Init 1 */
+// 	htim7.Instance = TIM7;
+// 	htim7.Init.Prescaler = psc;
+// 	htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
+// 	htim7.Init.Period = arr;
+// 	htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+// 	if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
+// 	{
+// 		Error_Handler();
+// 	}
+// 	sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+// 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+// 	if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
+// 	{
+// 		Error_Handler();
+// 	}
+// 	/* USER CODE BEGIN TIM7_Init 2 */
+
+// 	/* USER CODE END TIM7_Init 2 */
+// 	HAL_TIM_Base_Start(&htim7);
+// }
 
 /**
  * @brief	TIM8 Initialization Function
@@ -603,58 +690,117 @@ void MX_TIM14_Init(u16 arr, u16 psc)
 /**
  * @brief TIM_Base MSP Initialization
  * This function configures the hardware resources used in this example
- * @param htim_base: TIM_Base handle pointer
+ * @param tim_baseHandle: TIM_Base handle pointer
  * @retval None
  */
-void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim_base)
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle)
 {
-	if (htim_base->Instance == TIM1)
+	if (tim_baseHandle->Instance == TIM1)
 	{
+		/* USER CODE BEGIN TIM1_MspInit 0 */
+
+		/* USER CODE END TIM1_MspInit 0 */
+		/* TIM1 clock enable */
 		__HAL_RCC_TIM1_CLK_ENABLE();
+		/* USER CODE BEGIN TIM1_MspInit 1 */
+
+		/* USER CODE END TIM1_MspInit 1 */
 	}
-	else if (htim_base->Instance == TIM2)
+	else if (tim_baseHandle->Instance == TIM2)
 	{
 		__HAL_RCC_TIM2_CLK_ENABLE();
 	}
-	else if (htim_base->Instance == TIM3)
+	else if (tim_baseHandle->Instance == TIM3)
 	{
 		__HAL_RCC_TIM3_CLK_ENABLE();
 	}
-	else if (htim_base->Instance == TIM4)
+	else if (tim_baseHandle->Instance == TIM4)
 	{
 		__HAL_RCC_TIM4_CLK_ENABLE();
 	}
-	else if (htim_base->Instance == TIM5)
+	else if (tim_baseHandle->Instance == TIM5)
 	{
 		__HAL_RCC_TIM5_CLK_ENABLE();
 	}
-	else if (htim_base->Instance == TIM7)
+	else if (tim_baseHandle->Instance == TIM6)
 	{
+		/* USER CODE BEGIN TIM6_MspInit 0 */
+
+		/* USER CODE END TIM6_MspInit 0 */
+		/* TIM6 clock enable */
+		__HAL_RCC_TIM6_CLK_ENABLE();
+
+		/* TIM6 interrupt Init */
+		HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 3, 0);
+		HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
+		/* USER CODE BEGIN TIM6_MspInit 1 */
+
+		/* USER CODE END TIM6_MspInit 1 */
+	}
+	else if (tim_baseHandle->Instance == TIM7)
+	{
+		/* USER CODE BEGIN TIM7_MspInit 0 */
+
+		/* USER CODE END TIM7_MspInit 0 */
+		/* TIM7 clock enable */
 		__HAL_RCC_TIM7_CLK_ENABLE();
-		HAL_NVIC_SetPriority(TIM5_IRQn, 3, 0);
-		HAL_NVIC_EnableIRQ(TIM5_IRQn);
+
+		/* TIM7 interrupt Init */
+		HAL_NVIC_SetPriority(TIM7_IRQn, 0, 0);
+		HAL_NVIC_EnableIRQ(TIM7_IRQn);
+		/* USER CODE BEGIN TIM7_MspInit 1 */
+
+		/* USER CODE END TIM7_MspInit 1 */
 	}
-	else if (htim_base->Instance == TIM8)
+	else if (tim_baseHandle->Instance == TIM8)
 	{
+		/* USER CODE BEGIN TIM8_MspInit 0 */
+
+		/* USER CODE END TIM8_MspInit 0 */
+		/* TIM8 clock enable */
 		__HAL_RCC_TIM8_CLK_ENABLE();
+		/* USER CODE BEGIN TIM8_MspInit 1 */
+
+		/* USER CODE END TIM8_MspInit 1 */
 	}
-	else if (htim_base->Instance == TIM11)
+	else if (tim_baseHandle->Instance == TIM11)
 	{
+		/* USER CODE BEGIN TIM11_MspInit 0 */
+
+		/* USER CODE END TIM11_MspInit 0 */
+		/* TIM11 clock enable */
 		__HAL_RCC_TIM11_CLK_ENABLE();
 		HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn, 4, 0);
 		HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
+		/* USER CODE BEGIN TIM11_MspInit 1 */
+
+		/* USER CODE END TIM11_MspInit 1 */
 	}
-	else if (htim_base->Instance == TIM13)
+	else if (tim_baseHandle->Instance == TIM13)
 	{
+		/* USER CODE BEGIN TIM13_MspInit 0 */
+
+		/* USER CODE END TIM13_MspInit 0 */
+		/* TIM11 clock enable */
 		__HAL_RCC_TIM13_CLK_ENABLE();
 		HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 4, 0);
 		HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
+		/* USER CODE BEGIN TIM13_MspInit 1 */
+
+		/* USER CODE END TIM13_MspInit 1 */
 	}
-	else if (htim_base->Instance == TIM14)
+	else if (tim_baseHandle->Instance == TIM14)
 	{
+		/* USER CODE BEGIN TIM14_MspInit 0 */
+
+		/* USER CODE END TIM14_MspInit 0 */
+		/* TIM11 clock enable */
 		__HAL_RCC_TIM14_CLK_ENABLE();
-		HAL_NVIC_SetPriority(TIM8_TRG_COM_TIM14_IRQn, 2, 0);
+		HAL_NVIC_SetPriority(TIM8_TRG_COM_TIM14_IRQn, 4, 0);
 		HAL_NVIC_EnableIRQ(TIM8_TRG_COM_TIM14_IRQn);
+		/* USER CODE BEGIN TIM14_MspInit 1 */
+
+		/* USER CODE END TIM14_MspInit 1 */
 	}
 }
 
@@ -839,6 +985,34 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *tim_baseHandle)
 
 		/* USER CODE END TIM1_MspDeInit 1 */
 	}
+	else if (tim_baseHandle->Instance == TIM6)
+	{
+		/* USER CODE BEGIN TIM6_MspDeInit 0 */
+
+		/* USER CODE END TIM6_MspDeInit 0 */
+		/* Peripheral clock disable */
+		__HAL_RCC_TIM6_CLK_DISABLE();
+
+		/* TIM6 interrupt Deinit */
+		HAL_NVIC_DisableIRQ(TIM6_DAC_IRQn);
+		/* USER CODE BEGIN TIM6_MspDeInit 1 */
+
+		/* USER CODE END TIM6_MspDeInit 1 */
+	}
+	else if (tim_baseHandle->Instance == TIM7)
+	{
+		/* USER CODE BEGIN TIM7_MspDeInit 0 */
+
+		/* USER CODE END TIM7_MspDeInit 0 */
+		/* Peripheral clock disable */
+		__HAL_RCC_TIM7_CLK_DISABLE();
+
+		/* TIM7 interrupt Deinit */
+		HAL_NVIC_DisableIRQ(TIM7_IRQn);
+		/* USER CODE BEGIN TIM7_MspDeInit 1 */
+
+		/* USER CODE END TIM7_MspDeInit 1 */
+	}
 	else if (tim_baseHandle->Instance == TIM8)
 	{
 		/* USER CODE BEGIN TIM8_MspDeInit 0 */
@@ -849,6 +1023,17 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *tim_baseHandle)
 		/* USER CODE BEGIN TIM8_MspDeInit 1 */
 
 		/* USER CODE END TIM8_MspDeInit 1 */
+	}
+	else if (tim_baseHandle->Instance == TIM11)
+	{
+		/* USER CODE BEGIN TIM11_MspDeInit 0 */
+
+		/* USER CODE END TIM11_MspDeInit 0 */
+		/* Peripheral clock disable */
+		__HAL_RCC_TIM11_CLK_DISABLE();
+		/* USER CODE BEGIN TIM11_MspDeInit 1 */
+
+		/* USER CODE END TIM11_MspDeInit 1 */
 	}
 }
 
@@ -940,7 +1125,7 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef *tim_encoderHandle)
 void ConfigureTimerForTimeStats(void)
 {
 	FreeRTOSRunTimeTicks = 0;
-	MX_TIM11_Init(50 - 1, (u16)(SystemCoreClock / 1000000 / 2 - 1)); // 定时器11初始化，120分频，计数50，为20KHz
+	MX_TIM14_Init(50 - 1, (u16)(SystemCoreClock / 1000000 / 2 - 1)); // 定时器14初始化，120分频，计数50，为20KHz
 }
 
 /**
@@ -951,5 +1136,5 @@ void ConfigureTimerForTimeStats(void)
  */
 void Tim_ConfigureTimerForTask(void)
 {
-	MX_TIM14_Init(100 - 1, (u16)(SystemCoreClock / 100000 / 2 - 1)); // 定时器14初始化，周期1ms
+	MX_TIM7_Init(100 - 1, (u16)(SystemCoreClock / 100000 / 2 - 1)); // 定时器7初始化，周期1ms
 }

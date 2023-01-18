@@ -94,8 +94,8 @@
 #define SP_TYPE_DEC 0 // 10进制参数显示
 #define SP_TYPE_HEX 1 // 16进制参数显示
 
-#define USMARTTimer_HandleTypeDef htim13
-#define USMARTTimer_FunInit MX_TIM13_Init
+#define USMARTTimer_HandleTypeDef htim6
+#define USMARTTimer_FunInit MX_TIM6_Init
 
 // 函数名列表
 struct _m_usmart_nametab

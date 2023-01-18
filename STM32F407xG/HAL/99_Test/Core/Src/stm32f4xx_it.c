@@ -311,6 +311,34 @@ void TIM5_IRQHandler(void)
 }
 
 /**
+ * @brief This function handles TIM6 global interrupt, DAC1 and DAC2 underrun error interrupts.
+ */
+void TIM6_DAC_IRQHandler(void)
+{
+	/* USER CODE BEGIN TIM6_DAC_IRQn 0 */
+
+	/* USER CODE END TIM6_DAC_IRQn 0 */
+	HAL_TIM_IRQHandler(&htim6);
+	/* USER CODE BEGIN TIM6_DAC_IRQn 1 */
+
+	/* USER CODE END TIM6_DAC_IRQn 1 */
+}
+
+/**
+ * @brief This function handles TIM7 global interrupt.
+ */
+void TIM7_IRQHandler(void)
+{
+	/* USER CODE BEGIN TIM7_IRQn 0 */
+
+	/* USER CODE END TIM7_IRQn 0 */
+	HAL_TIM_IRQHandler(&htim7);
+	/* USER CODE BEGIN TIM7_IRQn 1 */
+
+	/* USER CODE END TIM7_IRQn 1 */
+}
+
+/**
  * @brief 定时器1com,11中断服务函数
  */
 void TIM1_TRG_COM_TIM11_IRQHandler(void)
@@ -361,17 +389,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		// 	}
 		// }
 	}
-	else if (htim == (&htim11))
-	{
-		FreeRTOSRunTimeTicks++; // important
-	}
-	else if (htim == (&htim13))
+	else if (htim == (&htim6))
 	{
 		usmart_dev.scan();												// 执行usmart扫描
 		__HAL_TIM_SET_COUNTER(&USMARTTimer_HandleTypeDef, 0);			// 清空定时器的CNT
 		__HAL_TIM_SET_AUTORELOAD(&USMARTTimer_HandleTypeDef, 1000 - 1); // 恢复原来的设置
 	}
-	else if (htim == (&htim14))
+	else if (htim == (&htim7))
 	{
 		static u16 x1ms = 0;
 		u8 i;
@@ -415,6 +439,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		{
 			x1ms = 0; // 归零
 		}
+	}
+	else if (htim == (&htim11))
+	{
+	}
+	else if (htim == (&htim13))
+	{
+	}
+	else if (htim == (&htim14))
+	{
+		FreeRTOSRunTimeTicks++; // important
 	}
 }
 

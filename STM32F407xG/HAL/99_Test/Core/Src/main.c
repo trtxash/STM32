@@ -2,7 +2,7 @@
  * @file	99_Test
  * @brief 	FreeRTOS，Test
  * @note  	Printf函数对应UART1，Vlauepack对应UART6
- * 			FreeRTOS任务计时用了Tim11，USMART用了TIM13，定时任务用了TIM14
+ * 			USMART用了TIM6，定时任务用了TIM7,FreeRTOS任务计时用了Tim14
  * @author 	TRTX-gamer      https://github.com/TRTX-gamer；
  *          突然吐血    https://space.bilibili.com/12890038;
  * @version 1.00
@@ -53,7 +53,7 @@ int main(void)
 
 	printf("\r\n初始化中...\r\n");
 	// MX_I2C1_Init();
-	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim13,100ms定时，0.1ms计数时间
+	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim6,100ms定时，0.1ms计数时间
 	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	Tim_Encoder_Init();
 	Tim_Motor_Init();
@@ -61,7 +61,7 @@ int main(void)
 	LED1_Init();
 	KEY0_Init();
 	OLED_Init();
-	Tim_ConfigureTimerForTask(); // 定时任务，定时器14初始化，周期1ms,最后初始化
+	Tim_ConfigureTimerForTask(); // 定时任务，tim7初始化，周期1ms,最后初始化
 	printf("\r\n初始化完成\r\n");
 	sprintf(temp, "OK!");
 	OLED_ShowString(0, 0, temp, 8, 1, WHITE);
