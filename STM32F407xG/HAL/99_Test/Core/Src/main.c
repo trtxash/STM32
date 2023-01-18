@@ -141,7 +141,8 @@ void test_task(void *pvParameters)
 			case 0:
 				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i - 1);
 				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, i - 1);
+				// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, i - 1);
+				__HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, i - 1);
 				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, i - 1);
 				i--;
 				break;
@@ -149,7 +150,8 @@ void test_task(void *pvParameters)
 				++i;
 				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i - 1);
 				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, i - 1);
+				// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, i - 1);
+				__HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, i - 1);
 				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, i - 1);
 				break;
 			case 2:

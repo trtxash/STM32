@@ -21,7 +21,7 @@ TIM_HandleTypeDef htim6; // USMART
 TIM_HandleTypeDef htim7; // 定时任务
 TIM_HandleTypeDef htim8; // 4通道PWM
 TIM_HandleTypeDef htim11;
-TIM_HandleTypeDef htim13;
+TIM_HandleTypeDef htim13; // 补tim8 ch1 pwm，芯片管脚坏了
 TIM_HandleTypeDef htim14; // FreeRTOS任务计时C
 
 volatile unsigned long long FreeRTOSRunTimeTicks; // 易变量，FreeRTOS运行计时
@@ -638,24 +638,41 @@ void MX_TIM11_Init(u16 arr, u16 psc)
  */
 void MX_TIM13_Init(u16 arr, u16 psc)
 {
-	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-	TIM_MasterConfigTypeDef sMasterConfig = {0};
+	/* USER CODE BEGIN TIM13_Init 0 */
+
+	/* USER CODE END TIM13_Init 0 */
+
 	TIM_OC_InitTypeDef sConfigOC = {0};
 
+	/* USER CODE BEGIN TIM13_Init 1 */
+
+	/* USER CODE END TIM13_Init 1 */
 	htim13.Instance = TIM13;
 	htim13.Init.Prescaler = psc;
 	htim13.Init.CounterMode = TIM_COUNTERMODE_UP;
 	htim13.Init.Period = arr;
 	htim13.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-	htim13.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+	htim13.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if (HAL_TIM_Base_Init(&htim13) != HAL_OK)
 	{
 		Error_Handler();
 	}
-	if (HAL_TIM_Base_Start_IT(&htim13) != HAL_OK) // 也可以用这个，使能定时器13和定时器13更新中断：TIM_IT_UPDATE
+	if (HAL_TIM_PWM_Init(&htim13) != HAL_OK)
 	{
 		Error_Handler();
 	}
+	sConfigOC.OCMode = TIM_OCMODE_PWM1;
+	sConfigOC.Pulse = 0;
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	if (HAL_TIM_PWM_ConfigChannel(&htim13, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	/* USER CODE BEGIN TIM13_Init 2 */
+
+	/* USER CODE END TIM13_Init 2 */
+	HAL_TIM_MspPostInit(&htim13);
 }
 
 /**
@@ -783,8 +800,8 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle)
 		/* USER CODE END TIM13_MspInit 0 */
 		/* TIM11 clock enable */
 		__HAL_RCC_TIM13_CLK_ENABLE();
-		HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 4, 0);
-		HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
+		// HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 4, 0);
+		// HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
 		/* USER CODE BEGIN TIM13_MspInit 1 */
 
 		/* USER CODE END TIM13_MspInit 1 */
@@ -969,6 +986,27 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *timHandle)
 
 		/* USER CODE END TIM8_MspPostInit 1 */
 	}
+	else if (timHandle->Instance == TIM13)
+	{
+		/* USER CODE BEGIN TIM13_MspPostInit 0 */
+
+		/* USER CODE END TIM13_MspPostInit 0 */
+
+		__HAL_RCC_GPIOF_CLK_ENABLE();
+		/**TIM13 GPIO Configuration
+		PF8     ------> TIM13_CH1
+		*/
+		GPIO_InitStruct.Pin = GPIO_PIN_8;
+		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+		GPIO_InitStruct.Pull = GPIO_PULLUP;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+		GPIO_InitStruct.Alternate = GPIO_AF9_TIM13;
+		HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+		/* USER CODE BEGIN TIM13_MspPostInit 1 */
+
+		/* USER CODE END TIM13_MspPostInit 1 */
+	}
 }
 
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *tim_baseHandle)
@@ -1034,6 +1072,28 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *tim_baseHandle)
 		/* USER CODE BEGIN TIM11_MspDeInit 1 */
 
 		/* USER CODE END TIM11_MspDeInit 1 */
+	}
+	else if (tim_baseHandle->Instance == TIM13)
+	{
+		/* USER CODE BEGIN TIM13_MspDeInit 0 */
+
+		/* USER CODE END TIM13_MspDeInit 0 */
+		/* Peripheral clock disable */
+		__HAL_RCC_TIM13_CLK_DISABLE();
+		/* USER CODE BEGIN TIM13_MspDeInit 1 */
+
+		/* USER CODE END TIM13_MspDeInit 1 */
+	}
+	else if (tim_baseHandle->Instance == TIM14)
+	{
+		/* USER CODE BEGIN TIM14_MspDeInit 0 */
+
+		/* USER CODE END TIM14_MspDeInit 0 */
+		/* Peripheral clock disable */
+		__HAL_RCC_TIM14_CLK_DISABLE();
+		/* USER CODE BEGIN TIM14_MspDeInit 1 */
+
+		/* USER CODE END TIM14_MspDeInit 1 */
 	}
 }
 
