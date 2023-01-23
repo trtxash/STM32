@@ -45,6 +45,7 @@ extern "C"
 #include "led.h"
 #include "key.h"
 #include "oled.h"
+#include "HC-05.h"
 #include "mecanum_wheel.h"
 
 #ifdef __cplusplus

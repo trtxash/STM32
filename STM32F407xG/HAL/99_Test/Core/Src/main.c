@@ -12,7 +12,7 @@
 
 #define Debug 1 // 控制Debug的一些相关函数
 
-#define BOUND 256000 // 串口波特率
+#define BOUND 115200 // 串口波特率
 
 #define START_TASK_PRIO 1			 // 任务优先级
 #define START_STK_SIZE 128			 // 任务堆栈大小
@@ -61,6 +61,7 @@ int main(void)
 	LED1_Init();
 	KEY0_Init();
 	OLED_Init();
+	HC_05_init();
 	Tim_ConfigureTimerForTask(); // 定时任务，tim7初始化，周期1ms,最后初始化
 	printf("\r\n初始化完成\r\n");
 	sprintf(temp, "OK!");
@@ -188,7 +189,8 @@ void test_task(void *pvParameters)
 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 600 - 1);
 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 1 - 1);
 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 600 - 1);
-			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, 1 - 1);
+			// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, 1 - 1);
+			__HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, 1 - 1);
 			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, 600 - 1);
 			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, 1 - 1);
 			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_4, 600 - 1);

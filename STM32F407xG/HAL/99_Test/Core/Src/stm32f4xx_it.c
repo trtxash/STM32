@@ -401,39 +401,51 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		u8 i;
 
 		x1ms++;
-		/* 每毫秒读取编码器数值 */
-		for (i = 0; i < 4; i++)
-		{
-			Encoder[i] = Read_Encoder(2 + i);
-		}
 
+		// if (x1ms % 5 == 0) // 5ms
+		// {
 		if (x1ms % 10 == 0) // 10ms
 		{
+			/* 每10毫秒读取串口6接收到的数据 */
 			readValuePack(&rxvaluepack);
 
-			if (x1ms % 100 == 0) // 100ms
+			if (x1ms % 50 == 0) // 50ms
 			{
-				OLED_Refresh();
-
-				if (x1ms % 1000 == 0) // 1000ms
+				/* 每50毫秒读取编码器数值 */
+				for (i = 0; i < 4; i++)
 				{
-					// for (i = 2; i < 6; i++)
+					Encoder[i] = Read_Encoder(2 + i);
+				}
+
+				if (x1ms % 100 == 0) // 100ms
+				{
+					/* 每100刷新OLED */
+					OLED_Refresh();
+
+					// if (x1ms % 500 == 0) // 500ms
 					// {
-					// 	printf("Encoder%d=%d\r\n", i - 2, Read_Encoder(i));
+					// 	if (x1ms % 1000 == 0) // 1000ms
+					// 	{
+					// 		// for (i = 2; i < 6; i++)
+					// 		// {
+					// 		// 	printf("Encoder%d=%d\r\n", i - 2, Read_Encoder(i));
+					// 		// }
+
+					// 		// printf("Pitch:  %f\r\n", (float)pitch);
+					// 		// printf("Roll:  %f\r\n", (float)roll);
+					// 		// printf("yaw:  %f\r\n", (float)yaw);
+					// 		// printf("temp:  %f\r\n", (float)temp);
+					// 		// printf("next \r\n");
+
+					// 		if (x1ms % 10000 == 0) // 10000ms
+					// 		{
+					// 		}
+					// 	}
 					// }
-
-					// printf("Pitch:  %f\r\n", (float)pitch);
-					// printf("Roll:  %f\r\n", (float)roll);
-					// printf("yaw:  %f\r\n", (float)yaw);
-					// printf("temp:  %f\r\n", (float)temp);
-					// printf("next \r\n");
-
-					if (x1ms % 10000 == 0) // 10000ms
-					{
-					}
 				}
 			}
 		}
+		// }
 
 		if (x1ms >= 60000)
 		{
