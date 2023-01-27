@@ -5,9 +5,9 @@
  * @param   none
  * @arg		none
  * @note
- * @retval  u8，1成功，0失败
+ * @retval  void
  */
-u8 HC_05_init()
+void HC_05_init()
 {
     GPIO_InitTypeDef GPIO_InitStructure = {0};
 
@@ -27,6 +27,4 @@ u8 HC_05_init()
     HAL_GPIO_Init(HC_05_EN_Port, &GPIO_InitStructure);
 
     HC_05_EN_Set();
-    delay_ms(100);
-    return HC_05_READ_STATE();
 }

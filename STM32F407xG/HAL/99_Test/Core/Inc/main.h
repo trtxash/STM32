@@ -34,7 +34,6 @@ extern "C"
 #include "usart.h"
 #include "valuepack.h"
 #include "usmart.h"
-#include "encoder_pid.h"
 
 #include "dma.h"
 #include "tim.h"

@@ -17,6 +17,6 @@
 
 #define HC_05_READ_STATE() HC_05_STATE_Port->IDR &HC_05_STATE_Pin // 0 or 1
 
-u8 HC_05_init(void);
+void HC_05_init(void);
 
 #endif

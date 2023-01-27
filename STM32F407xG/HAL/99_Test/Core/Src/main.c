@@ -134,7 +134,7 @@ void test_task(void *pvParameters)
 			OLED_ShowString(0, 8 * (j + 1), temp, 8, 1, WHITE);
 		}
 
-		if (KEY0_READ())
+		if (!KEY0_READ())
 		{
 
 			switch (s)
@@ -185,15 +185,16 @@ void test_task(void *pvParameters)
 		{
 			s = 0;
 			i = 600;
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1 - 1);
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 600 - 1);
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 1 - 1);
-			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 600 - 1);
-			// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, 1 - 1);
-			__HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, 1 - 1);
-			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, 600 - 1);
-			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, 1 - 1);
-			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_4, 600 - 1);
+			// __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1 - 1);
+			// __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 600 - 1);
+			// __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 1 - 1);
+			// __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 600 - 1);
+			// // __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, 1 - 1);
+			// __HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, 1 - 1);
+			// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, 600 - 1);
+			// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, 1 - 1);
+			// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_4, 600 - 1);
+			vTaskDelay(1000);
 		}
 
 		vTaskDelay(10);

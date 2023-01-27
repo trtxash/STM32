@@ -3,14 +3,12 @@
 
 #include "sys.h"
 #include "tim.h"
-
-// #include "encoder_pid.h"
-
-// extern int Encoder_target_1;
-// extern int Encoder_target_2;
-// extern int Encoder_target_3;
-// extern int Encoder_target_4;
+#include "mecanum_wheel_encoder_pid.h"
+#include "valuepack.h"
 
 void Tim_Motor_Init(void);
+void mecanum_wheel_pwm_set(void);
+void mecanum_wheel_xy_set(void);
+void mecanum_wheel_stop(void);
 
 #endif

@@ -412,10 +412,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			if (x1ms % 50 == 0) // 50ms
 			{
 				/* 每50毫秒读取编码器数值 */
-				for (i = 0; i < 4; i++)
-				{
-					Encoder[i] = Read_Encoder(2 + i);
-				}
+				Encoder[0] = -Read_Encoder(2); // 正负矫正
+				Encoder[1] = Read_Encoder(3);
+				Encoder[2] = Read_Encoder(4);
+				Encoder[3] = -Read_Encoder(5); // 正负矫正
+				mecanum_wheel_pwm_set();	   // PID计算，设置PWM
 
 				if (x1ms % 100 == 0) // 100ms
 				{

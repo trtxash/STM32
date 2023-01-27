@@ -71,7 +71,6 @@ User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
 User/Src/valuepack.c \
-User/Src/encoder_pid.c \
 USMART/Src/usmart_config.c \
 USMART/Src/usmart_str.c \
 USMART/Src/usmart.c \
@@ -87,6 +86,8 @@ Hardware/LED/Src/led.c \
 Hardware/Key/Src/key.c \
 Hardware/OLED/Src/oled.c \
 Hardware/OLED/Src/oledio.c \
+Hardware/Bluetooth/Src/HC-05.c \
+Hardware/Car/Src/mecanum_wheel_encoder_pid.c \
 Hardware/Car/Src/mecanum_wheel.c \
 
 # ASM sources
@@ -157,6 +158,7 @@ C_INCLUDES =  \
 -IHardware/LED/Inc \
 -IHardware/Key/Inc \
 -IHardware/OLED/Inc \
+-IHardware/Bluetooth/Inc \
 -IHardware/Car/Inc \
 
 # compile gcc flags
