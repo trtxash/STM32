@@ -54,7 +54,8 @@ int main(void)
 	printf("\r\n初始化中...\r\n");
 	// MX_I2C1_Init();
 	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim6,100ms定时，0.1ms计数时间
-	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
+	uart6_init(38400);
+	// initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	Tim_Encoder_Init();
 	Tim_Motor_Init();
 	LED0_Init();
@@ -123,8 +124,22 @@ void test_task(void *pvParameters)
 	u8 j;
 	u16 i = 600;
 	u8 temp[21] = {0};
+
 	while (1)
 	{
+		if (USART_RX_STA & 0x8000) // 如果接收完成
+		{
+			USART_RX_BUF[USART_RX_STA & 0X3FFF - 2] = '\0'; // 转换一下，适配sprintf函数
+			sprintf(temp, USART_RX_BUF);
+			// OLED_ShowString(0, 40, "                     ", 8, 1, WHITE);
+			OLED_ShowString(0, 40, temp, 8, 1, WHITE);
+		}
+
+		if (HC_05_READ_STATE())
+			OLED_ShowString(64, 0, "Bl OK!", 8, 1, WHITE);
+		else
+			OLED_ShowString(64, 0, "Bl NO!", 8, 1, WHITE);
+
 		for (j = 0; j < 4; j++)
 		{
 			if (Encoder[j] < 0)
@@ -132,59 +147,67 @@ void test_task(void *pvParameters)
 			else
 				sprintf(temp, "+%5d", Encoder[j]);
 			OLED_ShowString(0, 8 * (j + 1), temp, 8, 1, WHITE);
+
+			sprintf(temp, "%5d", Encoder_target[j]);
+			OLED_ShowString(64, 8 * (j + 1), temp, 8, 1, WHITE);
 		}
 
-		if (!KEY0_READ())
+		if (rxvaluepack.bools[0])
+			mecanum_wheel_xy_set(); // 5ms计算一次麦轮运动值
+		else
+			mecanum_wheel_stop();
+
+		if (KEY0_READ())
 		{
 
-			switch (s)
-			{
-			case 0:
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, i - 1);
-				// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, i - 1);
-				i--;
-				break;
-			case 1:
-				++i;
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, i - 1);
-				// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, i - 1);
-				break;
-			case 2:
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_4, i - 1);
-				i--;
-				break;
-			case 3:
-				++i;
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, i - 1);
-				__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_4, i - 1);
-				break;
-			default:
-				s = 0;
-				break;
-			}
+			// switch (s)
+			// {
+			// case 0:
+			// 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, i - 1);
+			// 	// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, i - 1);
+			// 	i--;
+			// 	break;
+			// case 1:
+			// 	++i;
+			// 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, i - 1);
+			// 	// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, i - 1);
+			// 	break;
+			// case 2:
+			// 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_4, i - 1);
+			// 	i--;
+			// 	break;
+			// case 3:
+			// 	++i;
+			// 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, i - 1);
+			// 	__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_4, i - 1);
+			// 	break;
+			// default:
+			// 	s = 0;
+			// 	break;
+			// }
 
-			if (i == 0 || i == 600)
-			{
-				s++;
-				if (s > 3)
-					s = 0;
-			}
+			// if (i == 0 || i == 600)
+			// {
+			// 	s++;
+			// 	if (s > 3)
+			// 		s = 0;
+			// }
 		}
 		else
 		{
-			s = 0;
-			i = 600;
+			// s = 0;
+			// i = 600;
 			// __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1 - 1);
 			// __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 600 - 1);
 			// __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 1 - 1);
@@ -194,10 +217,9 @@ void test_task(void *pvParameters)
 			// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, 600 - 1);
 			// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, 1 - 1);
 			// __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_4, 600 - 1);
-			vTaskDelay(1000);
 		}
 
-		vTaskDelay(10);
+		vTaskDelay(5);
 	}
 }
 

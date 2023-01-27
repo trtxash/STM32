@@ -291,6 +291,33 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 	else if (huart->Instance == USART6) // 如果是串口6
 	{
+		if ((USART_RX_STA & 0x8000) == 0) // 接收未完成
+		{
+			if (USART_RX_STA & 0x4000) // 接收到了0x0d
+			{
+				if (aRxBuffer[0] != 0x0a)
+					USART_RX_STA = 0; // 接收错误,重新开始
+				else
+					USART_RX_STA |= 0x8000; // 接收完成了
+			}
+			else // 还没收到0X0D
+			{
+				if (aRxBuffer[0] == 0x0d)
+					USART_RX_STA |= 0x4000;
+				else
+				{
+					USART_RX_BUF[USART_RX_STA & 0X3FFF] = aRxBuffer[0];
+					USART_RX_STA++;
+					if (USART_RX_STA > (USART_REC_LEN - 1))
+					{
+						USART_RX_STA = 0; // 接收数据错误,重新开始接收
+						Error_sum++;
+					}
+				}
+			}
+		}
+
+		HAL_UART_Receive_IT(&UART6_Handler, aRxBuffer, RXBUFFERSIZE); // Receive_IT中会关闭中断，需要重开
 	}
 }
 
@@ -398,55 +425,65 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	else if (htim == (&htim7))
 	{
 		static u16 x1ms = 0;
-		u8 i;
 
 		x1ms++;
-
-		// if (x1ms % 5 == 0) // 5ms
-		// {
-		if (x1ms % 10 == 0) // 10ms
+		if (x1ms % 5 == 0) // 5ms
 		{
-			/* 每10毫秒读取串口6接收到的数据 */
-			readValuePack(&rxvaluepack);
-
-			if (x1ms % 50 == 0) // 50ms
+			if (x1ms % 10 == 0) // 10ms
 			{
-				/* 每50毫秒读取编码器数值 */
-				Encoder[0] = -Read_Encoder(2); // 正负矫正
-				Encoder[1] = Read_Encoder(3);
-				Encoder[2] = Read_Encoder(4);
-				Encoder[3] = -Read_Encoder(5); // 正负矫正
-				mecanum_wheel_pwm_set();	   // PID计算，设置PWM
+				// /* 每10毫秒读取串口6接收到的数据 */
+				// readValuePack(&rxvaluepack);
 
-				if (x1ms % 100 == 0) // 100ms
+				if (x1ms % 50 == 0) // 50ms
 				{
-					/* 每100刷新OLED */
-					OLED_Refresh();
+					/* 每50毫秒读取编码器数值 */
+					Encoder[0] = -Read_Encoder(2); // 正负矫正
+					Encoder[1] = Read_Encoder(3);
+					Encoder[2] = Read_Encoder(4);
+					Encoder[3] = -Read_Encoder(5); // 正负矫正
+					mecanum_wheel_pwm_set();	   // PID计算，设置PWM
+					txvaluepack.shorts[0] = Encoder[0];
+					txvaluepack.shorts[1] = Encoder[1];
+					txvaluepack.shorts[2] = Encoder[2];
+					txvaluepack.shorts[3] = Encoder[3];
+					// if (HC_05_READ_STATE())
+					// 	sendValuePack(&txvaluepack); // 串口6 DMA正常模式发送编码器的值
 
-					// if (x1ms % 500 == 0) // 500ms
-					// {
-					// 	if (x1ms % 1000 == 0) // 1000ms
-					// 	{
-					// 		// for (i = 2; i < 6; i++)
-					// 		// {
-					// 		// 	printf("Encoder%d=%d\r\n", i - 2, Read_Encoder(i));
-					// 		// }
+					if (x1ms % 100 == 0) // 100ms
+					{
+						/* 每100刷新OLED */
+						OLED_Refresh();
 
-					// 		// printf("Pitch:  %f\r\n", (float)pitch);
-					// 		// printf("Roll:  %f\r\n", (float)roll);
-					// 		// printf("yaw:  %f\r\n", (float)yaw);
-					// 		// printf("temp:  %f\r\n", (float)temp);
-					// 		// printf("next \r\n");
+						if (x1ms % 500 == 0) // 500ms
+						{
+							if (x1ms % 1000 == 0) // 1000ms
+							{
+								// for (i = 2; i < 6; i++)
+								// {
+								// 	printf("Encoder%d=%d\r\n", i - 2, Read_Encoder(i));
+								// }
 
-					// 		if (x1ms % 10000 == 0) // 10000ms
-					// 		{
-					// 		}
-					// 	}
-					// }
+								// printf("Pitch:  %f\r\n", (float)pitch);
+								// printf("Roll:  %f\r\n", (float)roll);
+								// printf("yaw:  %f\r\n", (float)yaw);
+								// printf("temp:  %f\r\n", (float)temp);
+								// printf("next \r\n");
+
+								if (x1ms % 5000 == 0) // 5000ms
+								{
+									u8 n5s = 0;
+									HAL_UART_Transmit_IT(&UART6_Handler, "\n\rAT\n\r", 6);
+
+									if (x1ms % 10000 == 0) // 10000ms
+									{
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
-		// }
 
 		if (x1ms >= 60000)
 		{

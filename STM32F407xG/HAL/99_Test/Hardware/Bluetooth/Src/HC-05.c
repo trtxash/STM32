@@ -21,10 +21,11 @@ void HC_05_init()
     GPIO_InitStructure.Pin = HC_05_STATE_Pin;
     HAL_GPIO_Init(HC_05_STATE_Port, &GPIO_InitStructure);
 
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStructure.Pull = GPIO_PULLUP;
     GPIO_InitStructure.Pin = HC_05_EN_Pin;
     HAL_GPIO_Init(HC_05_EN_Port, &GPIO_InitStructure);
 
     HC_05_EN_Set();
 }
+
