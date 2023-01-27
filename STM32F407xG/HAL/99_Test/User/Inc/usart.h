@@ -4,7 +4,7 @@
 #include "sys.h"
 #include "stdio.h"
 
-#define VALUEPACK 0 // 使能valuepack
+#define VALUEPACK 1 // 使能valuepack
 
 #define USART_REC_LEN 256 // 定义最大接收字节数 256
 

@@ -54,8 +54,7 @@ int main(void)
 	printf("\r\n初始化中...\r\n");
 	// MX_I2C1_Init();
 	usmart_dev.init(SystemCoreClock / 1000000); // 初始化USMART，用了tim6,100ms定时，0.1ms计数时间
-	uart6_init(38400);
-	// initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
+	initValuePack(BOUND);						// Valuepack初始化，用了uart6+DMA
 	Tim_Encoder_Init();
 	Tim_Motor_Init();
 	LED0_Init();
@@ -127,14 +126,6 @@ void test_task(void *pvParameters)
 
 	while (1)
 	{
-		if (USART_RX_STA & 0x8000) // 如果接收完成
-		{
-			USART_RX_BUF[USART_RX_STA & 0X3FFF - 2] = '\0'; // 转换一下，适配sprintf函数
-			sprintf(temp, USART_RX_BUF);
-			// OLED_ShowString(0, 40, "                     ", 8, 1, WHITE);
-			OLED_ShowString(0, 40, temp, 8, 1, WHITE);
-		}
-
 		if (HC_05_READ_STATE())
 			OLED_ShowString(64, 0, "Bl OK!", 8, 1, WHITE);
 		else
@@ -153,9 +144,19 @@ void test_task(void *pvParameters)
 		}
 
 		if (rxvaluepack.bools[0])
-			mecanum_wheel_xy_set(); // 5ms计算一次麦轮运动值
+		{
+			mecanum_wheel_xyz_set(); // 5ms计算一次麦轮运动值
+			for (j = 0; j < 4; j++)
+			{
+				PID_V[0][j] = rxvaluepack.floats[0];
+				PID_V[1][j] = rxvaluepack.floats[1];
+				PID_V[2][j] = rxvaluepack.floats[2];
+			}
+		}
 		else
+		{
 			mecanum_wheel_stop();
+		}
 
 		if (KEY0_READ())
 		{

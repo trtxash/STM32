@@ -9,8 +9,6 @@ u8 move = 0;
 u8 bluetooth = 0;
 short Encoder[Encoder_NUM] = {0};          // 当前编码器值
 short Encoder_target[Encoder_NUM] = {0};   // 目标编码器值
-float EncoderVelocity[Encoder_NUM];        // 当前编码器速度
-float EncoderVelocity_target[Encoder_NUM]; // 目标编码器速度
 
 /**************************************************************************
 函数功能：速度闭环PID控制

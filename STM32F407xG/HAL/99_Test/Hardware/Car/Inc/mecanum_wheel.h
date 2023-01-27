@@ -8,7 +8,7 @@
 
 void Tim_Motor_Init(void);
 void mecanum_wheel_pwm_set(void);
-void mecanum_wheel_xy_set(void);
+void mecanum_wheel_xyz_set(void);
 void mecanum_wheel_stop(void);
 
 #endif

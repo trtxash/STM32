@@ -83,19 +83,25 @@ void mecanum_wheel_pwm_set()
 }
 
 /**
- * @brief	计算，设置xy速度
+ * @brief	计算，设置xyz速度
  * @param 	none
  * @arg		none
- * @note    输入位置方向速度Vx，Vy。得到电机方向速度。
+ * @note    输入位置方向速度Vx，Vy,Vz。得到电机方向速度。
  * @retval	void
  */
-void mecanum_wheel_xy_set()
+void mecanum_wheel_xyz_set()
 {
     Encoder_target[0] = (short)((rxvaluepack.shorts[0] + rxvaluepack.shorts[1]) / (float)1.414213562373);
     Encoder_target[2] = (short)((rxvaluepack.shorts[0] + rxvaluepack.shorts[1]) / (float)1.414213562373);
 
     Encoder_target[1] = (short)((-rxvaluepack.shorts[0] + rxvaluepack.shorts[1]) / (float)1.414213562373);
     Encoder_target[3] = (short)((-rxvaluepack.shorts[0] + rxvaluepack.shorts[1]) / (float)1.414213562373);
+
+    Encoder_target[0] -= rxvaluepack.shorts[2];
+    Encoder_target[3] -= rxvaluepack.shorts[2];
+
+    Encoder_target[1] += rxvaluepack.shorts[2];
+    Encoder_target[2] += rxvaluepack.shorts[2];
 
     for (u8 i = 0; i < 4; i++)
     {
@@ -115,6 +121,11 @@ void mecanum_wheel_xy_set()
  */
 void mecanum_wheel_stop()
 {
+    for (u8 i = 0; i < 4; i++)
+    {
+        Encoder_target[i] = 0;
+    }
+
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 600 - 1); // 默认0占空比
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 600 - 1); // 默认0占空比
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 600 - 1); // 默认0占空比

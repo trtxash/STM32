@@ -26,6 +26,6 @@ void HC_05_init()
     GPIO_InitStructure.Pin = HC_05_EN_Pin;
     HAL_GPIO_Init(HC_05_EN_Port, &GPIO_InitStructure);
 
-    HC_05_EN_Set();
+    HC_05_EN_Clr();
 }
 
