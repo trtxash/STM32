@@ -29,16 +29,25 @@ int main(void)
     uart_init(115200);              // 初始化串口
 
     printf("\r\n初始化中...\r\n");
+    MX_DMA_Init();  // 要先初始化DMA
+    MX_ADC1_Init(); // 初始化ADC1
     OLED_Init();
     printf("\r\n初始化完成...\r\n");
     sprintf(temp, "OK!");
     OLED_ShowString(0, 0, temp, 8, 1, WHITE);
     OLED_Refresh();
+    HAL_ADCEx_Calibration_Start(&hadc1);                      // 启动ADC1校准，不校准将导致ADC测量不准确
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx, ADC_Sec * 2); // 启动ADC+DMA
 
     while (1)
     {
+        u16 j = Get_Adc_Average_DMA();
         printf("\r\ni = %d\r\n", i);
-        OLED_ShowNum(0, 8, i, 4, 8, 1, WHITE);
+        printf("adc = %d\r\n", j);
+        sprintf(temp, "i = %d", i);
+        OLED_ShowString(0, 8, temp, 8, 1, WHITE);
+        sprintf(temp, "adc = %d", j);
+        OLED_ShowString(0, 16, temp, 8, 1, WHITE);
         OLED_Refresh();
         delay_ms(1000);
         i++;

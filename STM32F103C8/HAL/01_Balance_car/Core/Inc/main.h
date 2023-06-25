@@ -32,6 +32,8 @@ extern "C"
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
+#include "dma.h"
+#include "adc.h"
 #include "oled.h"
     // #include "stm3210e_eval.h"
 

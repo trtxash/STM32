@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "main.h": "c",
-        "oledfont.h": "c",
-        "oled.h": "c",
-        "oledconf.h": "c",
-        "oledio.h": "c"
-    }
-}

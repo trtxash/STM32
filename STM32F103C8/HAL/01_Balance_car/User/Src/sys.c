@@ -7,8 +7,8 @@
 void Stm32_Clock_Init(u32 PLL)
 {
     HAL_StatusTypeDef ret = HAL_OK;
-    RCC_OscInitTypeDef RCC_OscInitStructure;
-    RCC_ClkInitTypeDef RCC_ClkInitStructure;
+    RCC_OscInitTypeDef RCC_OscInitStructure = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStructure = {0};
 
     RCC_OscInitStructure.OscillatorType = RCC_OSCILLATORTYPE_HSE; // 时钟源为HSE
     RCC_OscInitStructure.HSEState = RCC_HSE_ON;                   // 打开HSE
