@@ -17,6 +17,9 @@
  */
 int main(void)
 {
+    u8 temp[21] = {0};
+    u8 i = 0;
+
     if (HAL_Init()) // 初始化HAL库
     {
         Error_Handler();
@@ -26,8 +29,15 @@ int main(void)
     uart_init(115200);              // 初始化串口
 
     printf("\r\n初始化中...\r\n");
+    OLED_Init();
+    printf("\r\n初始化完成...\r\n");
+    sprintf(temp, "OK!");
+    OLED_ShowString(0, 0, temp, 8, 1, WHITE);
 
     while (1)
     {
+        OLED_ShowNum(0, 8, i, 4, 8, 1, WHITE);
+        delay_ms(1000);
+        i++;
     }
 }

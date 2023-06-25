@@ -5,7 +5,6 @@
 #include "delay.h"
 #include "oledio.h"
 #include "oledconf.h"
-
 #if _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE && _SOFT_OR_HARE == OLED_HARD
 #include "spi.h"
 #endif

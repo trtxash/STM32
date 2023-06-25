@@ -224,7 +224,7 @@ void OledDrv_Init(void)
   OLED_CLK_Port_Clk_Enable();
 
   GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; // 推挽输出
-  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStructure.Pull = GPIO_PULLUP;
 
   GPIO_InitStructure.Pin = OLED_CS_Pin;
