@@ -1,5 +1,5 @@
 /**
- * @file	06_Balance_car
+ * @file	01_Balance_car
  * @brief
  * @author 	TRTX-gamer
  * @version 1.00
@@ -33,10 +33,13 @@ int main(void)
     printf("\r\n初始化完成...\r\n");
     sprintf(temp, "OK!");
     OLED_ShowString(0, 0, temp, 8, 1, WHITE);
+    OLED_Refresh();
 
     while (1)
     {
+        printf("\r\ni = %d\r\n", i);
         OLED_ShowNum(0, 8, i, 4, 8, 1, WHITE);
+        OLED_Refresh();
         delay_ms(1000);
         i++;
     }
