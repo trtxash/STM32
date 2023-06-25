@@ -23,6 +23,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
+#include "sys.h"
+#include "delay.h"
+#include "usart.h"
+#include "oled.h"
 // #include "stm3210e_eval.h"
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
