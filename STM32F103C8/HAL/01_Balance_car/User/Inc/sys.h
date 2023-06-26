@@ -90,6 +90,8 @@ typedef __I uint8_t vuc8;
 #define PGout(n) BIT_ADDR(GPIOG_ODR_Addr, n) // 输出
 #define PGin(n) BIT_ADDR(GPIOG_IDR_Addr, n)  // 输入
 
+#define PI 3.141592653589793238 // PI圆周率
+
 void Stm32_Clock_Init(u32 PLL); // 时钟系统配置
 void Error_Handler(void);       // 异常处理函数
 

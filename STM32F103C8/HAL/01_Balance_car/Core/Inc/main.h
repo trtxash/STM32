@@ -32,9 +32,15 @@ extern "C"
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
+
 #include "dma.h"
 #include "adc.h"
+
 #include "oled.h"
+
+#include "mpu6050.h"
+#include "inv_mpu.h"
+#include "inv_mpu_dmp_motion_driver.h"
     // #include "stm3210e_eval.h"
 
     /* Private includes ----------------------------------------------------------*/

@@ -3032,10 +3032,12 @@ unsigned short inv_row_2_scale(const signed char *row)
         b = 7; // error
     return b;
 }
+
 // 空函数,未用到.
 void mget_ms(unsigned long *time)
 {
 }
+
 // mpu6050,dmp初始化
 // 返回值:0,正常
 //     其他,失败
@@ -3075,6 +3077,10 @@ u8 mpu_dmp_init(void)
         if (res)
             return 9;
     }
+    else
+    {
+        return 10; // MPU6050初始化失败
+    }
     return 0;
 }
 // 得到dmp处理后的数据(注意,本函数需要比较多堆栈,局部变量有点多)
@@ -3087,7 +3093,6 @@ u8 mpu_dmp_get_data(float *pitch, float *roll, float *yaw)
 {
     float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;
     unsigned long sensor_timestamp;
-    short gyro[3], accel[3], sensors;
     unsigned char more;
     long quat[4];
     if (dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more))

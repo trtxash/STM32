@@ -29,7 +29,7 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-#define ADC_Sec 32
+#define ADC_Sec 128
 
     extern u16 adcx[2][ADC_Sec];
 
