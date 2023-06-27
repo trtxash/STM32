@@ -47,7 +47,9 @@
 #define TIRE_DIAMETER 0.065
 
 /* 计算转一圈的距离 单位M */
-#define ONE_WHEEL_CIRCUMFERENCE (3.14159265358979323846 * TIRE_DIAMETER)
+#define ONE_WHEEL_CIRCUMFERENCE (PI * TIRE_DIAMETER)
+
+extern int Encoder_val[2];
 
 void Tim_Encoder_Init(void);
 int Read_Encoder(u8 tim);

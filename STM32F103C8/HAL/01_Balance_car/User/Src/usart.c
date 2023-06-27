@@ -2,6 +2,7 @@
 
 UART_HandleTypeDef UART1_Handler; // UART1句柄
 UART_HandleTypeDef UART3_Handler; // UART3句柄
+DMA_HandleTypeDef hdma_usart3_rx;
 
 u32 Error_sum = 0;
 
@@ -53,35 +54,35 @@ void uart_init(u32 bound)
 //  bound:波特率
 void uart3_init(u32 bound)
 {
-    // #if VALUEPACK
-    //     UART3_Handler.Instance = USART3;
-    //     UART3_Handler.Init.BaudRate = bound;
-    //     UART3_Handler.Init.WordLength = UART_WORDLENGTH_8B;
-    //     UART3_Handler.Init.StopBits = UART_STOPBITS_1;
-    //     UART3_Handler.Init.Parity = UART_PARITY_NONE;
-    //     UART3_Handler.Init.Mode = UART_MODE_TX_RX;
-    //     UART3_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-    //     UART3_Handler.Init.OverSampling = UART_OVERSAMPLING_16; // 过采样16倍
-    //     if (HAL_UART_Init(&UART3_Handler) != HAL_OK)
-    //     {
-    //         Error_Handler();
-    //     }
-    // #else
-    //     // UART 初始化设置
-    //     UART3_Handler.Instance = USART3;                    // USART3
-    //     UART3_Handler.Init.BaudRate = bound;                // 波特率
-    //     UART3_Handler.Init.WordLength = UART_WORDLENGTH_8B; // 字长为8位数据格式
-    //     UART3_Handler.Init.StopBits = UART_STOPBITS_1;      // 一个停止位
-    //     UART3_Handler.Init.Parity = UART_PARITY_NONE;       // 无奇偶校验位
-    //     UART3_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE; // 无硬件流控
-    //     UART3_Handler.Init.Mode = UART_MODE_TX_RX;          // 收发模式
-    //     if (HAL_UART_Init(&UART3_Handler) != HAL_OK)        // HAL_UART_Init()会使能UART3
-    //     {
-    //         Error_Handler();
-    //     }
+#if VALUEPACK
+    UART3_Handler.Instance = USART3;
+    UART3_Handler.Init.BaudRate = bound;
+    UART3_Handler.Init.WordLength = UART_WORDLENGTH_8B;
+    UART3_Handler.Init.StopBits = UART_STOPBITS_1;
+    UART3_Handler.Init.Parity = UART_PARITY_NONE;
+    UART3_Handler.Init.Mode = UART_MODE_TX_RX;
+    UART3_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    UART3_Handler.Init.OverSampling = UART_OVERSAMPLING_16; // 过采样16倍
+    if (HAL_UART_Init(&UART3_Handler) != HAL_OK)
+    {
+        Error_Handler();
+    }
+#else
+    // UART 初始化设置
+    UART3_Handler.Instance = USART3;                    // USART3
+    UART3_Handler.Init.BaudRate = bound;                // 波特率
+    UART3_Handler.Init.WordLength = UART_WORDLENGTH_8B; // 字长为8位数据格式
+    UART3_Handler.Init.StopBits = UART_STOPBITS_1;      // 一个停止位
+    UART3_Handler.Init.Parity = UART_PARITY_NONE;       // 无奇偶校验位
+    UART3_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE; // 无硬件流控
+    UART3_Handler.Init.Mode = UART_MODE_TX_RX;          // 收发模式
+    if (HAL_UART_Init(&UART3_Handler) != HAL_OK)        // HAL_UART_Init()会使能UART3
+    {
+        Error_Handler();
+    }
 
-    //     HAL_UART_Receive_IT(&UART3_Handler, (u8 *)aRxBuffer, RXBUFFERSIZE); // 该函数会开启接收中断：标志位UART_IT_RXNE，并且设置接收缓冲以及接收缓冲接收最大数据量
-    // #endif
+    HAL_UART_Receive_IT(&UART3_Handler, (u8 *)aRxBuffer, RXBUFFERSIZE); // 该函数会开启接收中断：标志位UART_IT_RXNE，并且设置接收缓冲以及接收缓冲接收最大数据量
+#endif
 }
 
 // UART底层初始化，时钟使能，引脚配置，中断配置
@@ -113,87 +114,70 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
     }
     if (huart->Instance == USART3) // 如果是串口3，进行串口3 MSP初始化
     {
-        // #if VALUEPACK
-        //         /* USER CODE BEGIN USART3_MspInit 0 */
+#if VALUEPACK
+        /* USER CODE BEGIN USART3_MspInit 0 */
 
-        //         /* USER CODE END USART3_MspInit 0 */
-        //         /* USART3 clock enable */
-        //         __HAL_RCC_USART3_CLK_ENABLE();
+        /* USER CODE END USART3_MspInit 0 */
+        /* USART3 clock enable */
+        __HAL_RCC_USART3_CLK_ENABLE();
 
-        //         __HAL_RCC_GPIOG_CLK_ENABLE();
-        //         /**USART3 GPIO Configuration
-        //         PG9     ------> USART3_RX
-        //         PG14     ------> USART3_TX
-        //         */
-        //         GPIO_Initure.Pin = GPIO_PIN_9 | GPIO_PIN_14;
-        //         GPIO_Initure.Mode = GPIO_MODE_AF_PP;
-        //         GPIO_Initure.Pull = GPIO_NOPULL;
-        //         GPIO_Initure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        //         GPIO_Initure.Alternate = GPIO_AF8_USART3;
-        //         HAL_GPIO_Init(GPIOG, &GPIO_Initure);
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+        /**USART3 GPIO Configuration
+        PB10     ------> USART3_TX
+        PB11     ------> USART3_RX
+        */
+        GPIO_Initure.Pin = GPIO_PIN_10;
+        GPIO_Initure.Mode = GPIO_MODE_AF_PP;
+        GPIO_Initure.Speed = GPIO_SPEED_FREQ_HIGH;
+        HAL_GPIO_Init(GPIOB, &GPIO_Initure);
 
-        //         /* USART3 DMA Init */
-        //         /* USART3_TX Init */
-        //         hdma_usart3_tx.Instance = DMA2_Stream6;
-        //         hdma_usart3_tx.Init.Channel = DMA_CHANNEL_5;
-        //         hdma_usart3_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
-        //         hdma_usart3_tx.Init.PeriphInc = DMA_PINC_DISABLE;
-        //         hdma_usart3_tx.Init.MemInc = DMA_MINC_ENABLE;
-        //         hdma_usart3_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-        //         hdma_usart3_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-        //         hdma_usart3_tx.Init.Mode = DMA_NORMAL;
-        //         hdma_usart3_tx.Init.Priority = DMA_PRIORITY_MEDIUM;
-        //         hdma_usart3_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-        //         if (HAL_DMA_Init(&hdma_usart3_tx) != HAL_OK)
-        //         {
-        //             Error_Handler();
-        //         }
+        GPIO_Initure.Pin = GPIO_PIN_11;
+        GPIO_Initure.Mode = GPIO_MODE_INPUT;
+        GPIO_Initure.Pull = GPIO_NOPULL;
+        HAL_GPIO_Init(GPIOB, &GPIO_Initure);
 
-        //         __HAL_LINKDMA(huart, hdmatx, hdma_usart3_tx);
+        /* USART3 DMA Init */
+        /* USART3_RX Init */
+        hdma_usart3_rx.Instance = DMA1_Channel3;
+        hdma_usart3_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+        hdma_usart3_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+        hdma_usart3_rx.Init.MemInc = DMA_MINC_ENABLE;
+        hdma_usart3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+        hdma_usart3_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+        hdma_usart3_rx.Init.Mode = DMA_CIRCULAR;
+        hdma_usart3_rx.Init.Priority = DMA_PRIORITY_MEDIUM;
+        if (HAL_DMA_Init(&hdma_usart3_rx) != HAL_OK)
+        {
+            Error_Handler();
+        }
 
-        //         /* USART3_RX Init */
-        //         hdma_usart3_rx.Instance = DMA2_Stream1;
-        //         hdma_usart3_rx.Init.Channel = DMA_CHANNEL_5;
-        //         hdma_usart3_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
-        //         hdma_usart3_rx.Init.PeriphInc = DMA_PINC_DISABLE;
-        //         hdma_usart3_rx.Init.MemInc = DMA_MINC_ENABLE;
-        //         hdma_usart3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-        //         hdma_usart3_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-        //         hdma_usart3_rx.Init.Mode = DMA_CIRCULAR;
-        //         hdma_usart3_rx.Init.Priority = DMA_PRIORITY_MEDIUM;
-        //         hdma_usart3_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-        //         if (HAL_DMA_Init(&hdma_usart3_rx) != HAL_OK)
-        //         {
-        //             Error_Handler();
-        //         }
+        __HAL_LINKDMA(huart, hdmarx, hdma_usart3_rx);
 
-        //         __HAL_LINKDMA(huart, hdmarx, hdma_usart3_rx);
+        /* USART3 interrupt Init */
+        HAL_NVIC_SetPriority(USART3_IRQn, 7, 0); // 这里开中断是因为stm32f4xx_hal_uart.c里面的介绍，用于校验完成最后一个字节的发送完成
+        HAL_NVIC_EnableIRQ(USART3_IRQn);
+        /* USER CODE BEGIN USART3_MspInit 1 */
 
-        //         /* USART3 interrupt Init */
-        //         HAL_NVIC_SetPriority(USART3_IRQn, 0, 0); // 这里开中断是因为stm32f4xx_hal_uart.c里面的介绍，用于校验完成最后一个字节的发送完成
-        //         HAL_NVIC_EnableIRQ(USART3_IRQn);
-        //         /* USER CODE BEGIN USART3_MspInit 1 */
+        /* USER CODE END USART3_MspInit 1 */
+#else
+        __HAL_RCC_GPIOC_CLK_ENABLE();                                   // 使能GPIOA时钟
+        __HAL_RCC_USART3_CLK_ENABLE();                                  // 使能USART3时钟
 
-        //         /* USER CODE END USART3_MspInit 1 */
-        // #else
-        //         __HAL_RCC_GPIOC_CLK_ENABLE();                                   // 使能GPIOA时钟
-        //         __HAL_RCC_USART3_CLK_ENABLE();                                  // 使能USART3时钟
+        GPIO_Initure.Pin = GPIO_PIN_6;             // PA11
+        GPIO_Initure.Mode = GPIO_MODE_AF_PP;       // 复用推挽输出
+        GPIO_Initure.Pull = GPIO_PULLUP;           // 上拉
+        GPIO_Initure.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
+        GPIO_Initure.Alternate = GPIO_AF8_USART3;  // 复用为USART3
+        HAL_GPIO_Init(GPIOC, &GPIO_Initure);       // 初始化PA11
 
-        //         GPIO_Initure.Pin = GPIO_PIN_6;             // PA11
-        //         GPIO_Initure.Mode = GPIO_MODE_AF_PP;       // 复用推挽输出
-        //         GPIO_Initure.Pull = GPIO_PULLUP;           // 上拉
-        //         GPIO_Initure.Speed = GPIO_SPEED_FREQ_HIGH; // 高速
-        //         GPIO_Initure.Alternate = GPIO_AF8_USART3;  // 复用为USART3
-        //         HAL_GPIO_Init(GPIOC, &GPIO_Initure);       // 初始化PA11
+        GPIO_Initure.Pin = GPIO_PIN_7;           // PA12
+        HAL_GPIO_Init(GPIOC, &GPIO_Initure);     // 初始化PA12
 
-        //         GPIO_Initure.Pin = GPIO_PIN_7;           // PA12
-        //         HAL_GPIO_Init(GPIOC, &GPIO_Initure);     // 初始化PA12
+#if EN_USART3_RX
+        HAL_NVIC_EnableIRQ(USART3_IRQn);         // 使能USART3中断通道
+        HAL_NVIC_SetPriority(USART3_IRQn, 8, 0); // 抢占优先级6，子优先级1
+#endif
 
-        // #if EN_USART3_RX
-        //         HAL_NVIC_EnableIRQ(USART3_IRQn);         // 使能USART3中断通道
-        //         HAL_NVIC_SetPriority(USART3_IRQn, 8, 0); // 抢占优先级6，子优先级1
-        // #endif
-
-        // #endif
+#endif
     }
 }

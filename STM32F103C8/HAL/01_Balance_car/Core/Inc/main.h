@@ -32,48 +32,25 @@ extern "C"
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
+#include "valuepack.h"
 
 #include "dma.h"
 #include "adc.h"
+#include "tim.h"
+#include "encoder.h"
+#include "positional_pid.h"
 
 #include "oled.h"
+#include "tb6612.h"
 
 #include "mpu6050.h"
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
     // #include "stm3210e_eval.h"
 
-    /* Private includes ----------------------------------------------------------*/
-    /* USER CODE BEGIN Includes */
-
-    /* USER CODE END Includes */
-
-    /* Exported types ------------------------------------------------------------*/
-    /* USER CODE BEGIN ET */
-
-    /* USER CODE END ET */
-
-    /* Exported constants --------------------------------------------------------*/
-    /* USER CODE BEGIN EC */
-
-    /* USER CODE END EC */
-
-    /* Exported macro ------------------------------------------------------------*/
-    /* USER CODE BEGIN EM */
-
-    /* USER CODE END EM */
-
-    /* Exported functions prototypes ---------------------------------------------*/
-
-    /* USER CODE BEGIN EFP */
-
-    /* USER CODE END EFP */
-
-    /* Private defines -----------------------------------------------------------*/
-
-    /* USER CODE BEGIN Private defines */
-
-    /* USER CODE END Private defines */
+    extern positional_pid_params_t motor1_blance_pid;
+    extern float battery_v;      // 单电池电压
+    extern double battery_v_100; // 电池容量百分比
 
 #ifdef __cplusplus
 }

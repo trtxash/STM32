@@ -22,7 +22,7 @@ TARGET = Template
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -O3 -g
+OPT = -O2 -g
 
 
 #######################################
@@ -57,16 +57,22 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c \
 Core/Src/system_stm32f1xx.c \
+Core/Src/tim.c \
 Core/Src/adc.c \
 Core/Src/dma.c \
+Core/Src/exti.c \
+Core/Src/encoder.c \
 User/Src/delay.c \
 User/Src/sys.c \
 User/Src/usart.c \
+User/Src/valuepack.c \
 User/Src/filter.c \
+User/Src/positional_pid.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 Hardware/OLED/Src/oled.c \
 Hardware/OLED/Src/oledio.c \
+Hardware/TB6612/Src/tb6612.c \
 Hardware/MPU6050/Src/mpu6050.c \
 Hardware/MPU6050/eMPL/Src/inv_mpu.c \
 Hardware/MPU6050/eMPL/Src/inv_mpu_dmp_motion_driver.c \
@@ -134,6 +140,7 @@ C_INCLUDES =  \
 -IRTT \
 -IUser/Inc \
 -IHardware/OLED/Inc \
+-IHardware/TB6612/Inc \
 -IHardware/MPU6050/Inc \
 -IHardware/MPU6050/eMPL/Inc \
 

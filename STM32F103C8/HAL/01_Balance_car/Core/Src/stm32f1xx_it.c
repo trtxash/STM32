@@ -199,6 +199,14 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+ * @brief 串口6中断服务程序
+ */
+void USART3_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&UART3_Handler);
+}
+
+/**
  * @brief This function handles DMA1 channel1 global interrupt.
  */
 void DMA1_Channel1_IRQHandler(void)
@@ -220,10 +228,70 @@ void EXTI15_10_IRQHandler(void)
     /* USER CODE BEGIN EXTI15_10_IRQn 0 */
 
     /* USER CODE END EXTI15_10_IRQn 0 */
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12); // 调用中断处理公用函数
     /* USER CODE BEGIN EXTI15_10_IRQn 1 */
 
     /* USER CODE END EXTI15_10_IRQn 1 */
+}
+
+// 中断服务程序中需要做的事情
+// 在HAL库中所有的外部中断服务函数都会调用此函数
+//  GPIO_Pin:中断引脚号
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    static u8 Delay_sum = 0;
+
+    if (GPIO_Pin == GPIO_PIN_12)
+    {
+        Get_Angle(1);                      // 读取角度
+        Encoder_val[0] = -Read_Encoder(2); // 读取编码器，前进为正
+        Encoder_val[1] = -Read_Encoder(4);
+        readValuePack(&rxvaluepack); // 每5毫秒读取串口3接收到的数据
+
+        // Delay_sum++; // 延时计数
+
+        positional_pid_set_value(&motor1_blance_pid, rxvaluepack.integers[0], rxvaluepack.integers[1], rxvaluepack.integers[2]);
+
+        if (rxvaluepack.bools[0] == 1)
+        {
+            int a = (int)positional_pid_compute(&motor1_blance_pid, 0, Roll);
+            control_speed(a, a);
+        }
+        else
+            control_speed(0, 0);
+
+        OLED_Refresh();
+    }
+}
+
+// 控制左右轮速度,arr范围7199 ~ -7199
+void control_speed(int arr_r, int arr_l)
+{
+    if (arr_r >= 0) // 正转
+    {
+        TB6612_AIN1_Clr(); // 右轮正转
+        TB6612_AIN2_Set();
+        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, arr_r); // tim1，ch1大，左轮
+    }
+    else
+    {
+        TB6612_AIN1_Set(); // 右轮反转
+        TB6612_AIN2_Clr();
+        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, -arr_r); // tim1，ch1大，左轮
+    }
+
+    if (arr_l >= 0) // 正转
+    {
+        TB6612_BIN1_Set(); // 左轮正转
+        TB6612_BIN2_Clr();
+        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, arr_l); // tim1，ch1大，左轮
+    }
+    else
+    {
+        TB6612_BIN1_Clr(); // 左轮反转
+        TB6612_BIN2_Set();
+        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, -arr_l); // tim1，ch1大，左轮
+    }
 }
 
 /* USER CODE BEGIN 1 */

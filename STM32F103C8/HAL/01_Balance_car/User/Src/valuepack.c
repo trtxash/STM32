@@ -32,8 +32,8 @@ unsigned char vp_txbuff[TXPACK_BYTE_SIZE + 3];
 // DMA将串口接收寄存器和接收缓冲数组连接，将DMA设置为循环模式，实现环形缓冲区
 void initValuePack(u32 baudrate)
 {
-    uart6_init(baudrate);
-    HAL_UART_Receive_DMA(&UART6_Handler, (uint32_t)vp_rxbuff, VALUEPACK_BUFFER_SIZE);
+    uart3_init(baudrate);
+    HAL_UART_Receive_DMA(&UART3_Handler, (uint32_t)vp_rxbuff, VALUEPACK_BUFFER_SIZE);
 }
 
 // 数据读取涉及到的变量
@@ -59,7 +59,7 @@ unsigned char readValuePack(RxPack *rx_pack_ptr)
     isok = 0;
 
     // 这次通过DMA接收的计数值
-    this_index = VALUEPACK_BUFFER_SIZE - UART6_Handler.hdmarx->Instance->NDTR;
+    this_index = VALUEPACK_BUFFER_SIZE - UART3_Handler.hdmarx->Instance->CNDTR; // 查手册
 
     // 根据上次DMA计数值和本次DMA计数值的差值，确定两次函数执行中间接收的数据字节数，并使rxIndex增加
     if (this_index < last_index)
@@ -289,5 +289,5 @@ void sendValuePack(TxPack *tx_pack_ptr)
     vp_txbuff[TXPACK_BYTE_SIZE + 1] = sum;
     vp_txbuff[TXPACK_BYTE_SIZE + 2] = 0x5a;
 
-    HAL_UART_Transmit_DMA(&UART6_Handler, (uint32_t)vp_txbuff, TXPACK_BYTE_SIZE + 3);
+    HAL_UART_Transmit_DMA(&UART3_Handler, (uint32_t)vp_txbuff, TXPACK_BYTE_SIZE + 3);
 }

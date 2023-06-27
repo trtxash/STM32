@@ -1,5 +1,7 @@
 #include "encoder.h"
 
+int Encoder_val[2];
+
 /**
  * @brief  配置TIMx编码器模式
  * @param  无
@@ -10,14 +12,14 @@ void Tim_Encoder_Init(void)
     MX_TIM2_Init(ENCODER_TIM_PERIOD_0, ENCODER_TIM_PRESCALER_0, ENCODER_FILTER_VALUE_0);
     HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL); // 使能编码器接口
 
-    MX_TIM3_Init(ENCODER_TIM_PERIOD_1, ENCODER_TIM_PRESCALER_1, ENCODER_FILTER_VALUE_1);
-    HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL); // 使能编码器接口
+    // MX_TIM3_Init(ENCODER_TIM_PERIOD_1, ENCODER_TIM_PRESCALER_1, ENCODER_FILTER_VALUE_1);
+    // HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL); // 使能编码器接口
 
-    MX_TIM4_Init(ENCODER_TIM_PERIOD_2, ENCODER_TIM_PRESCALER_2, ENCODER_FILTER_VALUE_2);
+    MX_TIM4_Init(ENCODER_TIM_PERIOD_1, ENCODER_TIM_PRESCALER_1, ENCODER_FILTER_VALUE_1);
     HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL); // 使能编码器接口
 
-    MX_TIM5_Init(ENCODER_TIM_PERIOD_3, ENCODER_TIM_PRESCALER_3, ENCODER_FILTER_VALUE_3);
-    HAL_TIM_Encoder_Start(&htim5, TIM_CHANNEL_ALL); // 使能编码器接口
+    // MX_TIM5_Init(ENCODER_TIM_PERIOD_3, ENCODER_TIM_PRESCALER_3, ENCODER_FILTER_VALUE_3);
+    // HAL_TIM_Encoder_Start(&htim5, TIM_CHANNEL_ALL); // 使能编码器接口
 }
 
 /**
@@ -44,9 +46,6 @@ int Read_Encoder(u8 tim)
     case 4:
         Encoder_TIM = TIM4->CNT;
         break;
-    case 5:
-        Encoder_TIM = TIM5->CNT;
-        break;
     default:
         break;
     }
@@ -64,9 +63,6 @@ int Read_Encoder(u8 tim)
         break;
     case 4:
         TIM4->CNT = 0;
-        break;
-    case 5:
-        TIM5->CNT = 0;
         break;
     default:
         break;
