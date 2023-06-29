@@ -506,7 +506,7 @@ void Get_Angle(u8 way)
     if (way == 1)                        // DMP的读取在数据采集中断读取，严格遵循时序要求
     {
         mpu_dmp_get_data(&Pitch, &Roll, &Yaw); // 读取加速度、角速度、倾角
-        Angle_Balance = Pitch;                 // 更新平衡倾角,前倾为正，后倾为负
+        Angle_Balance = Roll;                  // 更新平衡倾角,前倾为正，后倾为负
         Gyro_Balance = gyro[0];                // 更新平衡角速度,前倾为正，后倾为负
         Gyro_Turn = gyro[2];                   // 更新转向角速度
         Acceleration_Z = accel[2];             // 更新Z轴加速度计

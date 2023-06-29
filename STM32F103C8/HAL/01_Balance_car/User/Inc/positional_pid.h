@@ -27,6 +27,7 @@ typedef struct _positional_pid_params_t
 
     float p_out;
     float i_out;
+    float i_out_max;
     float d_out;
 
     float output;
@@ -40,8 +41,8 @@ typedef struct _positional_pid_params_t
     float dead_zone;
 
     void (*positional_pid_params_init)(
-        struct _positional_pid_params_t *positional_pid, float kp, float ki,
-        float kd, float dead_zone, float output_max, float output_min);
+        struct _positional_pid_params_t *positional_pid, float kp, float ki, float kd,
+        float iout_max, float dead_zone, float output_max, float output_min);
     void (*positional_pid_set_value)(
         struct _positional_pid_params_t *positional_pid, float kp, float ki,
         float kd);
@@ -50,10 +51,8 @@ typedef struct _positional_pid_params_t
         positional_pid_status status);
 } positional_pid_params_t;
 
-void positional_pid_init(positional_pid_params_t *positional_pid, float kp,
-                         float ki, float kd,
-
-                         float dead_zone, float output_max, float output_min);
+void positional_pid_init(positional_pid_params_t *positional_pid, float kp, float ki, float kd,
+                         float iout_max, float dead_zone, float output_max, float output_min);
 float positional_pid_compute(positional_pid_params_t *positional_pid,
                              float target, float measure);
 

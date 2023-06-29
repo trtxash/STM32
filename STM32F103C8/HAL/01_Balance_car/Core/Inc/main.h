@@ -49,6 +49,8 @@ extern "C"
     // #include "stm3210e_eval.h"
 
     extern positional_pid_params_t motor1_blance_pid;
+    // extern positional_pid_params_t motor1_blance_a_pid;
+    extern positional_pid_params_t motor1_velocity_pid;
     extern float battery_v;      // 单电池电压
     extern double battery_v_100; // 电池容量百分比
 

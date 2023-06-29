@@ -25,8 +25,8 @@
 //    根据实际需要的变量，定义数据包中 bool byte short int float 五种类型的数目
 #define RX_BOOL_NUM 1
 #define RX_BYTE_NUM 0
-#define RX_SHORT_NUM 0
-#define RX_INT_NUM 3
+#define RX_SHORT_NUM 9
+#define RX_INT_NUM 2
 #define RX_FLOAT_NUM 0
 
 typedef struct

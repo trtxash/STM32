@@ -243,24 +243,30 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
     if (GPIO_Pin == GPIO_PIN_12)
     {
-        Get_Angle(1);                      // 读取角度
-        Encoder_val[0] = -Read_Encoder(2); // 读取编码器，前进为正
-        Encoder_val[1] = -Read_Encoder(4);
-        readValuePack(&rxvaluepack); // 每5毫秒读取串口3接收到的数据
+        Get_Angle(1); // 读取角度
 
         // Delay_sum++; // 延时计数
 
-        positional_pid_set_value(&motor1_blance_pid, rxvaluepack.integers[0], rxvaluepack.integers[1], rxvaluepack.integers[2]);
-
+        Encoder_val[0] = -Read_Encoder(2); // 读取编码器，前进为正
+        Encoder_val[1] = -Read_Encoder(4);
         if (rxvaluepack.bools[0] == 1)
         {
-            int a = (int)positional_pid_compute(&motor1_blance_pid, 0, Roll);
+            int a;
+            if (Angle_Balance > 35.0 || Angle_Balance < -35.0)
+            {
+                a = 0;
+            }
+            else
+            {
+                a = (int)positional_pid_compute(&motor1_blance_pid, 0, Angle_Balance);
+                // a += (int)positional_pid_compute(&motor1_blance_a_pid, 0, Gyro_Balance);
+                a += (int)positional_pid_compute(&motor1_velocity_pid, rxvaluepack.integers[0], -(Encoder_val[0] + Encoder_val[1]));
+                // a -= (int)positional_pid_compute(&motor1_velocity_pid, rxvaluepack.integers[0] + rxvaluepack.integers[1], Encoder_val[0] + Encoder_val[1]);
+            }
             control_speed(a, a);
         }
         else
             control_speed(0, 0);
-
-        OLED_Refresh();
     }
 }
 
