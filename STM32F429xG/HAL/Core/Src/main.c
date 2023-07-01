@@ -12,13 +12,13 @@ int main(void)
 
     while (1)
     {
-        delay_ms(1000);
+        delay_ms(250);
         LED0_Reverse();
-        // delay_ms(250);
-        // LED1_Reverse();
-        // delay_ms(250);
-        // LED2_Reverse();
-        // delay_ms(250);
-        // LED3_Reverse();
+        delay_ms(250);
+        LED1_Reverse();
+        delay_ms(250);
+        LED2_Reverse();
+        delay_ms(250);
+        LED3_Reverse();
     }
 }
