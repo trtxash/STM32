@@ -20,11 +20,10 @@
 
 #ifndef _INV_MPU_H_
 #define _INV_MPU_H_
-#include "stm32f4xx.h"
 #include "sys.h"
 
 // 定义输出速度
-#define DEFAULT_MPU_HZ (100) // 100Hz
+#define DEFAULT_MPU_HZ (200) // 200Hz，采样速率
 
 #define INV_X_GYRO (0x40)
 #define INV_Y_GYRO (0x20)
@@ -129,6 +128,7 @@ int mpu_reg_dump(void);
 int mpu_read_reg(unsigned char reg, unsigned char *data);
 int mpu_run_self_test(long *gyro, long *accel);
 int mpu_register_tap_cb(void (*func)(unsigned char, unsigned char));
+
 // 自行添加的一些函数
 void mget_ms(unsigned long *time);
 unsigned short inv_row_2_scale(const signed char *row);

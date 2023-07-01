@@ -3,26 +3,39 @@
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
+#include "inv_mpu.h"
 
 #define MPU6050_SCLK_Port GPIOB
 #define MPU6050_SCLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define MPU6050_SCLK_Pin GPIO_PIN_6
+#define MPU6050_SCLK_Pin GPIO_PIN_8
 
 #define MPU6050_SDIN_Port GPIOB
 #define MPU6050_SDIN_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define MPU6050_SDIN_Pin GPIO_PIN_7
+#define MPU6050_SDIN_Pin GPIO_PIN_9
 
-// IO方向设置
-#define MPU_SDA_IN()                                 \
-    {                                                \
-        MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-        MPU6050_SDIN_Port->MODER |= 0 << 7 * 2;      \
+// IO方向设置，f1，建议查手册看寄存器
+#define MPU_SDA_IN()                          \
+    {                                         \
+        MPU6050_SDIN_Port->CRH &= 0XFFFFFF0F; \
+        MPU6050_SDIN_Port->CRH |= 8 << 4;     \
     } // PB9输入模式
-#define MPU_SDA_OUT()                                \
-    {                                                \
-        MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-        MPU6050_SDIN_Port->MODER |= 1 << 7 * 2;      \
+#define MPU_SDA_OUT()                         \
+    {                                         \
+        MPU6050_SDIN_Port->CRH &= 0XFFFFFF0F; \
+        MPU6050_SDIN_Port->CRH |= 3 << 4;     \
     } // PB9输出模式
+
+// IO方向设置，f4，建议查手册看寄存器
+// #define MPU_SDA_IN()                                 \
+//     {                                                \
+//         MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
+//         MPU6050_SDIN_Port->MODER |= 0 << 7 * 2;      \
+//     } // PB7输入模式
+// #define MPU_SDA_OUT()                                \
+//     {                                                \
+//         MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
+//         MPU6050_SDIN_Port->MODER |= 1 << 7 * 2;      \
+//     } // PB7输出模式
 
 #define MPU6050_SCLK_Clr() MPU6050_SCLK_Port->BSRR = (uint32_t)MPU6050_SCLK_Pin << 16U
 #define MPU6050_SCLK_Set() MPU6050_SCLK_Port->BSRR = MPU6050_SCLK_Pin
@@ -108,6 +121,12 @@
 // #define MPU_READ    				0XD1
 // #define MPU_WRITE   				0XD0
 
+extern u16 Temperature; // 温度变量
+extern short gyro[3], accel[3], sensors;
+extern float Roll, Pitch, Yaw;                       // 欧拉角，横滚角，俯仰角，偏航角
+extern float Angle_Balance, Gyro_Balance, Gyro_Turn; // 平衡倾角 平衡陀螺仪 转向陀螺仪
+extern float Acceleration_Z;                         // Z轴加速度计
+
 // IIC所有操作函数
 void MPU_IIC_Delay(void);                // IIC延时2ms函数
 void MPU_IIC_Init(void);                 // 初始化IIC的IO口
@@ -137,5 +156,6 @@ u8 MPU_Set_Fifo(u8 sens);
 short MPU_Get_Temperature(void);
 u8 MPU_Get_Gyroscope(short *gx, short *gy, short *gz);
 u8 MPU_Get_Accelerometer(short *ax, short *ay, short *az);
+void Get_Angle(u8 way);
 
 #endif
