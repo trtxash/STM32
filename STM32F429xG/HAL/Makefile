@@ -22,7 +22,7 @@ TARGET = Template
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -O3 -g
+OPT = -Og
 
 
 #######################################
@@ -55,7 +55,10 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
-Core/Src/system_stm32f4xx.c  
+Core/Src/system_stm32f4xx.c  \
+User/Src/sys.c \
+User/Src/delay.c \
+Hardware/LED/Src/led.c \
 
 # ASM sources
 ASM_SOURCES =  \
