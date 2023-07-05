@@ -19,11 +19,11 @@
 /*************************************************** OLED IIC 端口定义 ************************************************/
 #define OLED_SCLK_Port GPIOB
 #define OLED_SCLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define OLED_SCLK_Pin GPIO_PIN_6
+#define OLED_SCLK_Pin GPIO_PIN_9
 
 #define OLED_SDIN_Port GPIOB
 #define OLED_SDIN_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define OLED_SDIN_Pin GPIO_PIN_7
+#define OLED_SDIN_Pin GPIO_PIN_8
 
 #define OLED_RST_Port GPIOB
 #define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
@@ -32,13 +32,13 @@
 // IO方向设置
 #define OLED_SDA_IN()                             \
     {                                             \
-        OLED_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-        OLED_SDIN_Port->MODER |= 0 << 7 * 2;      \
+        OLED_SDIN_Port->MODER &= ~(3 << (8 * 2)); \
+        OLED_SDIN_Port->MODER |= 0 << 8 * 2;      \
     } // PB9输入模式，括号内数字为几号管脚
 #define OLED_SDA_OUT()                            \
     {                                             \
-        OLED_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-        OLED_SDIN_Port->MODER |= 1 << 7 * 2;      \
+        OLED_SDIN_Port->MODER &= ~(3 << (8 * 2)); \
+        OLED_SDIN_Port->MODER |= 1 << 8 * 2;      \
     } // PB9输出模式，括号内数字为几号管脚
 
 #define OLED_SCLK_Clr() OLED_SCLK_Port->BSRR = (uint32_t)OLED_SCLK_Pin << 16U
