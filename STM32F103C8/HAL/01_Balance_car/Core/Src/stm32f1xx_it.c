@@ -251,19 +251,30 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         Encoder_val[1] = -Read_Encoder(4);
         if (rxvaluepack.bools[0] == 1)
         {
-            int a;
-            if (Angle_Balance > 35.0 || Angle_Balance < -35.0)
+            static r, l;
+            if (Angle_Balance > 45.0 || Angle_Balance < -45.0)
             {
-                a = 0;
+                r = l = 0;
             }
             else
             {
-                a = (int)positional_pid_compute(&motor1_blance_pid, 0, Angle_Balance);
-                // a += (int)positional_pid_compute(&motor1_blance_a_pid, 0, Gyro_Balance);
-                a += (int)positional_pid_compute(&motor1_velocity_pid, rxvaluepack.integers[0], -(Encoder_val[0] + Encoder_val[1]));
-                // a -= (int)positional_pid_compute(&motor1_velocity_pid, rxvaluepack.integers[0] + rxvaluepack.integers[1], Encoder_val[0] + Encoder_val[1]);
+                r = l = (int)positional_pid_compute(&motor1_blance_pid, Modle_Angle_Balance, Angle_Balance);
+                r = l -= (int)positional_pid_compute(&motor1_velocity_pid, rxvaluepack.integers[0], Encoder_val[1] + Encoder_val[0]); // 正反馈，-=,目标速度为0
+
+                r -= rxvaluepack.integers[1] * 25;
+                l += rxvaluepack.integers[1] * 25;
+                // i = (int)positional_pid_compute(&motor1_turn_pid, rxvaluepack.integers[0] + rxvaluepack.integers[1], Encoder_val[0]);
+
+                if (r > 7199)
+                    r = 7199;
+                if (r < -7199)
+                    r = -7199;
+                if (l > 7199)
+                    l = 7199;
+                if (l < -7199)
+                    l = -7199;
             }
-            control_speed(a, a);
+            control_speed(r, l);
         }
         else
             control_speed(0, 0);

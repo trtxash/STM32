@@ -3083,6 +3083,53 @@ u8 mpu_dmp_init(void)
     }
     return 0;
 }
+
+// mpu6050,dmp初始化
+// 返回值:0,正常
+//     其他,失败
+u8 mpu_dmp_init_noreset(void)
+{
+    u8 res = 0;
+    MPU_IIC_Init();      // 初始化IIC总线
+    if (mpu_init() == 0) // 初始化MPU6050
+    {
+        res = mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL); // 设置所需要的传感器
+        if (res)
+            return 1;
+        res = mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL); // 设置FIFO
+        if (res)
+            return 2;
+        res = mpu_set_sample_rate(DEFAULT_MPU_HZ); // 设置采样率
+        if (res)
+            return 3;
+        res = dmp_load_motion_driver_firmware(); // 加载dmp固件
+        if (res)
+            return 4;
+        res = dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_orientation)); // 设置陀螺仪方向
+        if (res)
+            return 5;
+        res = dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP | // 设置dmp功能
+                                 DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO |
+                                 DMP_FEATURE_GYRO_CAL);
+        if (res)
+            return 6;
+        res = dmp_set_fifo_rate(DEFAULT_MPU_HZ); // 设置DMP输出速率(最大不超过200Hz)
+        // if (res)
+        //     return 7;
+        // res = run_self_test(); // 自检
+        if (res)
+            return 8;
+        res = mpu_set_dmp_state(1); // 使能DMP
+        if (res)
+            return 9;
+    }
+    else
+    {
+        return 10; // MPU6050初始化失败
+    }
+    return 0;
+}
+
 // 得到dmp处理后的数据(注意,本函数需要比较多堆栈,局部变量有点多)
 // pitch:俯仰角 精度:0.1°   范围:-90.0° <---> +90.0°
 // roll:横滚角  精度:0.1°   范围:-180.0°<---> +180.0°

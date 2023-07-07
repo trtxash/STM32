@@ -9,8 +9,8 @@
 #include "main.h"
 
 positional_pid_params_t motor1_blance_pid;
-// positional_pid_params_t motor1_blance_a_pid;
 positional_pid_params_t motor1_velocity_pid;
+positional_pid_params_t motor1_turn_pid;
 
 float battery_v;      // 单电池电压
 double battery_v_100; // 电池容量百分比
@@ -45,7 +45,7 @@ int main(void)
     initValuePack(9600); // Valuepack初始化，用了uart3+DMA
     while (1)
     {
-        u8 mpu_state = mpu_dmp_init();
+        u8 mpu_state = mpu_dmp_init_noreset();
         if (mpu_state == 0)
         {
             sprintf(temp, "mpu OK!   ");
@@ -65,9 +65,9 @@ int main(void)
     EXTI_Init();                                              // 外部中断，由mpu6050 int脚触发，5ms周期
     HAL_ADCEx_Calibration_Start(&hadc1);                      // 启动ADC1校准，不校准将导致ADC测量不准确
     HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx, ADC_Sec * 2); // 启动ADC+DMA
-    positional_pid_init(&motor1_blance_pid, 0, 0, 0, 1000, 0, 3600, -3600);
-    // positional_pid_init(&motor1_blance_a_pid, 0, 0, 0, 1000, 0, 3600, -3600);
-    positional_pid_init(&motor1_velocity_pid, 0, 0, 0, 1000, 0, 3600, -3600);
+    positional_pid_init(&motor1_blance_pid, 230, 6, 0, 3600, 0, 7199, -7199);
+    positional_pid_init(&motor1_velocity_pid, 0, 2.5, 0, 3600, 0, 7199, -7199);
+    positional_pid_init(&motor1_turn_pid, 0, 0, 0, 3600, 0, 7199, -7199);
 
     sprintf(temp, "Init ok!");
     OLED_ShowString(0, 0, temp, 8, 1, WHITE);
@@ -77,9 +77,8 @@ int main(void)
     {
         readValuePack(&rxvaluepack); // 读取串口3接收到的数据
         positional_pid_set_value(&motor1_blance_pid, rxvaluepack.shorts[0] / 10, rxvaluepack.shorts[1] / 10, rxvaluepack.shorts[2] / 10);
-        // positional_pid_set_value(&motor1_blance_a_pid, 0, rxvaluepack.shorts[1] / 10, 0);
         positional_pid_set_value(&motor1_velocity_pid, rxvaluepack.shorts[3] / 10, rxvaluepack.shorts[4] / 10, rxvaluepack.shorts[5] / 10);
-        // positional_pid_set_value(&motor1_blance_pid, rxvaluepack.shorts[0], rxvaluepack.shorts[1], rxvaluepack.shorts[2]);
+        positional_pid_set_value(&motor1_turn_pid, rxvaluepack.shorts[6] / 10, rxvaluepack.shorts[7] / 10, rxvaluepack.shorts[8] / 10);
 
         battery_v = Get_Adc_Average_DMA() * 3.3 * 11 * 100 / 1.0 / 4096 / 100 / 3;
         battery_v_100 = 9413.0184 - 303.204 * battery_v * battery_v * battery_v * battery_v * battery_v + 114.0062 * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v - 44.7181 * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v + 6.547055 * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v - 0.336029617 * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v * battery_v;

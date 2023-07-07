@@ -126,6 +126,7 @@ extern short gyro[3], accel[3], sensors;
 extern float Roll, Pitch, Yaw;                       // 欧拉角，横滚角，俯仰角，偏航角
 extern float Angle_Balance, Gyro_Balance, Gyro_Turn; // 平衡倾角 平衡陀螺仪 转向陀螺仪
 extern float Acceleration_Z;                         // Z轴加速度计
+extern float Modle_Angle_Balance;
 
 // IIC所有操作函数
 void MPU_IIC_Delay(void);                // IIC延时2ms函数

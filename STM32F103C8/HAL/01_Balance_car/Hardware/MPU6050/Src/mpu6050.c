@@ -7,6 +7,7 @@ short gyro[3], accel[3], sensors;
 float Roll, Pitch, Yaw;                       // 欧拉角，横滚角，俯仰角，偏航角
 float Angle_Balance, Gyro_Balance, Gyro_Turn; // 平衡倾角 平衡陀螺仪 转向陀螺仪
 float Acceleration_Z;                         // Z轴加速度计
+float Modle_Angle_Balance = -3.75;            // 模型平衡角（平衡时的角）
 
 /**********************************************
 函数名称：MPU_IIC_Delay
