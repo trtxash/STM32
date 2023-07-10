@@ -318,11 +318,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             /* 每50毫秒读取编码器数值 */
             Encoder[0] = Read_Encoder(&htim2);
             Encoder[1] = Read_Encoder(&htim3);
-            // PID速度环计算
-            positional_pid_compute(&motor1_velocity, TARGET_V[0], Encoder[0]);
-            positional_pid_compute(&motor2_velocity, TARGET_V[1], Encoder[1]);
             // 位置积分
             Location_sum = Location_integral((short)((Encoder[0] + Encoder[1]) / 2), 0);
+            // PID速度环计算
+            positional_pid_compute(&motor1_velocity, TARGET_V[0] + Get_Grayscale_Val(), Encoder[0]);
+            positional_pid_compute(&motor2_velocity, TARGET_V[1] - Get_Grayscale_Val(), Encoder[1]);
+            // PID转向环计算
+            positional_pid_compute(&motor_turn, TARGET_ANGLE, Yaw);
 
             if (x10ms % 10 == 0) // 100ms
             {

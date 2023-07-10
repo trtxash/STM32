@@ -48,3 +48,21 @@ void Grayscale_Init(void)
     GPIO_Initure.Speed = GPIO_SPEED_LOW; // 高速
     HAL_GPIO_Init(GRAYSCALE6_Port, &GPIO_Initure);
 }
+
+// 根据灰度信息计算出具体偏移位置
+float Get_Grayscale_Val(void)
+{
+    // 7路：-3 -2 -1 0 1 2 3，超出为0
+    // 0,1,2亮
+    static float i = 0;
+    u8 temp;
+    temp = GRAYSCALE0_READ() + GRAYSCALE1_READ() + GRAYSCALE2_READ() + GRAYSCALE3_READ() + GRAYSCALE4_READ() + GRAYSCALE5_READ() + GRAYSCALE6_READ();
+    if (temp == 0)
+        i = 0;
+    else if (temp == 1)
+        i = -3 * GRAYSCALE0_READ() - 2 * GRAYSCALE1_READ() - GRAYSCALE2_READ() + GRAYSCALE4_READ() + 2 * GRAYSCALE5_READ() + 3 * GRAYSCALE6_READ();
+    else if (tmep == 2)
+        i = (-3 * GRAYSCALE0_READ() - 2 * GRAYSCALE1_READ() - GRAYSCALE2_READ() + GRAYSCALE4_READ() + 2 * GRAYSCALE5_READ() + 3 * GRAYSCALE6_READ()) / 2;
+
+    return i;
+}

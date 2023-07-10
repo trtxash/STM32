@@ -64,15 +64,15 @@ int main(void)
         sprintf(temp, "GB:%0.2f ", Gyro_Balance);
         OLED_ShowString(64, 32, temp, 8, 1, WHITE);
 
-        if (USART_RX_STA & 0x8000) // 接受到数字
-        {
-            int len = USART_RX_STA & 0X3FFF; // 接收次数
+        // if (USART_RX_STA & 0x8000) // 接受到数字
+        // {
+        //     int len = USART_RX_STA & 0X3FFF; // 接收次数
 
-            for (; len >= 0; len--)
-            {
-                OLED_ShowChar(len * 6, 40, USART_RX_BUF[len], 8, 1, WHITE);
-            }
-            USART_RX_STA = 0; // 清楚标志位
-        }
+        //     for (; len >= 0; len--)
+        //     {
+        //         OLED_ShowChar(len * 6, 40, USART_RX_BUF[len], 8, 1, WHITE);
+        //     }
+        //     USART_RX_STA = 0; // 清楚标志位
+        // }
     }
 }

@@ -39,5 +39,6 @@
 #define GRAYSCALE6_READ() GRAYSCALE6_Port->IDR &GRAYSCALE6_Pin // 0 or 1
 
 void Grayscale_Init(void);
+float Get_Grayscale_Val(void);
 
 #endif
