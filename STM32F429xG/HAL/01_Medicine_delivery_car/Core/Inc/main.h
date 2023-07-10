@@ -31,10 +31,12 @@ extern "C"
 #include "stm32f4xx_hal.h"
 #include "sys.h"
 #include "delay.h"
+#include "usart.h"
 
 #include "dma.h"
 #include "spi.h"
 #include "tim.h"
+#include "encoder.h"
 
 #include "led.h"
 #include "oled.h"
@@ -42,6 +44,8 @@ extern "C"
 #include "mpu6050.h"
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
+
+#include "control.h"
 
     /* Private includes ----------------------------------------------------------*/
     /* USER CODE BEGIN Includes */

@@ -1,5 +1,8 @@
 #include "encoder.h"
 
+short Encoder[2] = {0}; // 记录编码器的值
+int Location_sum = 0;
+
 /**
  * @brief  配置TIMx编码器模式
  * @param  无
@@ -41,12 +44,33 @@ short Read_Encoder(TIM_HandleTypeDef *htim)
  * @param 	none
  * @arg		none
  * @note  	根据编码器读数和轮直径计算具体速度
- * @retval	int
+ * @retval	short
  */
-double Calculate_Velocity(int encoder_value)
+double Calculate_Velocity(short encoder_value)
 {
     double velocity = 0;
     /* 转速为周长*编码器读数*当前频率/电机减速比/电机总分辨率 */
     velocity = ONE_WHEEL_CIRCUMFERENCE * (double)encoder_value * READ_ENCODER_FREQU / REDUCTION_RATIO / ENCODER_TOTAL_RESOLUTION;
     return velocity;
+}
+
+/**
+ * @brief	计算具体路程函数
+ * @param 	none
+ * @arg		none
+ * @note  	根据编码器读数和轮直径计算具体路程
+ * @retval	int
+ */
+int Location_integral(short encoder_value, u8 reset)
+{
+    static int location = 0;
+    /* 路程为周长*编码器读数/电机减速比/电机总分辨率,做个积分 */
+    location += ONE_WHEEL_CIRCUMFERENCE * (double)encoder_value / REDUCTION_RATIO / ENCODER_TOTAL_RESOLUTION;
+
+    if (reset)
+    {
+        location = 0;
+    }
+
+    return location;
 }

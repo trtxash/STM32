@@ -15,6 +15,7 @@
 TIM_HandleTypeDef htim2; // 编码器0
 TIM_HandleTypeDef htim3; // 编码器1
 TIM_HandleTypeDef htim5; // 编码器3
+TIM_HandleTypeDef htim6; // 基础任务定时
 
 volatile unsigned long long FreeRTOSRunTimeTicks; // 易变量，FreeRTOS运行计时
 
@@ -177,6 +178,49 @@ void MX_TIM5_Init(u32 arr, u16 psc)
 }
 
 /**
+ * @brief   TIM6 Initialization Function
+ * @note
+ *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+ * @param 	arr-Period
+ * 			psc-Prescaler
+ * @retval  None
+ */
+void MX_TIM6_Init(u16 arr, u16 psc)
+{
+
+    /* USER CODE BEGIN TIM6_Init 0 */
+
+    /* USER CODE END TIM6_Init 0 */
+
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+    /* USER CODE BEGIN TIM6_Init 1 */
+
+    /* USER CODE END TIM6_Init 1 */
+    htim6.Instance = TIM6;
+    htim6.Init.Prescaler = psc;
+    htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim6.Init.Period = arr;
+    htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN TIM6_Init 2 */
+    if (HAL_TIM_Base_Start_IT(&htim6) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE END TIM6_Init 2 */
+}
+
+/**
  * @brief TIM_Base MSP Initialization
  * This function configures the hardware resources used in this example
  * @param tim_baseHandle: TIM_Base handle pointer
@@ -196,6 +240,21 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle)
     else if (tim_baseHandle->Instance == TIM5)
     {
         __HAL_RCC_TIM5_CLK_ENABLE();
+    }
+    else if (tim_baseHandle->Instance == TIM6)
+    {
+        /* USER CODE BEGIN TIM6_MspInit 0 */
+
+        /* USER CODE END TIM6_MspInit 0 */
+        /* TIM6 clock enable */
+        __HAL_RCC_TIM6_CLK_ENABLE();
+
+        /* TIM6 interrupt Init */
+        HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
+        /* USER CODE BEGIN TIM6_MspInit 1 */
+
+        /* USER CODE END TIM6_MspInit 1 */
     }
 }
 
@@ -321,6 +380,20 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *tim_baseHandle)
         /* USER CODE BEGIN TIM1_MspDeInit 1 */
 
         /* USER CODE END TIM1_MspDeInit 1 */
+    }
+    else if (tim_baseHandle->Instance == TIM6)
+    {
+        /* USER CODE BEGIN TIM6_MspDeInit 0 */
+
+        /* USER CODE END TIM6_MspDeInit 0 */
+        /* Peripheral clock disable */
+        __HAL_RCC_TIM6_CLK_DISABLE();
+
+        /* TIM6 interrupt Deinit */
+        HAL_NVIC_DisableIRQ(TIM6_DAC_IRQn);
+        /* USER CODE BEGIN TIM6_MspDeInit 1 */
+
+        /* USER CODE END TIM6_MspDeInit 1 */
     }
 }
 

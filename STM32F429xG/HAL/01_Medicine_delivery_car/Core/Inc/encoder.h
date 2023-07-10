@@ -49,8 +49,12 @@
 /* 计算转一圈的距离 单位M */
 #define ONE_WHEEL_CIRCUMFERENCE (3.14159265358979323846 * TIRE_DIAMETER)
 
+extern short Encoder[2]; // 记录编码器的值
+extern int Location_sum;
+
 void Tim_Encoder_Init(void);
 short Read_Encoder(TIM_HandleTypeDef *htim); // 输入定时器句柄，返回编码器数值
-double Calculate_Velocity(int encoder_value);
+double Calculate_Velocity(short encoder_value);
+int Location_integral(short encoder_value, u8 reset);
 
 #endif /* __BSP_ENCODER_H */

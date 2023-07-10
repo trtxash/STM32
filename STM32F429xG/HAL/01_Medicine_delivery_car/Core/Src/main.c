@@ -29,6 +29,7 @@ int main(void)
     MX_SPI6_Init();
     LED_Init();
     OLED_Init();
+    uart_init(115200);
     while (1)
     {
         u8 mpu_state = mpu_dmp_init();
@@ -44,6 +45,7 @@ int main(void)
             OLED_ShowString(64, 0, temp, 8, 1, WHITE);
         }
     }
+    MX_TIM6_Init((u16)(10000 - 1), (u16)(120 - 1)); // 定时器6初始化，周期10ms
 
     while (1)
     {
@@ -61,5 +63,16 @@ int main(void)
         OLED_ShowString(0, 32, temp, 8, 1, WHITE);
         sprintf(temp, "GB:%0.2f ", Gyro_Balance);
         OLED_ShowString(64, 32, temp, 8, 1, WHITE);
+
+        if (USART_RX_STA & 0x8000) // 接受到数字
+        {
+            int len = USART_RX_STA & 0X3FFF; // 接收次数
+
+            for (; len >= 0; len--)
+            {
+                OLED_ShowChar(len * 6, 40, USART_RX_BUF[len], 8, 1, WHITE);
+            }
+            USART_RX_STA = 0; // 清楚标志位
+        }
     }
 }
