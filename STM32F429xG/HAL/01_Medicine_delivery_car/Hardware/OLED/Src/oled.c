@@ -100,11 +100,11 @@ void OLED_WR_CMD(u8 dat)
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     HAL_I2C_Mem_Write(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x00, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
+
     OLED_DC_Clr();
-
     HAL_SPI_Transmit(&OLED_SPI_HandleTypeDef, &dat, 1, 100);
-
     OLED_DC_Set();
+
 #endif
 
 #endif
@@ -155,9 +155,9 @@ void OLED_WR_DATA8(u8 dat)
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     HAL_I2C_Mem_Write(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-
+   
     HAL_SPI_Transmit(&OLED_SPI_HandleTypeDef, &dat, 1, 100);
-
+    
 #endif
 
 #endif

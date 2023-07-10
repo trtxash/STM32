@@ -23,7 +23,7 @@ void MPU_IIC_Delay(void)
     // while (t--)
     // {
     // }
-    delay_us(1);
+    delay_us(2);
 }
 #pragma GCC pop_options
 
@@ -52,7 +52,7 @@ void MPU_IIC_Init(void)
 
     MPU6050_SDIN_Set();
     MPU6050_SCLK_Set();
-    // delay_ms(100);
+    delay_ms(100);
 }
 
 /**********************************************

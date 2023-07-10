@@ -17,23 +17,49 @@
  */
 int main(void)
 {
+    u8 temp[21] = {0};
+
     if (HAL_Init()) // 初始化HAL库
     {
         Error_Handler();
     }
     Stm32_Clock_Init(240, 12, RCC_PLLP_DIV2, 8); // 设置时钟
     delay_init(240);                             // 初始化延时函数
+    MX_DMA_Init();
+    MX_SPI6_Init();
     LED_Init();
+    OLED_Init();
+    while (1)
+    {
+        u8 mpu_state = mpu_dmp_init();
+        if (mpu_state == 0)
+        {
+            sprintf(temp, "mpu OK!   ");
+            OLED_ShowString(64, 0, temp, 8, 1, WHITE);
+            break;
+        }
+        else
+        {
+            sprintf(temp, "mpu fal:%d", mpu_state);
+            OLED_ShowString(64, 0, temp, 8, 1, WHITE);
+        }
+    }
 
     while (1)
     {
-        delay_ms(50);
-        LED0_Reverse();
-        delay_ms(50);
-        LED1_Reverse();
-        delay_ms(50);
-        LED2_Reverse();
-        delay_ms(50);
-        LED3_Reverse();
+        Get_Angle(1); // 读取角度
+        sprintf(temp, "t:%0.2f ", (float)Temperature / 100);
+        OLED_ShowString(64, 8, temp, 8, 1, WHITE);
+        sprintf(temp, "R:%0.2f ", Roll);
+        OLED_ShowString(0, 16, temp, 8, 1, WHITE);
+        sprintf(temp, "P:%0.2f ", Pitch);
+        OLED_ShowString(64, 16, temp, 8, 1, WHITE);
+        sprintf(temp, "Y:%0.2f ", Yaw);
+        OLED_ShowString(0, 24, temp, 8, 1, WHITE);
+
+        sprintf(temp, "AB:%0.2f ", Angle_Balance);
+        OLED_ShowString(0, 32, temp, 8, 1, WHITE);
+        sprintf(temp, "GB:%0.2f ", Gyro_Balance);
+        OLED_ShowString(64, 32, temp, 8, 1, WHITE);
     }
 }

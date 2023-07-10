@@ -38,8 +38,13 @@ BUILD_DIR = build
 C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/gpio.c \
+Core/Src/dma.c \
+Core/Src/spi.c \
+Core/Src/tim.c \
+Core/Src/encoder.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
+Core/Src/system_stm32f4xx.c  \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
@@ -55,10 +60,20 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
-Core/Src/system_stm32f4xx.c  \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
 User/Src/sys.c \
 User/Src/delay.c \
+User/Src/usart.c \
+User/Src/filter.c \
+RTT/SEGGER_RTT_printf.c \
+RTT/SEGGER_RTT.c \
 Hardware/LED/Src/led.c \
+Hardware/OLED/Src/oled.c \
+Hardware/OLED/Src/oledio.c \
+Hardware/MPU6050/Src/mpu6050.c \
+Hardware/MPU6050/eMPL/Src/inv_mpu.c \
+Hardware/MPU6050/eMPL/Src/inv_mpu_dmp_motion_driver.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -126,6 +141,9 @@ C_INCLUDES =  \
 -IUser/Inc \
 -IUSMART/Inc \
 -IHardware/LED/Inc \
+-IHardware/OLED/Inc \
+-IHardware/MPU6050/Inc \
+-IHardware/MPU6050/eMPL/Inc \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

@@ -2,40 +2,38 @@
 #define __MPU6050_H
 #include "sys.h"
 #include "delay.h"
-#include "usart.h"
 #include "inv_mpu.h"
 
 #define MPU6050_SCLK_Port GPIOB
 #define MPU6050_SCLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define MPU6050_SCLK_Pin GPIO_PIN_8
+#define MPU6050_SCLK_Pin GPIO_PIN_10
 
 #define MPU6050_SDIN_Port GPIOB
 #define MPU6050_SDIN_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define MPU6050_SDIN_Pin GPIO_PIN_9
+#define MPU6050_SDIN_Pin GPIO_PIN_11
 
-// IO方向设置，f1，建议查手册看寄存器
-#define MPU_SDA_IN()                          \
-    {                                         \
-        MPU6050_SDIN_Port->CRH &= 0XFFFFFF0F; \
-        MPU6050_SDIN_Port->CRH |= 8 << 4;     \
-    } // PB9输入模式
-#define MPU_SDA_OUT()                         \
-    {                                         \
-        MPU6050_SDIN_Port->CRH &= 0XFFFFFF0F; \
-        MPU6050_SDIN_Port->CRH |= 3 << 4;     \
-    } // PB9输出模式
+// // IO方向设置，f1，建议查手册看寄存器
+// #define MPU_SDA_IN()                          \
+//     {                                         \
+//         MPU6050_SDIN_Port->CRH &= 0XFFFFFF0F; \
+//         MPU6050_SDIN_Port->CRH |= 8 << 4;     \
+//     } // PB9输入模式
+// #define MPU_SDA_OUT()                         \
+//     {                                         \
+//         MPU6050_SDIN_Port->CRH &= 0XFFFFFF0F; \
+//         MPU6050_SDIN_Port->CRH |= 3 << 4;     \
+//     } // PB9输出模式
 
 // IO方向设置，f4，建议查手册看寄存器
-// #define MPU_SDA_IN()                                 \
-//     {                                                \
-//         MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-//         MPU6050_SDIN_Port->MODER |= 0 << 7 * 2;      \
-//     } // PB7输入模式
-// #define MPU_SDA_OUT()                                \
-//     {                                                \
-//         MPU6050_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-//         MPU6050_SDIN_Port->MODER |= 1 << 7 * 2;      \
-//     } // PB7输出模式
+#define MPU_SDA_IN()                                 \
+    {                                                \
+        MPU6050_SDIN_Port->MODER &= ~(3 << (11 * 2)); \
+    } // PB7输入模式
+#define MPU_SDA_OUT()                                \
+    {                                                \
+        MPU6050_SDIN_Port->MODER &= ~(3 << (11 * 2)); \
+        MPU6050_SDIN_Port->MODER |= 1 << 11 * 2;      \
+    } // PB7输出模式
 
 #define MPU6050_SCLK_Clr() MPU6050_SCLK_Port->BSRR = (uint32_t)MPU6050_SCLK_Pin << 16U
 #define MPU6050_SCLK_Set() MPU6050_SCLK_Port->BSRR = MPU6050_SCLK_Pin

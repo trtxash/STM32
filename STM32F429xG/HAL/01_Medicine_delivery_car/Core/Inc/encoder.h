@@ -50,7 +50,7 @@
 #define ONE_WHEEL_CIRCUMFERENCE (3.14159265358979323846 * TIRE_DIAMETER)
 
 void Tim_Encoder_Init(void);
-int Read_Encoder(u8 tim);
+short Read_Encoder(TIM_HandleTypeDef *htim); // 输入定时器句柄，返回编码器数值
 double Calculate_Velocity(int encoder_value);
 
 #endif /* __BSP_ENCODER_H */

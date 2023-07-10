@@ -33,13 +33,13 @@
 
 /* I2C,SPI 句柄选择------------------------------------------------------------------------- */
 #define OLED_I2C_HandleTypeDef hi2c1 // I2C句柄选择
-#define OLED_SPI_HandleTypeDef hspi1 // SPI句柄选择
+#define OLED_SPI_HandleTypeDef hspi6 // SPI句柄选择
 
 /* OLED 具体选择------------------------------------------------------------------------- */
 #define _OLED_DRIVER_IC_TYPE OLED_SSD1306_SSD1315 // 改SSD种类
-#define _SOFT_OR_HARE OLED_SOFT                   // 改是否软件模拟
-#define _DRIVE_INTERFACE_TYPE OLED_IIC_INTERFACE  // 改接口类型
-#define _OLED_DMA OLED_DMA_DISABLE                // 改是否开启DMA
+#define _SOFT_OR_HARE OLED_HARD                   // 改是否软件模拟
+#define _DRIVE_INTERFACE_TYPE OLED_SPI_INTERFACE  // 改接口类型
+#define _OLED_DMA OLED_DMA_ABLE                // 改是否开启DMA
 #define _OLED_RGB_COLOR_DEPTH K65                 // RGB颜色深度选择
 
 /* OLED 的通信地址 */
