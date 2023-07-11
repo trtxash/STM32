@@ -4,16 +4,18 @@ positional_pid_params_t motor1_velocity;
 positional_pid_params_t motor2_velocity;
 positional_pid_params_t motor_turn;
 
-u8 SUM[4][2] = {0};
+u8 SUM[4] = {0}; // 存的是字符
 short TARGET_V[2] = {0};
 float TARGET_ANGLE = 0;
 float Yaw_Start = 0;
 u8 TASK = 0;
+u8 GET_ROOM_FLAG = 0;
 u8 FIND_ROOM_FLAG = 0;
 u8 LOAD_FLAG = 0;
+u8 AIM_SUM = 0;
 u8 AIM_PLACE = 0;
 u8 Do_count = 0;
-u8 STOP_FLAG = 0, LINE_FLAG = 0, TURN_SUCCEED_FLAG = 0;
+u8 STOP_FLAG = 1, LINE_FLAG = 0, TURN_SUCCEED_FLAG = 0; // 初始车停下，不巡线
 u8 LOR = 0;
 
 // 主要任务
@@ -21,8 +23,8 @@ void MIAN_TASK(void)
 {
     if (TASK == 0) // 等待识别目标房间
     {
-        SET_AIM_ROOM(); // 设置目标房间
-        LOADORNOT();    // 检测药物
+        GET_SET_AIM_ROOM(); // 设置目标房间
+        LOADORNOT();        // 检测药物
     }
     else if (TASK == 1)
     {
@@ -134,9 +136,34 @@ void MIAN_TASK(void)
             {
                 switch (Do_count)
                 {
-                case 0:
+                case 0: // 直走
+                    Car_GO(100);
+                    Do_count++;
                     break;
                 case 1:
+                    if (Location_sum > 125536)
+                        Do_count++;
+                    break;
+                case 2: // 低速检测数字
+                    TARGET_V[0] = TARGET_V[1] = 50;
+                    Do_count++;
+                    break;
+                case 3:
+                    if (GET_NUM())
+                        Do_count++;
+                    break;
+                case 4: // 设置房间
+                    GET_SET_AIM_ROOM();
+                    Do_count++;
+                    break;
+                case 5:
+                    // if ()
+                    // {
+                    // }
+                    break;
+                case 6:
+                    break;
+                case 7:
                     break;
                 default:
                     break;
@@ -255,33 +282,49 @@ void MIAN_TASK(void)
                     break;
                 }
             }
+            else
+            {
+            }
         }
     }
 }
 
-void SET_AIM_ROOM(void)
+void GET_SET_AIM_ROOM(void)
 {
     // 一开始识别目标房间
-    if (FIND_ROOM_FLAG == 0) // 等待
+    if (GET_ROOM_FLAG == 0) // 等待
     {
-        GET_NUM();
+        if (GET_NUM()) // 得到数字
+        {
+            GET_ROOM_FLAG = 1; // 标记得到目标房间
+            AIM_SUM = SUM[0];  // 存下目标数字
+        }
     }
-    else if (FIND_ROOM_FLAG == 1) // 识别开始房间
+    else if (GET_ROOM_FLAG == 1) // 识别开始房间
     {
-        if (SUM[0][0] == 1) // 设置目标房间
+        if (STOP_FLAG) // 分两种识别，开始识别（STOP）和路程中识别（LINE）
         {
-            AIM_PLACE = 'A';
+            if (AIM_SUM == '1') // 设置目标房间
+            {
+                AIM_PLACE = 'A';
+                FIND_ROOM_FLAG = 1;
+            }
+            else if (AIM_SUM == '2')
+            {
+                AIM_PLACE = 'B';
+                FIND_ROOM_FLAG = 1;
+            }
+            else if (AIM_SUM > '2')
+            {
+                AIM_PLACE = 'C';
+                FIND_ROOM_FLAG = 0; // 在中端找
+            }
+            TASK = 1;
         }
-        else if (SUM[0][0] == 2)
+        else if (LINE_FLAG) // 路程中识别
         {
-            AIM_PLACE = 'B';
+
         }
-        else if (SUM[0][0] > 2)
-        {
-            AIM_PLACE = 'C';
-            FIND_ROOM_FLAG = 0; // 在中端找
-        }
-        TASK = 1;
     }
 }
 
@@ -314,24 +357,29 @@ void LOADORNOT(void)
     }
 }
 
-// 从串口得到数字
-void GET_NUM(void)
+// 从串口得到数字,返回1成功
+u8 GET_NUM(void)
 {
     if (USART_RX_STA & 0x8000) // 接受到数字
     {
-        static int i = 0;
-
+        u8 i = 0;
         i = USART_RX_STA & 0X3FFF; // 接收次数
-        u8 temp[4] = {0};
-        for (; i >= 0; i--)
+
+        if (i >= 3)
         {
-            temp[i] = USART_RX_BUF[i];
+            if (USART_RX_BUF[0] == '*' & USART_RX_BUF[i - 1] == '#') // 检验包头包尾
+            {
+                for (u8 j = 0; j < i - 2; j++) // 去掉包头包尾，存入数组
+                {
+                    SUM[j] = USART_RX_BUF[j + 1];
+                }
+                USART_RX_STA = 0; // 清楚标志位
+                return 1;         // 接收成功
+            }
         }
-        USART_RX_STA = 0; // 清楚标志位
-        FIND_ROOM_FLAG = 1;
     }
-    else
-        FIND_ROOM_FLAG = 0;
+    USART_RX_STA = 0; // 清楚标志位
+    return 0;         // 接收失败
 }
 
 // 小车直走
@@ -363,7 +411,7 @@ void Car_TURN(float turn_angle)
     motor_turn.control = PID_ENABLE; // 转向环开启
 }
 
-// 小车转向
+// 小车停止
 void Car_STOP(void)
 {
     LINE_FLAG = 0;

@@ -111,7 +111,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
 #if EN_USART1_RX
         HAL_NVIC_EnableIRQ(USART1_IRQn);         // 使能USART1中断通道
-        HAL_NVIC_SetPriority(USART1_IRQn, 7, 0); // 抢占优先级0，子优先级0
+        HAL_NVIC_SetPriority(USART1_IRQn, 0, 0); // 抢占优先级0，子优先级0
 #endif
     }
     if (huart->Instance == USART6) // 如果是串口6，进行串口6 MSP初始化
