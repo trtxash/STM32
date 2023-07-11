@@ -65,7 +65,7 @@ int Location_integral(short encoder_value, u8 reset)
 {
     static int location = 0;
     /* 路程为周长*编码器读数/电机减速比/电机总分辨率,做个积分 */
-    location += ONE_WHEEL_CIRCUMFERENCE * (double)encoder_value / REDUCTION_RATIO / ENCODER_TOTAL_RESOLUTION;
+    location += encoder_value;
 
     if (reset)
     {

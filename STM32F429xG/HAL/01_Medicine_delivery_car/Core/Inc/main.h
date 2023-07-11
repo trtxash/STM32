@@ -40,6 +40,7 @@ extern "C"
 
 #include "led.h"
 #include "oled.h"
+#include "tb6612.h"
 
 #include "mpu6050.h"
 #include "inv_mpu.h"
@@ -68,7 +69,6 @@ extern "C"
     /* USER CODE END EM */
 
     /* Exported functions prototypes ---------------------------------------------*/
-    void Error_Handler(void);
 
     /* USER CODE BEGIN EFP */
 

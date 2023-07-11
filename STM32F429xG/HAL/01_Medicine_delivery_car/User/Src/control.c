@@ -323,7 +323,14 @@ void GET_SET_AIM_ROOM(void)
         }
         else if (LINE_FLAG) // 路程中识别
         {
-
+            if (AIM_PLACE == 'C') // 中端路程
+                if (GET_NUM())    // 得到数字
+                {
+                    if (AIM_SUM == SUM[0]) // sum0为左边数字
+                    {
+                        AIM_PLACE = 'D';
+                    }
+                }
         }
     }
 }

@@ -35,44 +35,36 @@ int main(void)
         u8 mpu_state = mpu_dmp_init();
         if (mpu_state == 0)
         {
-            sprintf(temp, "mpu OK!   ");
-            OLED_ShowString(64, 0, temp, 8, 1, WHITE);
             break;
         }
-        else
-        {
-            sprintf(temp, "mpu fal:%d", mpu_state);
-            OLED_ShowString(64, 0, temp, 8, 1, WHITE);
-        }
     }
+    Tim_Encoder_Init();
+    TB6612_init();
     MX_TIM6_Init((u16)(10000 - 1), (u16)(120 - 1)); // 定时器6初始化，周期10ms
+    positional_pid_init(&motor1_velocity, 10, 0.1, 0, 1000, 0, 7199, -7199);
+    positional_pid_init(&motor2_velocity, 10, 0.1, 0, 1000, 0, 7199, -7199);
 
+    TARGET_V[0] = TARGET_V[1] = 100;
     while (1)
     {
         Get_Angle(1); // 读取角度
-        sprintf(temp, "t:%0.2f ", (float)Temperature / 100);
-        OLED_ShowString(64, 8, temp, 8, 1, WHITE);
         sprintf(temp, "R:%0.2f ", Roll);
-        OLED_ShowString(0, 16, temp, 8, 1, WHITE);
+        OLED_ShowString(0, 0, temp, 8, 1, WHITE);
         sprintf(temp, "P:%0.2f ", Pitch);
-        OLED_ShowString(64, 16, temp, 8, 1, WHITE);
+        OLED_ShowString(64, 0, temp, 8, 1, WHITE);
         sprintf(temp, "Y:%0.2f ", Yaw);
-        OLED_ShowString(0, 24, temp, 8, 1, WHITE);
+        OLED_ShowString(0, 8, temp, 8, 1, WHITE);
 
-        sprintf(temp, "AB:%0.2f ", Angle_Balance);
-        OLED_ShowString(0, 32, temp, 8, 1, WHITE);
-        sprintf(temp, "GB:%0.2f ", Gyro_Balance);
-        OLED_ShowString(64, 32, temp, 8, 1, WHITE);
+        sprintf(temp, "l:%d ", Location_sum);
+        OLED_ShowString(64, 8, temp, 8, 1, WHITE);
+        sprintf(temp, "e1:%d ", Encoder[0]);
+        OLED_ShowString(0, 16, temp, 8, 1, WHITE);
+        sprintf(temp, "e2:%d ", Encoder[1]);
+        OLED_ShowString(64, 16, temp, 8, 1, WHITE);
 
-        // if (USART_RX_STA & 0x8000) // 接受到数字
-        // {
-        //     int len = USART_RX_STA & 0X3FFF; // 接收次数
-
-        //     for (; len >= 0; len--)
-        //     {
-        //         OLED_ShowChar(len * 6, 40, USART_RX_BUF[len], 8, 1, WHITE);
-        //     }
-        //     USART_RX_STA = 0; // 清楚标志位
-        // }
+        // sprintf(temp, "%d ", );
+        // OLED_ShowString(0, 24, temp, 8, 1, WHITE);
+        // sprintf(temp, "%d ", Encoder[1]);
+        // OLED_ShowString(64, 24, temp, 8, 1, WHITE);
     }
 }

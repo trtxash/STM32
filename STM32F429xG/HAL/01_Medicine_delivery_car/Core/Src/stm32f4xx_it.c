@@ -18,8 +18,8 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
 #include "stm32f4xx_it.h"
+#include "main.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -315,17 +315,22 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         x10ms++;
         if (x10ms % 5 == 0) // 50ms
         {
+            static short vr = 0, vl = 0, temp = 0;
+
             /* 每50毫秒读取编码器数值 */
-            Encoder[0] = Read_Encoder(&htim2);
-            Encoder[1] = Read_Encoder(&htim3);
+            Encoder[0] = -Read_Encoder(&htim2);
+            Encoder[1] = -Read_Encoder(&htim3);
             // 位置积分
             Location_sum = Location_integral((short)((Encoder[0] + Encoder[1]) / 2), 0);
             // PID速度环计算
-            positional_pid_compute(&motor1_velocity, TARGET_V[0] + Get_Grayscale_Val(), Encoder[0]);
-            positional_pid_compute(&motor2_velocity, TARGET_V[1] - Get_Grayscale_Val(), Encoder[1]);
+            vr += positional_pid_compute(&motor1_velocity, TARGET_V[0] + Get_Grayscale_Val(), Encoder[0]);
+            vl += positional_pid_compute(&motor2_velocity, TARGET_V[1] - Get_Grayscale_Val(), Encoder[1]);
             // PID转向环计算
-            positional_pid_compute(&motor_turn, TARGET_ANGLE, Yaw);
+            temp = positional_pid_compute(&motor_turn, TARGET_ANGLE, Yaw);
+            vr += temp;
+            vl -= temp;
 
+            TB6612_control_speed(3000, 3000);
             if (x10ms % 10 == 0) // 100ms
             {
                 if (x10ms % 50 == 0) // 500ms

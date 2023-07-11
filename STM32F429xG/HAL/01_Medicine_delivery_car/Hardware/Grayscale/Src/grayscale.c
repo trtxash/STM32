@@ -61,7 +61,7 @@ float Get_Grayscale_Val(void)
         i = 0;
     else if (temp == 1)
         i = -3 * GRAYSCALE0_READ() - 2 * GRAYSCALE1_READ() - GRAYSCALE2_READ() + GRAYSCALE4_READ() + 2 * GRAYSCALE5_READ() + 3 * GRAYSCALE6_READ();
-    else if (tmep == 2)
+    else if (temp == 2)
         i = (-3 * GRAYSCALE0_READ() - 2 * GRAYSCALE1_READ() - GRAYSCALE2_READ() + GRAYSCALE4_READ() + 2 * GRAYSCALE5_READ() + 3 * GRAYSCALE6_READ()) / 2;
 
     return i;
