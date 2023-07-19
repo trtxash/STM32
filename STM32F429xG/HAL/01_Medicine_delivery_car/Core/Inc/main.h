@@ -28,23 +28,25 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "delay.h"
 #include "stm32f4xx_hal.h"
 #include "sys.h"
-#include "delay.h"
 #include "usart.h"
+#include "valuepack.h"
 
 #include "dma.h"
+#include "encoder.h"
 #include "spi.h"
 #include "tim.h"
-#include "encoder.h"
 
+#include "key.h"
 #include "led.h"
 #include "oled.h"
 #include "tb6612.h"
 
-#include "mpu6050.h"
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
+#include "mpu6050.h"
 
 #include "control.h"
 
@@ -60,7 +62,9 @@ extern "C"
 
     /* Exported constants --------------------------------------------------------*/
     /* USER CODE BEGIN EC */
-
+    extern short vr, vl;
+    extern float v_p;
+    extern u8 time_flag;
     /* USER CODE END EC */
 
     /* Exported macro ------------------------------------------------------------*/

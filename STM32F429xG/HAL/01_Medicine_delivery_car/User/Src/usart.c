@@ -88,13 +88,13 @@ void uart6_init(u32 bound)
 
 // UART底层初始化，时钟使能，引脚配置，中断配置
 // 此函数会被HAL_UART_Init()调用
-// huart:串口句柄
-void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+// uartHandle:串口句柄
+void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
 {
     // GPIO端口设置
     GPIO_InitTypeDef GPIO_Initure = {0};
 
-    if (huart->Instance == USART1) // 如果是串口1，进行串口1 MSP初始化
+    if (uartHandle->Instance == USART1) // 如果是串口1，进行串口1 MSP初始化
     {
         __HAL_RCC_GPIOA_CLK_ENABLE();  // 使能GPIOA时钟
         __HAL_RCC_USART1_CLK_ENABLE(); // 使能USART1时钟
@@ -114,7 +114,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         HAL_NVIC_SetPriority(USART1_IRQn, 0, 0); // 抢占优先级0，子优先级0
 #endif
     }
-    if (huart->Instance == USART6) // 如果是串口6，进行串口6 MSP初始化
+    if (uartHandle->Instance == USART6) // 如果是串口6，进行串口6 MSP初始化
     {
 #if VALUEPACK
         /* USER CODE BEGIN USART6_MspInit 0 */
@@ -123,37 +123,19 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         /* USART6 clock enable */
         __HAL_RCC_USART6_CLK_ENABLE();
 
-        __HAL_RCC_GPIOG_CLK_ENABLE();
+        __HAL_RCC_GPIOC_CLK_ENABLE();
         /**USART6 GPIO Configuration
-        PG9     ------> USART6_RX
-        PG14     ------> USART6_TX
+        PC6     ------> USART6_TX
+        PC7     ------> USART6_RX
         */
-        GPIO_Initure.Pin = GPIO_PIN_9 | GPIO_PIN_14;
+        GPIO_Initure.Pin = GPIO_PIN_6 | GPIO_PIN_7;
         GPIO_Initure.Mode = GPIO_MODE_AF_PP;
         GPIO_Initure.Pull = GPIO_NOPULL;
         GPIO_Initure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         GPIO_Initure.Alternate = GPIO_AF8_USART6;
-        HAL_GPIO_Init(GPIOG, &GPIO_Initure);
+        HAL_GPIO_Init(GPIOC, &GPIO_Initure);
 
         /* USART6 DMA Init */
-        /* USART6_TX Init */
-        hdma_usart6_tx.Instance = DMA2_Stream6;
-        hdma_usart6_tx.Init.Channel = DMA_CHANNEL_5;
-        hdma_usart6_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
-        hdma_usart6_tx.Init.PeriphInc = DMA_PINC_DISABLE;
-        hdma_usart6_tx.Init.MemInc = DMA_MINC_ENABLE;
-        hdma_usart6_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-        hdma_usart6_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-        hdma_usart6_tx.Init.Mode = DMA_NORMAL;
-        hdma_usart6_tx.Init.Priority = DMA_PRIORITY_MEDIUM;
-        hdma_usart6_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-        if (HAL_DMA_Init(&hdma_usart6_tx) != HAL_OK)
-        {
-            Error_Handler();
-        }
-
-        __HAL_LINKDMA(huart, hdmatx, hdma_usart6_tx);
-
         /* USART6_RX Init */
         hdma_usart6_rx.Instance = DMA2_Stream1;
         hdma_usart6_rx.Init.Channel = DMA_CHANNEL_5;
@@ -170,14 +152,56 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
             Error_Handler();
         }
 
-        __HAL_LINKDMA(huart, hdmarx, hdma_usart6_rx);
+        __HAL_LINKDMA(uartHandle, hdmarx, hdma_usart6_rx);
+
+        /* USART6_TX Init */
+        hdma_usart6_tx.Instance = DMA2_Stream6;
+        hdma_usart6_tx.Init.Channel = DMA_CHANNEL_5;
+        hdma_usart6_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+        hdma_usart6_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+        hdma_usart6_tx.Init.MemInc = DMA_MINC_ENABLE;
+        hdma_usart6_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+        hdma_usart6_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+        hdma_usart6_tx.Init.Mode = DMA_NORMAL;
+        hdma_usart6_tx.Init.Priority = DMA_PRIORITY_LOW;
+        hdma_usart6_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+        if (HAL_DMA_Init(&hdma_usart6_tx) != HAL_OK)
+        {
+            Error_Handler();
+        }
+
+        __HAL_LINKDMA(uartHandle, hdmatx, hdma_usart6_tx);
 
         /* USART6 interrupt Init */
-        HAL_NVIC_SetPriority(USART6_IRQn, 0, 0); // 这里开中断是因为stm32f4xx_hal_uart.c里面的介绍，用于校验完成最后一个字节的发送完成
+        HAL_NVIC_SetPriority(USART6_IRQn, 1, 0); // 这里开中断是因为stm32f4xx_hal_uart.c里面的介绍，用于校验完成最后一个字节的发送完成
         HAL_NVIC_EnableIRQ(USART6_IRQn);
         /* USER CODE BEGIN USART6_MspInit 1 */
+    }
+}
 
-        /* USER CODE END USART6_MspInit 1 */
+void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle)
+{
+
+    if (uartHandle->Instance == USART6)
+    {
+        /* USER CODE BEGIN USART6_MspDeInit 0 */
+
+        /* USER CODE END USART6_MspDeInit 0 */
+        /* Peripheral clock disable */
+        __HAL_RCC_USART6_CLK_DISABLE();
+
+        /**USART6 GPIO Configuration
+        PC6     ------> USART6_TX
+        PC7     ------> USART6_RX
+        */
+        HAL_GPIO_DeInit(GPIOC, GPIO_PIN_6 | GPIO_PIN_7);
+
+        /* USART6 DMA DeInit */
+        HAL_DMA_DeInit(uartHandle->hdmarx);
+        HAL_DMA_DeInit(uartHandle->hdmatx);
+        /* USER CODE BEGIN USART6_MspDeInit 1 */
+
+        /* USER CODE END USART6_MspDeInit 1 */
 #else
         __HAL_RCC_GPIOC_CLK_ENABLE();                                   // 使能GPIOA时钟
         __HAL_RCC_USART6_CLK_ENABLE();                                  // 使能USART6时钟

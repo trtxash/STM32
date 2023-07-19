@@ -55,6 +55,6 @@ extern int Location_sum;
 void Tim_Encoder_Init(void);
 short Read_Encoder(TIM_HandleTypeDef *htim); // 输入定时器句柄，返回编码器数值
 double Calculate_Velocity(short encoder_value);
-int Location_integral(short encoder_value, u8 reset);
+int Location_integral(short encoder_value);
 
 #endif /* __BSP_ENCODER_H */

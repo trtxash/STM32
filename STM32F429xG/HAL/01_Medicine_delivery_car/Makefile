@@ -69,6 +69,7 @@ User/Src/usart.c \
 User/Src/filter.c \
 User/Src/control.c \
 User/Src/positional_pid.c \
+User/Src/valuepack.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
 Hardware/LED/Src/led.c \
@@ -79,6 +80,7 @@ Hardware/MPU6050/Src/mpu6050.c \
 Hardware/MPU6050/eMPL/Src/inv_mpu.c \
 Hardware/MPU6050/eMPL/Src/inv_mpu_dmp_motion_driver.c \
 Hardware/Grayscale/Src/grayscale.c \
+Hardware/Key/Src/key.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -151,6 +153,7 @@ C_INCLUDES =  \
 -IHardware/MPU6050/eMPL/Inc \
 -IHardware/Grayscale/Inc \
 -IHardware/TB6612/Inc \
+-IHardware/Key/Inc \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

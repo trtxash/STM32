@@ -82,6 +82,11 @@ float positional_pid_compute(positional_pid_params_t *positional_pid,
     }
     else
     {
+        // 失能后，归零
+        positional_pid->last_measure = 0;
+        positional_pid->last_output = 0;
+        positional_pid->last_error = 0;
+
         return 0.0f;
     }
 }

@@ -1,10 +1,10 @@
 #include "mpu6050.h"
-#include "math.h"
 #include "filter.h"
+#include "math.h"
 
 u16 Temperature; // 温度变量
 short gyro[3], accel[3], sensors;
-float Roll, Pitch, Yaw;                       // 欧拉角，横滚角，俯仰角，偏航角
+float Roll, Pitch, Yaw, Yaw_turn;
 float Angle_Balance, Gyro_Balance, Gyro_Turn; // 平衡倾角 平衡陀螺仪 转向陀螺仪
 float Acceleration_Z;                         // Z轴加速度计
 

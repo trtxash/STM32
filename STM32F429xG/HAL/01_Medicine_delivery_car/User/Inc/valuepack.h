@@ -17,17 +17,17 @@
 //    根据实际需要的变量，定义数据包中 bool byte short int float 五种类型的数目
 #define TX_BOOL_NUM 0
 #define TX_BYTE_NUM 0
-#define TX_SHORT_NUM 4
-#define TX_INT_NUM 0
-#define TX_FLOAT_NUM 0
+#define TX_SHORT_NUM 3 // 速度，目标速度
+#define TX_INT_NUM 1   // 路程
+#define TX_FLOAT_NUM 1 // 角度
 
 /// 3.指定接收数据包的结构-----------------------------------------------------------------------------------
 //    根据实际需要的变量，定义数据包中 bool byte short int float 五种类型的数目
-#define RX_BOOL_NUM 1
+#define RX_BOOL_NUM 1 // 放药
 #define RX_BYTE_NUM 0
-#define RX_SHORT_NUM 3
-#define RX_INT_NUM 0
-#define RX_FLOAT_NUM 3
+#define RX_SHORT_NUM 15 // 12 pid + 目标速度 
+#define RX_INT_NUM 1	// 目标位置
+#define RX_FLOAT_NUM 2	// 巡线补偿
 
 typedef struct
 {

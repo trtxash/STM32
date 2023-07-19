@@ -1,12 +1,12 @@
 #ifndef _USART_H
 #define _USART_H
 
-#include "sys.h"
 #include "stdio.h"
+#include "sys.h"
 
 #define VALUEPACK 1 // 使能valuepack
 
-#define USART_REC_LEN 32 // 定义最大接收字节数 256
+#define USART_REC_LEN 1024 // 定义最大接收字节数 256
 
 #define EN_USART1_RX 1 // 使能（1）/禁止（0）串口1接收
 #define EN_USART6_RX 1 // 使能（1）/禁止（0）串口1接收
@@ -19,6 +19,8 @@ extern u8 aRxBuffer[RXBUFFERSIZE]; // HAL库USART接收Buffer
 
 extern UART_HandleTypeDef UART1_Handler; // UART句柄
 extern UART_HandleTypeDef UART6_Handler; // UART句柄
+extern DMA_HandleTypeDef hdma_usart6_tx;
+extern DMA_HandleTypeDef hdma_usart6_rx;
 
 extern u32 Error_sum;
 

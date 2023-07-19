@@ -238,6 +238,14 @@ void USART1_IRQHandler(void)
     HAL_UART_IRQHandler(&UART1_Handler);
 }
 
+/**
+ * @brief 串口6中断服务程序
+ */
+void USART6_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&UART6_Handler);
+}
+
 /*
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);//发送完成回调函数
 void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart);//发送完成过半
@@ -311,31 +319,97 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if (htim == (&htim6))
     {
         static u16 x10ms = 0;
-
         x10ms++;
+
+        readValuePack(&rxvaluepack); // 读取上位机
+        // 发送到上位机
+        txvaluepack.shorts[0] = Encoder[0];             // vl
+        txvaluepack.shorts[1] = Encoder[1];             // vr
+        txvaluepack.shorts[2] = rxvaluepack.shorts[12]; // tv
+        txvaluepack.integers[0] = Location_sum;         // vl
+        txvaluepack.floats[0] = Yaw;                    // angle
+        sendValuePack(&txvaluepack);                    // 发送数据
+
+        // TARGET_ANGLE = rxvaluepack.floats[1];
+        // TARGET_LOCATION = rxvaluepack.integers[0];
+        // TARGET_V = rxvaluepack.shorts[12];
+        // v_p = rxvaluepack.floats[0];
+
         if (x10ms % 5 == 0) // 50ms
         {
-            static short vr = 0, vl = 0, temp = 0;
+            static float v_b = 0;
+            short temp = 0;
 
             /* 每50毫秒读取编码器数值 */
             Encoder[0] = -Read_Encoder(&htim2);
             Encoder[1] = -Read_Encoder(&htim3);
             // 位置积分
-            Location_sum = Location_integral((short)((Encoder[0] + Encoder[1]) / 2), 0);
-            // PID速度环计算
-            vr += positional_pid_compute(&motor1_velocity, TARGET_V[0] + Get_Grayscale_Val(), Encoder[0]);
-            vl += positional_pid_compute(&motor2_velocity, TARGET_V[1] - Get_Grayscale_Val(), Encoder[1]);
+            Location_sum = Location_integral((short)((Encoder[0] + Encoder[1]) / 2));
+            // 位置环速度限幅,决定速度
+            if (TARGET_V >= 0)
+            {
+                motor12_location.output_max = TARGET_V;
+                motor12_location.output_min = -TARGET_V;
+            }
+            else
+            {
+                motor12_location.output_max = -TARGET_V;
+                motor12_location.output_min = TARGET_V;
+            }
+            // PID位置环计算
+            vl = vr = positional_pid_compute(&motor12_location, TARGET_LOCATION, Location_sum);
+            // 巡线
+            if (LINE_FLAG)
+            {
+                // 巡线速度补偿计算
+                if (Grayscale_truesum >= 2) // 都为0或者1
+                    v_b = 0;
+                else if (Grayscale_truesum == 1)
+                {
+                    // if (Grayscale_Val[2])
+                    // {
+                    //     v_b = -v_b / 2; // 为0时让其收敛
+                    // }
+                    // else if (Grayscale_Val[0])
+                    //     v_b = -rxvaluepack.shorts[13];
+                    // else if (Grayscale_Val[1])
+                    //     v_b = -rxvaluepack.shorts[14];
+                    // else if (Grayscale_Val[3])
+                    //     v_b = rxvaluepack.shorts[14];
+                    // else if (Grayscale_Val[4])
+                    //     v_b = rxvaluepack.shorts[13];
+
+                    if (Grayscale_Val[2])
+                    {
+                        v_b = -v_b / 2; // 为0时让其收敛
+                    }
+                    else if (Grayscale_Val[0])
+                        v_b = -250;
+                    else if (Grayscale_Val[1])
+                        v_b = -110;
+                    else if (Grayscale_Val[3])
+                        v_b = 110;
+                    else if (Grayscale_Val[4])
+                        v_b = 250;
+                }
+                // 巡线速度补偿
+                vl += v_b * v_p;
+                vr -= v_b * v_p;
+            }
             // PID转向环计算
             temp = positional_pid_compute(&motor_turn, TARGET_ANGLE, Yaw);
             vr += temp;
             vl -= temp;
+            // PID速度环计算
+            vl = positional_pid_compute(&motor1_velocity, vl, Encoder[0]);
+            vr = positional_pid_compute(&motor2_velocity, vr, Encoder[1]);
 
-            TB6612_control_speed(3000, 3000);
+            TB6612_control_speed(vr, vl);
             if (x10ms % 10 == 0) // 100ms
             {
+                time_flag = 1;
                 if (x10ms % 50 == 0) // 500ms
                 {
-
                     if (x10ms % 100 == 0) // 1000ms
                     {
                     }
@@ -348,6 +422,34 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             x10ms = 0; // 归零
         }
     }
+}
+
+/**
+ * @brief This function handles DMA2 stream1 global interrupt.
+ */
+void DMA2_Stream1_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA2_Stream1_IRQn 0 */
+
+    /* USER CODE END DMA2_Stream1_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_usart6_rx);
+    /* USER CODE BEGIN DMA2_Stream1_IRQn 1 */
+
+    /* USER CODE END DMA2_Stream1_IRQn 1 */
+}
+
+/**
+ * @brief This function handles DMA2 stream6 global interrupt.
+ */
+void DMA2_Stream6_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA2_Stream6_IRQn 0 */
+
+    /* USER CODE END DMA2_Stream6_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_usart6_tx);
+    /* USER CODE BEGIN DMA2_Stream6_IRQn 1 */
+
+    /* USER CODE END DMA2_Stream6_IRQn 1 */
 }
 
 /* USER CODE END 1 */
