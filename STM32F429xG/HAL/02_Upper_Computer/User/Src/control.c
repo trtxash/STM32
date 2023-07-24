@@ -13,7 +13,7 @@ positional_pid_params_t motor_turn;
 
 u8 SUM[4] = {0};
 int TARGET_LOCATION = 0; // 目标位置
-short TARGET_V = 8000;   // 目标速度
+short TARGET_V = 1000;   // 目标速度
 float TARGET_ANGLE = 0;
 float Yaw_Start = 0;
 u8 TASK = 0;

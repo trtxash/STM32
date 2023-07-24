@@ -72,6 +72,10 @@ User/Src/positional_pid.c \
 User/Src/valuepack.c \
 RTT/SEGGER_RTT_printf.c \
 RTT/SEGGER_RTT.c \
+AnoPTv8/Src/AnoPTv8DataDef.c \
+AnoPTv8/Src/AnoPTv8FrameFactory.c \
+AnoPTv8/Src/AnoPTv8Run.c \
+AnoPTv8/Src/hardwareInterface.c \
 Hardware/LED/Src/led.c \
 Hardware/OLED/Src/oled.c \
 Hardware/OLED/Src/oledio.c \
@@ -146,6 +150,7 @@ C_INCLUDES =  \
 -IFreeRTOS/portable/Inc \
 -IRTT \
 -IUser/Inc \
+-IAnoPTv8/Inc \
 -IUSMART/Inc \
 -IHardware/LED/Inc \
 -IHardware/OLED/Inc \

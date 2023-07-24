@@ -34,7 +34,7 @@ int main(void)
     LED_Init();
     OLED_Init();
     uart_init(115200);
-    initValuePack(115200);
+    uart6_init(1384200);
     while (1)
     {
         if (!mpu_dmp_init())
@@ -42,7 +42,8 @@ int main(void)
     }
     Tim_Encoder_Init();
     TB6612_init();
-    MX_TIM6_Init((u16)(10000 - 1), (u16)(120 - 1)); // 定时器6初始化，周期10ms
+    MX_TIM6_Init((u16)(50000 - 1), (u16)(120 - 1)); // 定时器6初始化，周期50ms
+    MX_TIM7_Init((u16)(1000 - 1), (u16)(120 - 1));  // 定时器7初始化，周期1ms
     KEY0_Init();
     positional_pid_init(&motor1_velocity, 0.16, 0.14, 0, 7199, 0, 7199, -7199);
     positional_pid_init(&motor2_velocity, 0.16, 0.14, 0, 7199, 0, 7199, -7199);
@@ -52,22 +53,19 @@ int main(void)
     motor1_velocity.control = PID_ENABLE;
     motor2_velocity.control = PID_ENABLE;
     motor12_location.control = PID_ENABLE;
-    motor_turn.control = PID_DISABLE; // 转向环开启
+    motor_turn.control = PID_DISABLE;
+    TARGET_LOCATION = 8000;
     while (1)
     {
         GET_NUM();
         Get_Angle(1);        // 读取角度
         Get_Grayscale_Val(); // 读取灰度
 
-        // 100ms的周期任务
+        // 1ms的周期任务
         if (time_flag)
         {
             time_flag = 0;
-            // PID设置
-            // positional_pid_set_value(&motor1_velocity, (float)rxvaluepack.shorts[0] / 100, (float)rxvaluepack.shorts[1] / 100, (float)rxvaluepack.shorts[2] / 100);
-            // positional_pid_set_value(&motor2_velocity, (float)rxvaluepack.shorts[3] / 100, (float)rxvaluepack.shorts[4] / 100, (float)rxvaluepack.shorts[5] / 100);
-            // positional_pid_set_value(&motor12_location, (float)rxvaluepack.shorts[6] / 100, (float)rxvaluepack.shorts[7] / 100, (float)rxvaluepack.shorts[8] / 100);
-            // positional_pid_set_value(&motor_turn, (float)rxvaluepack.shorts[9] / 100, (float)rxvaluepack.shorts[10] / 100, (float)rxvaluepack.shorts[11] / 100);
+
             // OLED显示
             sprintf(temp, "R:%0.1f,P:%0.1f,Y:%0.1f ", Roll, Pitch, Yaw);
             OLED_ShowString(0, 0, temp, 8, 1, WHITE);
@@ -87,8 +85,52 @@ int main(void)
 
             sprintf(temp, "S:%d%d%d%d,AS:%d,SF:%d,P:%c ", SUM[0], SUM[1], SUM[2], SUM[3], AIM_SUM, GET_ROOM_FLAG, AIM_PLACE);
             OLED_ShowString(0, 40, temp, 8, 1, WHITE);
+
+            // 上位机调整参数
+            motor1_velocity.kp = (float)parListForTest[0] / 100;
+            motor1_velocity.ki = (float)parListForTest[1] / 100;
+            motor1_velocity.kd = (float)parListForTest[2] / 100;
+            motor2_velocity.kp = (float)parListForTest[3] / 100;
+            motor2_velocity.ki = (float)parListForTest[4] / 100;
+            motor2_velocity.kd = (float)parListForTest[5] / 100;
+            motor12_location.kp = (float)parListForTest[6] / 100;
+            motor12_location.ki = (float)parListForTest[7] / 100;
+            motor12_location.kd = (float)parListForTest[8] / 100;
+            motor_turn.kp = (float)parListForTest[9] / 100;
+            motor_turn.ki = (float)parListForTest[10] / 100;
+            motor_turn.kd = (float)parListForTest[11] / 100;
+            motor1_velocity.control = parListForTest[12];
+            motor2_velocity.control = parListForTest[13];
+            motor12_location.control = parListForTest[14];
+            motor_turn.control = parListForTest[15];
+            TARGET_V = parListForTest[16];
+            TARGET_LOCATION = parListForTest[17];
+            TARGET_ANGLE = (float)parListForTest[18] / 100;
+            // 上位机上传数据处理
+            databuf[0] = BYTE0(Encoder[0]);
+            databuf[1] = BYTE1(Encoder[0]);
+            databuf[2] = BYTE0(Encoder[1]);
+            databuf[3] = BYTE1(Encoder[1]);
+            databuf[4] = BYTE0(TARGET_V);
+            databuf[5] = BYTE1(TARGET_V);
+            databuf[6] = BYTE0(Location_sum);
+            databuf[7] = BYTE1(Location_sum);
+            databuf[8] = BYTE2(Location_sum);
+            databuf[9] = BYTE3(Location_sum);
+            databuf[10] = BYTE0(TARGET_LOCATION);
+            databuf[11] = BYTE1(TARGET_LOCATION);
+            databuf[12] = BYTE2(TARGET_LOCATION);
+            databuf[13] = BYTE3(TARGET_LOCATION);
+            databuf[14] = BYTE0(Yaw);
+            databuf[15] = BYTE1(Yaw);
+            databuf[16] = BYTE2(Yaw);
+            databuf[17] = BYTE3(Yaw);
+            databuf[18] = BYTE0(TARGET_ANGLE);
+            databuf[19] = BYTE1(TARGET_ANGLE);
+            databuf[20] = BYTE2(TARGET_ANGLE);
+            databuf[21] = BYTE3(TARGET_ANGLE);
         }
 
-        MIAN_TASK();
+        // MIAN_TASK();
     }
 }

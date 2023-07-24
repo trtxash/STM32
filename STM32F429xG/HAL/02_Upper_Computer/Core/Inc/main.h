@@ -34,6 +34,9 @@ extern "C"
 #include "usart.h"
 #include "valuepack.h"
 
+#include "AnoPTv8.h"
+#include "AnoPTv8Run.h"
+
 #include "dma.h"
 #include "encoder.h"
 #include "spi.h"

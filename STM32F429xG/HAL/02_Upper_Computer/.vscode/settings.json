@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "usart.h": "c",
+        "hardwareinterface.h": "c",
+        "main.h": "c",
+        "anoptv8run.h": "c",
+        "anoptv8.h": "c",
+        "anoptv8datadef.h": "c"
+    }
+}

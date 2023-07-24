@@ -16,6 +16,7 @@ TIM_HandleTypeDef htim2; // 编码器0
 TIM_HandleTypeDef htim3; // 编码器1
 TIM_HandleTypeDef htim5; // 编码器3
 TIM_HandleTypeDef htim6; // 基础任务定时
+TIM_HandleTypeDef htim7; // 基础任务定时
 
 volatile unsigned long long FreeRTOSRunTimeTicks; // 易变量，FreeRTOS运行计时
 
@@ -201,7 +202,7 @@ void MX_TIM6_Init(u16 arr, u16 psc)
     htim6.Init.Prescaler = psc;
     htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim6.Init.Period = arr;
-    htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
     if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
     {
         Error_Handler();
@@ -218,6 +219,49 @@ void MX_TIM6_Init(u16 arr, u16 psc)
         Error_Handler();
     }
     /* USER CODE END TIM6_Init 2 */
+}
+
+/**
+ * @brief   TIM7 Initialization Function
+ * @note
+ *          定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+ * @param 	arr-Period
+ * 			psc-Prescaler
+ * @retval  None
+ */
+void MX_TIM7_Init(u16 arr, u16 psc)
+{
+
+    /* USER CODE BEGIN TIM7_Init 0 */
+
+    /* USER CODE END TIM7_Init 0 */
+
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+    /* USER CODE BEGIN TIM7_Init 1 */
+
+    /* USER CODE END TIM7_Init 1 */
+    htim7.Instance = TIM7;
+    htim7.Init.Prescaler = psc;
+    htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim7.Init.Period = arr;
+    htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+    if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN TIM7_Init 2 */
+    if (HAL_TIM_Base_Start_IT(&htim7) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE END TIM7_Init 2 */
 }
 
 /**
@@ -255,6 +299,21 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle)
         /* USER CODE BEGIN TIM6_MspInit 1 */
 
         /* USER CODE END TIM6_MspInit 1 */
+    }
+    else if (tim_baseHandle->Instance == TIM7)
+    {
+        /* USER CODE BEGIN TIM7_MspInit 0 */
+
+        /* USER CODE END TIM7_MspInit 0 */
+        /* TIM7 clock enable */
+        __HAL_RCC_TIM7_CLK_ENABLE();
+
+        /* TIM7 interrupt Init */
+        HAL_NVIC_SetPriority(TIM7_IRQn, 8, 0);
+        HAL_NVIC_EnableIRQ(TIM7_IRQn);
+        /* USER CODE BEGIN TIM7_MspInit 1 */
+
+        /* USER CODE END TIM7_MspInit 1 */
     }
 }
 

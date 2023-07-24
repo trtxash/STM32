@@ -30,20 +30,22 @@ u8 USART_RX_BUF[USART_REC_LEN]; // 接收缓冲,最大USART_REC_LEN个字节.
 u16 USART_RX_STA = 0; // 接收状态标记
 
 u8 aRxBuffer[RXBUFFERSIZE]; // HAL库使用的串口接收缓冲
+u8 bRxBuffer[RXBUFFERSIZE]; // HAL库使用的串口接收缓冲
 
 // 初始化IO 串口1
 //  bound:波特率
 void uart_init(u32 bound)
 {
     // UART 初始化设置
-    UART1_Handler.Instance = USART1;                    // USART1
-    UART1_Handler.Init.BaudRate = bound;                // 波特率
-    UART1_Handler.Init.WordLength = UART_WORDLENGTH_8B; // 字长为8位数据格式
-    UART1_Handler.Init.StopBits = UART_STOPBITS_1;      // 一个停止位
-    UART1_Handler.Init.Parity = UART_PARITY_NONE;       // 无奇偶校验位
-    UART1_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE; // 无硬件流控
-    UART1_Handler.Init.Mode = UART_MODE_TX_RX;          // 收发模式
-    if (HAL_UART_Init(&UART1_Handler) != HAL_OK)        // HAL_UART_Init()会使能UART1
+    UART1_Handler.Instance = USART1;                        // USART1
+    UART1_Handler.Init.BaudRate = bound;                    // 波特率
+    UART1_Handler.Init.WordLength = UART_WORDLENGTH_8B;     // 字长为8位数据格式
+    UART1_Handler.Init.StopBits = UART_STOPBITS_1;          // 一个停止位
+    UART1_Handler.Init.Parity = UART_PARITY_NONE;           // 无奇偶校验位
+    UART1_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE;     // 无硬件流控
+    UART1_Handler.Init.Mode = UART_MODE_TX_RX;              // 收发模式
+    UART1_Handler.Init.OverSampling = UART_OVERSAMPLING_16; // 过采样16倍
+    if (HAL_UART_Init(&UART1_Handler) != HAL_OK)            // HAL_UART_Init()会使能UART1
     {
         Error_Handler();
     }
@@ -55,7 +57,6 @@ void uart_init(u32 bound)
 //  bound:波特率
 void uart6_init(u32 bound)
 {
-#if VALUEPACK
     UART6_Handler.Instance = USART6;
     UART6_Handler.Init.BaudRate = bound;
     UART6_Handler.Init.WordLength = UART_WORDLENGTH_8B;
@@ -68,22 +69,8 @@ void uart6_init(u32 bound)
     {
         Error_Handler();
     }
-#else
-    // UART 初始化设置
-    UART6_Handler.Instance = USART6;                    // USART6
-    UART6_Handler.Init.BaudRate = bound;                // 波特率
-    UART6_Handler.Init.WordLength = UART_WORDLENGTH_8B; // 字长为8位数据格式
-    UART6_Handler.Init.StopBits = UART_STOPBITS_1;      // 一个停止位
-    UART6_Handler.Init.Parity = UART_PARITY_NONE;       // 无奇偶校验位
-    UART6_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE; // 无硬件流控
-    UART6_Handler.Init.Mode = UART_MODE_TX_RX;          // 收发模式
-    if (HAL_UART_Init(&UART6_Handler) != HAL_OK)        // HAL_UART_Init()会使能UART6
-    {
-        Error_Handler();
-    }
 
-    HAL_UART_Receive_IT(&UART6_Handler, (u8 *)aRxBuffer, RXBUFFERSIZE); // 该函数会开启接收中断：标志位UART_IT_RXNE，并且设置接收缓冲以及接收缓冲接收最大数据量
-#endif
+    HAL_UART_Receive_IT(&UART6_Handler, bRxBuffer, RXBUFFERSIZE); // 如果要调用处理回调函数，用这个函数使能接收中断
 }
 
 // UART底层初始化，时钟使能，引脚配置，中断配置
@@ -116,7 +103,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
     }
     if (uartHandle->Instance == USART6) // 如果是串口6，进行串口6 MSP初始化
     {
-#if VALUEPACK
         /* USER CODE BEGIN USART6_MspInit 0 */
 
         /* USER CODE END USART6_MspInit 0 */
@@ -181,7 +167,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
 
 void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle)
 {
-
     if (uartHandle->Instance == USART6)
     {
         /* USER CODE BEGIN USART6_MspDeInit 0 */
@@ -202,25 +187,5 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle)
         /* USER CODE BEGIN USART6_MspDeInit 1 */
 
         /* USER CODE END USART6_MspDeInit 1 */
-#else
-        __HAL_RCC_GPIOC_CLK_ENABLE();                                   // 使能GPIOA时钟
-        __HAL_RCC_USART6_CLK_ENABLE();                                  // 使能USART6时钟
-
-        GPIO_Initure.Pin = GPIO_PIN_6;            // PA11
-        GPIO_Initure.Mode = GPIO_MODE_AF_PP;      // 复用推挽输出
-        GPIO_Initure.Pull = GPIO_PULLUP;          // 上拉
-        GPIO_Initure.Speed = GPIO_SPEED_FAST;     // 高速
-        GPIO_Initure.Alternate = GPIO_AF8_USART6; // 复用为USART6
-        HAL_GPIO_Init(GPIOC, &GPIO_Initure);      // 初始化PA11
-
-        GPIO_Initure.Pin = GPIO_PIN_7;           // PA12
-        HAL_GPIO_Init(GPIOC, &GPIO_Initure);     // 初始化PA12
-
-#if EN_USART6_RX
-        HAL_NVIC_EnableIRQ(USART6_IRQn);         // 使能USART6中断通道
-        HAL_NVIC_SetPriority(USART6_IRQn, 8, 0); // 抢占优先级6，子优先级1
-#endif
-
-#endif
     }
 }
