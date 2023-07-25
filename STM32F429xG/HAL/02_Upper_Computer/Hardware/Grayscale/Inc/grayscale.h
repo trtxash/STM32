@@ -40,6 +40,7 @@
 
 extern u8 Grayscale_Val[5];
 extern u8 Grayscale_truesum;
+extern float Grayscale_truesum_val;
 
 void Grayscale_Init(void);
 void Get_Grayscale_Val(void);

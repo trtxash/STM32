@@ -6,7 +6,7 @@
 注意：指向参数的指针，是int32_t*，参数必须为int32_t数据类型
 */
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-uint8_t databuf[22]; // 上传的参数
+uint8_t databuf[ANOPTV8_PARNUM_UPPER]; // 上传的参数
 int32_t parListForTest[ANOPTV8_PARNUM];
 const _st_par_info AnoParInfoList[ANOPTV8_PARNUM] = {
     // 参数最小值，参数最大值，参数值指针，参数名称，参数介绍
@@ -26,9 +26,12 @@ const _st_par_info AnoParInfoList[ANOPTV8_PARNUM] = {
     {0, 1, &parListForTest[13], "PID_E2_C", "E2，PID控制"},
     {0, 1, &parListForTest[14], "PID_L_C", "位置，PID控制"},
     {0, 1, &parListForTest[15], "PID_T_C", "转向，PID控制"},
-    {-7199, 7199, &parListForTest[16], "TARGET_V", "目标速度"},
+    {-8000, 8000, &parListForTest[16], "TARGET_V", "目标速度"},
     {-100000000, 100000000, &parListForTest[17], "TARGET_LOCATION", "目标位置"},
     {-18000, 18000, &parListForTest[18], "TARGET_ANGLE", "目标角度，放大100倍"},
+    {0, 719900, &parListForTest[19], "PID_X_P", "巡线补偿：P，放大100倍"},
+    {0, 719900, &parListForTest[20], "PID_X_I", "巡线补偿：I，放大100倍"},
+    {0, 719900, &parListForTest[21], "PID_X_D", "巡线补偿：D，放大100倍"},
     // {0, 65535, &parListForTest[0], "PID_1_P", "角速度ROL：P"},
     // {0, 65535, &parListForTest[1], "PID_1_I", "角速度ROL：I"},
     // {0, 65535, &parListForTest[2], "PID_1_D", "角速度ROL：D"},

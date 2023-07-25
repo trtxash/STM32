@@ -315,27 +315,31 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         // 巡线
         if (LINE_FLAG)
         {
-            // 巡线速度补偿计算
-            if (Grayscale_truesum >= 2) // 都为0或者1
-                v_b = 0;
-            else if (Grayscale_truesum == 1)
-            {
-                if (Grayscale_Val[2])
-                {
-                    v_b = -v_b / 2; // 为0时让其收敛
-                }
-                else if (Grayscale_Val[0])
-                    v_b = -250;
-                else if (Grayscale_Val[1])
-                    v_b = -110;
-                else if (Grayscale_Val[3])
-                    v_b = 110;
-                else if (Grayscale_Val[4])
-                    v_b = 250;
-            }
-            // 巡线速度补偿
-            vl += v_b * v_p;
-            vr -= v_b * v_p;
+            // 巡线PID计算
+            temp = positional_pid_compute(&xunxian, 0, Grayscale_truesum_val);
+            vr += temp;
+            vl -= temp;
+            // // 巡线速度补偿计算
+            // if (Grayscale_truesum >= 2) // 都为0或者1
+            //     v_b = 0;
+            // else if (Grayscale_truesum == 1)
+            // {
+            //     if (Grayscale_Val[2])
+            //     {
+            //         v_b = -v_b / 2; // 为0时让其收敛
+            //     }
+            //     else if (Grayscale_Val[0])
+            //         v_b = -250;
+            //     else if (Grayscale_Val[1])
+            //         v_b = -110;
+            //     else if (Grayscale_Val[3])
+            //         v_b = 110;
+            //     else if (Grayscale_Val[4])
+            //         v_b = 250;
+            // }
+            // // 巡线速度补偿
+            // vl += v_b * v_p;
+            // vr -= v_b * v_p;
         }
         // PID转向环计算
         temp = positional_pid_compute(&motor_turn, TARGET_ANGLE, Yaw);
@@ -349,7 +353,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
         TB6612_control_speed(vr, vl);
 
-        AnoPTv8SendBuf(ANOPTV8_SWJID, 0xF1, databuf, 22); // 数据发送到上位机
+        AnoPTv8SendBuf(ANOPTV8_SWJID, 0xF1, databuf, ANOPTV8_PARNUM_UPPER); // 数据发送到上位机
     }
     else if (htim == (&htim7))
     {

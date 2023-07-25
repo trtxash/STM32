@@ -2,6 +2,7 @@
 
 u8 Grayscale_Val[5] = {0};
 u8 Grayscale_truesum = 0;
+float Grayscale_truesum_val = 0;
 
 // 按键初始化函数
 void Grayscale_Init(void)
@@ -45,7 +46,7 @@ void Grayscale_Init(void)
 // 根据灰度信息计算出具体偏移位置
 void Get_Grayscale_Val(void)
 {
-    static Grayscale_trueval_old = 0;
+    static float Grayscale_truesum_val_old = 0;
 
     Grayscale_truesum = 0;
 
@@ -88,4 +89,16 @@ void Get_Grayscale_Val(void)
     }
     else
         Grayscale_Val[4] = 0;
+
+    if (Grayscale_truesum == 1)
+    {
+        if (Grayscale_Val[2] == 1)
+            Grayscale_truesum_val = -Grayscale_truesum_val_old / 2;
+        else
+            Grayscale_truesum_val = Grayscale_truesum_val_old = -Grayscale_Val[0] * 2 - Grayscale_Val[1] + Grayscale_Val[3] + Grayscale_Val[4] * 2;
+    }
+    else if (Grayscale_truesum == 2)
+        Grayscale_truesum_val = Grayscale_truesum_val_old = (-Grayscale_Val[0] * 2 - Grayscale_Val[1] + Grayscale_Val[3] + Grayscale_Val[4] * 2) / 2;
+    else
+        Grayscale_truesum_val = Grayscale_truesum_val_old;
 }

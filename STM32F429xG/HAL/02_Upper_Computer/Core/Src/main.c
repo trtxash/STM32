@@ -49,11 +49,13 @@ int main(void)
     positional_pid_init(&motor2_velocity, 0.35, 0.21, 0.04, 7199, 0, 7199, -7199);
     positional_pid_init(&motor12_location, 30, 0.0, 0, 7199, 0, 100, -100);
     positional_pid_init(&motor_turn, 120.0, 0.0, 0.0, 7199, 0, 7199, -7199);
+    positional_pid_init(&xunxian, 400.0, 0.0, 0.0, 7199, 0, 7199, -7199);
 
     motor1_velocity.control = PID_ENABLE;
     motor2_velocity.control = PID_ENABLE;
     motor12_location.control = PID_ENABLE;
     motor_turn.control = PID_DISABLE;
+    xunxian.control = PID_ENABLE;
     while (1)
     {
         GET_NUM();
@@ -105,6 +107,9 @@ int main(void)
             // TARGET_V = parListForTest[16];
             // TARGET_LOCATION = parListForTest[17];
             // TARGET_ANGLE = (float)parListForTest[18] / 100;
+            // xunxian.kp = (float)parListForTest[19] / 100;
+            // xunxian.ki = (float)parListForTest[20] / 100;
+            // xunxian.kd = (float)parListForTest[21] / 100;
             // // 上位机上传数据处理
             // databuf[0] = BYTE0(Encoder[0]);
             // databuf[1] = BYTE1(Encoder[0]);
@@ -128,6 +133,10 @@ int main(void)
             // databuf[19] = BYTE1(TARGET_ANGLE);
             // databuf[20] = BYTE2(TARGET_ANGLE);
             // databuf[21] = BYTE3(TARGET_ANGLE);
+            // databuf[22] = BYTE0(Grayscale_truesum_val);
+            // databuf[23] = BYTE1(Grayscale_truesum_val);
+            // databuf[24] = BYTE2(Grayscale_truesum_val);
+            // databuf[25] = BYTE3(Grayscale_truesum_val);
         }
 
         MIAN_TASK();

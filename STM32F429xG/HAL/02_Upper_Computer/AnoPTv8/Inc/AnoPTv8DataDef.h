@@ -1,7 +1,7 @@
 #ifndef __ANOPTV8DATADEF_H
 #define __ANOPTV8DATADEF_H
-#include "hardwareInterface.h"
 #include "AnoPTv8Run.h"
+#include "hardwareInterface.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -18,9 +18,10 @@ typedef struct
 } __attribute__((__packed__)) _st_par_info;
 
 // 注意，这里定义参数个数，如果用户增加或删除参数，一定要修改ANOPTV8_PARNUM宏定义，并在AnoPTv8DataDef.c中修改对应的AnoParInfoList定义
-#define ANOPTV8_PARNUM 19
+#define ANOPTV8_PARNUM 22
+#define ANOPTV8_PARNUM_UPPER 26
 
-extern uint8_t databuf[22];
+extern uint8_t databuf[ANOPTV8_PARNUM_UPPER];
 extern int32_t parListForTest[ANOPTV8_PARNUM];
 extern const _st_par_info AnoParInfoList[ANOPTV8_PARNUM];
 

@@ -10,6 +10,7 @@ positional_pid_params_t motor1_velocity;
 positional_pid_params_t motor2_velocity;
 positional_pid_params_t motor12_location;
 positional_pid_params_t motor_turn;
+positional_pid_params_t xunxian;
 
 u8 SUM[4] = {0};
 int TARGET_LOCATION = 0; // 目标位置

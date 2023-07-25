@@ -15,6 +15,7 @@ extern positional_pid_params_t motor1_velocity;
 extern positional_pid_params_t motor2_velocity;
 extern positional_pid_params_t motor12_location;
 extern positional_pid_params_t motor_turn;
+extern positional_pid_params_t xunxian;
 
 extern u8 SUM[4];           // 存的是字符
 extern int TARGET_LOCATION; // 目标位置
