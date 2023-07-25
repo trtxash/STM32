@@ -54,7 +54,6 @@ int main(void)
     motor2_velocity.control = PID_ENABLE;
     motor12_location.control = PID_ENABLE;
     motor_turn.control = PID_DISABLE;
-    TARGET_LOCATION = 8000;
     while (1)
     {
         GET_NUM();
