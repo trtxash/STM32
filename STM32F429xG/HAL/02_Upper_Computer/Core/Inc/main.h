@@ -68,7 +68,6 @@ extern "C"
     /* Exported constants --------------------------------------------------------*/
     /* USER CODE BEGIN EC */
     extern short vr, vl;
-    extern float v_p;
     extern u8 time_flag;
     /* USER CODE END EC */
 
