@@ -84,6 +84,8 @@ Hardware/MPU6050/Src/mpu6050.c \
 Hardware/MPU6050/eMPL/Src/inv_mpu.c \
 Hardware/MPU6050/eMPL/Src/inv_mpu_dmp_motion_driver.c \
 Hardware/Grayscale/Src/grayscale.c \
+Hardware/GW_Grayscale/Src/gw_grayscale_sensor.c \
+Hardware/GW_Grayscale/Src/sw_i2c.c \
 Hardware/Key/Src/key.c \
 
 # ASM sources
@@ -157,6 +159,7 @@ C_INCLUDES =  \
 -IHardware/MPU6050/Inc \
 -IHardware/MPU6050/eMPL/Inc \
 -IHardware/Grayscale/Inc \
+-IHardware/GW_Grayscale/Inc \
 -IHardware/TB6612/Inc \
 -IHardware/Key/Inc \
 

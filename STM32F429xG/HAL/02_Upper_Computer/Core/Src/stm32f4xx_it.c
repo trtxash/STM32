@@ -316,7 +316,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         if (LINE_FLAG)
         {
             // 巡线PID计算
-            temp = positional_pid_compute(&xunxian, 0, Grayscale_truesum_val);
+            temp = positional_pid_compute(&xunxian, 0, gray_sensor_sum_val);
             vr += temp;
             vl -= temp;
             // // 巡线速度补偿计算

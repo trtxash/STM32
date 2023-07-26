@@ -40,6 +40,7 @@ int main(void)
         if (!mpu_dmp_init())
             break;
     }
+    gw_grayscale_sensor_init();
     Tim_Encoder_Init();
     TB6612_init();
     MX_TIM6_Init((u16)(50000 - 1), (u16)(120 - 1)); // 定时器6初始化，周期50ms
@@ -59,8 +60,9 @@ int main(void)
     while (1)
     {
         GET_NUM();
-        Get_Angle(1);        // 读取角度
-        Get_Grayscale_Val(); // 读取灰度
+        Get_Angle(1);           // 读取角度
+        Get_GW_Grayscale_Val(); // 读取灰度
+        // Get_Grayscale_Val(); // 读取灰度
 
         // 1ms的周期任务
         if (time_flag)
@@ -78,7 +80,9 @@ int main(void)
             sprintf(temp, "ERR:%d ", Error_sum);
             OLED_ShowString(64, 16, temp, 8, 1, WHITE);
 
-            sprintf(temp, "G:%d%d%d%d%d,S:%d ", Grayscale_Val[0], Grayscale_Val[1], Grayscale_Val[2], Grayscale_Val[3], Grayscale_Val[4], Grayscale_truesum);
+            // sprintf(temp, "G:%d%d%d%d%d,S:%d ", Grayscale_Val[0], Grayscale_Val[1], Grayscale_Val[2], Grayscale_Val[3], Grayscale_Val[4], Grayscale_truesum);
+            // OLED_ShowString(0, 24, temp, 8, 1, WHITE);
+            sprintf(temp, "G:%d%d%d%d%d%d%d%d,S:%0.2f ", gray_sensor[0], gray_sensor[1], gray_sensor[2], gray_sensor[3], gray_sensor[4], gray_sensor[5], gray_sensor[6], gray_sensor[7], gray_sensor_sum_val);
             OLED_ShowString(0, 24, temp, 8, 1, WHITE);
 
             sprintf(temp, "LF:%d,DC:%d,TA:%d ", LOAD_FLAG, Do_count, TASK);
@@ -87,58 +91,58 @@ int main(void)
             sprintf(temp, "S:%d%d%d%d,AS:%d,SF:%d,P:%c ", SUM[0], SUM[1], SUM[2], SUM[3], AIM_SUM, GET_ROOM_FLAG, AIM_PLACE);
             OLED_ShowString(0, 40, temp, 8, 1, WHITE);
 
-            // // 上位机调整参数
-            // motor1_velocity.kp = (float)parListForTest[0] / 100;
-            // motor1_velocity.ki = (float)parListForTest[1] / 100;
-            // motor1_velocity.kd = (float)parListForTest[2] / 100;
-            // motor2_velocity.kp = (float)parListForTest[3] / 100;
-            // motor2_velocity.ki = (float)parListForTest[4] / 100;
-            // motor2_velocity.kd = (float)parListForTest[5] / 100;
-            // motor12_location.kp = (float)parListForTest[6] / 100;
-            // motor12_location.ki = (float)parListForTest[7] / 100;
-            // motor12_location.kd = (float)parListForTest[8] / 100;
-            // motor_turn.kp = (float)parListForTest[9] / 100;
-            // motor_turn.ki = (float)parListForTest[10] / 100;
-            // motor_turn.kd = (float)parListForTest[11] / 100;
-            // motor1_velocity.control = parListForTest[12];
-            // motor2_velocity.control = parListForTest[13];
-            // motor12_location.control = parListForTest[14];
-            // motor_turn.control = parListForTest[15];
-            // TARGET_V = parListForTest[16];
-            // TARGET_LOCATION = parListForTest[17];
-            // TARGET_ANGLE = (float)parListForTest[18] / 100;
-            // xunxian.kp = (float)parListForTest[19] / 100;
-            // xunxian.ki = (float)parListForTest[20] / 100;
-            // xunxian.kd = (float)parListForTest[21] / 100;
-            // // 上位机上传数据处理
-            // databuf[0] = BYTE0(Encoder[0]);
-            // databuf[1] = BYTE1(Encoder[0]);
-            // databuf[2] = BYTE0(Encoder[1]);
-            // databuf[3] = BYTE1(Encoder[1]);
-            // databuf[4] = BYTE0(TARGET_V);
-            // databuf[5] = BYTE1(TARGET_V);
-            // databuf[6] = BYTE0(Location_sum);
-            // databuf[7] = BYTE1(Location_sum);
-            // databuf[8] = BYTE2(Location_sum);
-            // databuf[9] = BYTE3(Location_sum);
-            // databuf[10] = BYTE0(TARGET_LOCATION);
-            // databuf[11] = BYTE1(TARGET_LOCATION);
-            // databuf[12] = BYTE2(TARGET_LOCATION);
-            // databuf[13] = BYTE3(TARGET_LOCATION);
-            // databuf[14] = BYTE0(Yaw);
-            // databuf[15] = BYTE1(Yaw);
-            // databuf[16] = BYTE2(Yaw);
-            // databuf[17] = BYTE3(Yaw);
-            // databuf[18] = BYTE0(TARGET_ANGLE);
-            // databuf[19] = BYTE1(TARGET_ANGLE);
-            // databuf[20] = BYTE2(TARGET_ANGLE);
-            // databuf[21] = BYTE3(TARGET_ANGLE);
-            // databuf[22] = BYTE0(Grayscale_truesum_val);
-            // databuf[23] = BYTE1(Grayscale_truesum_val);
-            // databuf[24] = BYTE2(Grayscale_truesum_val);
-            // databuf[25] = BYTE3(Grayscale_truesum_val);
+            // 上位机调整参数
+            motor1_velocity.kp = (float)parListForTest[0] / 100;
+            motor1_velocity.ki = (float)parListForTest[1] / 100;
+            motor1_velocity.kd = (float)parListForTest[2] / 100;
+            motor2_velocity.kp = (float)parListForTest[3] / 100;
+            motor2_velocity.ki = (float)parListForTest[4] / 100;
+            motor2_velocity.kd = (float)parListForTest[5] / 100;
+            motor12_location.kp = (float)parListForTest[6] / 100;
+            motor12_location.ki = (float)parListForTest[7] / 100;
+            motor12_location.kd = (float)parListForTest[8] / 100;
+            motor_turn.kp = (float)parListForTest[9] / 100;
+            motor_turn.ki = (float)parListForTest[10] / 100;
+            motor_turn.kd = (float)parListForTest[11] / 100;
+            motor1_velocity.control = parListForTest[12];
+            motor2_velocity.control = parListForTest[13];
+            motor12_location.control = parListForTest[14];
+            motor_turn.control = parListForTest[15];
+            TARGET_V = parListForTest[16];
+            TARGET_LOCATION = parListForTest[17];
+            TARGET_ANGLE = (float)parListForTest[18] / 100;
+            xunxian.kp = (float)parListForTest[19] / 100;
+            xunxian.ki = (float)parListForTest[20] / 100;
+            xunxian.kd = (float)parListForTest[21] / 100;
+            // 上位机上传数据处理
+            databuf[0] = BYTE0(Encoder[0]);
+            databuf[1] = BYTE1(Encoder[0]);
+            databuf[2] = BYTE0(Encoder[1]);
+            databuf[3] = BYTE1(Encoder[1]);
+            databuf[4] = BYTE0(TARGET_V);
+            databuf[5] = BYTE1(TARGET_V);
+            databuf[6] = BYTE0(Location_sum);
+            databuf[7] = BYTE1(Location_sum);
+            databuf[8] = BYTE2(Location_sum);
+            databuf[9] = BYTE3(Location_sum);
+            databuf[10] = BYTE0(TARGET_LOCATION);
+            databuf[11] = BYTE1(TARGET_LOCATION);
+            databuf[12] = BYTE2(TARGET_LOCATION);
+            databuf[13] = BYTE3(TARGET_LOCATION);
+            databuf[14] = BYTE0(Yaw);
+            databuf[15] = BYTE1(Yaw);
+            databuf[16] = BYTE2(Yaw);
+            databuf[17] = BYTE3(Yaw);
+            databuf[18] = BYTE0(TARGET_ANGLE);
+            databuf[19] = BYTE1(TARGET_ANGLE);
+            databuf[20] = BYTE2(TARGET_ANGLE);
+            databuf[21] = BYTE3(TARGET_ANGLE);
+            databuf[22] = BYTE0(Grayscale_truesum_val);
+            databuf[23] = BYTE1(Grayscale_truesum_val);
+            databuf[24] = BYTE2(Grayscale_truesum_val);
+            databuf[25] = BYTE3(Grayscale_truesum_val);
         }
 
-        MIAN_TASK();
+        // MIAN_TASK();
     }
 }

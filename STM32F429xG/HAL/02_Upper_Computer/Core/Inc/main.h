@@ -46,6 +46,8 @@ extern "C"
 #include "led.h"
 #include "oled.h"
 #include "tb6612.h"
+#include "grayscale.h"
+#include "gw_grayscale_sensor.h"
 
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
