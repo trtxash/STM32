@@ -1,10 +1,12 @@
 #include "control.h"
 
-#define BUCHANG_L 230
-#define BUCHANG_D 15
+#define BUCHANG_L 210
+#define BUCHANG_D 10
 #define BUCHANG_A 1
 #define JUDGE_A 1
 #define JUDGE_V 4000
+#define LEFT_GR gray_sensor[0]
+#define RIGHT_GR gray_sensor[7]
 
 positional_pid_params_t motor1_velocity;
 positional_pid_params_t motor2_velocity;
@@ -58,7 +60,7 @@ void MIAN_TASK(void)
                     }
                     break;
                 case 2:
-                    if (Grayscale_truesum > 2)
+                    if (gray_sensor_sum > 2)
                     {
                         Car_GO(JUDGE_V, BUCHANG_L);
                         STOP_FLAG = 1;
@@ -84,7 +86,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 7:
-                    if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                    if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                         STOP_FLAG = 1;
                     if (STOP_FLAG & Location_sum > 1300)
                         Do_count++;
@@ -117,7 +119,7 @@ void MIAN_TASK(void)
                     }
                     break;
                 case 2:
-                    if (Grayscale_truesum > 2)
+                    if (gray_sensor_sum > 2)
                     {
                         Car_GO(JUDGE_V, BUCHANG_L);
                         STOP_FLAG = 1;
@@ -143,7 +145,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 7:
-                    if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                    if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                         STOP_FLAG = 1;
                     if (STOP_FLAG & Location_sum > 1300)
                         Do_count++;
@@ -203,7 +205,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum > 2)
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -229,7 +231,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 1350)
                             Do_count++;
@@ -255,7 +257,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum > 2)
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -281,7 +283,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 1350)
                             Do_count++;
@@ -332,7 +334,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum > 2)
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -383,7 +385,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum > 2)
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -434,7 +436,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum > 2)
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -460,7 +462,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 1350)
                             Do_count++;
@@ -486,7 +488,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum > 2)
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -512,7 +514,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 1350)
                             Do_count++;
@@ -538,7 +540,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum >= 2)
+                        if (gray_sensor_sum >= 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -564,7 +566,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 1350)
                             Do_count++;
@@ -590,7 +592,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum > 2)
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -616,7 +618,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 1350)
                             Do_count++;
@@ -657,7 +659,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 3:
-                    if (Grayscale_truesum > 2)
+                    if (gray_sensor_sum > 2)
                     {
                         Car_GO(JUDGE_V, BUCHANG_L);
                         STOP_FLAG = 1;
@@ -683,7 +685,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 8:
-                    if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                    if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                         STOP_FLAG = 1;
                     if (STOP_FLAG & Location_sum > 2100)
                         Do_count++;
@@ -717,7 +719,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 3:
-                    if (Grayscale_truesum > 2)
+                    if (gray_sensor_sum > 2)
                     {
                         Car_GO(JUDGE_V, BUCHANG_L);
                         STOP_FLAG = 1;
@@ -743,7 +745,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 8:
-                    if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                    if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                         STOP_FLAG = 1;
                     if (STOP_FLAG & Location_sum > 2100)
                         Do_count++;
@@ -779,7 +781,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_truesum > 2 & Grayscale_Val[4])
+                        if (gray_sensor_sum > 2 & RIGHT_GR)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -805,7 +807,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 4800)
                             Do_count++;
@@ -839,7 +841,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_truesum > 2 & Grayscale_Val[0])
+                        if (gray_sensor_sum > 2 & LEFT_GR)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -865,7 +867,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 4800)
                             Do_count++;
@@ -904,7 +906,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_Val[4] & Location_sum > 1000)
+                        if (RIGHT_GR & Location_sum > 1000)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -930,7 +932,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if (Grayscale_Val[4] & Location_sum > 2250)
+                        if (RIGHT_GR & Location_sum > 2250)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -956,7 +958,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 13:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 7450)
                             Do_count++;
@@ -990,7 +992,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_Val[0] & Location_sum > 1000)
+                        if (LEFT_GR & Location_sum > 1000)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1021,7 +1023,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if (Grayscale_Val[4] & Location_sum > 2250)
+                        if (RIGHT_GR & Location_sum > 2250)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1047,7 +1049,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 13:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 7450)
                             Do_count++;
@@ -1081,7 +1083,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_Val[4] & Location_sum > 1000)
+                        if (RIGHT_GR & Location_sum > 1000)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1112,7 +1114,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if (Grayscale_Val[0] & Location_sum > 2250)
+                        if (LEFT_GR & Location_sum > 2250)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1138,7 +1140,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 13:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 7450)
                             Do_count++;
@@ -1177,7 +1179,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_Val[0] & Location_sum > 1000)
+                        if (LEFT_GR & Location_sum > 1000)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1203,7 +1205,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if (Grayscale_Val[0] & Location_sum > 2250)
+                        if (LEFT_GR & Location_sum > 2250)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1229,7 +1231,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 13:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 7450)
                             Do_count++;
