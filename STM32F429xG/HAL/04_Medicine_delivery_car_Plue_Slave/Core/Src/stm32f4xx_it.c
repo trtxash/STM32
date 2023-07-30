@@ -353,15 +353,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         if (LINE_FLAG)
         {
             // 巡线PID计算
-            temp = positional_pid_compute(&xunxian, 0, gray_sensor_sum_val);
-            // temp = positional_pid_compute(&xunxian, 0, OPMV_LP);
-            vr += temp;
-            vl -= temp;
+            // temp = positional_pid_compute(&xunxian, 0, gray_sensor_sum_val);
+            temp = positional_pid_compute(&xunxian, 0, OPMV_LP);
+            vr -= temp;
+            vl += temp;
         }
         // PID转向环计算
         temp = positional_pid_compute(&motor_turn, TARGET_ANGLE, Yaw);
-        vr += temp;
-        vl -= temp;
+        vr -= temp;
+        vl += temp;
         // PID速度环计算
         if (motor12_location.control == DISABLE & motor_turn.control == DISABLE) // 调试用
             vl = vr = TARGET_V;

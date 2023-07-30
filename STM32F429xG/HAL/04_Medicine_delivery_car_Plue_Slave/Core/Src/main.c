@@ -6,6 +6,8 @@
  * @date 	2023年7月26号17点6分
  */
 
+// 未完，有时间再补
+
 #include "main.h"
 
 short vr = 0, vl = 0;
@@ -47,17 +49,17 @@ int main(void)
     MX_TIM7_Init((u16)(1000 - 1), (u16)(120 - 1));  // 定时器7初始化，周期1ms
     KEY0_Init();
 
-    positional_pid_init(&motor1_velocity, 0.35, 0.21, 0.04, 7199, 0, 7199, -7199);
-    positional_pid_init(&motor2_velocity, 0.35, 0.21, 0.04, 7199, 0, 7199, -7199);
-    positional_pid_init(&motor12_location, 30, 0.0, 0, 7199, 0, 100, -100);
-    positional_pid_init(&motor_turn, 120.0, 0.0, 0.0, 7199, 0, 7199, -7199);
-    positional_pid_init(&xunxian, 140.0, 0.0, 0.0, 7199, 0, 7199, -7199);
+    // positional_pid_init(&motor1_velocity, 0.35, 0.21, 0.04, 7199, 0, 7199, -7199);
+    // positional_pid_init(&motor2_velocity, 0.35, 0.21, 0.04, 7199, 0, 7199, -7199);
+    // positional_pid_init(&motor12_location, 30, 0.0, 0, 7199, 0, 100, -100);
+    // positional_pid_init(&motor_turn, 120.0, 0.0, 0.0, 7199, 0, 7199, -7199);
+    // positional_pid_init(&xunxian, 140.0, 0.0, 0.0, 7199, 0, 7199, -7199);
 
-    // positional_pid_init(&motor1_velocity, 17.5, 14, 0.18, 7199, 0, 7199, -7199);
-    // positional_pid_init(&motor2_velocity, 17.5, 14, 0.18, 7199, 0, 7199, -7199);
-    // positional_pid_init(&motor12_location, 0.5, 0.0, 0, 7199, 0, 100, -100);
-    // positional_pid_init(&motor_turn, 1.7, 0.0, 0.0, 7199, 0, 7199, -7199);
-    // positional_pid_init(&xunxian, 0.4, 0.0, 0.0, 7199, 0, 7199, -7199);
+    positional_pid_init(&motor1_velocity, 17.5, 14, 0.18, 7199, 0, 7199, -7199);
+    positional_pid_init(&motor2_velocity, 17.5, 14, 0.18, 7199, 0, 7199, -7199);
+    positional_pid_init(&motor12_location, 0.5, 0.0, 0, 7199, 0, 100, -100);
+    positional_pid_init(&motor_turn, 1.7, 0.0, 0.0, 7199, 0, 7199, -7199);
+    positional_pid_init(&xunxian, 0.4, 0.0, 0.0, 7199, 0, 7199, -7199);
 
     motor1_velocity.control = PID_ENABLE;
     motor2_velocity.control = PID_ENABLE;
@@ -65,13 +67,12 @@ int main(void)
     motor_turn.control = PID_DISABLE;
     xunxian.control = PID_ENABLE;
 
-    // Car_GO(1000,8000);
     while (1)
     {
         GET_NUM();
         Get_Angle(1); // 读取角度
-        // GET_OPENMV();
-        Get_GW_Grayscale_Val(); // 读取灰度
+        GET_OPENMV();
+        // Get_GW_Grayscale_Val(); // 读取灰度
         // Get_Grayscale_Val(); // 读取灰度
 
         // 1ms的周期任务
