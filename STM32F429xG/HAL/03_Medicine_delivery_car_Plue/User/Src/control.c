@@ -1,10 +1,12 @@
 #include "control.h"
 
-#define BUCHANG_L 230
-#define BUCHANG_D 15
+#define BUCHANG_L 210
+#define BUCHANG_D 10
 #define BUCHANG_A 1
 #define JUDGE_A 1
 #define JUDGE_V 4000
+#define LEFT_GR gray_sensor[0]
+#define RIGHT_GR gray_sensor[7]
 
 positional_pid_params_t motor1_velocity;
 positional_pid_params_t motor2_velocity;
@@ -25,7 +27,13 @@ u8 AIM_SUM = 0;
 u8 AIM_PLACE = 0;
 u8 Do_count = 0;
 u8 STOP_FLAG = 1, LINE_FLAG = 0, TURN_SUCCEED_FLAG = 0; // 初始车停下，不巡线
-u8 LOR = 0;
+u8 OPMVDATA[21] = {0};
+int OPMV_FLAG = 0;     // 1 直行，2 路口
+int OPMV_LP = 0;       // 位置偏移量
+int OPMV_AP = 0;       // 角度偏移量
+int OPMV_STOPFLAG = 0; // 终止
+u8 TWOCAR_FLAG = 0;
+u8 TWOCAR_LINEFLAG = 0;
 
 // 第一个岔口:2150，第二个岔口4850，第三个岔路口7500，近中端1400，远端2650
 // 主要任务
@@ -42,595 +50,1193 @@ void MIAN_TASK(void)
     {
         if (LOAD_FLAG == 1) // 送药
         {
-            if (AIM_PLACE == 'A')
+            if (TWOCAR_FLAG == 0) // 单车
             {
-                switch (Do_count)
-                {
-                case 0: // 直走
-                    Car_GO(5000, 2150);
-                    Do_count++;
-                    break;
-                case 1:
-                    if (Location_sum > 1100)
-                    {
-                        TARGET_V = JUDGE_V;
-                        Do_count++;
-                    }
-                    break;
-                case 2:
-                    if (Grayscale_truesum > 2)
-                    {
-                        Car_GO(JUDGE_V, BUCHANG_L);
-                        STOP_FLAG = 1;
-                        Do_count++;
-                    }
-                    break;
-                case 3:
-                    if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
-                        Do_count++;
-                    break;
-                case 4: // 左转向
-                    Car_TURN(90);
-                    Do_count++;
-                    break;
-                case 5:
-                    if (J_turn(BUCHANG_A)) // 转向角差5以内
-                        TURN_SUCCEED_FLAG = 1;
-                    if (TURN_SUCCEED_FLAG)
-                        Do_count++;
-                    break;
-                case 6: // 直走
-                    Car_GO(5000, 1400);
-                    Do_count++;
-                    break;
-                case 7:
-                    if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
-                        STOP_FLAG = 1;
-                    if (STOP_FLAG & Location_sum > 1300)
-                        Do_count++;
-                    break;
-                case 8: // 卸药
-                    Car_STOP();
-                    LED0_Set();
-                    Do_count++;
-                    break;
-                case 9:
-                    LOADORNOT();
-                    break;
-                default:
-                    break;
-                }
-            }
-            else if (AIM_PLACE == 'B')
-            {
-                switch (Do_count)
-                {
-                case 0: // 直走
-                    Car_GO(5000, 2150);
-                    Do_count++;
-                    break;
-                case 1:
-                    if (Location_sum > 1100)
-                    {
-                        TARGET_V = JUDGE_V;
-                        Do_count++;
-                    }
-                    break;
-                case 2:
-                    if (Grayscale_truesum > 2)
-                    {
-                        Car_GO(JUDGE_V, BUCHANG_L);
-                        STOP_FLAG = 1;
-                        Do_count++;
-                    }
-                    break;
-                case 3:
-                    if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
-                        Do_count++;
-                    break;
-                case 4: // 转向
-                    Car_TURN(-90);
-                    Do_count++;
-                    break;
-                case 5:
-                    if (J_turn(BUCHANG_A)) // 转向角差5以内
-                        TURN_SUCCEED_FLAG = 1;
-                    if (TURN_SUCCEED_FLAG)
-                        Do_count++;
-                    break;
-                case 6: // 直走
-                    Car_GO(5000, 1400);
-                    Do_count++;
-                    break;
-                case 7:
-                    if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
-                        STOP_FLAG = 1;
-                    if (STOP_FLAG & Location_sum > 1300)
-                        Do_count++;
-                    break;
-                case 8: // 卸药
-                    Car_STOP();
-                    LED0_Set();
-                    Do_count++;
-                    break;
-                case 9:
-                    LOADORNOT();
-                    break;
-                default:
-                    break;
-                }
-            }
-            else // 中端病房和远端病房需要发送特定标志位
-            {
-                if (AIM_PLACE == 'C')
+                if (AIM_PLACE == 'A')
                 {
                     switch (Do_count)
                     {
                     case 0: // 直走
-                        Car_GO(8000, 4850);
+                        Car_GO(5000, 2150);
                         Do_count++;
                         break;
                     case 1:
-                        if (Location_sum > 3000)
+                        if (Location_sum > 1100)
                         {
-                            TARGET_V = 5000;
+                            TARGET_V = JUDGE_V;
                             Do_count++;
                         }
                         break;
                     case 2:
-                        if (Location_sum > 3500)
-                        {
-                            TARGET_V = JUDGE_V;
-                            Do_count++;
-                        }
-                        break;
-                    case 3: // 识别数字
-                        if (GET_SET_AIM_ROOM() == 0)
-                        {
-                            Do_count = 0;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                }
-                else if (AIM_PLACE == 'D')
-                {
-                    switch (Do_count)
-                    {
-                    case 0: // 直走
-                        Car_GO(JUDGE_V, 1350);
-                        Do_count++;
-                        break;
-                    case 1:
-                        if (Grayscale_truesum > 2)
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
                             Do_count++;
                         }
                         break;
-                    case 2: // 左转向
+                    case 3:
                         if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
                             Do_count++;
                         break;
-                    case 3: // 左转向
+                    case 4: // 左转向
                         Car_TURN(90);
                         Do_count++;
                         break;
-                    case 4:
+                    case 5:
                         if (J_turn(BUCHANG_A)) // 转向角差5以内
                             TURN_SUCCEED_FLAG = 1;
                         if (TURN_SUCCEED_FLAG)
                             Do_count++;
                         break;
-                    case 5: // 直走
+                    case 6: // 直走
                         Car_GO(5000, 1400);
                         Do_count++;
                         break;
-                    case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                    case 7:
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
-                        if (STOP_FLAG & Location_sum > 1350)
+                        if (STOP_FLAG & Location_sum > 1300)
                             Do_count++;
                         break;
-                    case 7: // 卸药
+                    case 8: // 卸药
                         Car_STOP();
                         LED0_Set();
                         Do_count++;
                         break;
-                    case 8:
+                    case 9:
                         LOADORNOT();
                         break;
                     default:
                         break;
                     }
                 }
-                else if (AIM_PLACE == 'E')
+                else if (AIM_PLACE == 'B')
                 {
                     switch (Do_count)
                     {
                     case 0: // 直走
-                        Car_GO(JUDGE_V, 1350);
+                        Car_GO(5000, 2150);
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum > 2)
-                        {
-                            Car_GO(JUDGE_V, BUCHANG_L);
-                            STOP_FLAG = 1;
-                            Do_count++;
-                        }
-                        break;
-                    case 2: // 左转向
-                        if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
-                            Do_count++;
-                        break;
-                    case 3: // 转向
-                        Car_TURN(-90);
-                        Do_count++;
-                        break;
-                    case 4:
-                        if (J_turn(BUCHANG_A)) // 转向角差5以内
-                            TURN_SUCCEED_FLAG = 1;
-                        if (TURN_SUCCEED_FLAG)
-                            Do_count++;
-                        break;
-                    case 5: // 直走
-                        Car_GO(5000, 1400);
-                        Do_count++;
-                        break;
-                    case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
-                            STOP_FLAG = 1;
-                        if (STOP_FLAG & Location_sum > 1350)
-                            Do_count++;
-                        break;
-                    case 7: // 卸药
-                        Car_STOP();
-                        LED0_Set();
-                        Do_count++;
-                        break;
-                    case 8:
-                        LOADORNOT();
-                        break;
-                    default:
-                        break;
-                    }
-                }
-                else if (AIM_PLACE == 'F')
-                {
-                    switch (Do_count)
-                    {
-                    case 0: // 直走
-                        Car_GO(5000, 2650);
-                        Do_count++;
-                        break;
-                    case 1:
-                        if (Location_sum > 1400)
+                        if (Location_sum > 1100)
                         {
                             TARGET_V = JUDGE_V;
                             Do_count++;
                         }
                         break;
-                    case 2: // 识别数字
-                        if (GET_SET_AIM_ROOM() == 0)
-                        {
-                            Do_count = 0;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                }
-                else if (AIM_PLACE == 'G')
-                {
-                    switch (Do_count)
-                    {
-                    case 0: // 直走
-                        Car_GO(JUDGE_V, 1300);
-                        Do_count++;
-                        break;
-                    case 1:
-                        if (Grayscale_truesum > 2)
+                    case 2:
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
                             Do_count++;
                         }
                         break;
-                    case 2: // 左转向
+                    case 3:
                         if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
                             Do_count++;
                         break;
-                    case 3: // 左转向
+                    case 4: // 转向
+                        Car_TURN(-90);
+                        Do_count++;
+                        break;
+                    case 5:
+                        if (J_turn(BUCHANG_A)) // 转向角差5以内
+                            TURN_SUCCEED_FLAG = 1;
+                        if (TURN_SUCCEED_FLAG)
+                            Do_count++;
+                        break;
+                    case 6: // 直走
+                        Car_GO(5000, 1400);
+                        Do_count++;
+                        break;
+                    case 7:
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                            STOP_FLAG = 1;
+                        if (STOP_FLAG & Location_sum > 1300)
+                            Do_count++;
+                        break;
+                    case 8: // 卸药
+                        Car_STOP();
+                        LED0_Set();
+                        Do_count++;
+                        break;
+                    case 9:
+                        LOADORNOT();
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                else // 中端病房和远端病房需要发送特定标志位
+                {
+                    if (AIM_PLACE == 'C')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(8000, 4850);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (Location_sum > 3000)
+                            {
+                                TARGET_V = 5000;
+                                Do_count++;
+                            }
+                            break;
+                        case 2:
+                            if (Location_sum > 3500)
+                            {
+                                TARGET_V = JUDGE_V;
+                                Do_count++;
+                            }
+                            break;
+                        case 3: // 识别数字
+                            if (GET_SET_AIM_ROOM() == 0)
+                            {
+                                Do_count = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'D')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 左转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 左转向
+                            Car_TURN(90);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(5000, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'E')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 左转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 转向
+                            Car_TURN(-90);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(5000, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'F')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(5000, 2650);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (Location_sum > 1400)
+                            {
+                                TARGET_V = JUDGE_V;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 识别数字
+                            if (GET_SET_AIM_ROOM() == 0)
+                            {
+                                Do_count = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'G')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1300);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 左转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 左转向
+                            Car_TURN(90);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(6000, 2650);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if (Location_sum > 1300)
+                            {
+                                TARGET_V = JUDGE_V;
+                                Do_count++;
+                            }
+                            break;
+                        case 7: // 识别数字
+                            if (GET_SET_AIM_ROOM() == 0)
+                            {
+                                Do_count = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'H')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1300);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 转向
+                            Car_TURN(-90);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(6000, 2650);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if (Location_sum > 1300)
+                            {
+                                TARGET_V = JUDGE_V;
+                                Do_count++;
+                            }
+                            break;
+                        case 7: // 识别数字
+                            if (GET_SET_AIM_ROOM() == 0)
+                            {
+                                Do_count = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'I')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 左转向
+                            Car_TURN(85);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(JUDGE_V, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'J')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 转向
+                            Car_TURN(-85);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(JUDGE_V, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'K')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum >= 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 左转向
+                            Car_TURN(85);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(JUDGE_V, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'L')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 转向
+                            Car_TURN(-85);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(JUDGE_V, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (TWOCAR_FLAG == 1) // 双车
+            {
+                if (AIM_PLACE == 'A')
+                {
+                    switch (Do_count)
+                    {
+                    case 0: // 直走
+                        Car_GO(5000, 2150);
+                        Do_count++;
+                        break;
+                    case 1:
+                        if (Location_sum > 1100)
+                        {
+                            TARGET_V = JUDGE_V;
+                            Do_count++;
+                        }
+                        break;
+                    case 2:
+                        if (gray_sensor_sum > 2)
+                        {
+                            Car_GO(JUDGE_V, BUCHANG_L);
+                            STOP_FLAG = 1;
+                            Do_count++;
+                        }
+                        break;
+                    case 3:
+                        if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                            Do_count++;
+                        break;
+                    case 4: // 左转向
                         Car_TURN(90);
                         Do_count++;
                         break;
-                    case 4:
+                    case 5:
                         if (J_turn(BUCHANG_A)) // 转向角差5以内
                             TURN_SUCCEED_FLAG = 1;
                         if (TURN_SUCCEED_FLAG)
                             Do_count++;
                         break;
-                    case 5: // 直走
-                        Car_GO(6000, 2650);
+                    case 6: // 直走
+                        Car_GO(5000, 1400);
                         Do_count++;
                         break;
-                    case 6:
-                        if (Location_sum > 1300)
-                        {
-                            TARGET_V = JUDGE_V;
+                    case 7:
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                            STOP_FLAG = 1;
+                        if (STOP_FLAG & Location_sum > 1300)
                             Do_count++;
-                        }
                         break;
-                    case 7: // 识别数字
-                        if (GET_SET_AIM_ROOM() == 0)
-                        {
-                            Do_count = 0;
-                        }
+                    case 8: // 卸药
+                        Car_STOP();
+                        LED0_Set();
+                        Do_count++;
+                        break;
+                    case 9:
+                        LOADORNOT();
                         break;
                     default:
                         break;
                     }
                 }
-                else if (AIM_PLACE == 'H')
+                else if (AIM_PLACE == 'B')
                 {
                     switch (Do_count)
                     {
                     case 0: // 直走
-                        Car_GO(JUDGE_V, 1300);
+                        Car_GO(5000, 2150);
                         Do_count++;
                         break;
                     case 1:
-                        if (Grayscale_truesum > 2)
+                        if (Location_sum > 1100)
+                        {
+                            TARGET_V = JUDGE_V;
+                            Do_count++;
+                        }
+                        break;
+                    case 2:
+                        if (gray_sensor_sum > 2)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
                             Do_count++;
                         }
                         break;
-                    case 2: // 转向
+                    case 3:
                         if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
                             Do_count++;
                         break;
-                    case 3: // 转向
+                    case 4: // 转向
                         Car_TURN(-90);
                         Do_count++;
                         break;
-                    case 4:
+                    case 5:
                         if (J_turn(BUCHANG_A)) // 转向角差5以内
                             TURN_SUCCEED_FLAG = 1;
                         if (TURN_SUCCEED_FLAG)
                             Do_count++;
                         break;
-                    case 5: // 直走
-                        Car_GO(6000, 2650);
+                    case 6: // 直走
+                        Car_GO(5000, 1400);
                         Do_count++;
                         break;
-                    case 6:
-                        if (Location_sum > 1300)
-                        {
-                            TARGET_V = JUDGE_V;
-                            Do_count++;
-                        }
-                        break;
-                    case 7: // 识别数字
-                        if (GET_SET_AIM_ROOM() == 0)
-                        {
-                            Do_count = 0;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                }
-                else if (AIM_PLACE == 'I')
-                {
-                    switch (Do_count)
-                    {
-                    case 0: // 直走
-                        Car_GO(JUDGE_V, 1350);
-                        Do_count++;
-                        break;
-                    case 1:
-                        if (Grayscale_truesum > 2)
-                        {
-                            Car_GO(JUDGE_V, BUCHANG_L);
+                    case 7:
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
-                            Do_count++;
-                        }
-                        break;
-                    case 2: // 转向
-                        if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                        if (STOP_FLAG & Location_sum > 1300)
                             Do_count++;
                         break;
-                    case 3: // 左转向
-                        Car_TURN(85);
-                        Do_count++;
-                        break;
-                    case 4:
-                        if (J_turn(BUCHANG_A)) // 转向角差5以内
-                            TURN_SUCCEED_FLAG = 1;
-                        if (TURN_SUCCEED_FLAG)
-                            Do_count++;
-                        break;
-                    case 5: // 直走
-                        Car_GO(JUDGE_V, 1400);
-                        Do_count++;
-                        break;
-                    case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
-                            STOP_FLAG = 1;
-                        if (STOP_FLAG & Location_sum > 1350)
-                            Do_count++;
-                        break;
-                    case 7: // 卸药
+                    case 8: // 卸药
                         Car_STOP();
                         LED0_Set();
                         Do_count++;
                         break;
-                    case 8:
+                    case 9:
                         LOADORNOT();
                         break;
                     default:
                         break;
                     }
                 }
-                else if (AIM_PLACE == 'J')
+                else // 中端病房和远端病房需要发送特定标志位
                 {
-                    switch (Do_count)
+                    if (AIM_PLACE == 'C')
                     {
-                    case 0: // 直走
-                        Car_GO(JUDGE_V, 1350);
-                        Do_count++;
-                        break;
-                    case 1:
-                        if (Grayscale_truesum > 2)
+                        switch (Do_count)
                         {
-                            Car_GO(JUDGE_V, BUCHANG_L);
-                            STOP_FLAG = 1;
+                        case 0: // 直走
+                            Car_GO(8000, 4850);
                             Do_count++;
+                            break;
+                        case 1:
+                            if (Location_sum > 3000)
+                            {
+                                TARGET_V = 5000;
+                                Do_count++;
+                            }
+                            break;
+                        case 2:
+                            if (Location_sum > 3500)
+                            {
+                                TARGET_V = JUDGE_V;
+                                Do_count++;
+                            }
+                            break;
+                        case 3: // 识别数字
+                            if (GET_SET_AIM_ROOM() == 0)
+                            {
+                                Do_count = 0;
+                            }
+                            break;
+                        default:
+                            break;
                         }
-                        break;
-                    case 2: // 转向
-                        if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
-                            Do_count++;
-                        break;
-                    case 3: // 转向
-                        Car_TURN(-85);
-                        Do_count++;
-                        break;
-                    case 4:
-                        if (J_turn(BUCHANG_A)) // 转向角差5以内
-                            TURN_SUCCEED_FLAG = 1;
-                        if (TURN_SUCCEED_FLAG)
-                            Do_count++;
-                        break;
-                    case 5: // 直走
-                        Car_GO(JUDGE_V, 1400);
-                        Do_count++;
-                        break;
-                    case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
-                            STOP_FLAG = 1;
-                        if (STOP_FLAG & Location_sum > 1350)
-                            Do_count++;
-                        break;
-                    case 7: // 卸药
-                        Car_STOP();
-                        LED0_Set();
-                        Do_count++;
-                        break;
-                    case 8:
-                        LOADORNOT();
-                        break;
-                    default:
-                        break;
                     }
-                }
-                else if (AIM_PLACE == 'K')
-                {
-                    switch (Do_count)
+                    else if (AIM_PLACE == 'D')
                     {
-                    case 0: // 直走
-                        Car_GO(JUDGE_V, 1350);
-                        Do_count++;
-                        break;
-                    case 1:
-                        if (Grayscale_truesum >= 2)
+                        switch (Do_count)
                         {
-                            Car_GO(JUDGE_V, BUCHANG_L);
-                            STOP_FLAG = 1;
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
                             Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 左转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 左转向
+                            Car_TURN(90);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(5000, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
                         }
-                        break;
-                    case 2: // 转向
-                        if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
-                            Do_count++;
-                        break;
-                    case 3: // 左转向
-                        Car_TURN(85);
-                        Do_count++;
-                        break;
-                    case 4:
-                        if (J_turn(BUCHANG_A)) // 转向角差5以内
-                            TURN_SUCCEED_FLAG = 1;
-                        if (TURN_SUCCEED_FLAG)
-                            Do_count++;
-                        break;
-                    case 5: // 直走
-                        Car_GO(JUDGE_V, 1400);
-                        Do_count++;
-                        break;
-                    case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
-                            STOP_FLAG = 1;
-                        if (STOP_FLAG & Location_sum > 1350)
-                            Do_count++;
-                        break;
-                    case 7: // 卸药
-                        Car_STOP();
-                        LED0_Set();
-                        Do_count++;
-                        break;
-                    case 8:
-                        LOADORNOT();
-                        break;
-                    default:
-                        break;
                     }
-                }
-                else if (AIM_PLACE == 'L')
-                {
-                    switch (Do_count)
+                    else if (AIM_PLACE == 'E')
                     {
-                    case 0: // 直走
-                        Car_GO(JUDGE_V, 1350);
-                        Do_count++;
-                        break;
-                    case 1:
-                        if (Grayscale_truesum > 2)
+                        switch (Do_count)
                         {
-                            Car_GO(JUDGE_V, BUCHANG_L);
-                            STOP_FLAG = 1;
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
                             Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 左转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 转向
+                            Car_TURN(-90);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(5000, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
                         }
-                        break;
-                    case 2: // 转向
-                        if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                    }
+                    else if (AIM_PLACE == 'F')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(5000, 2650);
                             Do_count++;
-                        break;
-                    case 3: // 转向
-                        Car_TURN(-85);
-                        Do_count++;
-                        break;
-                    case 4:
-                        if (J_turn(BUCHANG_A)) // 转向角差5以内
-                            TURN_SUCCEED_FLAG = 1;
-                        if (TURN_SUCCEED_FLAG)
+                            break;
+                        case 1:
+                            if (Location_sum > 1400)
+                            {
+                                TARGET_V = JUDGE_V;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 识别数字
+                            if (GET_SET_AIM_ROOM() == 0)
+                            {
+                                Do_count = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'G')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1300);
                             Do_count++;
-                        break;
-                    case 5: // 直走
-                        Car_GO(JUDGE_V, 1400);
-                        Do_count++;
-                        break;
-                    case 6:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
-                            STOP_FLAG = 1;
-                        if (STOP_FLAG & Location_sum > 1350)
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 左转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 左转向
+                            Car_TURN(90);
                             Do_count++;
-                        break;
-                    case 7: // 卸药
-                        Car_STOP();
-                        LED0_Set();
-                        Do_count++;
-                        break;
-                    case 8:
-                        LOADORNOT();
-                        break;
-                    default:
-                        break;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(6000, 2650);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if (Location_sum > 1300)
+                            {
+                                TARGET_V = JUDGE_V;
+                                Do_count++;
+                            }
+                            break;
+                        case 7: // 识别数字
+                            if (GET_SET_AIM_ROOM() == 0)
+                            {
+                                Do_count = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'H')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1300);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 转向
+                            Car_TURN(-90);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(6000, 2650);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if (Location_sum > 1300)
+                            {
+                                TARGET_V = JUDGE_V;
+                                Do_count++;
+                            }
+                            break;
+                        case 7: // 识别数字
+                            if (GET_SET_AIM_ROOM() == 0)
+                            {
+                                Do_count = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'I')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 左转向
+                            Car_TURN(85);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(JUDGE_V, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'J')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 转向
+                            Car_TURN(-85);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(JUDGE_V, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'K')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum >= 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 左转向
+                            Car_TURN(85);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(JUDGE_V, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (AIM_PLACE == 'L')
+                    {
+                        switch (Do_count)
+                        {
+                        case 0: // 直走
+                            Car_GO(JUDGE_V, 1350);
+                            Do_count++;
+                            break;
+                        case 1:
+                            if (gray_sensor_sum > 2)
+                            {
+                                Car_GO(JUDGE_V, BUCHANG_L);
+                                STOP_FLAG = 1;
+                                Do_count++;
+                            }
+                            break;
+                        case 2: // 转向
+                            if (STOP_FLAG & ((BUCHANG_L - Location_sum) < BUCHANG_D))
+                                Do_count++;
+                            break;
+                        case 3: // 转向
+                            Car_TURN(-85);
+                            Do_count++;
+                            break;
+                        case 4:
+                            if (J_turn(BUCHANG_A)) // 转向角差5以内
+                                TURN_SUCCEED_FLAG = 1;
+                            if (TURN_SUCCEED_FLAG)
+                                Do_count++;
+                            break;
+                        case 5: // 直走
+                            Car_GO(JUDGE_V, 1400);
+                            Do_count++;
+                            break;
+                        case 6:
+                            if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
+                                STOP_FLAG = 1;
+                            if (STOP_FLAG & Location_sum > 1350)
+                                Do_count++;
+                            break;
+                        case 7: // 卸药
+                            Car_STOP();
+                            LED0_Set();
+                            Do_count++;
+                            break;
+                        case 8:
+                            LOADORNOT();
+                            break;
+                        default:
+                            break;
+                        }
                     }
                 }
             }
@@ -657,7 +1263,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 3:
-                    if (Grayscale_truesum > 2)
+                    if (gray_sensor_sum > 2)
                     {
                         Car_GO(JUDGE_V, BUCHANG_L);
                         STOP_FLAG = 1;
@@ -683,7 +1289,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 8:
-                    if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                    if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                         STOP_FLAG = 1;
                     if (STOP_FLAG & Location_sum > 2100)
                         Do_count++;
@@ -717,7 +1323,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 3:
-                    if (Grayscale_truesum > 2)
+                    if (gray_sensor_sum > 2)
                     {
                         Car_GO(JUDGE_V, BUCHANG_L);
                         STOP_FLAG = 1;
@@ -743,7 +1349,7 @@ void MIAN_TASK(void)
                     Do_count++;
                     break;
                 case 8:
-                    if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                    if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                         STOP_FLAG = 1;
                     if (STOP_FLAG & Location_sum > 2100)
                         Do_count++;
@@ -779,7 +1385,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_truesum > 2 & Grayscale_Val[4])
+                        if (gray_sensor_sum > 2 & RIGHT_GR)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -805,7 +1411,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 4800)
                             Do_count++;
@@ -839,7 +1445,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_truesum > 2 & Grayscale_Val[0])
+                        if (gray_sensor_sum > 2 & LEFT_GR)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -865,7 +1471,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 4800)
                             Do_count++;
@@ -904,7 +1510,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_Val[4] & Location_sum > 1000)
+                        if (RIGHT_GR & Location_sum > 1000)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -930,7 +1536,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if (Grayscale_Val[4] & Location_sum > 2250)
+                        if (RIGHT_GR & Location_sum > 2250)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -956,7 +1562,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 13:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 7450)
                             Do_count++;
@@ -990,7 +1596,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_Val[0] & Location_sum > 1000)
+                        if (LEFT_GR & Location_sum > 1000)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1021,7 +1627,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if (Grayscale_Val[4] & Location_sum > 2250)
+                        if (RIGHT_GR & Location_sum > 2250)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1047,7 +1653,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 13:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 7450)
                             Do_count++;
@@ -1081,7 +1687,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_Val[4] & Location_sum > 1000)
+                        if (RIGHT_GR & Location_sum > 1000)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1112,7 +1718,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if (Grayscale_Val[0] & Location_sum > 2250)
+                        if (LEFT_GR & Location_sum > 2250)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1138,7 +1744,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 13:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 7450)
                             Do_count++;
@@ -1177,7 +1783,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 3:
-                        if (Grayscale_Val[0] & Location_sum > 1000)
+                        if (LEFT_GR & Location_sum > 1000)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1203,7 +1809,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 8:
-                        if (Grayscale_Val[0] & Location_sum > 2250)
+                        if (LEFT_GR & Location_sum > 2250)
                         {
                             Car_GO(JUDGE_V, BUCHANG_L);
                             STOP_FLAG = 1;
@@ -1229,7 +1835,7 @@ void MIAN_TASK(void)
                         Do_count++;
                         break;
                     case 13:
-                        if ((Grayscale_truesum > 2) | (Grayscale_truesum == 0))
+                        if ((gray_sensor_sum > 2) | (gray_sensor_sum == 0))
                             STOP_FLAG = 1;
                         if (STOP_FLAG & Location_sum > 7450)
                             Do_count++;
@@ -1434,6 +2040,34 @@ u8 GET_NUM(void)
     return 0;         // 接收失败
 }
 
+// 从串口得到数字,返回1成功
+u8 GET_OPENMV(void)
+{
+    if (USART_RX_STA_C & 0x8000) // 接受到数字
+    {
+        u8 i = 0;
+        i = USART_RX_STA_C & 0X3FFF; // 接收次数
+
+        if (i >= 3)
+        {
+            if (USART_RX_BUF_C[0] == '*' & USART_RX_BUF_C[i - 1] == '#') // 检验包头包尾
+            {
+                for (u8 j = 0; j < 21; j++)
+                    OPMVDATA[j] = 0;
+                for (u8 j = 0; j < i - 2; j++) // 去掉包头包尾，存入数组
+                {
+                    OPMVDATA[j] = USART_RX_BUF_C[j + 1];
+                }
+                USART_RX_STA_C = 0; // 清楚标志位
+                sscanf(OPMVDATA, "%d %d %d %d", &OPMV_FLAG, &OPMV_LP, &OPMV_AP, &OPMV_STOPFLAG);
+                return 1; // 接收成功
+            }
+        }
+    }
+    USART_RX_STA_C = 0; // 清楚标志位
+    return 0;           // 接收失败
+}
+
 // 小车直走
 void Car_GO(short v, int targetl)
 {
@@ -1524,4 +2158,19 @@ u8 J_sum(u8 sum, u8 sec)
     }
     else
         return 0;
+}
+
+u8 J_lukou(void)
+{
+    if (LOAD_FLAG == 1) // 送药
+    {
+#if FINDWAY == 0 // 灰度
+        if (LEFT_GR == 1)
+        {
+        }
+#endif
+    }
+    else if (LOAD_FLAG == 0)
+    {
+    }
 }

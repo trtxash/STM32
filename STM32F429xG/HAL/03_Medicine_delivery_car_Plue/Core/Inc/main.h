@@ -42,18 +42,20 @@ extern "C"
 #include "spi.h"
 #include "tim.h"
 
+#include "grayscale.h"
+#include "gw_grayscale_sensor.h"
 #include "key.h"
 #include "led.h"
 #include "oled.h"
 #include "tb6612.h"
-#include "grayscale.h"
-#include "gw_grayscale_sensor.h"
 
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
 #include "mpu6050.h"
 
 #include "control.h"
+
+#define FINDWAY 0 // 0为灰度，1为OPENMV循迹
 
     /* Private includes ----------------------------------------------------------*/
     /* USER CODE BEGIN Includes */

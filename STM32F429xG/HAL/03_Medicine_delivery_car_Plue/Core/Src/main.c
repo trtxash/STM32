@@ -1,5 +1,5 @@
 /**
- * @file	02_Upper_Computer
+ * @file	03_Medicine_delivery_car_Plue
  * @brief
  * @author 	TRTX-gamer
  * @version 1.00
@@ -32,8 +32,9 @@ int main(void)
     MX_SPI6_Init();
     LED_Init();
     OLED_Init();
-    uart_init(115200);
-    uart6_init(1384200);
+    uart_init(115200);   // 树莓派
+    uart2_init(115200);  // OpenMV
+    uart6_init(1384200); // 蓝牙
     while (1)
     {
         if (!mpu_dmp_init())
@@ -45,11 +46,18 @@ int main(void)
     MX_TIM6_Init((u16)(50000 - 1), (u16)(120 - 1)); // 定时器6初始化，周期50ms
     MX_TIM7_Init((u16)(1000 - 1), (u16)(120 - 1));  // 定时器7初始化，周期1ms
     KEY0_Init();
+
     positional_pid_init(&motor1_velocity, 0.35, 0.21, 0.04, 7199, 0, 7199, -7199);
     positional_pid_init(&motor2_velocity, 0.35, 0.21, 0.04, 7199, 0, 7199, -7199);
     positional_pid_init(&motor12_location, 30, 0.0, 0, 7199, 0, 100, -100);
     positional_pid_init(&motor_turn, 120.0, 0.0, 0.0, 7199, 0, 7199, -7199);
     positional_pid_init(&xunxian, 140.0, 0.0, 0.0, 7199, 0, 7199, -7199);
+
+    // positional_pid_init(&motor1_velocity, 17.5, 14, 0.18, 7199, 0, 7199, -7199);
+    // positional_pid_init(&motor2_velocity, 17.5, 14, 0.18, 7199, 0, 7199, -7199);
+    // positional_pid_init(&motor12_location, 0.5, 0.0, 0, 7199, 0, 100, -100);
+    // positional_pid_init(&motor_turn, 1.7, 0.0, 0.0, 7199, 0, 7199, -7199);
+    // positional_pid_init(&xunxian, 0.4, 0.0, 0.0, 7199, 0, 7199, -7199);
 
     motor1_velocity.control = PID_ENABLE;
     motor2_velocity.control = PID_ENABLE;
@@ -57,10 +65,12 @@ int main(void)
     motor_turn.control = PID_DISABLE;
     xunxian.control = PID_ENABLE;
 
+    // Car_GO(1000,8000);
     while (1)
     {
         GET_NUM();
-        Get_Angle(1);           // 读取角度
+        Get_Angle(1); // 读取角度
+        // GET_OPENMV();
         Get_GW_Grayscale_Val(); // 读取灰度
         // Get_Grayscale_Val(); // 读取灰度
 
@@ -90,6 +100,9 @@ int main(void)
 
             sprintf(temp, "S:%d%d%d%d,AS:%d,SF:%d,P:%c ", SUM[0], SUM[1], SUM[2], SUM[3], AIM_SUM, GET_ROOM_FLAG, AIM_PLACE);
             OLED_ShowString(0, 40, temp, 8, 1, WHITE);
+
+            sprintf(temp, "F:%d,L:%d,A:%d,S:%d ", OPMV_FLAG, OPMV_LP, OPMV_AP, OPMV_STOPFLAG);
+            OLED_ShowString(0, 48, temp, 8, 1, WHITE);
 
             // // 调试
             // LINE_FLAG = 1;

@@ -65,6 +65,7 @@ int Location_integral(short encoder_value)
 {
     /* 路程为周长*编码器读数/电机减速比/电机总分辨率,做个积分 */
     Location_sum += encoder_value * 0.01;
+    Location_sum += encoder_value;
 
     return Location_sum;
 }

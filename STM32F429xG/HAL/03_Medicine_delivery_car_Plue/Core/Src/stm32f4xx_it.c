@@ -209,6 +209,14 @@ void USART1_IRQHandler(void)
 }
 
 /**
+ * @brief 串口2中断服务程序
+ */
+void USART2_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&UART2_Handler);
+}
+
+/**
  * @brief 串口6中断服务程序
  */
 void USART6_IRQHandler(void)
@@ -258,6 +266,35 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         }
 
         HAL_UART_Receive_IT(&UART1_Handler, aRxBuffer, RXBUFFERSIZE); // Receive_IT中会关闭中断，需要重开
+    }
+    else if (huart->Instance == USART2) // 如果是串口2
+    {
+        if ((USART_RX_STA_C & 0x8000) == 0) // 接收未完成
+        {
+            if (USART_RX_STA_C & 0x4000) // 接收到了0x0d
+            {
+                if (cRxBuffer[0] != 0x0a)
+                    USART_RX_STA_C = 0; // 接收错误,重新开始
+                else
+                    USART_RX_STA_C |= 0x8000; // 接收完成了
+            }
+            else // 还没收到0X0D
+            {
+                if (cRxBuffer[0] == 0x0d)
+                    USART_RX_STA_C |= 0x4000;
+                else
+                {
+                    USART_RX_BUF_C[USART_RX_STA_C & 0X3FFF] = cRxBuffer[0];
+                    USART_RX_STA_C++;
+                    if (USART_RX_STA_C > (USART_REC_LEN - 1))
+                    {
+                        USART_RX_STA_C = 0; // 接收数据错误,重新开始接收
+                        Error_sum++;
+                    }
+                }
+            }
+        }
+        HAL_UART_Receive_IT(&UART2_Handler, cRxBuffer, RXBUFFERSIZE); // 如果要调用处理回调函数，用这个函数使能接收中断
     }
     else if (huart->Instance == USART6) // 如果是串口6
     {
@@ -316,14 +353,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         if (LINE_FLAG)
         {
             // 巡线PID计算
-            temp = positional_pid_compute(&xunxian, 0, gray_sensor_sum_val);
-            vr += temp;
-            vl -= temp;
+            // temp = positional_pid_compute(&xunxian, 0, gray_sensor_sum_val);
+            temp = positional_pid_compute(&xunxian, 0, OPMV_LP);
+            vr -= temp;
+            vl += temp;
         }
         // PID转向环计算
         temp = positional_pid_compute(&motor_turn, TARGET_ANGLE, Yaw);
-        vr += temp;
-        vl -= temp;
+        vr -= temp;
+        vl += temp;
         // PID速度环计算
         if (motor12_location.control == DISABLE & motor_turn.control == DISABLE) // 调试用
             vl = vr = TARGET_V;

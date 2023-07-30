@@ -1,6 +1,7 @@
 #include "usart.h"
 
 UART_HandleTypeDef UART1_Handler; // UART1句柄
+UART_HandleTypeDef UART2_Handler; // UART2句柄
 UART_HandleTypeDef UART6_Handler; // UART6句柄
 DMA_HandleTypeDef hdma_usart6_tx;
 DMA_HandleTypeDef hdma_usart6_rx;
@@ -22,15 +23,18 @@ __attribute__((used)) int _write(int fd, char *ptr, int len) // 如果用GNUC库
 #endif
 
 // 注意,读取USARTx->SR能避免莫名其妙的错误
-u8 USART_RX_BUF[USART_REC_LEN]; // 接收缓冲,最大USART_REC_LEN个字节.
+u8 USART_RX_BUF[USART_REC_LEN];   // 接收缓冲,最大USART_REC_LEN个字节.
+u8 USART_RX_BUF_C[USART_REC_LEN]; // 接收缓冲,最大USART_REC_LEN个字节.
 // 接收状态
 // bit15，	接收完成标志
 // bit14，	接收到0x0d
 // bit13~0，	接收到的有效字节数目
-u16 USART_RX_STA = 0; // 接收状态标记
+u16 USART_RX_STA = 0;   // 接收状态标记
+u16 USART_RX_STA_C = 0; // 接收状态标记
 
 u8 aRxBuffer[RXBUFFERSIZE]; // HAL库使用的串口接收缓冲
 u8 bRxBuffer[RXBUFFERSIZE]; // HAL库使用的串口接收缓冲
+u8 cRxBuffer[RXBUFFERSIZE]; // HAL库使用的串口接收缓冲
 
 // 初始化IO 串口1
 //  bound:波特率
@@ -51,6 +55,27 @@ void uart_init(u32 bound)
     }
 
     HAL_UART_Receive_IT(&UART1_Handler, aRxBuffer, RXBUFFERSIZE); // 如果要调用处理回调函数，用这个函数使能接收中断
+}
+
+// 初始化IO 串口2
+//  bound:波特率
+void uart2_init(u32 bound)
+{
+    // UART 初始化设置
+    UART2_Handler.Instance = USART2;                        // USART2
+    UART2_Handler.Init.BaudRate = bound;                    // 波特率
+    UART2_Handler.Init.WordLength = UART_WORDLENGTH_8B;     // 字长为8位数据格式
+    UART2_Handler.Init.StopBits = UART_STOPBITS_1;          // 一个停止位
+    UART2_Handler.Init.Parity = UART_PARITY_NONE;           // 无奇偶校验位
+    UART2_Handler.Init.HwFlowCtl = UART_HWCONTROL_NONE;     // 无硬件流控
+    UART2_Handler.Init.Mode = UART_MODE_TX_RX;              // 收发模式
+    UART2_Handler.Init.OverSampling = UART_OVERSAMPLING_16; // 过采样16倍
+    if (HAL_UART_Init(&UART2_Handler) != HAL_OK)            // HAL_UART_Init()会使能UART1
+    {
+        Error_Handler();
+    }
+
+    HAL_UART_Receive_IT(&UART2_Handler, cRxBuffer, RXBUFFERSIZE); // 如果要调用处理回调函数，用这个函数使能接收中断
 }
 
 // 初始化IO 串口6
@@ -79,29 +104,58 @@ void uart6_init(u32 bound)
 void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
 {
     // GPIO端口设置
-    GPIO_InitTypeDef GPIO_Initure = {0};
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
 
     if (uartHandle->Instance == USART1) // 如果是串口1，进行串口1 MSP初始化
     {
         __HAL_RCC_GPIOA_CLK_ENABLE();  // 使能GPIOA时钟
         __HAL_RCC_USART1_CLK_ENABLE(); // 使能USART1时钟
 
-        GPIO_Initure.Pin = GPIO_PIN_9;            // PA9
-        GPIO_Initure.Mode = GPIO_MODE_AF_PP;      // 复用推挽输出
-        GPIO_Initure.Pull = GPIO_PULLUP;          // 上拉
-        GPIO_Initure.Speed = GPIO_SPEED_FAST;     // 高速
-        GPIO_Initure.Alternate = GPIO_AF7_USART1; // 复用为USART1
-        HAL_GPIO_Init(GPIOA, &GPIO_Initure);      // 初始化PA9
+        GPIO_InitStruct.Pin = GPIO_PIN_9;            // PA9
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;      // 复用推挽输出
+        GPIO_InitStruct.Pull = GPIO_PULLUP;          // 上拉
+        GPIO_InitStruct.Speed = GPIO_SPEED_FAST;     // 高速
+        GPIO_InitStruct.Alternate = GPIO_AF7_USART1; // 复用为USART1
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);      // 初始化PA9
 
-        GPIO_Initure.Pin = GPIO_PIN_10;      // PA10
-        HAL_GPIO_Init(GPIOA, &GPIO_Initure); // 初始化PA10
+        GPIO_InitStruct.Pin = GPIO_PIN_10;      // PA10
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); // 初始化PA10
 
-#if EN_USART1_RX
         HAL_NVIC_EnableIRQ(USART1_IRQn);         // 使能USART1中断通道
         HAL_NVIC_SetPriority(USART1_IRQn, 0, 0); // 抢占优先级0，子优先级0
-#endif
     }
-    if (uartHandle->Instance == USART6) // 如果是串口6，进行串口6 MSP初始化
+    else if (uartHandle->Instance == USART2) // 如果是串口1，进行串口1 MSP初始化
+    {
+        /* USER CODE BEGIN USART2_MspInit 0 */
+
+        /* USER CODE END USART2_MspInit 0 */
+        /* USART2 clock enable */
+        __HAL_RCC_USART2_CLK_ENABLE();
+
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+        __HAL_RCC_GPIOD_CLK_ENABLE();
+        /**USART2 GPIO Configuration
+        PA3     ------> USART2_RX
+        PD5     ------> USART2_TX
+        */
+        GPIO_InitStruct.Pin = GPIO_PIN_3;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+        GPIO_InitStruct.Pin = GPIO_PIN_5;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+        HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+        HAL_NVIC_EnableIRQ(USART2_IRQn);
+        HAL_NVIC_SetPriority(USART2_IRQn, 2, 0);
+    }
+    else if (uartHandle->Instance == USART6) // 如果是串口6，进行串口6 MSP初始化
     {
         /* USER CODE BEGIN USART6_MspInit 0 */
 
@@ -114,12 +168,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
         PC6     ------> USART6_TX
         PC7     ------> USART6_RX
         */
-        GPIO_Initure.Pin = GPIO_PIN_6 | GPIO_PIN_7;
-        GPIO_Initure.Mode = GPIO_MODE_AF_PP;
-        GPIO_Initure.Pull = GPIO_NOPULL;
-        GPIO_Initure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_Initure.Alternate = GPIO_AF8_USART6;
-        HAL_GPIO_Init(GPIOC, &GPIO_Initure);
+        GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_7;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF8_USART6;
+        HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
         /* USART6 DMA Init */
         /* USART6_RX Init */
@@ -167,7 +221,45 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
 
 void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle)
 {
-    if (uartHandle->Instance == USART6)
+    if (uartHandle->Instance == USART1)
+    {
+        /* USER CODE BEGIN USART1_MspDeInit 0 */
+
+        /* USER CODE END USART1_MspDeInit 0 */
+        /* Peripheral clock disable */
+        __HAL_RCC_USART1_CLK_DISABLE();
+
+        /**USART1 GPIO Configuration
+        PA9     ------> USART1_TX
+        PA10     ------> USART1_RX
+        */
+        HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9 | GPIO_PIN_10);
+
+        /* USER CODE BEGIN USART1_MspDeInit 1 */
+
+        /* USER CODE END USART1_MspDeInit 1 */
+    }
+    else if (uartHandle->Instance == USART2)
+    {
+        /* USER CODE BEGIN USART2_MspDeInit 0 */
+
+        /* USER CODE END USART2_MspDeInit 0 */
+        /* Peripheral clock disable */
+        __HAL_RCC_USART2_CLK_DISABLE();
+
+        /**USART2 GPIO Configuration
+        PA3     ------> USART2_RX
+        PD5     ------> USART2_TX
+        */
+        HAL_GPIO_DeInit(GPIOA, GPIO_PIN_3);
+
+        HAL_GPIO_DeInit(GPIOD, GPIO_PIN_5);
+
+        /* USER CODE BEGIN USART2_MspDeInit 1 */
+
+        /* USER CODE END USART2_MspDeInit 1 */
+    }
+    else if (uartHandle->Instance == USART6)
     {
         /* USER CODE BEGIN USART6_MspDeInit 0 */
 

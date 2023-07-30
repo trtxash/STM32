@@ -30,16 +30,22 @@ extern u8 AIM_SUM;
 extern u8 AIM_PLACE;
 extern u8 Do_count;
 extern u8 STOP_FLAG, LINE_FLAG, TURN_SUCCEED_FLAG; // 初始车停下，不巡线
-extern u8 LOR;
+extern u8 OPMVDATA[21];
+extern int OPMV_FLAG;     // 1 直行，2 路口
+extern int OPMV_LP;     // 位置偏移量
+extern int OPMV_AP;       // 角度偏移量
+extern int OPMV_STOPFLAG; // 终止
 
 void MIAN_TASK(void);
 u8 GET_SET_AIM_ROOM(void);
 void LOADORNOT(void);
 u8 GET_NUM(void);
+u8 GET_OPENMV(void);
 void Car_GO(short v, int targetl);
 void Car_TURN(float turn_angle);
 void Car_STOP(void);
 u8 J_turn(float angle);
 u8 J_sum(u8 sum, u8 sec);
+u8 J_lukou(void);
 
 #endif
