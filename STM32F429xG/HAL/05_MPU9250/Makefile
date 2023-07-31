@@ -171,8 +171,13 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 LDSCRIPT = STM32F429ZGTx_FLASH.ld
 
 # libraries
-LIBS = -lc -lm -lnosys 
-LIBDIR =
+LIBS = \
+-lc \
+-lm \
+-lnosys \
+Hardware/DMP/mpl/libmpllib.a \
+
+LIBDIR = 
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 LDFLAGS += -u _printf_float # -lprintf_float,if you want sprintf
 
