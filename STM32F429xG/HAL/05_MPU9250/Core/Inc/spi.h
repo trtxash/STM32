@@ -39,8 +39,6 @@ extern "C"
     extern SPI_HandleTypeDef hspi6;
     extern DMA_HandleTypeDef hdma_spi6_tx;
 
-#define SPI1_DataSize SPI_DATASIZE_8BIT // 选择SPI1数据大小选择
-
     /* USER CODE BEGIN Private defines */
 
     /* USER CODE END Private defines */

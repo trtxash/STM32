@@ -41,9 +41,9 @@ static u8 OLED_GRAM[OLED_WIDTH][OLED_HEIGHT / 8] = {0}; // OLED画布,与寻址�
 
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
 
-#if SPI1_DataSize == SPI_DATASIZE_8BIT
+#if OLEDSPI_DataSize == SPI_DATASIZE_8BIT
 static u8 OLED_GRAM[OLED_HEIGHT][OLED_WIDTH * 2] = {0}; // OLED画布,与寻址方式初始化有关
-#elif SPI1_DataSize == SPI_DATASIZE_16BIT
+#elif OLEDSPI_DataSize == SPI_DATASIZE_16BIT
 static u16 OLED_GRAM[OLED_HEIGHT][OLED_WIDTH] = {0}; // OLED画布,与寻址方式初始化有关
 #endif
 
@@ -100,11 +100,11 @@ void OLED_WR_CMD(u8 dat)
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     HAL_I2C_Mem_Write(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x00, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-
     OLED_DC_Clr();
+    OLED_CS_Clr();
     HAL_SPI_Transmit(&OLED_SPI_HandleTypeDef, &dat, 1, 100);
+    OLED_CS_Set();
     OLED_DC_Set();
-
 #endif
 
 #endif
@@ -155,9 +155,9 @@ void OLED_WR_DATA8(u8 dat)
 #if _DRIVE_INTERFACE_TYPE == OLED_IIC_INTERFACE
     HAL_I2C_Mem_Write(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, &dat, 1, 100);
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE // SPI通信
-   
+    OLED_CS_Clr();
     HAL_SPI_Transmit(&OLED_SPI_HandleTypeDef, &dat, 1, 100);
-    
+    OLED_CS_Set();
 #endif
 
 #endif
@@ -234,17 +234,16 @@ void OLED_Refresh(void)
     HAL_I2C_Mem_Write_DMA(&OLED_I2C_HandleTypeDef, OLED_ADDRESS, 0x40, I2C_MEMADD_SIZE_8BIT, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8);
 
 #elif _DRIVE_INTERFACE_TYPE == OLED_SPI_INTERFACE
-
-    // 选中
+    OLED_CS_Clr(); // 选中
 #if _OLED_DRIVER_IC_TYPE == OLED_SSD1306_SSD1315
 
     HAL_SPI_Transmit_DMA(&OLED_SPI_HandleTypeDef, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT / 8); // DMA循环，运行一次就行
 
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
 
-#if SPI1_DataSize == SPI_DATASIZE_8BIT
+#if OLEDSPI_DataSize == SPI_DATASIZE_8BIT
     HAL_SPI_Transmit_DMA(&OLED_SPI_HandleTypeDef, OLED_GRAM, OLED_WIDTH * OLED_HEIGHT * 2); // DMA循环，运行一次就行
-#elif SPI1_DataSize == SPI_DATASIZE_16BIT
+#elif OLEDSPI_DataSize == SPI_DATASIZE_16BIT
     hspi1.Instance = SPI1;
     hspi1.Init.Mode = SPI_MODE_MASTER;                      // 设置SPI工作模式：主机模式
     hspi1.Init.Direction = SPI_DIRECTION_2LINES;            // 双线模式
@@ -343,7 +342,7 @@ void OLED_DrawPoint(u16 x, u8 y, u8 t, u16 color)
 
 #elif _OLED_DRIVER_IC_TYPE == OLED_SSD1351
 
-#if SPI1_DataSize == SPI_DATASIZE_8BIT
+#if OLEDSPI_DataSize == SPI_DATASIZE_8BIT
     if (t)
     {
         OLED_GRAM[y][2 * x] = color >> 8;
@@ -354,7 +353,7 @@ void OLED_DrawPoint(u16 x, u8 y, u8 t, u16 color)
         OLED_GRAM[y][2 * x] = BACKGROUND >> 8;
         OLED_GRAM[y][2 * x + 1] = BACKGROUND;
     }
-#elif SPI1_DataSize == SPI_DATASIZE_16BIT
+#elif OLEDSPI_DataSize == SPI_DATASIZE_16BIT
     if (t)
     {
         OLED_GRAM[y][x] = color;
@@ -784,9 +783,9 @@ void OLED_Init(void)
     11 pin output HIGH
     */
     OLED_WR_CMD(0xAB);   // Function Selection
-#if SPI1_DataSize == SPI_DATASIZE_8BIT
+#if OLEDSPI_DataSize == SPI_DATASIZE_8BIT
     OLED_WR_DATA8(0x01); // 8BIT
-#elif SPI1_DataSize == SPI_DATASIZE_16BIT
+#elif OLEDSPI_DataSize == SPI_DATASIZE_16BIT
     OLED_WR_DATA8(0x41); // 16BIT
 #endif
     /*

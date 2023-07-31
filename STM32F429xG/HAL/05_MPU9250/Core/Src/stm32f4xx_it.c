@@ -200,108 +200,12 @@ __weak void SysTick_Handler(void)
 
 /* USER CODE BEGIN 1 */
 
-/**
- * @brief 串口1中断服务程序
- */
-void USART1_IRQHandler(void)
-{
-    HAL_UART_IRQHandler(&UART1_Handler);
-}
-
-/**
- * @brief 串口2中断服务程序
- */
-void USART2_IRQHandler(void)
-{
-    HAL_UART_IRQHandler(&UART2_Handler);
-}
-
-/**
- * @brief 串口6中断服务程序
- */
-void USART6_IRQHandler(void)
-{
-    HAL_UART_IRQHandler(&UART6_Handler);
-}
-
 /*
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);//发送完成回调函数
 void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart);//发送完成过半
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);//接收完成回调函数
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart);//接收完成过半
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);//错误处理回调函数
-*/
-/**
- * @brief 串口接收完成回调函数
- */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-    if (huart->Instance == USART1) // 如果是串口1
-    {
-        // aRxBuffer[0] = USART1->DR;		  // 读取可以自动清楚RXNE,这里用了HAL_UART_Receive_IT函数，这里不需要
-        if ((USART_RX_STA & 0x8000) == 0) // 接收未完成
-        {
-            if (USART_RX_STA & 0x4000) // 接收到了0x0d
-            {
-                if (aRxBuffer[0] != 0x0a)
-                    USART_RX_STA = 0; // 接收错误,重新开始
-                else
-                    USART_RX_STA |= 0x8000; // 接收完成了
-            }
-            else // 还没收到0X0D
-            {
-                if (aRxBuffer[0] == 0x0d)
-                    USART_RX_STA |= 0x4000;
-                else
-                {
-                    USART_RX_BUF[USART_RX_STA & 0X3FFF] = aRxBuffer[0];
-                    USART_RX_STA++;
-                    if (USART_RX_STA > (USART_REC_LEN - 1))
-                    {
-                        USART_RX_STA = 0; // 接收数据错误,重新开始接收
-                        Error_sum++;
-                    }
-                }
-            }
-        }
-
-        HAL_UART_Receive_IT(&UART1_Handler, aRxBuffer, RXBUFFERSIZE); // Receive_IT中会关闭中断，需要重开
-    }
-    else if (huart->Instance == USART2) // 如果是串口2
-    {
-        if ((USART_RX_STA_C & 0x8000) == 0) // 接收未完成
-        {
-            if (USART_RX_STA_C & 0x4000) // 接收到了0x0d
-            {
-                if (cRxBuffer[0] != 0x0a)
-                    USART_RX_STA_C = 0; // 接收错误,重新开始
-                else
-                    USART_RX_STA_C |= 0x8000; // 接收完成了
-            }
-            else // 还没收到0X0D
-            {
-                if (cRxBuffer[0] == 0x0d)
-                    USART_RX_STA_C |= 0x4000;
-                else
-                {
-                    USART_RX_BUF_C[USART_RX_STA_C & 0X3FFF] = cRxBuffer[0];
-                    USART_RX_STA_C++;
-                    if (USART_RX_STA_C > (USART_REC_LEN - 1))
-                    {
-                        USART_RX_STA_C = 0; // 接收数据错误,重新开始接收
-                        Error_sum++;
-                    }
-                }
-            }
-        }
-        HAL_UART_Receive_IT(&UART2_Handler, cRxBuffer, RXBUFFERSIZE); // 如果要调用处理回调函数，用这个函数使能接收中断
-    }
-    else if (huart->Instance == USART6) // 如果是串口6
-    {
-        AnoPTv8HwRecvByte(bRxBuffer[0]);
-        HAL_UART_Receive_IT(&UART6_Handler, bRxBuffer, RXBUFFERSIZE); // 如果要调用处理回调函数，用这个函数使能接收中断
-    }
-}
 
 /**
  * @brief This function handles TIM6 global interrupt, DAC1 and DAC2 underrun error interrupts.
@@ -335,75 +239,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&htim6))
     {
-        static float v_b = 0;
-        short temp = 0;
+        static u8 time_flag50ms = 0;
 
-        time_flag = 1;
-        /* 每50毫秒读取编码器数值 */
-        Encoder[0] = -Read_Encoder(&htim2);
-        Encoder[1] = -Read_Encoder(&htim3);
-        // 位置积分
-        Location_sum = Location_integral((short)((Encoder[0] + Encoder[1]) / 2));
-        // 位置环速度限幅,决定速度
-        motor12_location.output_max = TARGET_V;
-        motor12_location.output_min = -TARGET_V;
-        // PID位置环计算
-        vl = vr = positional_pid_compute(&motor12_location, TARGET_LOCATION, Location_sum);
-        // 巡线
-        if (LINE_FLAG)
-        {
-            // 巡线PID计算
-            // temp = positional_pid_compute(&xunxian, 0, gray_sensor_sum_val);
-            temp = positional_pid_compute(&xunxian, 0, OPMV_LP);
-            vr -= temp;
-            vl += temp;
-        }
-        // PID转向环计算
-        temp = positional_pid_compute(&motor_turn, TARGET_ANGLE, Yaw);
-        vr -= temp;
-        vl += temp;
-        // PID速度环计算
-        if (motor12_location.control == DISABLE & motor_turn.control == DISABLE) // 调试用
-            vl = vr = TARGET_V;
-        vl = positional_pid_compute(&motor1_velocity, vl, Encoder[0]);
-        vr = positional_pid_compute(&motor2_velocity, vr, Encoder[1]);
+        if (time_flag50ms % 20 == 0)
+            LED0_Reverse();
 
-        TB6612_control_speed(vr, vl);
-
-        AnoPTv8SendBuf(ANOPTV8_SWJID, 0xF1, databuf, ANOPTV8_PARNUM_UPPER); // 数据发送到上位机
+        time_flag50ms++;
+        if (time_flag50ms >= 250)
+            time_flag50ms = 0;
     }
     else if (htim == (&htim7))
     {
-        AnoPTv8HwTrigger1ms(); // 上位机1ms调用
     }
-}
-
-/**
- * @brief This function handles DMA2 stream1 global interrupt.
- */
-void DMA2_Stream1_IRQHandler(void)
-{
-    /* USER CODE BEGIN DMA2_Stream1_IRQn 0 */
-
-    /* USER CODE END DMA2_Stream1_IRQn 0 */
-    HAL_DMA_IRQHandler(&hdma_usart6_rx);
-    /* USER CODE BEGIN DMA2_Stream1_IRQn 1 */
-
-    /* USER CODE END DMA2_Stream1_IRQn 1 */
-}
-
-/**
- * @brief This function handles DMA2 stream6 global interrupt.
- */
-void DMA2_Stream6_IRQHandler(void)
-{
-    /* USER CODE BEGIN DMA2_Stream6_IRQn 0 */
-
-    /* USER CODE END DMA2_Stream6_IRQn 0 */
-    HAL_DMA_IRQHandler(&hdma_usart6_tx);
-    /* USER CODE BEGIN DMA2_Stream6_IRQn 1 */
-
-    /* USER CODE END DMA2_Stream6_IRQn 1 */
 }
 
 /* USER CODE END 1 */

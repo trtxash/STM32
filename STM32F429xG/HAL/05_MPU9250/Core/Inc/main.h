@@ -31,29 +31,18 @@ extern "C"
 #include "delay.h"
 #include "stm32f4xx_hal.h"
 #include "sys.h"
-#include "usart.h"
-#include "valuepack.h"
-
-#include "AnoPTv8.h"
-#include "AnoPTv8Run.h"
+#include "stdio.h"
 
 #include "dma.h"
-#include "encoder.h"
 #include "spi.h"
 #include "tim.h"
 
-#include "grayscale.h"
-#include "gw_grayscale_sensor.h"
-#include "key.h"
 #include "led.h"
 #include "oled.h"
-#include "tb6612.h"
 
+#include "mpu9250.h"
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
-#include "mpu6050.h"
-
-#include "control.h"
 
 #define FINDWAY 0 // 0为灰度，1为OPENMV循迹
 

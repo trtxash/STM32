@@ -22,8 +22,14 @@
 #define _INV_MPU_H_
 #include "sys.h"
 
+// 初始定义，选择
+#define MPU9250
+#define EMPL
+#define EMPL_TARGET_STM32F4
+
 // 定义输出速度
-#define DEFAULT_MPU_HZ (200) // 200Hz，采样速率
+#define DEFAULT_MPU_HZ (100) // 100Hz
+#define COMPASS_READ_MS (100)
 
 #define INV_X_GYRO (0x40)
 #define INV_Y_GYRO (0x20)
@@ -32,19 +38,20 @@
 #define INV_XYZ_ACCEL (0x08)
 #define INV_XYZ_COMPASS (0x01)
 
-// 移植官方MSP430 DMP驱动过来
 struct int_param_s
 {
-    // #if defined EMPL_TARGET_MSP430 || defined MOTION_DRIVER_TARGET_MSP430
+#if defined EMPL_TARGET_MSP430 || defined MOTION_DRIVER_TARGET_MSP430
     void (*cb)(void);
     unsigned short pin;
     unsigned char lp_exit;
     unsigned char active_low;
-    // #elif defined EMPL_TARGET_UC3L0
-    //     unsigned long pin;
-    //     void (*cb)(volatile void*);
-    //     void *arg;
-    // #endif
+#elif defined EMPL_TARGET_UC3L0
+    unsigned long pin;
+    void (*cb)(volatile void *);
+    void *arg;
+#elif defined EMPL_TARGET_STM32F4
+    void (*cb)(void);
+#endif
 };
 
 #define MPU_INT_STATUS_DATA_READY (0x0001)
@@ -63,14 +70,14 @@ struct int_param_s
 #define MPU_INT_STATUS_DMP_5 (0x2000)
 
 /* Set up APIs */
-int mpu_init(void);
+int mpu_init(struct int_param_s *int_param);
 int mpu_init_slave(void);
 int mpu_set_bypass(unsigned char bypass_on);
 
 /* Configuration APIs */
-int mpu_lp_accel_mode(unsigned char rate);
+int mpu_lp_accel_mode(unsigned short rate);
 int mpu_lp_motion_interrupt(unsigned short thresh, unsigned char time,
-                            unsigned char lpa_freq);
+                            unsigned short lpa_freq);
 int mpu_set_int_level(unsigned char active_low);
 int mpu_set_int_latched(unsigned char enable);
 
@@ -102,7 +109,11 @@ int mpu_configure_fifo(unsigned char sensors);
 int mpu_get_power_state(unsigned char *power_on);
 int mpu_set_sensors(unsigned char sensors);
 
-int mpu_set_accel_bias(const long *accel_bias);
+int mpu_read_6500_accel_bias(long *accel_bias);
+int mpu_set_gyro_bias_reg(long *gyro_bias);
+int mpu_set_accel_bias_6500_reg(const long *accel_bias);
+int mpu_read_6050_accel_bias(long *accel_bias);
+int mpu_set_accel_bias_6050_reg(const long *accel_bias);
 
 /* Data getter/setter APIs */
 int mpu_get_gyro_reg(short *data, unsigned long *timestamp);
@@ -127,6 +138,7 @@ int mpu_load_firmware(unsigned short length, const unsigned char *firmware,
 int mpu_reg_dump(void);
 int mpu_read_reg(unsigned char reg, unsigned char *data);
 int mpu_run_self_test(long *gyro, long *accel);
+int mpu_run_6500_self_test(long *gyro, long *accel, unsigned char debug);
 int mpu_register_tap_cb(void (*func)(unsigned char, unsigned char));
 
 // 自行添加的一些函数
@@ -136,5 +148,5 @@ unsigned short inv_orientation_matrix_to_scalar(const signed char *mtx);
 u8 run_self_test(void);
 u8 mpu_dmp_init(void);
 u8 mpu_dmp_get_data(float *pitch, float *roll, float *yaw);
-
+u8 mpu_mpl_get_data(float *pitch, float *roll, float *yaw);
 #endif /* #ifndef _INV_MPU_H_ */

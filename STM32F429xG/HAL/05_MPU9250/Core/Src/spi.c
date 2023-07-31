@@ -31,7 +31,7 @@ SPI_HandleTypeDef hspi6;
 DMA_HandleTypeDef hdma_spi6_tx;
 
 /* SPI1 init function */
-void MX_SPI1_Init(void) // 因为OLED——RGB时钟周期不小于50ns，故降频
+void MX_SPI1_Init(void)
 {
 
     /* USER CODE BEGIN SPI1_Init 0 */
@@ -83,7 +83,7 @@ void MX_SPI3_Init(void)
 }
 
 /* SPI6 init function */
-void MX_SPI6_Init(void)
+void MX_SPI6_Init(void) // 因为OLED_RGB时钟周期不小于50ns，故降频
 {
 
     /* USER CODE BEGIN SPI6_Init 0 */
@@ -98,9 +98,9 @@ void MX_SPI6_Init(void)
     hspi6.Init.Direction = SPI_DIRECTION_2LINES;
     hspi6.Init.DataSize = SPI_DATASIZE_8BIT;
     hspi6.Init.CLKPolarity = SPI_POLARITY_HIGH;
-    hspi6.Init.CLKPhase = SPI_PHASE_1EDGE;
+    hspi6.Init.CLKPhase = SPI_PHASE_2EDGE;
     hspi6.Init.NSS = SPI_NSS_SOFT;
-    hspi6.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+    hspi6.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
     hspi6.Init.FirstBit = SPI_FIRSTBIT_MSB;
     hspi6.Init.TIMode = SPI_TIMODE_DISABLE;
     hspi6.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

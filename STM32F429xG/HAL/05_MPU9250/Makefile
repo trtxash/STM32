@@ -41,7 +41,6 @@ Core/Src/gpio.c \
 Core/Src/dma.c \
 Core/Src/spi.c \
 Core/Src/tim.c \
-Core/Src/encoder.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
 Core/Src/system_stm32f4xx.c  \
@@ -66,32 +65,24 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
 User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
-User/Src/filter.c \
-User/Src/control.c \
-User/Src/positional_pid.c \
-User/Src/valuepack.c \
-RTT/SEGGER_RTT_printf.c \
-RTT/SEGGER_RTT.c \
-AnoPTv8/Src/AnoPTv8DataDef.c \
-AnoPTv8/Src/AnoPTv8FrameFactory.c \
-AnoPTv8/Src/AnoPTv8Run.c \
-AnoPTv8/Src/hardwareInterface.c \
 Hardware/LED/Src/led.c \
 Hardware/OLED/Src/oled.c \
 Hardware/OLED/Src/oledio.c \
-Hardware/TB6612/Src/tb6612.c \
-Hardware/MPU6050/Src/mpu6050.c \
-Hardware/MPU6050/eMPL/Src/inv_mpu.c \
-Hardware/MPU6050/eMPL/Src/inv_mpu_dmp_motion_driver.c \
-Hardware/Grayscale/Src/grayscale.c \
-Hardware/GW_Grayscale/Src/gw_grayscale_sensor.c \
-Hardware/GW_Grayscale/Src/sw_i2c.c \
-Hardware/Key/Src/key.c \
+Hardware/MPU9250/Src/mpu9250.c \
+Hardware/DMP/driver/eMPL/inv_mpu.c \
+Hardware/DMP/driver/eMPL/inv_mpu_dmp_motion_driver.c \
+Hardware/DMP/driver/stm32L/log_stm32.c \
+Hardware/DMP/mllite/mpl.c \
+Hardware/DMP/mllite/results_holder.c \
+Hardware/DMP/mllite/start_manager.c \
+Hardware/DMP/mllite/storage_manager.c \
+Hardware/DMP/mllite/data_builder.c \
+Hardware/DMP/mllite/ml_math_func.c \
+Hardware/DMP/eMPL-hal/eMPL_outputs.c \
 
 # ASM sources
 ASM_SOURCES =  \
-startup_stm32f429xx.s
-
+startup_stm32f429xx.s \
 
 #######################################
 # binaries
@@ -139,7 +130,7 @@ C_DEFS =  \
 
 
 # AS includes
-AS_INCLUDES = 
+AS_INCLUDES =  \
 
 # C includes
 C_INCLUDES =  \
@@ -148,20 +139,16 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
--IFreeRTOS/Inc \
--IFreeRTOS/portable/Inc \
--IRTT \
 -IUser/Inc \
--IAnoPTv8/Inc \
--IUSMART/Inc \
 -IHardware/LED/Inc \
 -IHardware/OLED/Inc \
--IHardware/MPU6050/Inc \
--IHardware/MPU6050/eMPL/Inc \
--IHardware/Grayscale/Inc \
--IHardware/GW_Grayscale/Inc \
--IHardware/TB6612/Inc \
--IHardware/Key/Inc \
+-IHardware/MPU9250/Inc \
+-IHardware/DMP/driver/eMPL \
+-IHardware/DMP/driver/include \
+-IHardware/DMP/driver/stm32L \
+-IHardware/DMP/mllite \
+-IHardware/DMP/mpl \
+-IHardware/DMP/eMPL-hal \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
@@ -185,7 +172,7 @@ LDSCRIPT = STM32F429ZGTx_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys 
-LIBDIR = 
+LIBDIR =
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 LDFLAGS += -u _printf_float # -lprintf_float,if you want sprintf
 
