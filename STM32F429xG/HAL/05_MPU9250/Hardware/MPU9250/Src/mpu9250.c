@@ -10,12 +10,12 @@
 #pragma GCC optimize("O0")
 void MPU9250_IIC_Delay(void)
 {
-    // u8 t = 10;
+    u8 t = 15;
 
-    // while (t--)
-    // {
-    // }
-    delay_us(2);
+    while (t--)
+    {
+    }
+    // delay_us(2);
 }
 #pragma GCC pop_options
 
@@ -34,8 +34,8 @@ void MPU9250_IIC_Init(void)
 
     // PH4,5初始化设置
     GPIO_Initure.Pin = MPU9250_SCLK_Pin;
-    GPIO_Initure.Mode = GPIO_MODE_OUTPUT_OD;   // MPU9250要开漏输出
-    GPIO_Initure.Pull = GPIO_NOPULL;           // 上拉
+    GPIO_Initure.Mode = GPIO_MODE_OUTPUT_PP;   
+    GPIO_Initure.Pull = GPIO_PULLUP;           // 上拉
     GPIO_Initure.Speed = GPIO_SPEED_FREQ_HIGH; // 快速
     HAL_GPIO_Init(MPU9250_SCLK_Port, &GPIO_Initure);
 
@@ -55,13 +55,13 @@ void MPU9250_IIC_Init(void)
 **********************************************/
 void MPU9250_IIC_Start(void)
 {
-    MPU9250_SDA_OUT(); // SDA线 输出
+    MPU9250_SDIN_OUT(); // SDIN线 输出
     MPU9250_SDIN_Set();
     MPU9250_IIC_Delay();
     MPU9250_IIC_Delay();
     MPU9250_SCLK_Set();
     MPU9250_IIC_Delay();
-    MPU9250_SDIN_Clr(); // START:当SCL线处于高电平时,SDA线突然从高变低,发送起始信号
+    MPU9250_SDIN_Clr(); // START:当SCL线处于高电平时,SDIN线突然从高变低,发送起始信号
     MPU9250_IIC_Delay();
     MPU9250_SCLK_Clr(); // 钳住I2C总线，准备发送或接收数据
 }
@@ -74,9 +74,9 @@ void MPU9250_IIC_Start(void)
 **********************************************/
 void MPU9250_IIC_Stop(void)
 {
-    MPU9250_SDA_OUT(); // SDA线输出
+    MPU9250_SDIN_OUT(); // SDIN线输出
     MPU9250_SCLK_Clr();
-    MPU9250_SDIN_Clr(); // STOP:当SCL线处于高电平时,SDA线突然从低变高,发送停止信号
+    MPU9250_SDIN_Clr(); // STOP:当SCL线处于高电平时,SDIN线突然从低变高,发送停止信号
     MPU9250_IIC_Delay();
     MPU9250_SCLK_Set();
     MPU9250_SDIN_Set(); // 发送I2C总线结束信号
@@ -93,7 +93,7 @@ u8 MPU9250_IIC_Wait_Ack(void)
 {
     u8 ucErrTime = 0;
     // MPU9250_SDIN_Set();
-    MPU9250_SDA_IN(); // SDA设置为输入
+    MPU9250_SDIN_IN(); // SDIN设置为输入
     MPU9250_IIC_Delay();
     MPU9250_IIC_Delay();
     MPU9250_SCLK_Set();
@@ -121,7 +121,7 @@ u8 MPU9250_IIC_Wait_Ack(void)
 void MPU9250_IIC_Ack(void)
 {
     MPU9250_SCLK_Clr();
-    MPU9250_SDA_OUT();
+    MPU9250_SDIN_OUT();
     MPU9250_IIC_Delay();
     MPU9250_SDIN_Clr();
     MPU9250_IIC_Delay();
@@ -140,7 +140,7 @@ void MPU9250_IIC_Ack(void)
 void MPU9250_IIC_NAck(void)
 {
     MPU9250_SCLK_Clr();
-    MPU9250_SDA_OUT();
+    MPU9250_SDIN_OUT();
     MPU9250_IIC_Delay();
     MPU9250_SDIN_Set();
     MPU9250_IIC_Delay();
@@ -160,7 +160,7 @@ void MPU9250_IIC_NAck(void)
 void MPU9250_IIC_Send_Byte(u8 txd)
 {
     u8 t;
-    MPU9250_SDA_OUT();
+    MPU9250_SDIN_OUT();
     MPU9250_SCLK_Clr(); // 拉低时钟开始数据传输
     for (t = 0; t < 8; t++)
     {
@@ -188,7 +188,7 @@ void MPU9250_IIC_Send_Byte(u8 txd)
 u8 MPU9250_IIC_Read_Byte(unsigned char ack)
 {
     unsigned char i, receive = 0;
-    MPU9250_SDA_IN(); // SDA设置为输入
+    MPU9250_SDIN_IN(); // SDIN设置为输入
     for (i = 0; i < 8; i++)
     {
         MPU9250_SCLK_Clr();

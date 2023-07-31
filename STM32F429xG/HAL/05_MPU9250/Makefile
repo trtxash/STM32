@@ -22,7 +22,7 @@ TARGET = Template
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -O3 -g
+OPT = -Og
 
 
 #######################################
@@ -77,6 +77,8 @@ Hardware/DMP/mllite/results_holder.c \
 Hardware/DMP/mllite/start_manager.c \
 Hardware/DMP/mllite/storage_manager.c \
 Hardware/DMP/mllite/data_builder.c \
+Hardware/DMP/mllite/hal_outputs.c \
+Hardware/DMP/mllite/message_layer.c \
 Hardware/DMP/mllite/ml_math_func.c \
 Hardware/DMP/eMPL-hal/eMPL_outputs.c \
 
@@ -175,7 +177,7 @@ LIBS = \
 -lc \
 -lm \
 -lnosys \
-Hardware/DMP/mpl/libmpllib.a \
+Hardware/DMP/mpl/liblibmplmpu.a \
 
 LIBDIR = 
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections

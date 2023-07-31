@@ -62,7 +62,9 @@ extern "C"
 #define LOG_ERRROR ANDROID_LOG_ERROR
 #endif
 
-#define MPL_LOG_NDEBUG 1
+// 宏配置
+#define MPL_LOG_NDEBUG 0
+#define REMOVE_LOGGING
 
 /* --------------------------------------------------------------------- */
 

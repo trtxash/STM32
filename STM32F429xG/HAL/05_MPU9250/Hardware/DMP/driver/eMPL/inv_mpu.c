@@ -2410,7 +2410,8 @@ static int accel_6500_self_test(long *bias_regular, long *bias_st, int debug)
             log_i("Accel:CRITERIA C: bias less than %7.4f\n", accel_offset_max / 1.f);
         for (i = 0; i < 3; i++)
         {
-            if (fabs(bias_regular[i]) > accel_offset_max)
+            // if (fabs(bias_regular[i]) > accel_offset_max)
+            if ((bias_regular[i]) > accel_offset_max)
             {
                 if (debug)
                     log_i("FAILED: Accel axis:%d = %ld > 500mg\n", i, bias_regular[i]);

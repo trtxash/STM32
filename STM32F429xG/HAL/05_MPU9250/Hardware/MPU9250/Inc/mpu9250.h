@@ -13,11 +13,11 @@
 #define MPU9250_SDIN_Pin GPIO_PIN_11
 
 // IO方向设置，f4，建议查手册看寄存器
-#define MPU9250_SDA_IN()                              \
+#define MPU9250_SDIN_IN()                              \
     {                                                 \
         MPU9250_SDIN_Port->MODER &= ~(3 << (11 * 2)); \
     } // PB7输入模式
-#define MPU9250_SDA_OUT()                             \
+#define MPU9250_SDIN_OUT()                             \
     {                                                 \
         MPU9250_SDIN_Port->MODER &= ~(3 << (11 * 2)); \
         MPU9250_SDIN_Port->MODER |= 1 << 11 * 2;      \
