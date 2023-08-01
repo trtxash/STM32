@@ -13,11 +13,11 @@
 #define MPU9250_SDIN_Pin GPIO_PIN_11
 
 // IO方向设置，f4，建议查手册看寄存器
-#define MPU9250_SDIN_IN()                              \
+#define MPU9250_SDIN_IN()                             \
     {                                                 \
         MPU9250_SDIN_Port->MODER &= ~(3 << (11 * 2)); \
     } // PB7输入模式
-#define MPU9250_SDIN_OUT()                             \
+#define MPU9250_SDIN_OUT()                            \
     {                                                 \
         MPU9250_SDIN_Port->MODER &= ~(3 << (11 * 2)); \
         MPU9250_SDIN_Port->MODER |= 1 << 11 * 2;      \
@@ -118,6 +118,12 @@
 #define MPU9250_FIFO_CNTL_REG 0X73    // FIFO计数寄存器低八位
 #define MPU9250_FIFO_RW_REG 0X74      // FIFO读写寄存器
 #define MPU9250_DEVICE_ID_REG 0X75    // 器件ID寄存器
+
+extern float pitch, roll, yaw;    // 欧拉角
+extern short aacx, aacy, aacz;    // 加速度传感器原始数据
+extern short gyrox, gyroy, gyroz; // 陀螺仪原始数据
+extern short myrox, myroy, myroz; // 磁力计原始数据
+extern short t;                   // 温度
 
 u8 MPU9250_Init(void);
 u8 MPU9250_Write_Byte(u8 devaddr, u8 reg, u8 data);

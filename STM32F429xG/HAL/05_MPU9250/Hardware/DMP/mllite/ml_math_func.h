@@ -130,4 +130,3 @@ extern "C" {
 }
 #endif
 #endif // INVENSENSE_INV_MATH_FUNC_H__
-

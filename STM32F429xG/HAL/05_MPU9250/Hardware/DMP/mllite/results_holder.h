@@ -79,4 +79,3 @@ void inv_set_accel_bias_found(int state);
 #endif
 
 #endif // INV_RESULTS_HOLDER_H__
-

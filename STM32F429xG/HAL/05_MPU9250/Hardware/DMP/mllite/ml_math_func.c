@@ -565,7 +565,7 @@ double inv_matrix_detd(double *p, int *n)
  */
 float inv_wrap_angle(float ang)
 {
-    if ((double)ang > M_PI)
+    if (ang > M_PI)
         return ang - 2 * (float)M_PI;
     else if (ang <= -(float)M_PI)
         return ang + 2 * (float)M_PI;
@@ -585,7 +585,7 @@ float inv_angle_diff(float ang1, float ang2)
     ang1 = inv_wrap_angle(ang1);
     ang2 = inv_wrap_angle(ang2);
     d = ang1 - ang2;
-    if ((double)d > M_PI)
+    if (d > M_PI)
         d -= 2 * (float)M_PI;
     else if (d < -(float)M_PI)
         d += 2 * (float)M_PI;

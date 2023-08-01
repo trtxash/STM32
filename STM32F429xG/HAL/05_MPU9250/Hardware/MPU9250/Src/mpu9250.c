@@ -1,5 +1,11 @@
 #include "mpu9250.h"
 
+float pitch, roll, yaw;    // 欧拉角
+short aacx, aacy, aacz;    // 加速度传感器原始数据
+short gyrox, gyroy, gyroz; // 陀螺仪原始数据
+short myrox, myroy, myroz; // 磁力计原始数据
+short t;                   // 温度
+
 /**********************************************
 函数名称：MPU9250_IIC_Delay
 函数功能：MPU IIC延时函数，延时2us
@@ -34,7 +40,7 @@ void MPU9250_IIC_Init(void)
 
     // PH4,5初始化设置
     GPIO_Initure.Pin = MPU9250_SCLK_Pin;
-    GPIO_Initure.Mode = GPIO_MODE_OUTPUT_PP;   
+    GPIO_Initure.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_Initure.Pull = GPIO_PULLUP;           // 上拉
     GPIO_Initure.Speed = GPIO_SPEED_FREQ_HIGH; // 快速
     HAL_GPIO_Init(MPU9250_SCLK_Port, &GPIO_Initure);

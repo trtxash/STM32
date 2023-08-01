@@ -46,18 +46,13 @@ int main(void)
         else
             break;
     }
-    OLED_ShowString(0, 32, "MPU OK    ", 8, 1, WHITE);
 
-    MX_TIM6_Init((u16)(50000 - 1), (u16)(120 - 1)); // 定时器6初始化，周期50ms
-    MX_TIM7_Init((u16)(1000 - 1), (u16)(120 - 1));  // 定时器7初始化，周期1ms
+  //  MX_TIM6_Init((u16)(50000 - 1), (u16)(120 - 1)); // 定时器6初始化，周期50ms
+   // MX_TIM7_Init((u16)(1000 - 1), (u16)(120 - 1));  // 定时器7初始化，周期1ms
 
     while (1)
     {
         static u32 i = 0;
-        float pitch, roll, yaw;    // 欧拉角
-        short aacx, aacy, aacz;    // 加速度传感器原始数据
-        short gyrox, gyroy, gyroz; // 陀螺仪原始数据
-        short t;                   // 温度
 
         sprintf(temp, "%d ", i);
         OLED_ShowString(0, 0, temp, 8, 1, WHITE);
@@ -65,19 +60,23 @@ int main(void)
         OLED_ShowString(0, 16, temp, 8, 1, GREEN);
         OLED_ShowString(0, 24, temp, 8, 1, BLUE);
         i++;
-
-        if (mpu_mpl_get_data(&pitch, &roll, &yaw) == 0)
+        u8 res = mpu_mpl_get_data(&pitch, &roll, &yaw);
+        if (res == 0)
         {
-            t = MPU9250_Get_Temperature();
-            
-
-            // MPU9250_Get_Accelerometer(&aacx, &aacy, &aacz); // 得到加速度传感器数据
-            // MPU9250_Get_Gyroscope(&gyrox, &gyroy, &gyroz);  // 得到陀螺仪数据}
-
-            sprintf(temp, "T:%d,P:%0.2f ", t, pitch);
+            sprintf(temp, "S:%d    ", res);
+            OLED_ShowString(0, 32, temp, 8, 1, WHITE);
+            sprintf(temp, "P:%0.1f ", pitch);
             OLED_ShowString(0, 40, temp, 8, 1, WHITE);
-            sprintf(temp, "R:%0.2f,Y:%0.2f ", roll, yaw);
+            sprintf(temp, "R:%0.1f ", roll);
             OLED_ShowString(0, 48, temp, 8, 1, WHITE);
+            sprintf(temp, "Y:%0.1f ", yaw);
+            OLED_ShowString(0, 56, temp, 8, 1, WHITE);
         }
+        else
+        {
+            sprintf(temp, "S:%d    ", res);
+            OLED_ShowString(0, 32, temp, 8, 1, WHITE);
+        }
+        delay_ms(50);
     }
 }

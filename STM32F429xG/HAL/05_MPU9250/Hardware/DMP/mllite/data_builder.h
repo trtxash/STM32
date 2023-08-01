@@ -257,4 +257,3 @@ int inv_get_gyro_bias_tc_set(void);
 #endif
 
 #endif  /* INV_DATA_BUILDER_H__ */
-
