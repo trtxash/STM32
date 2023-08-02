@@ -111,9 +111,9 @@ u8 OledDrv_IICReadByte(u8 ack);
 
 #else // SPI
 
-#define OLED_CS_Port GPIOB
-#define OLED_CS_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define OLED_CS_Pin GPIO_PIN_0
+#define OLED_CS_Port GPIOG
+#define OLED_CS_Port_Clk_Enable() __HAL_RCC_GPIOG_CLK_ENABLE()
+#define OLED_CS_Pin GPIO_PIN_12
 
 #define OLED_DC_Port GPIOG
 #define OLED_DC_Port_Clk_Enable() __HAL_RCC_GPIOG_CLK_ENABLE()
