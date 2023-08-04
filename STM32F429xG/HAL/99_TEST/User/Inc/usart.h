@@ -20,6 +20,8 @@ extern u8 cRxBuffer[RXBUFFERSIZE]; // HAL库USART接收Buffer
 extern UART_HandleTypeDef UART1_Handler; // UART句柄
 extern UART_HandleTypeDef UART2_Handler; // UART2句柄
 extern UART_HandleTypeDef UART6_Handler; // UART句柄
+extern DMA_HandleTypeDef hdma_usart2_tx;
+extern DMA_HandleTypeDef hdma_usart2_rx;
 extern DMA_HandleTypeDef hdma_usart6_tx;
 extern DMA_HandleTypeDef hdma_usart6_rx;
 

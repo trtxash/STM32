@@ -65,22 +65,11 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
 User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
+User/Src/control.c \
+User/Src/ipi_ring_buffer.c \
 Hardware/LED/Src/led.c \
 Hardware/OLED/Src/oled.c \
 Hardware/OLED/Src/oledio.c \
-Hardware/MPU9250/Src/mpu9250.c \
-Hardware/DMP/driver/eMPL/inv_mpu.c \
-Hardware/DMP/driver/eMPL/inv_mpu_dmp_motion_driver.c \
-Hardware/DMP/driver/stm32L/log_stm32.c \
-Hardware/DMP/mllite/mpl.c \
-Hardware/DMP/mllite/results_holder.c \
-Hardware/DMP/mllite/start_manager.c \
-Hardware/DMP/mllite/storage_manager.c \
-Hardware/DMP/mllite/data_builder.c \
-Hardware/DMP/mllite/hal_outputs.c \
-Hardware/DMP/mllite/message_layer.c \
-Hardware/DMP/mllite/ml_math_func.c \
-Hardware/DMP/eMPL-hal/eMPL_outputs.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -177,7 +166,6 @@ LIBS = \
 -lc \
 -lm \
 -lnosys \
-Hardware/DMP/mpl/liblibmplmpu.a \
 
 LIBDIR = 
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections

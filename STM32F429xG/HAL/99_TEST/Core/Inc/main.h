@@ -29,9 +29,10 @@ extern "C"
 
 /* Includes ------------------------------------------------------------------*/
 #include "delay.h"
+#include "stdio.h"
 #include "stm32f4xx_hal.h"
 #include "sys.h"
-#include "stdio.h"
+#include "control.h"
 
 #include "dma.h"
 #include "spi.h"
@@ -39,13 +40,6 @@ extern "C"
 
 #include "led.h"
 #include "oled.h"
-
-#include "mpu9250.h"
-#include "inv_mpu.h"
-#include "inv_mpu_dmp_motion_driver.h"
-
-#define FINDWAY 0 // 0为灰度，1为OPENMV循迹
-
     /* Private includes ----------------------------------------------------------*/
     /* USER CODE BEGIN Includes */
 
@@ -58,8 +52,6 @@ extern "C"
 
     /* Exported constants --------------------------------------------------------*/
     /* USER CODE BEGIN EC */
-    extern short vr, vl;
-    extern u8 time_flag;
     /* USER CODE END EC */
 
     /* Exported macro ------------------------------------------------------------*/

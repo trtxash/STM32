@@ -200,6 +200,14 @@ __weak void SysTick_Handler(void)
 
 /* USER CODE BEGIN 1 */
 
+/**
+ * @brief 串口2中断服务程序
+ */
+void USART2_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&UART2_Handler);
+}
+
 /*
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);//发送完成回调函数
 void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart);//发送完成过半
