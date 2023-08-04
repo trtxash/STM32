@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
 #include "main.h"
+#include "math.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -203,9 +204,25 @@ __weak void SysTick_Handler(void)
 /**
  * @brief 串口2中断服务程序
  */
+void USART1_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&UART1_Handler);
+}
+
+/**
+ * @brief 串口2中断服务程序
+ */
 void USART2_IRQHandler(void)
 {
     HAL_UART_IRQHandler(&UART2_Handler);
+}
+
+/**
+ * @brief 串口6中断服务程序
+ */
+void USART6_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&UART6_Handler);
 }
 
 /*
@@ -214,6 +231,77 @@ void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart);//发送完成过半
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);//接收完成回调函数
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart);//接收完成过半
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);//错误处理回调函数
+/**
+ * @brief 串口接收完成回调函数
+ */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART1) // 如果是串口1
+    {
+        // aRxBuffer[0] = USART1->DR;		  // 读取可以自动清楚RXNE,这里用了HAL_UART_Receive_IT函数，这里不需要
+        if ((USART_RX_STA & 0x8000) == 0) // 接收未完成
+        {
+            if (USART_RX_STA & 0x4000) // 接收到了0x0d
+            {
+                if (aRxBuffer[0] != 0x0a)
+                    USART_RX_STA = 0; // 接收错误,重新开始
+                else
+                    USART_RX_STA |= 0x8000; // 接收完成了
+            }
+            else // 还没收到0X0D
+            {
+                if (aRxBuffer[0] == 0x0d)
+                    USART_RX_STA |= 0x4000;
+                else
+                {
+                    USART_RX_BUF[USART_RX_STA & 0X3FFF] = aRxBuffer[0];
+                    USART_RX_STA++;
+                    if (USART_RX_STA > (USART_REC_LEN - 1))
+                    {
+                        USART_RX_STA = 0; // 接收数据错误,重新开始接收
+                        Error_sum++;
+                    }
+                }
+            }
+        }
+
+        HAL_UART_Receive_IT(&UART1_Handler, aRxBuffer, RXBUFFERSIZE); // Receive_IT中会关闭中断，需要重开
+    }
+    else if (huart->Instance == USART2) // 如果是串口2
+    {
+        if ((USART_RX_STA_C & 0x8000) == 0) // 接收未完成
+        {
+            if (USART_RX_STA_C & 0x4000) // 接收到了0x0d
+            {
+                if (cRxBuffer[0] != 0x0a)
+                    USART_RX_STA_C = 0; // 接收错误,重新开始
+                else
+                    USART_RX_STA_C |= 0x8000; // 接收完成了
+            }
+            else // 还没收到0X0D
+            {
+                if (cRxBuffer[0] == 0x0d)
+                    USART_RX_STA_C |= 0x4000;
+                else
+                {
+                    USART_RX_BUF_C[USART_RX_STA_C & 0X3FFF] = cRxBuffer[0];
+                    USART_RX_STA_C++;
+                    if (USART_RX_STA_C > (USART_REC_LEN - 1))
+                    {
+                        USART_RX_STA_C = 0; // 接收数据错误,重新开始接收
+                        Error_sum++;
+                    }
+                }
+            }
+        }
+        HAL_UART_Receive_IT(&UART2_Handler, cRxBuffer, RXBUFFERSIZE); // 如果要调用处理回调函数，用这个函数使能接收中断
+    }
+    else if (huart->Instance == USART6) // 如果是串口6
+    {
+        AnoPTv8HwRecvByte(bRxBuffer[0]);
+        HAL_UART_Receive_IT(&UART6_Handler, bRxBuffer, RXBUFFERSIZE); // 如果要调用处理回调函数，用这个函数使能接收中断
+    }
+}
 
 /**
  * @brief This function handles TIM6 global interrupt, DAC1 and DAC2 underrun error interrupts.
@@ -247,18 +335,98 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&htim6))
     {
-        static u8 time_flag50ms = 0;
+        static u8 time_flag40ms = 0;
+        float PWMA_TEMP, PWMB_TEMP = 0;
+        time40flag = 1;
+        if (TASK == 0)
+        {
+            if (redJabsl(150, 150, 150)) // 在屏幕内
+            {
+                PWMA_TEMP = -positional_pid_compute(&motor1_velocity, (float)TARGET_RED_XY[0], (float)RED_XY[0]);
+                PWMB_TEMP = -positional_pid_compute(&motor2_velocity, (float)TARGET_RED_XY[1], (float)RED_XY[1]);
+            }
 
-        if (time_flag50ms % 20 == 0)
+            if (finreset == 0)
+                Set_angle(XSET + PWMA_TEMP, YSET + PWMB_TEMP);
+        }
+        else if (TASK == 2 | TASK == 4)
+        {
+            if (redJabsl(150, 150, 150)) // 在屏幕内
+            {
+                PWMA_TEMP = -positional_pid_compute(&motor1_velocity, (float)TARGET_RED_XY[0], (float)RED_XY[0]);
+                PWMB_TEMP = -positional_pid_compute(&motor2_velocity, (float)TARGET_RED_XY[1], (float)RED_XY[1]);
+            }
+            Set_angle(XSET + PWMA_TEMP, YSET + PWMB_TEMP);
+        }
+
+        if (time_flag40ms % 25 == 0)
             LED0_Reverse();
 
-        time_flag50ms++;
-        if (time_flag50ms >= 250)
-            time_flag50ms = 0;
+        time_flag40ms++;
+        if (time_flag40ms >= 250)
+            time_flag40ms = 0;
+
+        AnoPTv8SendBuf(ANOPTV8_SWJID, 0xF1, databuf, ANOPTV8_PARNUM_UPPER); // 数据发送到上位机
     }
     else if (htim == (&htim7))
     {
+        AnoPTv8HwTrigger1ms();
     }
+}
+
+/**
+ * @brief This function handles DMA2 stream1 global interrupt.
+ */
+void DMA2_Stream1_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA2_Stream1_IRQn 0 */
+
+    /* USER CODE END DMA2_Stream1_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_usart6_rx);
+    /* USER CODE BEGIN DMA2_Stream1_IRQn 1 */
+
+    /* USER CODE END DMA2_Stream1_IRQn 1 */
+}
+/**
+ * @brief This function handles DMA2 stream2 global interrupt.
+ */
+void DMA2_Stream2_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA2_Stream2_IRQn 0 */
+
+    /* USER CODE END DMA2_Stream2_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_usart1_rx);
+    /* USER CODE BEGIN DMA2_Stream2_IRQn 1 */
+
+    /* USER CODE END DMA2_Stream2_IRQn 1 */
+}
+
+/**
+ * @brief This function handles DMA2 stream6 global interrupt.
+ */
+void DMA2_Stream6_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA2_Stream6_IRQn 0 */
+
+    /* USER CODE END DMA2_Stream6_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_usart6_tx);
+    /* USER CODE BEGIN DMA2_Stream6_IRQn 1 */
+
+    /* USER CODE END DMA2_Stream6_IRQn 1 */
+}
+
+/**
+ * @brief This function handles DMA2 stream7 global interrupt.
+ */
+void DMA2_Stream7_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA2_Stream7_IRQn 0 */
+
+    /* USER CODE END DMA2_Stream7_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_usart1_tx);
+    /* USER CODE BEGIN DMA2_Stream7_IRQn 1 */
+
+    /* USER CODE END DMA2_Stream7_IRQn 1 */
 }
 
 /* USER CODE END 1 */

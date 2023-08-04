@@ -4,6 +4,18 @@
         "control.h": "c",
         "ipi_ring_buffer.h": "c",
         "main.h": "c",
-        "key.h": "c"
+        "key.h": "c",
+        "anoptv8.h": "c",
+        "positional_pid.h": "c",
+        "anoptv8datadef.h": "c",
+        "cmath": "c",
+        "*.tcc": "c",
+        "cstdlib": "c",
+        "led.h": "c",
+        "filter.h": "c",
+        "sys.h": "c",
+        "lobotserialservo.h": "c",
+        "string.h": "c",
+        "stdarg.h": "c"
     }
 }

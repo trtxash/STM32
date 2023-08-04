@@ -22,7 +22,7 @@ TARGET = Template
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -Og
+OPT = -O0 -g
 
 
 #######################################
@@ -66,8 +66,14 @@ User/Src/sys.c \
 User/Src/delay.c \
 User/Src/usart.c \
 User/Src/control.c \
-User/Src/ipi_ring_buffer.c \
+User/Src/positional_pid.c \
+User/Src/filter.c \
+AnoPTv8/Src/AnoPTv8DataDef.c \
+AnoPTv8/Src/AnoPTv8FrameFactory.c \
+AnoPTv8/Src/AnoPTv8Run.c \
+AnoPTv8/Src/hardwareInterface.c \
 Hardware/LED/Src/led.c \
+Hardware/Key/Src/key.c \
 Hardware/OLED/Src/oled.c \
 Hardware/OLED/Src/oledio.c \
 
@@ -131,7 +137,9 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
 -IUser/Inc \
+-IAnoPTv8/Inc \
 -IHardware/LED/Inc \
+-IHardware/Key/Inc \
 -IHardware/OLED/Inc \
 -IHardware/MPU9250/Inc \
 -IHardware/DMP/driver/eMPL \

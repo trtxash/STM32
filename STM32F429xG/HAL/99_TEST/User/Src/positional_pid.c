@@ -51,17 +51,23 @@ float positional_pid_compute(positional_pid_params_t *positional_pid,
             // 计算积分项
             positional_pid->i_out += positional_pid->ki * positional_pid->error;
             // 积分限幅
-            if (positional_pid->i_out >= positional_pid->i_out_max)
+            if (positional_pid->i_out >= 0)
             {
-                positional_pid->i_out = positional_pid->i_out_max;
+                if (positional_pid->i_out >= positional_pid->i_out_max)
+                    positional_pid->i_out = positional_pid->i_out_max;
             }
-            // 计算微分项
-            positional_pid->d_out =
-                positional_pid->kd * (positional_pid->error - positional_pid->last_error);
-
-            // 计算总输出
-            positional_pid->output = positional_pid->p_out + positional_pid->i_out + positional_pid->d_out;
+            else if (positional_pid->i_out < 0)
+            {
+                if (positional_pid->i_out <= -positional_pid->i_out_max)
+                    positional_pid->i_out = -positional_pid->i_out_max;
+            }
         }
+        // 计算微分项
+        positional_pid->d_out =
+            positional_pid->kd * (positional_pid->error - positional_pid->last_error);
+
+        // 计算总输出
+        positional_pid->output = positional_pid->p_out + positional_pid->i_out + positional_pid->d_out;
 
         // 限制输出在输出上限和输出下限之间
         if (positional_pid->output > positional_pid->output_max)

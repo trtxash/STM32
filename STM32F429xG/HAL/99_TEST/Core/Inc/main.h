@@ -28,18 +28,24 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "control.h"
 #include "delay.h"
 #include "stdio.h"
 #include "stm32f4xx_hal.h"
 #include "sys.h"
-#include "control.h"
+#include "filter.h"
+
+#include "AnoPTv8.h"
+#include "AnoPTv8Run.h"
 
 #include "dma.h"
+#include "positional_pid.h"
 #include "spi.h"
 #include "tim.h"
 
 #include "led.h"
 #include "oled.h"
+#include "key.h"
     /* Private includes ----------------------------------------------------------*/
     /* USER CODE BEGIN Includes */
 
@@ -53,7 +59,7 @@ extern "C"
     /* Exported constants --------------------------------------------------------*/
     /* USER CODE BEGIN EC */
     /* USER CODE END EC */
-
+    extern u32 time40flag;
     /* Exported macro ------------------------------------------------------------*/
     /* USER CODE BEGIN EM */
 

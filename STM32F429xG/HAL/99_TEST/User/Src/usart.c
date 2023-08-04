@@ -3,6 +3,8 @@
 UART_HandleTypeDef UART1_Handler; // UART1句柄
 UART_HandleTypeDef UART2_Handler; // UART2句柄
 UART_HandleTypeDef UART6_Handler; // UART6句柄
+DMA_HandleTypeDef hdma_usart1_tx;
+DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart6_tx;
@@ -110,19 +112,64 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
 
     if (uartHandle->Instance == USART1) // 如果是串口1，进行串口1 MSP初始化
     {
-        __HAL_RCC_GPIOA_CLK_ENABLE();  // 使能GPIOA时钟
-        __HAL_RCC_USART1_CLK_ENABLE(); // 使能USART1时钟
+        /* USER CODE BEGIN USART1_MspInit 0 */
 
-        GPIO_InitStruct.Pin = GPIO_PIN_9;            // PA9
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;      // 复用推挽输出
-        GPIO_InitStruct.Pull = GPIO_PULLUP;          // 上拉
-        GPIO_InitStruct.Speed = GPIO_SPEED_FAST;     // 高速
-        GPIO_InitStruct.Alternate = GPIO_AF7_USART1; // 复用为USART1
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);      // 初始化PA9
+        /* USER CODE END USART1_MspInit 0 */
+        /* USART1 clock enable */
+        __HAL_RCC_USART1_CLK_ENABLE();
 
-        GPIO_InitStruct.Pin = GPIO_PIN_10;      // PA10
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); // 初始化PA10
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+        /**USART1 GPIO Configuration
+        PA9     ------> USART1_TX
+        PA10     ------> USART1_RX
+        */
+        GPIO_InitStruct.Pin = GPIO_PIN_9 | GPIO_PIN_10;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+        /* USART1 DMA Init */
+        /* USART1_TX Init */
+        hdma_usart1_tx.Instance = DMA2_Stream7;
+        hdma_usart1_tx.Init.Channel = DMA_CHANNEL_4;
+        hdma_usart1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+        hdma_usart1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+        hdma_usart1_tx.Init.MemInc = DMA_MINC_ENABLE;
+        hdma_usart1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+        hdma_usart1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+        hdma_usart1_tx.Init.Mode = DMA_NORMAL;
+        hdma_usart1_tx.Init.Priority = DMA_PRIORITY_LOW;
+        hdma_usart1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+        if (HAL_DMA_Init(&hdma_usart1_tx) != HAL_OK)
+        {
+            Error_Handler();
+        }
+
+        __HAL_LINKDMA(uartHandle, hdmatx, hdma_usart1_tx);
+
+        /* USART1_RX Init */
+        hdma_usart1_rx.Instance = DMA2_Stream2;
+        hdma_usart1_rx.Init.Channel = DMA_CHANNEL_4;
+        hdma_usart1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+        hdma_usart1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+        hdma_usart1_rx.Init.MemInc = DMA_MINC_ENABLE;
+        hdma_usart1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+        hdma_usart1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+        hdma_usart1_rx.Init.Mode = DMA_NORMAL;
+        hdma_usart1_rx.Init.Priority = DMA_PRIORITY_LOW;
+        hdma_usart1_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+        if (HAL_DMA_Init(&hdma_usart1_rx) != HAL_OK)
+        {
+            Error_Handler();
+        }
+
+        __HAL_LINKDMA(uartHandle, hdmarx, hdma_usart1_rx);
+
+        /* USER CODE BEGIN USART1_MspInit 1 */
+
+        /* USER CODE END USART1_MspInit 1 */
         HAL_NVIC_EnableIRQ(USART1_IRQn);         // 使能USART1中断通道
         HAL_NVIC_SetPriority(USART1_IRQn, 0, 0); // 抢占优先级0，子优先级0
     }
@@ -163,7 +210,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
         hdma_usart2_tx.Init.MemInc = DMA_MINC_ENABLE;
         hdma_usart2_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
         hdma_usart2_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-        hdma_usart2_tx.Init.Mode = DMA_NORMAL;
+        hdma_usart2_tx.Init.Mode = DMA_CIRCULAR;
         hdma_usart2_tx.Init.Priority = DMA_PRIORITY_LOW;
         hdma_usart2_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
         if (HAL_DMA_Init(&hdma_usart2_tx) != HAL_OK)
@@ -196,7 +243,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
         /* USER CODE END USART2_MspInit 1 */
 
         HAL_NVIC_EnableIRQ(USART2_IRQn);
-        HAL_NVIC_SetPriority(USART2_IRQn, 2, 0);
+        HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
     }
     else if (uartHandle->Instance == USART6) // 如果是串口6，进行串口6 MSP初始化
     {
