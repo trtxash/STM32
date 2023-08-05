@@ -335,7 +335,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&htim6))
     {
-        static u8 time_flag40ms = 0;
+        static u8 time_flag20ms = 0;
         float PWMA_TEMP, PWMB_TEMP = 0;
         time40flag = 1;
 
@@ -360,18 +360,45 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             }
             Set_angle(XSET + PWMA_TEMP, YSET + PWMB_TEMP);
         }
-        else if (TASK == 15)
+        else if (TASK == 12)
         {
-            Set_angle(PWMA, PWMB);
-            PWMA++;
+            if (RED_XY[0] != 0 & RED_XY[1] != 0 & GREEN_XY[0] != 0 & GREEN_XY[1] != 0)
+            {
+                PWMA_TEMP = -positional_pid_compute(&motor1_velocity, (float)RED_XY_OLD[0], (float)GREEN_XY[0]);
+                PWMB_TEMP = -positional_pid_compute(&motor2_velocity, (float)RED_XY_OLD[1], (float)GREEN_XY[1]);
+                STOP[0] = XSET + PWMA_TEMP;
+                STOP[1] = YSET + 75 + PWMB_TEMP;
+                Set_angle(STOP[0], STOP[1]);
+            }
+        }
+        else if (TASK == 13)
+        {
+        }
+        else if (TASK == 14)
+        {
+            if (RED_XY[0] != 0 & RED_XY[1] != 0 & GREEN_XY[0] != 0 & GREEN_XY[1] != 0)
+            {
+                PWMA_TEMP = -positional_pid_compute(&motor1_velocity, ((float)RED_XY[0] + (float)GREEN_XY[0]) / 2, (float)GREEN_XY[0]);
+                PWMB_TEMP = -positional_pid_compute(&motor2_velocity, ((float)RED_XY[1] + (float)GREEN_XY[1]) / 2, (float)GREEN_XY[1]);
+                STOP[0] = XSET + PWMA_TEMP;
+                STOP[1] = YSET + 75 + PWMB_TEMP;
+                Set_angle(STOP[0], STOP[1]);
+            }
         }
 
-        if (time_flag40ms % 25 == 0)
+        if (time_flag20ms % 25 == 0)
+        {
             LED0_Reverse();
+            if (time_flag20ms % 50 == 0)
+            {
+                RED_XY_OLD[0] = RED_XY[0];
+                RED_XY_OLD[1] = RED_XY[1];
+            }
+        }
 
-        time_flag40ms++;
-        if (time_flag40ms >= 250)
-            time_flag40ms = 0;
+        time_flag20ms++;
+        if (time_flag20ms >= 250)
+            time_flag20ms = 0;
 
         AnoPTv8SendBuf(ANOPTV8_SWJID, 0xF1, databuf, ANOPTV8_PARNUM_UPPER); // 数据发送到上位机
     }

@@ -12,15 +12,16 @@ extern positional_pid_params_t motor2_velocity;
 
 extern u8 TASK, TASK_TEMP, Do_count;
 extern u16 PWMA, PWMB;
-extern u32 RED_XY[2], RED_XY_TEMP[2];
+extern u32 RED_XY[2], RED_XY_TEMP[2], GREEN_XY[2], RED_XY_OLD[2];
 extern u32 TARGET_RED_XY[2], TARGET_GREEN_XY[2];
-extern u16 XSET, YSET;
+extern u16 XSET, YSET, STOP[2];
 extern u8 finreset;
 extern u16 HEIKUANG[8];
 extern u16 HEIKUANG_TEMP[16];
 
 void red_init(void);
 void control_red(u8 kaiguan);
+u8 redgreenJabsl(u16 x0, u16 y0, u16 x1, u16 y1, u16 l);
 u8 redJabsl(u16 x, u16 y, u16 l);
 void Set_angle(u16 pwm1, u16 pwm2);
 u8 get_pi_xy(void);

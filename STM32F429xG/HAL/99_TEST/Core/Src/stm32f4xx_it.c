@@ -357,8 +357,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             {
                 PWMA_TEMP = -positional_pid_compute(&motor1_velocity, (float)TARGET_RED_XY[0], (float)RED_XY[0]);
                 PWMB_TEMP = -positional_pid_compute(&motor2_velocity, (float)TARGET_RED_XY[1], (float)RED_XY[1]);
+                STOP[0] = XSET + PWMA_TEMP;
+                STOP[1] = YSET + PWMB_TEMP;
             }
-            Set_angle(XSET + PWMA_TEMP, YSET + PWMB_TEMP);
+            Set_angle(STOP[0], STOP[1]);
         }
         else if (TASK == 15)
         {

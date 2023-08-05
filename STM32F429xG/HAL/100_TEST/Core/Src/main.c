@@ -32,22 +32,23 @@ int main(void)
     MX_DMA_Init();
     MX_SPI6_Init();
     OLED_Init();
-    uart_init(115200);   // 舵机
+    // uart_init(115200);   // 舵机
     uart2_init(1384200); // OpenMV
     uart6_init(1384200); // 蓝牙
     LED_Init();
     KEY0_Init();
+    KEY1_Init();
     MX_TIM5_Init((u16)(20000 - 1), (u16)(90 - 1)); // 定时器5初始化，周期20ms
     MX_TIM6_Init((u16)(20000 - 1), (u16)(90 - 1)); // 定时器6初始化，周期20ms
     MX_TIM7_Init((u16)(1000 - 1), (u16)(90 - 1));  // 定时器7初始化，周期1ms
     HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);      // 开启定时器1通道1的PWM输出
     HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_3);      // 开启定时器1通道4的PWM输出
-    positional_pid_init(&motor1_velocity, 0.15, 0.026, 0.0, 1250, 0, 1250, -1250);
-    positional_pid_init(&motor2_velocity, 0.15, 0.026, 0.0, 1250, 0, 1250, -1250);
+    positional_pid_init(&motor1_velocity, 0.5, 0.08, 0.0, 1250, 0, 1250, -1250);
+    positional_pid_init(&motor2_velocity, 0.5, 0.08, 0.0, 1250, 0, 1250, -1250);
     motor1_velocity.control = DISABLE;
     motor2_velocity.control = DISABLE;
     red_init();
-    Kalman_Init();
+    // Kalman_Init();
 
     while (1)
     {
@@ -65,6 +66,8 @@ int main(void)
         OLED_ShowString(0, 32, temp, 8, 1, WHITE);
         sprintf(temp, "3:%d,3:%d ", HEIKUANG[6], HEIKUANG[7]);
         OLED_ShowString(0, 40, temp, 8, 1, WHITE);
+        sprintf(temp, "G1:%d,G2:%d ", GREEN_XY[0], GREEN_XY[1]);
+        OLED_ShowString(0, 48, temp, 8, 1, WHITE);
 
         // // 上位机调整参数
         // motor1_velocity.kp = (float)parListForTest[0] / 100;

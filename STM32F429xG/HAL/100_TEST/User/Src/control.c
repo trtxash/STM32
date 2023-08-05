@@ -11,12 +11,12 @@
 positional_pid_params_t motor1_velocity;
 positional_pid_params_t motor2_velocity;
 
-u8 TASK = 0, TASK_TEMP = 0, Do_count = 0;
+u8 TASK = 14, TASK_TEMP = 0, Do_count = 0;
 u8 finreset = 0;
 u16 PWMA = 0, PWMB = 0;
-u32 RED_XY[2] = {0}, RED_XY_TEMP[2] = {0};
+u32 RED_XY[2] = {0}, RED_XY_TEMP[2] = {0}, GREEN_XY[2] = {0}, RED_XY_OLD[2] = {0};
 u32 TARGET_RED_XY[2] = {150, 150}, TARGET_GREEN_XY[2] = {150, 150};
-u16 XSET = 1484, YSET = 2121;
+u16 XSET = 1484, YSET = 2121, STOP[2] = {0};
 u16 HEIKUANG_TEMP[16] = {0};
 u16 HEIKUANG[8] = {0};
 u16 HEIKUANG_LOCK[8] = {0};
@@ -55,9 +55,8 @@ u8 get_pi_xy(void)
 
         if (USART_RX_BUF_C[0] == '*' & USART_RX_BUF_C[i - 1] == '#') // 检验包头包尾
         {
-            sscanf(USART_RX_BUF_C, "*%d %d,%d %d %d %d %d %d %d %d#", &RED_XY[0], &RED_XY[1], &HEIKUANG[0], &HEIKUANG[1], &HEIKUANG[2], &HEIKUANG[3], &HEIKUANG[4], &HEIKUANG[5], &HEIKUANG[6], &HEIKUANG[7]);
-            
-            
+            sscanf(USART_RX_BUF_C, "*%d %d,%d %d#", &RED_XY[0], &RED_XY[1], &GREEN_XY[0], &GREEN_XY[1]);
+
             // sscanf(USART_RX_BUF_C, "*%d %d,%d %d %d %d %d %d %d %d,%d %d %d %d %d %d %d %d#", &RED_XY[0], &RED_XY[1], &HEIKUANG_TEMP[0], &HEIKUANG_TEMP[1], &HEIKUANG_TEMP[2], &HEIKUANG_TEMP[3], &HEIKUANG_TEMP[4], &HEIKUANG_TEMP[5], &HEIKUANG_TEMP[6], &HEIKUANG_TEMP[7], &HEIKUANG_TEMP[8], &HEIKUANG_TEMP[9], &HEIKUANG_TEMP[10], &HEIKUANG_TEMP[11], &HEIKUANG_TEMP[12], &HEIKUANG_TEMP[13], &HEIKUANG_TEMP[14], &HEIKUANG_TEMP[15]);
             // u8 x = 0;
             // // 融合
@@ -376,8 +375,79 @@ void MAIN_TASK(void)
             break;
         }
     }
-    else if (TASK == 5) //
+    else if (TASK == 12) // 黑线跟踪
     {
+        switch (Do_count)
+        {
+        case 0: // 复位
+            control_red(0);
+            motor1_velocity.control = DISABLE;
+            motor2_velocity.control = DISABLE;
+            Set_angle(XSET - 20, YSET + 75);
+            if (time40sec(1))
+                Do_count++;
+        case 1:
+            motor1_velocity.control = ENABLE;
+            motor2_velocity.control = ENABLE;
+            Do_count++;
+            break;
+        case 2:
+            if (redgreenJabsl(RED_XY[0], RED_XY[1], GREEN_XY[0], GREEN_XY[1], 600))
+            {
+                if (RED_XY[0] != 0 & RED_XY[1] != 0 & GREEN_XY[0] != 0 & GREEN_XY[1] != 0)
+                {
+                    Do_count++;
+                }
+            }
+            break;
+        case 3:
+            control_red(1);
+            break;
+        default:
+            break;
+        }
+    }
+    else if (TASK == 13) // 急停
+    {
+    }
+    else if (TASK == 14) // 跟踪
+    {
+        switch (Do_count)
+        {
+        case 0: // 复位
+            control_red(0);
+            motor1_velocity.control = DISABLE;
+            motor2_velocity.control = DISABLE;
+            Set_angle(XSET - 20, YSET + 75);
+            if (time40sec(1))
+                Do_count++;
+        case 1:
+            motor1_velocity.control = ENABLE;
+            motor2_velocity.control = ENABLE;
+            Do_count++;
+            break;
+        case 2:
+            if (redgreenJabsl(RED_XY[0], RED_XY[1], GREEN_XY[0], GREEN_XY[1], 600))
+            {
+                if (RED_XY[0] != 0 & RED_XY[1] != 0 & GREEN_XY[0] != 0 & GREEN_XY[1] != 0)
+                {
+                    Do_count++;
+                }
+            }
+            break;
+        case 3:
+            if (RED_XY[0] == 0 | RED_XY[1] == 0 | GREEN_XY[0] == 0 | GREEN_XY[1] == 0)
+            {
+                motor1_velocity.control = DISABLE;
+                motor2_velocity.control = DISABLE;
+                control_red(1);
+                finreset = 1;
+                TASK = 13;
+            }
+            break;
+        default:
+            break;
+        }
     }
     else if (TASK == 15) // 上位机
     {
@@ -402,38 +472,39 @@ u8 redJabsl(u16 x, u16 y, u16 l)
     return (abs(RED_XY[0] - x) < l & abs(RED_XY[1] - y) < l);
 }
 
+// 判断red离点距离，成功返回1
+u8 redgreenJabsl(u16 x0, u16 y0, u16 x1, u16 y1, u16 l)
+{
+    u16 temp = (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
+    if (temp <= l)
+        return 1;
+    else
+        return 0;
+}
+
 // 复位切换
 void M1M2RESET(void)
 {
     static u8 keychangeflag = 0;
-    if (read_key_val())
+    // if (KEY0_READ() & TASK != 13)
+    // {
+    //     TASK = key_val = 13;
+    //     Do_count = 0;
+    // }
+
+    if (KEY0_READ() & TASK != 12)
     {
-        TASK = key_val;
-        finreset = 0;
+        TASK = key_val = 12;
         Do_count = 0;
+        positional_pid_set_value(&motor1_velocity, 0.1, 0.03, 0.0);
+        positional_pid_set_value(&motor2_velocity, 0.1, 0.03, 0.0);
     }
 
-    // if (KEY0_READ())
+    // if (read_key_val())
     // {
-    //     if (time40sec(10))
-    //     {
-    //         keychangeflag = 1;
-    //         TASK_TEMP++;
-    //     }
-    // }
-    // if (keychangeflag)
-    // {
-    //     if (time40sec(10) & TASK != TASK_TEMP)
-    //     {
-    //         keychangeflag = 0;
-    //         TASK = TASK_TEMP;
-    //         finreset = 0;
-    //         Do_count = 0;
-    //         if (TASK >= 16)
-    //             TASK = 0;
-    //         if (TASK_TEMP >= 16)
-    //             TASK_TEMP = 0;
-    //     }
+    //     TASK = key_val;
+    //     finreset = 0;
+    //     Do_count = 0;
     // }
 }
 

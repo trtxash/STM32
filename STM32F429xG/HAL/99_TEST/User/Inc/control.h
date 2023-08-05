@@ -12,7 +12,7 @@ extern positional_pid_params_t motor2_velocity;
 
 extern u8 TASK, TASK_TEMP, Do_count;
 extern u16 PWMA, PWMB;
-extern u32 RED_XY[2], RED_XY_TEMP[2];
+extern u32 RED_XY[2], RED_XY_TEMP[2], STOP[2];
 extern u32 TARGET_RED_XY[2], TARGET_GREEN_XY[2];
 extern u16 XSET, YSET;
 extern u8 finreset;

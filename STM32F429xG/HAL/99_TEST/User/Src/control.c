@@ -14,7 +14,7 @@ positional_pid_params_t motor2_velocity;
 u8 TASK = 0, TASK_TEMP = 0, Do_count = 0;
 u8 finreset = 0;
 u16 PWMA = 0, PWMB = 0;
-u32 RED_XY[2] = {0}, RED_XY_TEMP[2] = {0};
+u32 RED_XY[2] = {0}, RED_XY_TEMP[2] = {0}, STOP[2] = {0};
 u32 TARGET_RED_XY[2] = {150, 150}, TARGET_GREEN_XY[2] = {150, 150};
 u16 XSET = 1484, YSET = 2121;
 u16 HEIKUANG_TEMP[16] = {0};
@@ -56,8 +56,7 @@ u8 get_pi_xy(void)
         if (USART_RX_BUF_C[0] == '*' & USART_RX_BUF_C[i - 1] == '#') // 检验包头包尾
         {
             sscanf(USART_RX_BUF_C, "*%d %d,%d %d %d %d %d %d %d %d#", &RED_XY[0], &RED_XY[1], &HEIKUANG[0], &HEIKUANG[1], &HEIKUANG[2], &HEIKUANG[3], &HEIKUANG[4], &HEIKUANG[5], &HEIKUANG[6], &HEIKUANG[7]);
-            
-            
+
             // sscanf(USART_RX_BUF_C, "*%d %d,%d %d %d %d %d %d %d %d,%d %d %d %d %d %d %d %d#", &RED_XY[0], &RED_XY[1], &HEIKUANG_TEMP[0], &HEIKUANG_TEMP[1], &HEIKUANG_TEMP[2], &HEIKUANG_TEMP[3], &HEIKUANG_TEMP[4], &HEIKUANG_TEMP[5], &HEIKUANG_TEMP[6], &HEIKUANG_TEMP[7], &HEIKUANG_TEMP[8], &HEIKUANG_TEMP[9], &HEIKUANG_TEMP[10], &HEIKUANG_TEMP[11], &HEIKUANG_TEMP[12], &HEIKUANG_TEMP[13], &HEIKUANG_TEMP[14], &HEIKUANG_TEMP[15]);
             // u8 x = 0;
             // // 融合
@@ -376,7 +375,7 @@ void MAIN_TASK(void)
             break;
         }
     }
-    else if (TASK == 5) //
+    else if (TASK == 5) // 暂停
     {
     }
     else if (TASK == 15) // 上位机
@@ -406,11 +405,24 @@ u8 redJabsl(u16 x, u16 y, u16 l)
 void M1M2RESET(void)
 {
     static u8 keychangeflag = 0;
+    u8 Do_count_old = 0;
     if (read_key_val())
     {
-        TASK = key_val;
-        finreset = 0;
-        Do_count = 0;
+        if (TASK == 6)
+        {
+            Do_count = 3;
+            TASK = 4;
+        }
+        else if (TASK == 5)
+        {
+            TASK = key_val;
+        }
+        else
+        {
+            TASK = key_val;
+            finreset = 0;
+            Do_count = 0;
+        }
     }
 
     // if (KEY0_READ())

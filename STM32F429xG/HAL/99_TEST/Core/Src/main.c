@@ -42,8 +42,8 @@ int main(void)
     MX_TIM7_Init((u16)(1000 - 1), (u16)(90 - 1));  // 定时器7初始化，周期1ms
     HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);      // 开启定时器1通道1的PWM输出
     HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_3);      // 开启定时器1通道4的PWM输出
-    positional_pid_init(&motor1_velocity, 0.15, 0.026, 0.0, 1250, 0, 1250, -1250);
-    positional_pid_init(&motor2_velocity, 0.15, 0.026, 0.0, 1250, 0, 1250, -1250);
+    positional_pid_init(&motor1_velocity, 0.15, 0.0285, 0.0, 1250, 0, 1250, -1250);
+    positional_pid_init(&motor2_velocity, 0.15, 0.0285, 0.0, 1250, 0, 1250, -1250);
     motor1_velocity.control = DISABLE;
     motor2_velocity.control = DISABLE;
     red_init();
