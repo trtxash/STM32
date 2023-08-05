@@ -62,8 +62,7 @@ void LobotSerialServoMove(uint8_t id, int16_t position, uint16_t time)
   buf[7] = GET_LOW_BYTE(time);
   buf[8] = GET_HIGH_BYTE(time);
   buf[9] = LobotCheckSum(buf);
-  // LobotSerialWrite(buf, 10);
-  HAL_UART_Transmit_DMA(&UART1_Handler, buf, 10);
+  LobotSerialWrite(buf, 10);
 }
 
 void LobotSerialServoUnload(uint8_t id)
@@ -139,5 +138,5 @@ int LobotSerialMsgHandle(void)
 
 void uartWriteBuf(u8 *buf, u8 size)
 {
-  HAL_UART_Transmit_DMA(&UART1_Handler, &buf, size);
+  HAL_UART_Transmit_DMA(&UART1_Handler, *buf, size);
 }

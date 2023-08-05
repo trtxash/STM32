@@ -32,28 +32,27 @@ int main(void)
     MX_DMA_Init();
     MX_SPI6_Init();
     OLED_Init();
-    uart_init(115200);  // 舵机
+    uart_init(115200);   // 舵机
     uart2_init(1384200); // OpenMV
     uart6_init(1384200); // 蓝牙
     LED_Init();
     KEY0_Init();
     MX_TIM5_Init((u16)(20000 - 1), (u16)(90 - 1)); // 定时器5初始化，周期20ms
-    MX_TIM6_Init((u16)(40000 - 1), (u16)(90 - 1)); // 定时器6初始化，周期40ms
+    MX_TIM6_Init((u16)(20000 - 1), (u16)(90 - 1)); // 定时器6初始化，周期20ms
     MX_TIM7_Init((u16)(1000 - 1), (u16)(90 - 1));  // 定时器7初始化，周期1ms
     HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);      // 开启定时器1通道1的PWM输出
     HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_3);      // 开启定时器1通道4的PWM输出
-    positional_pid_init(&motor1_velocity, 0.17, 0.065, 0.0, 1250, 0, 1250, -1250);
-    positional_pid_init(&motor2_velocity, 0.17, 0.065, 0.0, 1250, 0, 1250, -1250);
+    positional_pid_init(&motor1_velocity, 0.15, 0.026, 0.0, 1250, 0, 1250, -1250);
+    positional_pid_init(&motor2_velocity, 0.15, 0.026, 0.0, 1250, 0, 1250, -1250);
     motor1_velocity.control = DISABLE;
     motor2_velocity.control = DISABLE;
     red_init();
-    // Kalman_Init();
+    Kalman_Init();
 
     while (1)
     {
         static u32 sec = 0;
 
-        get_pi_xy();
         sprintf(temp, "E1:%d,E2:%d,key:%d ", RED_XY[0], RED_XY[1], key_val);
         OLED_ShowString(0, 0, temp, 8, 1, WHITE);
         sprintf(temp, "TASK:%d,TEMP:%d,DO:%d ", TASK, TASK_TEMP, Do_count);
@@ -67,6 +66,13 @@ int main(void)
         sprintf(temp, "3:%d,3:%d ", HEIKUANG[6], HEIKUANG[7]);
         OLED_ShowString(0, 40, temp, 8, 1, WHITE);
 
+        // // 上位机调整参数
+        // motor1_velocity.kp = (float)parListForTest[0] / 100;
+        // motor1_velocity.ki = (float)parListForTest[1] / 100;
+        // motor1_velocity.kd = (float)parListForTest[2] / 100;
+        // motor2_velocity.kp = (float)parListForTest[3] / 100;
+        // motor2_velocity.ki = (float)parListForTest[4] / 100;
+        // motor2_velocity.kd = (float)parListForTest[5] / 100;
         // 上位机上传数据处理
         databuf[0] = BYTE0(RED_XY[0]);
         databuf[1] = BYTE1(RED_XY[0]);

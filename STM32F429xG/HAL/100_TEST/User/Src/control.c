@@ -1,17 +1,17 @@
 #include "control.h"
 
-#define XYD 3
+#define XYD 5
 #define MINXY 10
 #define MAXXY 290
 #define MIDXY 150
-#define KAIDELAY 5
+#define KAIDELAY 10
 #define BIHEIXIADUAN_S_NUM 4
 #define BIHEIXIADUAN_L_NUM 6
 
 positional_pid_params_t motor1_velocity;
 positional_pid_params_t motor2_velocity;
 
-u8 TASK = 15, TASK_TEMP = 0, Do_count = 0;
+u8 TASK = 0, TASK_TEMP = 0, Do_count = 0;
 u8 finreset = 0;
 u16 PWMA = 0, PWMB = 0;
 u32 RED_XY[2] = {0}, RED_XY_TEMP[2] = {0};
@@ -25,24 +25,24 @@ float K0 = 0, B0 = 0, K1 = 0, B1 = 0, K2 = 0, B2 = 0, K3 = 0, B3 = 0;
 
 void Set_angle(u16 pwm1, u16 pwm2)
 {
-    // if (pwm1 < 500 - 1)
-    //     pwm1 = 500;
-    // if (pwm1 > 2500 - 1)
-    //     pwm1 = 2500;
-    // __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, pwm1); // PWMA
+    if (pwm1 < 500 - 1)
+        pwm1 = 500;
+    if (pwm1 > 2500 - 1)
+        pwm1 = 2500;
+    __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, pwm1); // PWMA
 
-    // if (pwm2 < 500 - 1)
-    //     pwm2 = 500;
-    // if (pwm2 > 2500 - 1)
-    //     pwm2 = 2500;
-    // __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, pwm2); // PWMA
+    if (pwm2 < 500 - 1)
+        pwm2 = 500;
+    if (pwm2 > 2500 - 1)
+        pwm2 = 2500;
+    __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, pwm2); // PWMA
 
-    if (pwm1 > 1000 - 1)
-        pwm1 = 1000;
-    if (pwm2 > 1000 - 1)
-        pwm2 = 1000;
-    LobotSerialServoMove(0, PWMA, 500);
-    LobotSerialServoMove(1, PWMB, 0);
+    // if (pwm1 > 1000 - 1)
+    //     pwm1 = 1000;
+    // if (pwm2 > 1000 - 1)
+    //     pwm2 = 1000;
+    // LobotSerialServoMove(0, PWMA, 500);
+    // LobotSerialServoMove(1, PWMB, 0);
 }
 
 // 从串口得到xy,返回0成功
@@ -56,6 +56,8 @@ u8 get_pi_xy(void)
         if (USART_RX_BUF_C[0] == '*' & USART_RX_BUF_C[i - 1] == '#') // 检验包头包尾
         {
             sscanf(USART_RX_BUF_C, "*%d %d,%d %d %d %d %d %d %d %d#", &RED_XY[0], &RED_XY[1], &HEIKUANG[0], &HEIKUANG[1], &HEIKUANG[2], &HEIKUANG[3], &HEIKUANG[4], &HEIKUANG[5], &HEIKUANG[6], &HEIKUANG[7]);
+            
+            
             // sscanf(USART_RX_BUF_C, "*%d %d,%d %d %d %d %d %d %d %d,%d %d %d %d %d %d %d %d#", &RED_XY[0], &RED_XY[1], &HEIKUANG_TEMP[0], &HEIKUANG_TEMP[1], &HEIKUANG_TEMP[2], &HEIKUANG_TEMP[3], &HEIKUANG_TEMP[4], &HEIKUANG_TEMP[5], &HEIKUANG_TEMP[6], &HEIKUANG_TEMP[7], &HEIKUANG_TEMP[8], &HEIKUANG_TEMP[9], &HEIKUANG_TEMP[10], &HEIKUANG_TEMP[11], &HEIKUANG_TEMP[12], &HEIKUANG_TEMP[13], &HEIKUANG_TEMP[14], &HEIKUANG_TEMP[15]);
             // u8 x = 0;
             // // 融合
@@ -270,86 +272,23 @@ void MAIN_TASK(void)
     {
         switch (Do_count)
         {
-        case 0: // 中上
-            control_red(1);
-            motor1_velocity.control = DISABLE;
-            motor2_velocity.control = DISABLE;
-            Set_angle(XSET, YSET - 105);
+        case 0: // 右上
+            Set_angle(XSET - 154, YSET + 135);
             if (time40sec(KAIDELAY))
                 Do_count++;
             break;
-        case 1:
-            Set_angle(XSET - 70, YSET - 100);
+        case 1: // 右下
+            Set_angle(XSET - 153, YSET - 144);
             if (time40sec(KAIDELAY))
                 Do_count++;
             break;
-        case 2: // 右上
-            Set_angle(XSET - 155, YSET - 75);
+        case 2: // 左下
+            Set_angle(XSET + 157, YSET - 145);
             if (time40sec(KAIDELAY))
                 Do_count++;
             break;
-        case 3:
-            Set_angle(XSET - 155, YSET - 35);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 4: // 右
-            Set_angle(XSET - 155, YSET + 15);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 5:
-            Set_angle(XSET - 155, YSET + 64);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 6: // 右下
-            Set_angle(XSET - 155, YSET + 115);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 7:
-            Set_angle(XSET - 110, YSET + 110);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 8: // 下
-            Set_angle(XSET - 25, YSET + 100);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 9:
-            Set_angle(XSET + 50, YSET + 90);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 10: // 左下
-            Set_angle(XSET + 135, YSET + 90);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 11:
-            Set_angle(XSET + 145, YSET + 50);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 12: // 左
-            Set_angle(XSET + 155, YSET);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 13:
-            Set_angle(XSET + 155, YSET - 55);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 14: // 左上
-            Set_angle(XSET + 150, YSET - 100);
-            if (time40sec(KAIDELAY))
-                Do_count++;
-            break;
-        case 15:
-            Set_angle(XSET + 100, YSET - 105);
+        case 3: // 左上
+            Set_angle(XSET + 159, YSET + 130);
             if (time40sec(KAIDELAY))
                 Do_count = 0;
             break;
@@ -467,10 +406,12 @@ u8 redJabsl(u16 x, u16 y, u16 l)
 void M1M2RESET(void)
 {
     static u8 keychangeflag = 0;
-    read_key_val();
-    TASK = key_val;
-    finreset = 0;
-    Do_count = 0;
+    if (read_key_val())
+    {
+        TASK = key_val;
+        finreset = 0;
+        Do_count = 0;
+    }
 
     // if (KEY0_READ())
     // {

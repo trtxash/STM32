@@ -1,6 +1,6 @@
 #include "key.h"
 
-u8 key_val = 15;
+u8 key_val = 0;
 
 // 按键初始化函数
 void KEY0_Init(void)
@@ -166,6 +166,8 @@ u8 read_key_val(void)
             key_val = key_val_temp;
             key_val_temp = 0;
             flag = 0;
+            return 1;
         }
     }
+    return 0;
 }

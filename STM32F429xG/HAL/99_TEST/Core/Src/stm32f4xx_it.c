@@ -338,6 +338,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         static u8 time_flag40ms = 0;
         float PWMA_TEMP, PWMB_TEMP = 0;
         time40flag = 1;
+
+        get_pi_xy();
         if (TASK == 0)
         {
             if (redJabsl(150, 150, 150)) // 在屏幕内
