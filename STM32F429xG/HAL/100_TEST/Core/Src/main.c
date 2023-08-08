@@ -37,7 +37,7 @@ int main(void)
     uart6_init(1384200); // 蓝牙
     LED_Init();
     KEY0_Init();
-    KEY1_Init();
+    KEY2_Init();
     MX_TIM5_Init((u16)(20000 - 1), (u16)(90 - 1)); // 定时器5初始化，周期20ms
     MX_TIM6_Init((u16)(20000 - 1), (u16)(90 - 1)); // 定时器6初始化，周期20ms
     MX_TIM7_Init((u16)(1000 - 1), (u16)(90 - 1));  // 定时器7初始化，周期1ms

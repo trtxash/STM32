@@ -166,5 +166,6 @@ void KEY1_Init(void);
 void KEY_4x4_Init_10(void);
 void KEY_4x4_Init_01(void);
 u8 read_key_val(void);
+void KEY2_Init(void);
 
 #endif

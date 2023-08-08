@@ -28,6 +28,19 @@ void KEY1_Init(void)
     HAL_GPIO_Init(KEY1_Port, &GPIO_Initure);
 }
 
+void KEY2_Init(void)
+{
+    GPIO_InitTypeDef GPIO_Initure = {0};
+
+    KEY0_Port_CLK_ENABLE();
+
+    GPIO_Initure.Mode = GPIO_MODE_INPUT; // 输入
+    GPIO_Initure.Pull = GPIO_PULLUP;     // 上拉
+    GPIO_Initure.Speed = GPIO_SPEED_LOW;
+    GPIO_Initure.Pin = KEY_4x4_8_PIN;
+    HAL_GPIO_Init(KEY_4x4_8_Port, &GPIO_Initure);
+}
+
 void KEY_4x4_Init_10(void)
 {
     GPIO_InitTypeDef GPIO_Initure = {0};

@@ -402,6 +402,7 @@ void MAIN_TASK(void)
             break;
         case 3:
             control_red(1);
+            Do_count++;
             break;
         default:
             break;
@@ -486,19 +487,34 @@ u8 redgreenJabsl(u16 x0, u16 y0, u16 x1, u16 y1, u16 l)
 void M1M2RESET(void)
 {
     static u8 keychangeflag = 0;
+
+    if (KEY0_READ())
+    {
+        if (TASK == 12)
+        {
+            TASK = 13;
+            Do_count = 4;
+        }
+        else
+        {
+            TASK = key_val = 12;
+            Do_count = 0;
+            positional_pid_set_value(&motor1_velocity, 0.1, 0.03, 0.0);
+            positional_pid_set_value(&motor2_velocity, 0.1, 0.03, 0.0);
+        }
+        delay_ms(100);
+    }
+    // if (KEY_4x4_8_READ() == 0)
+    // {
+    //     TASK = 13;
+    //     Do_count = 4;
+    // }
+
     // if (KEY0_READ() & TASK != 13)
     // {
     //     TASK = key_val = 13;
     //     Do_count = 0;
     // }
-
-    if (KEY0_READ() & TASK != 12)
-    {
-        TASK = key_val = 12;
-        Do_count = 0;
-        positional_pid_set_value(&motor1_velocity, 0.1, 0.03, 0.0);
-        positional_pid_set_value(&motor2_velocity, 0.1, 0.03, 0.0);
-    }
 
     // if (read_key_val())
     // {
