@@ -381,26 +381,25 @@ void MAIN_TASK(void)
         {
         case 0: // 复位
             control_red(0);
-            motor1_velocity.control = DISABLE;
-            motor2_velocity.control = DISABLE;
-            Set_angle(XSET - 20, YSET + 75);
-            if (time40sec(1))
-                Do_count++;
-        case 1:
-            motor1_velocity.control = ENABLE;
-            motor2_velocity.control = ENABLE;
-            Do_count++;
-            break;
-        case 2:
             if (redgreenJabsl(RED_XY[0], RED_XY[1], GREEN_XY[0], GREEN_XY[1], 600))
             {
-                if (RED_XY[0] != 0 & RED_XY[1] != 0 & GREEN_XY[0] != 0 & GREEN_XY[1] != 0)
-                {
-                    Do_count++;
-                }
+                positional_pid_set_value(&motor1_velocity, 0.1, 0.03, 0.0);
+                positional_pid_set_value(&motor2_velocity, 0.1, 0.03, 0.0);
+                Do_count++;
+            }
+            else
+            {
+                positional_pid_set_value(&motor1_velocity, 0.5, 0.08, 0.0);
+                positional_pid_set_value(&motor2_velocity, 0.5, 0.08, 0.0);
             }
             break;
-        case 3:
+        case 1:
+            if (RED_XY[0] != 0 & RED_XY[1] != 0 & GREEN_XY[0] != 0 & GREEN_XY[1] != 0)
+            {
+                Do_count++;
+            }
+            break;
+        case 2:
             control_red(1);
             Do_count++;
             break;
@@ -410,6 +409,15 @@ void MAIN_TASK(void)
     }
     else if (TASK == 13) // 急停
     {
+        if (RED_XY[0] == 0 & RED_XY[1] == 0 & GREEN_XY[0] == 0 & GREEN_XY[1] == 0)
+            control_red(1);
+        else
+        {
+            if (redgreenJabsl(RED_XY[0], RED_XY[1], GREEN_XY[0], GREEN_XY[1], 800)) // 关闭红色不叫
+                control_red(1);
+            else
+                control_red(0);
+        }
     }
     else if (TASK == 14) // 跟踪
     {
@@ -439,8 +447,6 @@ void MAIN_TASK(void)
         case 3:
             if (RED_XY[0] == 0 | RED_XY[1] == 0 | GREEN_XY[0] == 0 | GREEN_XY[1] == 0)
             {
-                motor1_velocity.control = DISABLE;
-                motor2_velocity.control = DISABLE;
                 control_red(1);
                 finreset = 1;
                 TASK = 13;
