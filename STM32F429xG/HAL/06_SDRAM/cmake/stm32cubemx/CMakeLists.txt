@@ -30,9 +30,6 @@ target_sources(stm32cubemx INTERFACE
     ../../startup_stm32f429xx.s
     ../../Core/Src/main.c
     ../../Core/Src/gpio.c
-    ../../Core/Src/dma.c
-    ../../Core/Src/spi.c
-    ../../Core/Src/tim.c
     ../../Core/Src/stm32f4xx_it.c
     ../../Core/Src/stm32f4xx_hal_msp.c
     ../../Core/Src/system_stm32f4xx.c
@@ -55,22 +52,6 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
     ../../User/Src/sys.c
-    ../../User/Src/delay.c
-    ../../User/Src/usart.c
-    ../../User/Src/control.c
-    ../../User/Src/positional_pid.c
-    ../../User/Src/filter.c
-    ../../RTT/SEGGER_RTT_printf.c
-    ../../RTT/SEGGER_RTT.c
-    ../../AnoPTv8/Src/AnoPTv8DataDef.c
-    ../../AnoPTv8/Src/AnoPTv8FrameFactory.c
-    ../../AnoPTv8/Src/AnoPTv8Run.c
-    ../../AnoPTv8/Src/hardwareInterface.c
-    ../../Hardware/LED/Src/led.c
-    ../../Hardware/Key/Src/key.c
-    ../../Hardware/OLED/Src/oled.c
-    ../../Hardware/OLED/Src/oledio.c
-    ../../Hardware/LobotSerialServo/Src/LobotSerialServo.c
 )
 
 target_link_directories(stm32cubemx INTERFACE

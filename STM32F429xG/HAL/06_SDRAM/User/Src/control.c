@@ -36,13 +36,6 @@ void Set_angle(u16 pwm1, u16 pwm2)
     if (pwm2 > 2500 - 1)
         pwm2 = 2500;
     __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, pwm2); // PWMA
-
-    // if (pwm1 > 1000 - 1)
-    //     pwm1 = 1000;
-    // if (pwm2 > 1000 - 1)
-    //     pwm2 = 1000;
-    // LobotSerialServoMove(0, PWMA, 500);
-    // LobotSerialServoMove(1, PWMB, 0);
 }
 
 // 从串口得到xy,返回0成功

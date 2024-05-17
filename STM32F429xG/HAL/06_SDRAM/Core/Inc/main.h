@@ -28,25 +28,24 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "control.h"
-#include "delay.h"
-#include "filter.h"
-#include "stdio.h"
+// #include "control.h"
+// #include "delay.h"
+// #include "filter.h"
+// #include "stdio.h"
 #include "stm32f4xx_hal.h"
 #include "sys.h"
 
-#include "AnoPTv8.h"
-#include "AnoPTv8Run.h"
+// #include "AnoPTv8.h"
+// #include "AnoPTv8Run.h"
 
-#include "dma.h"
-#include "positional_pid.h"
-#include "spi.h"
-#include "tim.h"
+// #include "dma.h"
+// #include "positional_pid.h"
+// #include "spi.h"
+// #include "tim.h"
 
-#include "LobotSerialServo.h"
-#include "key.h"
-#include "led.h"
-#include "oled.h"
+// #include "key.h"
+// #include "led.h"
+// #include "oled.h"
     /* Private includes ----------------------------------------------------------*/
     /* USER CODE BEGIN Includes */
 
