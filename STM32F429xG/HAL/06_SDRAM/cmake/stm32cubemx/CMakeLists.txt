@@ -13,26 +13,20 @@ target_compile_definitions(stm32cubemx INTERFACE
 )
 
 target_include_directories(stm32cubemx INTERFACE
-    ../../Core/Inc
+    ../../BSP/BSP_Core/Inc
+    ../../BSP/BSP_User/Inc
     ../../Drivers/STM32F4xx_HAL_Driver/Inc
     ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
     ../../Drivers/CMSIS/Device/ST/STM32F4xx/Include
     ../../Drivers/CMSIS/Include
-    ../../User/Inc
-    ../../AnoPTv8/Inc
-    ../../RTT
-    ../../Hardware/LED/Inc
-    ../../Hardware/Key/Inc
-    ../../Hardware/OLED/Inc
 )
 
 target_sources(stm32cubemx INTERFACE
     ../../startup_stm32f429xx.s
-    ../../Core/Src/main.c
-    ../../Core/Src/gpio.c
-    ../../Core/Src/stm32f4xx_it.c
-    ../../Core/Src/stm32f4xx_hal_msp.c
-    ../../Core/Src/system_stm32f4xx.c
+    ../../BSP/BSP_User/Src/main.c
+    ../../BSP/BSP_User/Src/stm32f4xx_it.c
+    ../../BSP/BSP_User/Src/stm32f4xx_hal_msp.c
+    ../../BSP/BSP_User/Src/system_stm32f4xx.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
@@ -51,7 +45,7 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
-    ../../User/Src/sys.c
+    ../../BSP/BSP_User/Src/sys.c
 )
 
 target_link_directories(stm32cubemx INTERFACE

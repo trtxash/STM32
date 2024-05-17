@@ -3,14 +3,12 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
-        {
-            "label": "build",
-            "type": "shell",
-            "command": "mingw32-make",
-            "args": [
-                "-j6"
-            ]
-        },
+        // {
+        //     "label": "build",
+        //     "type": "shell",
+        //     "command": "cmake",
+        //     "args": []
+        // },
         {
             "label": "clean",
             "type": "shell",
