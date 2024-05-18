@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "stm32",
+            "includePath": [
+                "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/lib/gcc/arm-none-eabi/13.2.1/include",
+                "${workspaceFolder}/BSP/BSP_User/Inc",
+                "${workspaceFolder}/BSP/BSP_Core/Inc",
+                "${workspaceFolder}/Drivers/STM32F4xx_HAL_Driver/Inc",
+                "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
+                "${workspaceFolder}/Drivers/CMSIS/Include",
+                "${workspaceFolder}/Drivers_Hardware/**/Inc",
+                "${workspaceFolder}/FreeRTOS/Inc",
+                "${workspaceFolder}/FreeRTOS/portable/Inc",
+                "${workspaceFolder}APP/**/**/Inc",
+                "${workspaceFolder}/**",
+            ],
+            "defines": [
+                "USE_HAL_DRIVER",
+                "STM32F429xx"
+            ],
+            "compilerPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/bin/arm-none-eabi-gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "windows-gcc-arm"
+        }
+    ],
+    "version": 4
+}
