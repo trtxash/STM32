@@ -62,7 +62,7 @@ extern volatile unsigned long long FreeRTOSRunTimeTicks;
 #define configTOTAL_HEAP_SIZE ((size_t)(75 * 1024))   // 设置堆大小，然后使用了动态内存管理，FreeRTOS会使用heapX.c中的内存申请函数来申请内存，这些内存时从堆ucHeap[configTOTAL_HEAP_SIZE]中申请的，堆的大小由这项来定义
 #define configMAX_TASK_NAME_LEN (10)                  // 设置任务名最大长度
 #define configUSE_TRACE_FACILITY 1                    // 为1启用可视化跟踪调试，会增加一些结构体成员和API函数
-#define configUSE_16_BIT_TICKS 0                      // 系统节拍计数器变量数据类型，0为TickType_t为32位，1为16位
+#define configUSE_16_BIT_TICKS 0                      // 来设置事件标志的位数，0为32位，1为16位
 #define configIDLE_SHOULD_YIELD 1                     // 定义了与空闲任务(idle Task)处于同等优先级的其他用户任务行为，为1可以让出cpu使用权，减少空闲任务时间，但有副作用
 #define configUSE_MUTEXES 1                           // 为1使用互斥信号量，相关API函数会被编译
 #define configQUEUE_REGISTRY_SIZE 8                   // 设置可以注册的队列和信号量的最大数量，使用内核调试器查看信号量和队列要设置，而且要先将消息队列和信号量进行注册
