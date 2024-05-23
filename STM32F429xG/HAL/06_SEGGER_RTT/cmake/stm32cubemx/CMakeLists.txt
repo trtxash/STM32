@@ -23,7 +23,6 @@ target_include_directories(stm32cubemx INTERFACE
 )
 
 target_sources(stm32cubemx INTERFACE
-    ../../startup_stm32f429xx.s
     ../../BSP/BSP_User/Src/main.c
     ../../BSP/BSP_User/Src/stm32f4xx_it.c
     ../../BSP/BSP_User/Src/stm32f4xx_hal_msp.c
@@ -50,6 +49,7 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/bsp_app.c
     ../../Drivers_Hardware/LED/Src/led.c
+    ../../startup_stm32f429xx.s
 )
 
 target_link_directories(stm32cubemx INTERFACE
