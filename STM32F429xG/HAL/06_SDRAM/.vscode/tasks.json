@@ -3,12 +3,12 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
-        // {
-        //     "label": "build",
-        //     "type": "shell",
-        //     "command": "cmake",
-        //     "args": []
-        // },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "mingw32-make",
+            "args": []
+        },
         {
             "label": "clean",
             "type": "shell",
@@ -23,6 +23,18 @@
             "type": "shell",
             "command": "JLinkRTTClient",
             "args": []
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: 生成",
+            "command": "build",
+            "targets": [
+                "template"
+            ],
+            "preset": "${command:cmake.activeBuildPresetName}",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "CMake 模板 生成 任务"
         }
     ]
 }
