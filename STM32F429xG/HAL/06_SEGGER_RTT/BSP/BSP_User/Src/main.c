@@ -1,5 +1,5 @@
 /**
- * @file	06_SDRAM
+ * @file	06_SEGGER_RTT
  * @brief
  * @author 	TRTX-gamer
  * @version 1.00
