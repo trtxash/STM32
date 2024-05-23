@@ -32,7 +32,7 @@ int main(void)
         static uint32_t i = 0;
         LED0_Reverse();
         // LOGE("ERR");
-        // LOGI("Inf");
+        LOGI("Inf");
         // LOGW("WAR");
         SEGGER_RTT_printf(0, "%shelow:%u\r\n%s", RTT_CTRL_TEXT_BRIGHT_BLUE, i, RTT_CTRL_RESET);
         SEGGER_RTT_printf(0, "%shelow:%u\r\n%s", RTT_CTRL_TEXT_BRIGHT_RED, i, RTT_CTRL_RESET);
