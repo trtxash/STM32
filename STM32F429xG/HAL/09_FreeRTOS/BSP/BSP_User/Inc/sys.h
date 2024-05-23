@@ -2,16 +2,17 @@
 #define _SYS_H
 #include "stm32f4xx.h"
 
-// 0,不支持os
-// 1,支持os
-#define SYSTEM_SUPPORT_OS 0 //定义系统文件夹是否支持OS
+// 宏设置部分
+#define SYSTEM_SUPPORT_OS 1 // 定义系统文件夹是否支持OS,1,支持os,0,不支持os
+#define DEBUG_FLAG 1
+#define LOG_TYPE 1 // 0为printf，1为segeerrtt
 
 #if SYSTEM_SUPPORT_OS
 #include "FreeRTOS.h" //os 使用
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////
-//定义一些常用的数据类型短关键字
+// 定义一些常用的数据类型短关键字
 typedef int32_t s32;
 typedef int16_t s16;
 typedef int8_t s8;
@@ -44,9 +45,9 @@ typedef __I uint32_t vuc32;
 typedef __I uint16_t vuc16;
 typedef __I uint8_t vuc8;
 
-//位带操作,实现51类似的GPIO控制功能
-//具体实现思想,参考<<CM3权威指南>>第五章(87页~92页).M4同M3类似,只是寄存器地址变了.
-// IO口操作宏定义
+// 位带操作,实现51类似的GPIO控制功能
+// 具体实现思想,参考<<CM3权威指南>>第五章(87页~92页).M4同M3类似,只是寄存器地址变了.
+//  IO口操作宏定义
 #define BITBAND(addr, bitnum) ((addr & 0xF0000000) + 0x2000000 + ((addr & 0xFFFFF) << 5) + (bitnum << 2))
 #define MEM_ADDR(addr) *((volatile unsigned long *)(addr))
 #define BIT_ADDR(addr, bitnum) MEM_ADDR(BITBAND(addr, bitnum))
@@ -76,47 +77,47 @@ typedef __I uint8_t vuc8;
 #define GPIOK_IDR_Addr (GPIOK_BASE + 16) // 0x40022810
 
 // IO口操作,只对单一的IO口!
-//确保n的值小于16!
-#define PAout(n) BIT_ADDR(GPIOA_ODR_Addr, n) //输出
-#define PAin(n) BIT_ADDR(GPIOA_IDR_Addr, n)  //输入
+// 确保n的值小于16!
+#define PAout(n) BIT_ADDR(GPIOA_ODR_Addr, n) // 输出
+#define PAin(n) BIT_ADDR(GPIOA_IDR_Addr, n)  // 输入
 
-#define PBout(n) BIT_ADDR(GPIOB_ODR_Addr, n) //输出
-#define PBin(n) BIT_ADDR(GPIOB_IDR_Addr, n)  //输入
+#define PBout(n) BIT_ADDR(GPIOB_ODR_Addr, n) // 输出
+#define PBin(n) BIT_ADDR(GPIOB_IDR_Addr, n)  // 输入
 
-#define PCout(n) BIT_ADDR(GPIOC_ODR_Addr, n) //输出
-#define PCin(n) BIT_ADDR(GPIOC_IDR_Addr, n)  //输入
+#define PCout(n) BIT_ADDR(GPIOC_ODR_Addr, n) // 输出
+#define PCin(n) BIT_ADDR(GPIOC_IDR_Addr, n)  // 输入
 
-#define PDout(n) BIT_ADDR(GPIOD_ODR_Addr, n) //输出
-#define PDin(n) BIT_ADDR(GPIOD_IDR_Addr, n)  //输入
+#define PDout(n) BIT_ADDR(GPIOD_ODR_Addr, n) // 输出
+#define PDin(n) BIT_ADDR(GPIOD_IDR_Addr, n)  // 输入
 
-#define PEout(n) BIT_ADDR(GPIOE_ODR_Addr, n) //输出
-#define PEin(n) BIT_ADDR(GPIOE_IDR_Addr, n)  //输入
+#define PEout(n) BIT_ADDR(GPIOE_ODR_Addr, n) // 输出
+#define PEin(n) BIT_ADDR(GPIOE_IDR_Addr, n)  // 输入
 
-#define PFout(n) BIT_ADDR(GPIOF_ODR_Addr, n) //输出
-#define PFin(n) BIT_ADDR(GPIOF_IDR_Addr, n)  //输入
+#define PFout(n) BIT_ADDR(GPIOF_ODR_Addr, n) // 输出
+#define PFin(n) BIT_ADDR(GPIOF_IDR_Addr, n)  // 输入
 
-#define PGout(n) BIT_ADDR(GPIOG_ODR_Addr, n) //输出
-#define PGin(n) BIT_ADDR(GPIOG_IDR_Addr, n)  //输入
+#define PGout(n) BIT_ADDR(GPIOG_ODR_Addr, n) // 输出
+#define PGin(n) BIT_ADDR(GPIOG_IDR_Addr, n)  // 输入
 
-#define PHout(n) BIT_ADDR(GPIOH_ODR_Addr, n) //输出
-#define PHin(n) BIT_ADDR(GPIOH_IDR_Addr, n)  //输入
+#define PHout(n) BIT_ADDR(GPIOH_ODR_Addr, n) // 输出
+#define PHin(n) BIT_ADDR(GPIOH_IDR_Addr, n)  // 输入
 
-#define PIout(n) BIT_ADDR(GPIOI_ODR_Addr, n) //输出
-#define PIin(n) BIT_ADDR(GPIOI_IDR_Addr, n)  //输入
+#define PIout(n) BIT_ADDR(GPIOI_ODR_Addr, n) // 输出
+#define PIin(n) BIT_ADDR(GPIOI_IDR_Addr, n)  // 输入
 
-#define PJout(n) BIT_ADDR(GPIOJ_ODR_Addr, n) //输出
-#define PJin(n) BIT_ADDR(GPIOJ_IDR_Addr, n)  //输入
+#define PJout(n) BIT_ADDR(GPIOJ_ODR_Addr, n) // 输出
+#define PJin(n) BIT_ADDR(GPIOJ_IDR_Addr, n)  // 输入
 
-#define PKout(n) BIT_ADDR(GPIOK_ODR_Addr, n) //输出
-#define PKin(n) BIT_ADDR(GPIOK_IDR_Addr, n)  //输入
+#define PKout(n) BIT_ADDR(GPIOK_ODR_Addr, n) // 输出
+#define PKin(n) BIT_ADDR(GPIOK_IDR_Addr, n)  // 输入
 
 #define PI 3.141592653589793238 // PI圆周率
 
-void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq); //时钟系统配置
+void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq); // 时钟系统配置
 void Error_Handler(void);                                      // 异常处理函数
-//以下为汇编函数
-void WFI_SET(void);      //执行WFI指令
-void INTX_DISABLE(void); //关闭所有中断
-void INTX_ENABLE(void);  //开启所有中断
-void MSR_MSP(u32 addr);  //设置堆栈地址
+// 以下为汇编函数
+// void WFI_SET(void);      // 执行WFI指令
+// void INTX_DISABLE(void); // 关闭所有中断
+// void INTX_ENABLE(void);  // 开启所有中断
+// void MSR_MSP(u32 addr);  // 设置堆栈地址
 #endif

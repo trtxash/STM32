@@ -4,6 +4,7 @@
 #include "delay.h"
 #include "log_rtt.h"
 #include "sys.h"
+#include "tim.h"
 
 #include "led.h"
 

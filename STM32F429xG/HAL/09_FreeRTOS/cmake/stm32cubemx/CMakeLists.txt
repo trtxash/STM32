@@ -13,12 +13,14 @@ target_compile_definitions(stm32cubemx INTERFACE
 )
 
 target_include_directories(stm32cubemx INTERFACE
-    ../../BSP/BSP_Core/Inc
     ../../BSP/BSP_User/Inc
+    ../../BSP/BSP_Core/Inc
     ../../Drivers/STM32F4xx_HAL_Driver/Inc
     ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
     ../../Drivers/CMSIS/Device/ST/STM32F4xx/Include
     ../../Drivers/CMSIS/Include
+    ../../FreeRTOS/Inc
+    ../../FreeRTOS/portable/GCC/ARM_CM4F
     ../../APP/Debug_Linker/RTT/Inc
     ../../Drivers_Hardware/LED/Inc
 )
@@ -46,9 +48,17 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
+    ../../FreeRTOS/Src/tasks.c
+    ../../FreeRTOS/Src/list.c
+    ../../FreeRTOS/Src/timers.c
+    ../../FreeRTOS/Src/queue.c
+    ../../FreeRTOS/portable/GCC/ARM_CM4F/port.c
+    ../../FreeRTOS/portable/MemMang/heap_4.c
     ../../BSP/BSP_User/Src/sys.c
     ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/bsp_app.c
+    ../../BSP/BSP_User/Src/bsp_freertos.c
+    ../../BSP/BSP_Core/Src/tim.c
     ../../Drivers_Hardware/LED/Src/led.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c

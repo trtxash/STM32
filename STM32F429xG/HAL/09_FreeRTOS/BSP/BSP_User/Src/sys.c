@@ -56,11 +56,11 @@ void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq)
         Error_Handler();
     }
 
-    // // STM32F405x/407x/415x/417x Z版本的器件支持预取功能
-    // if (HAL_GetREVID() == 0x1001)
-    // {
-    //     __HAL_FLASH_PREFETCH_BUFFER_ENABLE(); // 使能flash预取
-    // }
+    // STM32F405x/407x/415x/417x Z版本的器件支持预取功能
+    if (HAL_GetREVID() == 0x1001)
+    {
+        __HAL_FLASH_PREFETCH_BUFFER_ENABLE(); // 使能flash预取
+    }
 }
 
 /**
