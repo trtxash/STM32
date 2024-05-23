@@ -19,6 +19,7 @@ target_include_directories(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
     ../../Drivers/CMSIS/Device/ST/STM32F4xx/Include
     ../../Drivers/CMSIS/Include
+    ../../APP/Debug_Linker/RTT/Inc
     ../../Drivers_Hardware/LED/Inc
 )
 
@@ -49,6 +50,9 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/bsp_app.c
     ../../Drivers_Hardware/LED/Src/led.c
+    ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT.c
+    ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c
+    ../../APP/Debug_Linker/RTT/SEGGER_RTT_ASM_ARMv7M.S
     ../../startup_stm32f429xx.s
 )
 

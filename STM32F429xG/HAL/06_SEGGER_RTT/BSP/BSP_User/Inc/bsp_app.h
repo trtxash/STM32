@@ -2,10 +2,11 @@
 #define _BSP_APP_H
 
 #include "delay.h"
+#include "log_rtt.h"
 #include "sys.h"
 
 #include "led.h"
 
-extern void bsp_init(void);
+void bsp_init(void);
 
 #endif
