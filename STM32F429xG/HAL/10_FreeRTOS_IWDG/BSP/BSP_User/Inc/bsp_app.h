@@ -2,9 +2,12 @@
 #define _BSP_APP_H
 
 #include "delay.h"
-#include "log_rtt.h"
 #include "sys.h"
+
+#include "iwdg.h"
+#include "log_rtt.h"
 #include "tim.h"
+#include "wwdg.h"
 
 #include "led.h"
 
