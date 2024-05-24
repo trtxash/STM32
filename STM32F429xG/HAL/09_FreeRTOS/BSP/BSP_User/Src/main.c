@@ -7,8 +7,6 @@
  */
 #include "main.h"
 
-#define SYS_CLOCK 180 // 系统主频
-
 /**
  * @brief	对函数简要描述
  * @param 	参数说明，以’:’作为参数结束标志；
