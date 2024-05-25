@@ -16,12 +16,12 @@
  */
 int main(void)
 {
-    if (HAL_Init()) // 初始化HAL库
-    {
-        Error_Handler();
-    }
-    Stm32_Clock_Init(SYS_CLOCK, 12, RCC_PLLP_DIV2, 8); // 设置时钟
-    delay_init(SYS_CLOCK);                             // 延时初始化
-    bsp_init();                                        // 板级初始化
-    freertos_main();                                   // 进入os
+  if (HAL_Init()) // 初始化HAL库
+  {
+    Error_Handler();
+  }
+  Stm32_Clock_Init(SYS_CLOCK, 12, RCC_PLLP_DIV2, 8); // 设置时钟
+  delay_init(SYS_CLOCK);                             // 延时初始化
+  bsp_init();                                        // 板级初始化
+  freertos_main();                                   // 进入os
 }

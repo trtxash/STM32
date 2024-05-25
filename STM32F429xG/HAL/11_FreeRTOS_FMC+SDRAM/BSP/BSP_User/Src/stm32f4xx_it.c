@@ -9,10 +9,10 @@
  */
 void NMI_Handler(void)
 {
-    while (1)
-    {
-    }
-    /* USER CODE END NonMaskableInt_IRQn 1 */
+  while (1)
+  {
+  }
+  /* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
 /**
@@ -20,9 +20,9 @@ void NMI_Handler(void)
  */
 void HardFault_Handler(void)
 {
-    while (1)
-    {
-    }
+  while (1)
+  {
+  }
 }
 
 /**
@@ -30,9 +30,9 @@ void HardFault_Handler(void)
  */
 void MemManage_Handler(void)
 {
-    while (1)
-    {
-    }
+  while (1)
+  {
+  }
 }
 
 /**
@@ -40,9 +40,9 @@ void MemManage_Handler(void)
  */
 void BusFault_Handler(void)
 {
-    while (1)
-    {
-    }
+  while (1)
+  {
+  }
 }
 
 /**
@@ -50,9 +50,9 @@ void BusFault_Handler(void)
  */
 void UsageFault_Handler(void)
 {
-    while (1)
-    {
-    }
+  while (1)
+  {
+  }
 }
 
 /**
@@ -81,7 +81,7 @@ __weak void PendSV_Handler(void)
  */
 __weak void SysTick_Handler(void)
 {
-    HAL_IncTick();
+  HAL_IncTick();
 }
 
 /******************************************************************************/
@@ -92,33 +92,33 @@ __weak void SysTick_Handler(void)
 /******************************************************************************/
 
 // 窗口看门狗中断服务函数
-void WWDG_IRQHandler(void)
+void WWDG_IQHandler(void)
 {
-    HAL_WWDG_IRQHandler(&hwwdg);
+  // HAL_WWDG_IRQHandler(&hwwdg);
 }
 
 // 中断服务函数处理过程,此函数会被HAL_WWDG_IRQHandler()调用
 void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
 {
-    static volatile long long FreeRTOSRunTimeTicksold = 0;
-    HAL_WWDG_Refresh(hwwdg); // 更新窗口看门狗值
-    LED1_Reverse();
-    LOGI("WWDG_tim=%u", (uint32_t)((uint32_t)(FreeRTOSRunTimeTicks - FreeRTOSRunTimeTicksold) * 50));
-    FreeRTOSRunTimeTicksold = FreeRTOSRunTimeTicks;
+  // static volatile long long FreeRTOSRunTimeTicksold = 0;
+  // HAL_WWDG_Refresh(hwwdg); // 更新窗口看门狗值
+  // LED1_Reverse();
+  // LOGI("WWDG_tim=%u", (uint32_t)((uint32_t)(FreeRTOSRunTimeTicks - FreeRTOSRunTimeTicksold) * 50));
+  // FreeRTOSRunTimeTicksold = FreeRTOSRunTimeTicks;
 }
 
 void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
-    HAL_TIM_IRQHandler(&htim14);
+  HAL_TIM_IRQHandler(&htim14);
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    if (htim == (&htim14))
-    {
-        if (FreeRTOSRunTimeTicks == 0XFFFFFFFFFFFFFFFF)
-            FreeRTOSRunTimeTicks = 0;
-        else
-            FreeRTOSRunTimeTicks++;
-    }
+  if (htim == (&htim14))
+  {
+    if (FreeRTOSRunTimeTicks == 0XFFFFFFFFFFFFFFFF)
+      FreeRTOSRunTimeTicks = 0;
+    else
+      FreeRTOSRunTimeTicks++;
+  }
 }

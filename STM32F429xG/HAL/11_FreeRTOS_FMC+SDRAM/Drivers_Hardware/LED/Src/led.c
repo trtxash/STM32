@@ -9,10 +9,10 @@
  */
 void LED_Init(void)
 {
-    LED0_Init();
-    LED1_Init();
-    LED2_Init();
-    LED3_Init();
+  LED0_Init();
+  LED1_Init();
+  LED2_Init();
+  LED3_Init();
 }
 
 /**
@@ -24,19 +24,19 @@ void LED_Init(void)
  */
 void LED0_Init(void)
 {
-    GPIO_InitTypeDef GPIO_InitTure = {0};
+  GPIO_InitTypeDef GPIO_InitTure = {0};
 
-    LED0_GPIO_CLK_ENABLE(); // 开启GPIO时钟
-    /*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
+  LED0_GPIO_CLK_ENABLE(); // 开启GPIO时钟
+  /*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
 
-    /*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
-    GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;     // 推挽输出
-    GPIO_InitTure.Pull = GPIO_PULLUP;             // 上拉
-    GPIO_InitTure.Speed = GPIO_SPEED_FREQ_MEDIUM; // 高速
-    GPIO_InitTure.Pin = LED0_PIN;                 // 设置GPIOx的5口
-    HAL_GPIO_Init(LED0_GPIO, &GPIO_InitTure);     // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
+  /*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
+  GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;     // 推挽输出
+  GPIO_InitTure.Pull = GPIO_PULLUP;             // 上拉
+  GPIO_InitTure.Speed = GPIO_SPEED_FREQ_MEDIUM; // 高速
+  GPIO_InitTure.Pin = LED0_PIN;                 // 设置GPIOx的5口
+  HAL_GPIO_Init(LED0_GPIO, &GPIO_InitTure);     // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
 
-    HAL_GPIO_WritePin(LED0_GPIO, LED0_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
+  HAL_GPIO_WritePin(LED0_GPIO, LED0_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
 }
 
 /**
@@ -48,17 +48,17 @@ void LED0_Init(void)
  */
 void LED1_Init(void)
 {
-    GPIO_InitTypeDef GPIO_InitTure = {0};
+  GPIO_InitTypeDef GPIO_InitTure = {0};
 
-    LED1_GPIO_CLK_ENABLE();
+  LED1_GPIO_CLK_ENABLE();
 
-    GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;     // 推挽输出
-    GPIO_InitTure.Pull = GPIO_PULLUP;             // 上拉
-    GPIO_InitTure.Speed = GPIO_SPEED_FREQ_MEDIUM; // 高速
-    GPIO_InitTure.Pin = LED1_PIN;                 // 设置GPIOx的5口
-    HAL_GPIO_Init(LED1_GPIO, &GPIO_InitTure);     // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
+  GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;     // 推挽输出
+  GPIO_InitTure.Pull = GPIO_PULLUP;             // 上拉
+  GPIO_InitTure.Speed = GPIO_SPEED_FREQ_MEDIUM; // 高速
+  GPIO_InitTure.Pin = LED1_PIN;                 // 设置GPIOx的5口
+  HAL_GPIO_Init(LED1_GPIO, &GPIO_InitTure);     // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
 
-    HAL_GPIO_WritePin(LED1_GPIO, LED1_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
+  HAL_GPIO_WritePin(LED1_GPIO, LED1_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
 }
 
 /**
@@ -70,19 +70,19 @@ void LED1_Init(void)
  */
 void LED2_Init(void)
 {
-    GPIO_InitTypeDef GPIO_InitTure = {0};
+  GPIO_InitTypeDef GPIO_InitTure = {0};
 
-    LED2_GPIO_CLK_ENABLE(); // 开启GPIO时钟
-    /*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
+  LED2_GPIO_CLK_ENABLE(); // 开启GPIO时钟
+  /*ARM的芯片都是这样，外设通常都是给了时钟后，才能设置它的寄存器,这么做的目的是为了省电，使用了所谓时钟门控的技术。*/
 
-    /*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
-    GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;     // 推挽输出
-    GPIO_InitTure.Pull = GPIO_PULLUP;             // 上拉
-    GPIO_InitTure.Speed = GPIO_SPEED_FREQ_MEDIUM; // 高速
-    GPIO_InitTure.Pin = LED2_PIN;                 // 设置GPIOx的5口
-    HAL_GPIO_Init(LED2_GPIO, &GPIO_InitTure);     // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
+  /*进行结构体内的参数配置，先找到下面HAL_GPIO_Init();的定义处，再对定义处的函数详细找参数*/
+  GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;     // 推挽输出
+  GPIO_InitTure.Pull = GPIO_PULLUP;             // 上拉
+  GPIO_InitTure.Speed = GPIO_SPEED_FREQ_MEDIUM; // 高速
+  GPIO_InitTure.Pin = LED2_PIN;                 // 设置GPIOx的5口
+  HAL_GPIO_Init(LED2_GPIO, &GPIO_InitTure);     // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
 
-    HAL_GPIO_WritePin(LED2_GPIO, LED2_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
+  HAL_GPIO_WritePin(LED2_GPIO, LED2_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
 }
 
 /**
@@ -94,17 +94,17 @@ void LED2_Init(void)
  */
 void LED3_Init(void)
 {
-    GPIO_InitTypeDef GPIO_InitTure = {0};
+  GPIO_InitTypeDef GPIO_InitTure = {0};
 
-    LED3_GPIO_CLK_ENABLE();
+  LED3_GPIO_CLK_ENABLE();
 
-    GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;     // 推挽输出
-    GPIO_InitTure.Pull = GPIO_PULLUP;             // 上拉
-    GPIO_InitTure.Speed = GPIO_SPEED_FREQ_MEDIUM; // 高速
-    GPIO_InitTure.Pin = LED3_PIN;                 // 设置GPIOx的5口
-    HAL_GPIO_Init(LED3_GPIO, &GPIO_InitTure);     // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
+  GPIO_InitTure.Mode = GPIO_MODE_OUTPUT_PP;     // 推挽输出
+  GPIO_InitTure.Pull = GPIO_PULLUP;             // 上拉
+  GPIO_InitTure.Speed = GPIO_SPEED_FREQ_MEDIUM; // 高速
+  GPIO_InitTure.Pin = LED3_PIN;                 // 设置GPIOx的5口
+  HAL_GPIO_Init(LED3_GPIO, &GPIO_InitTure);     // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
 
-    HAL_GPIO_WritePin(LED3_GPIO, LED3_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
+  HAL_GPIO_WritePin(LED3_GPIO, LED3_PIN, GPIO_PIN_SET); // PB5置1，默认初始化后灯灭
 }
 
 /**
@@ -116,12 +116,12 @@ void LED3_Init(void)
  */
 void LED0_Reverse(void)
 {
-    static u8 i = 0;
-    if (i)
-        LED0_Clr();
-    else
-        LED0_Set();
-    i = !i;
+  static u8 i = 0;
+  if (i)
+    LED0_Clr();
+  else
+    LED0_Set();
+  i = !i;
 }
 
 /**
@@ -133,12 +133,12 @@ void LED0_Reverse(void)
  */
 void LED1_Reverse(void)
 {
-    static u8 i = 0;
-    if (i)
-        LED1_Clr();
-    else
-        LED1_Set();
-    i = !i;
+  static u8 i = 0;
+  if (i)
+    LED1_Clr();
+  else
+    LED1_Set();
+  i = !i;
 }
 
 /**
@@ -150,12 +150,12 @@ void LED1_Reverse(void)
  */
 void LED2_Reverse(void)
 {
-    static u8 i = 0;
-    if (i)
-        LED2_Clr();
-    else
-        LED2_Set();
-    i = !i;
+  static u8 i = 0;
+  if (i)
+    LED2_Clr();
+  else
+    LED2_Set();
+  i = !i;
 }
 
 /**
@@ -167,10 +167,10 @@ void LED2_Reverse(void)
  */
 void LED3_Reverse(void)
 {
-    static u8 i = 0;
-    if (i)
-        LED3_Clr();
-    else
-        LED3_Set();
-    i = !i;
+  static u8 i = 0;
+  if (i)
+    LED3_Clr();
+  else
+    LED3_Set();
+  i = !i;
 }
