@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "bsp_app.h": "c",
-        "bsp_freertos.h": "c"
-    }
-}
