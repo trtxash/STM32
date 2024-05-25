@@ -34,10 +34,8 @@ void start_task()
                 (void *)NULL,
                 (UBaseType_t)TEST_TASK_PRIO,
                 (TaskHandle_t *)&TESTTask_Handler);
-    vTaskDelete(StartTask_Handler);            // 删除开始任务
-    __HAL_IWDG_START(&hiwdg);                  // 开启独立看门狗
-    __HAL_WWDG_ENABLE_IT(&hwwdg, WWDG_IT_EWI); // 开启窗口看门狗
-    taskEXIT_CRITICAL();                       // 退出临界区
+    vTaskDelete(StartTask_Handler); // 删除开始任务
+    taskEXIT_CRITICAL();            // 退出临界区
 }
 
 // 测试任务函数
@@ -47,7 +45,6 @@ void test_task()
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        IWDG_Feed();
         LED0_Reverse();
         vTaskDelayUntil(&xLastWakeTime, 500);
     }
