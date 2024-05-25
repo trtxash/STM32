@@ -92,20 +92,20 @@ __weak void SysTick_Handler(void)
 /******************************************************************************/
 
 // 窗口看门狗中断服务函数
-void WWDG_IQHandler(void)
-{
-  // HAL_WWDG_IRQHandler(&hwwdg);
-}
+// void WWDG_IQHandler(void)
+// {
+//   HAL_WWDG_IRQHandler(&hwwdg);
+// }
 
 // 中断服务函数处理过程,此函数会被HAL_WWDG_IRQHandler()调用
-void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
-{
-  // static volatile long long FreeRTOSRunTimeTicksold = 0;
-  // HAL_WWDG_Refresh(hwwdg); // 更新窗口看门狗值
-  // LED1_Reverse();
-  // LOGI("WWDG_tim=%u", (uint32_t)((uint32_t)(FreeRTOSRunTimeTicks - FreeRTOSRunTimeTicksold) * 50));
-  // FreeRTOSRunTimeTicksold = FreeRTOSRunTimeTicks;
-}
+// void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
+// {
+//   static uint32_t FreeRTOSRunTimeTicksold = 0;
+//   HAL_WWDG_Refresh(hwwdg); // 更新窗口看门狗值
+//   LED1_Reverse();
+//   LOGI("WWDG_tim=%u", (uint32_t)((uint32_t)(FreeRTOSRunTimeTicks - FreeRTOSRunTimeTicksold) * 50));
+//   FreeRTOSRunTimeTicksold = FreeRTOSRunTimeTicks;
+// }
 
 void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
@@ -116,7 +116,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim == (&htim14))
   {
-    if (FreeRTOSRunTimeTicks == 0XFFFFFFFFFFFFFFFF)
+    if (FreeRTOSRunTimeTicks == 0XFFFFFFFF)
       FreeRTOSRunTimeTicks = 0;
     else
       FreeRTOSRunTimeTicks++;

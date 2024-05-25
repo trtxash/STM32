@@ -6,7 +6,12 @@ TaskHandle_t StartTask_Handler; // 任务句柄
 // void start_task(void *pvParameters); // 任务函数
 void start_task(); // 任务函数
 
-#define TEST_TASK_PRIO 2       // 任务优先级
+#define LED_TASK_PRIO 2       // 任务优先级
+#define LED_STK_SIZE 32       // 任务堆栈大小
+TaskHandle_t LEDTask_Handler; // 任务句柄
+void led_task();              // 任务函数
+
+#define TEST_TASK_PRIO 31      // 任务优先级
 #define TEST_STK_SIZE 256      // 任务堆栈大小
 TaskHandle_t TESTTask_Handler; // 任务句柄
 void test_task();              // 任务函数
@@ -28,6 +33,13 @@ void start_task()
 {
   taskENTER_CRITICAL(); // 进入临界区
   // 创建LED0任务
+  // xTaskCreate((TaskFunction_t)led_task,
+  //             (const char *)"led_task",
+  //             (uint16_t)LED_STK_SIZE,
+  //             (void *)NULL,
+  //             (UBaseType_t)LED_TASK_PRIO,
+  //             (TaskHandle_t *)&LEDTask_Handler);
+  // 创建test任务
   xTaskCreate((TaskFunction_t)test_task,
               (const char *)"test_task",
               (uint16_t)TEST_STK_SIZE,
@@ -38,8 +50,8 @@ void start_task()
   taskEXIT_CRITICAL();            // 退出临界区
 }
 
-// 测试任务函数
-void test_task()
+// led任务函数
+void led_task()
 {
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
@@ -47,5 +59,20 @@ void test_task()
   {
     LED0_Reverse();
     vTaskDelayUntil(&xLastWakeTime, 500);
+  }
+}
+
+// 测试任务函数
+void test_task()
+{
+  TickType_t xLastWakeTime;
+  xLastWakeTime = xTaskGetTickCount();
+  while (1)
+  {
+    LED1_Reverse();
+    taskENTER_CRITICAL(); // 进入临界区
+    SDRAM_WriteSpeedTest();
+    taskEXIT_CRITICAL(); // 退出临界区
+    vTaskDelayUntil(&xLastWakeTime, 1000);
   }
 }

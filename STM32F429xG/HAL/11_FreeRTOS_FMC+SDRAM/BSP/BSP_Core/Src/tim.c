@@ -16,7 +16,7 @@ TIM_HandleTypeDef htim14; // 基础任务定时
 
 extern uint32_t SystemCoreClock; // 系统时钟频率，初始化后发生变化
 #if SYSTEM_SUPPORT_OS
-volatile unsigned long long FreeRTOSRunTimeTicks = 0; // 系统任务计数
+volatile uint32_t FreeRTOSRunTimeTicks = 0; // 系统任务计数
 #endif
 /**
  * @brief   TIM7 Initialization Function

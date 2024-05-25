@@ -7,6 +7,7 @@
 #include "task.h"
 
 #include "led.h"
+#include "sdram.h"
 
 void freertos_main(void);
 

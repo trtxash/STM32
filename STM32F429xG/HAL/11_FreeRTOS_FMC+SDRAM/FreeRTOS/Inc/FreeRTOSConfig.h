@@ -49,7 +49,7 @@
 #include "tim.h"
 
 extern uint32_t SystemCoreClock;
-extern volatile unsigned long long FreeRTOSRunTimeTicks;
+extern volatile uint32_t FreeRTOSRunTimeTicks;
 #endif
 
 #define configUSE_PREEMPTION 1                        // 为1时使用抢占式调度器，为0时使用协程，抢断式调度器的话内核会在每个时钟节拍中断中进行任务切换，

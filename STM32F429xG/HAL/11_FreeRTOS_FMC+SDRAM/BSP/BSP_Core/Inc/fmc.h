@@ -38,9 +38,7 @@ extern "C"
 
   /* USER CODE END Private defines */
 
-  void MX_FMC_Init(void);
-  void HAL_SDRAM_MspInit(SDRAM_HandleTypeDef *hsdram);
-  void HAL_SDRAM_MspDeInit(SDRAM_HandleTypeDef *hsdram);
+  void FMC_Init(void);
 
   /* USER CODE BEGIN Prototypes */
 
@@ -50,11 +48,3 @@ extern "C"
 }
 #endif
 #endif /*__FMC_H */
-
-/**
- * @}
- */
-
-/**
- * @}
- */
