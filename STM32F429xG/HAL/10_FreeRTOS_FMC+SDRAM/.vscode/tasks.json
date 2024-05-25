@@ -1,0 +1,54 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "mingw32-make",
+            "args": []
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "mingw32-make",
+            "args": [
+                "clean"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "rtt",
+            "type": "shell",
+            "command": "JLinkRTTClient",
+            "args": [],
+            "problemMatcher": []
+        },
+        {
+            "type": "cmake",
+            "label": "CMake:build",
+            "command": "build",
+            "targets": [
+                "template"
+            ],
+            "preset": "${command:cmake.activeBuildPresetName}",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "CMake 模板 生成 任务",
+            "dependsOn": "CMake:configure"
+        },
+        {
+            "type": "cmake",
+            "label": "CMake:configure",
+            "command": "configure",
+            "targets": [
+                "template"
+            ],
+            "preset": "${command:cmake.activeBuildPresetName}",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "CMake设置"
+        }
+    ]
+}

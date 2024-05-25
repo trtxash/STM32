@@ -1,0 +1,5 @@
+C:/Users/11655/Documents/STM32/STM32F429xG/HAL/10_FreeRTOS_FMC+SDRAM/build/CMakeFiles/template.dir
+C:/Users/11655/Documents/STM32/STM32F429xG/HAL/10_FreeRTOS_FMC+SDRAM/build/CMakeFiles/edit_cache.dir
+C:/Users/11655/Documents/STM32/STM32F429xG/HAL/10_FreeRTOS_FMC+SDRAM/build/CMakeFiles/rebuild_cache.dir
+C:/Users/11655/Documents/STM32/STM32F429xG/HAL/10_FreeRTOS_FMC+SDRAM/build/cmake/stm32cubemx/CMakeFiles/edit_cache.dir
+C:/Users/11655/Documents/STM32/STM32F429xG/HAL/10_FreeRTOS_FMC+SDRAM/build/cmake/stm32cubemx/CMakeFiles/rebuild_cache.dir
