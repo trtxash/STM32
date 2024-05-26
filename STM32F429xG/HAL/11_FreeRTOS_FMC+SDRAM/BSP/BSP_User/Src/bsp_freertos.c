@@ -73,6 +73,6 @@ void test_task()
     taskENTER_CRITICAL(); // 进入临界区
     SDRAM_WriteSpeedTest();
     taskEXIT_CRITICAL(); // 退出临界区
-    vTaskDelayUntil(&xLastWakeTime, 1000);
+    vTaskDelayUntil(&xLastWakeTime, 500);
   }
 }

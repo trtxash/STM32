@@ -165,7 +165,9 @@ void SDRAM_WriteSpeedTest(void)
   }
 
   /* 打印速度 */
-  LOGI("32MB Write time %u ms, speed %u MB/s", (uint32_t)(iTime3 * 50 / 1000), (uint32_t)((Bank5_SDRAM_SIZE / 1024 / 1024 * 1000000) / iTime3));
+  LOGI("32MB Write time %u ms, speed %u MB/s", (uint32_t)(iTime3 * 50 / 1000), (uint32_t)((Bank5_SDRAM_SIZE / 1024 / 1024 * 1000000) / (iTime3 * 50)));
+
+  // LOGI("sysclock %u", HAL_RCC_GetSysClockFreq());
 }
 
 /*

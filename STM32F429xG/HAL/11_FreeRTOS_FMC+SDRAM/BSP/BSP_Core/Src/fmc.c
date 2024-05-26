@@ -51,7 +51,7 @@ void FMC_Init(void)
   hsdram1.Init.InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_4;    // 一共4个BANK
   hsdram1.Init.CASLatency = FMC_SDRAM_CAS_LATENCY_3;                 // CAS为3
   hsdram1.Init.WriteProtection = FMC_SDRAM_WRITE_PROTECTION_DISABLE; // 失能写保护
-  hsdram1.Init.SDClockPeriod = FMC_SDRAM_CLOCK_PERIOD_3;             // SDRAM时钟为HCLK/2=180M/2=90M=11.1ns
+  hsdram1.Init.SDClockPeriod = FMC_SDRAM_CLOCK_PERIOD_2;             // SDRAM时钟为HCLK/2=180M/2=90M=11.1ns
   hsdram1.Init.ReadBurst = FMC_SDRAM_RBURST_ENABLE;                  // 使能突发
   hsdram1.Init.ReadPipeDelay = FMC_SDRAM_RPIPE_DELAY_1;              // 读通道延时
   /* SdramTiming */
