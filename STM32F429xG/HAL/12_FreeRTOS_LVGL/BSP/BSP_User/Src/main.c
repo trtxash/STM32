@@ -1,9 +1,9 @@
 /**
- * @file	11_FreeRTOS_FMC+SDRAM
+ * @file	12_FreeRTOS_LVGL
  * @brief
  * @author 	TRTX-gamer
  * @version 1.00
- * @date 	2024年5月25号17点45分
+ * @date 	2024年6月2号23点15分
  */
 #include "main.h"
 
