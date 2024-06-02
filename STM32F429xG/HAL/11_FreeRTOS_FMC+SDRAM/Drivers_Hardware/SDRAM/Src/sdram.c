@@ -7,9 +7,9 @@ void SDRAM_Init(void)
   SDRAM_Initialization_Sequence(&hsdram1); // 发送SDRAM初始化序列
   // 刷新频率计数器(以SDCLK频率计数),计算方法:
   // COUNT=SDRAM刷新周期/行数-20=SDRAM刷新周期(us)*SDCLK频率(Mhz)/行数
-  // 我们使用的SDRAM刷新周期为64ms,SDCLK=180/2=90Mhz,行数为8192(2^13).
-  // 所以,COUNT=64*1000*90/8192-20=683
-  HAL_SDRAM_ProgramRefreshRate(&hsdram1, 683); // 设置刷新频率
+  // 我们使用的SDRAM刷新周期为64ms,SDCLK=240/2=120Mhz,行数为8192(2^13).
+  // 所以,COUNT=64*1000*120/8192-20=683
+  HAL_SDRAM_ProgramRefreshRate(&hsdram1, 917); // 设置刷新频率
 }
 
 // 发送SDRAM初始化序列
@@ -95,19 +95,18 @@ void FMC_SDRAM_ReadBuffer(u8 *pBuffer, u32 ReadAddr, u32 n)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-void SDRAM_WriteSpeedTest(void)
+void SDRAM_WriteSpeedTest_32bits(void)
 {
   volatile uint32_t i, j;
   uint32_t iTime1, iTime2, iTime3;
   volatile uint32_t *pBuf;
 
   /* 设置初始化值并记下开始时间 */
-  j = 0;
   pBuf = (uint32_t *)Bank5_SDRAM_ADDR;
   iTime1 = FreeRTOSRunTimeTicks;
 
   /* 以递增的方式写数据到SDRAM所有空间 */
-  for (i = 0; i < Bank5_SDRAM_SIZE / 128; i++)
+  for (j = 0, i = 0; i < Bank5_SDRAM_SIZE / 512; i++)
   {
     *pBuf++ = j++; // 一行4Byte
     *pBuf++ = j++;
@@ -143,31 +142,269 @@ void SDRAM_WriteSpeedTest(void)
     *pBuf++ = j++;
     *pBuf++ = j++;
     *pBuf++ = j++;
+    *pBuf++ = j++; // 4*8*4 Byte = 128 Byte
+
+    *pBuf++ = j++; // 一行4Byte
     *pBuf++ = j++;
-    // 4*8*4 Byte = 128 Byte
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++; // 8行32Byte
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++; // 128*2 Byte
+
+    *pBuf++ = j++; // 一行4Byte
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++; // 8行32Byte
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++; // 128*3 Byte
+
+    *pBuf++ = j++; // 一行4Byte
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++; // 8行32Byte
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++; // 128*4=512 Byte
   }
   iTime2 = FreeRTOSRunTimeTicks;
-  if (iTime2 - iTime1 < 0)
+  if (iTime2 < iTime1)
     iTime3 = iTime1 - iTime2;
   else
     iTime3 = iTime2 - iTime1;
 
   /* 读取写入的是否出错 */
-  j = 0;
   pBuf = (uint32_t *)Bank5_SDRAM_ADDR;
-  for (i = 0; i < Bank5_SDRAM_SIZE / 4; i++)
+  for (j = 0, i = 0; i < Bank5_SDRAM_SIZE / 4; i++)
   {
-    if (*pBuf++ != j++)
+    if (*pBuf != j)
     {
       LOGE("Write err %u,%u", j, *pBuf);
       break;
     }
+    else
+    {
+      pBuf++;
+      j++;
+    }
   }
 
   /* 打印速度 */
-  LOGI("32MB Write time %u ms, speed %u MB/s", (uint32_t)(iTime3 * 50 / 1000), (uint32_t)((Bank5_SDRAM_SIZE / 1024 / 1024 * 1000000) / (iTime3 * 50)));
+  LOGI("32bit/32MB Write time %u ms, speed %u MB/s", (uint32_t)(iTime3 * 50 / 1000), (uint32_t)((Bank5_SDRAM_SIZE / 1024 / 1024 * 1000000) / (iTime3 * 50)));
+}
 
-  // LOGI("sysclock %u", HAL_RCC_GetSysClockFreq());
+void SDRAM_WriteSpeedTest_16bits(void)
+{
+  volatile uint32_t i;
+  volatile uint16_t j;
+  uint32_t iTime1, iTime2, iTime3;
+  volatile uint16_t *pBuf;
+
+  /* 设置初始化值并记下开始时间 */
+  pBuf = (uint16_t *)Bank5_SDRAM_ADDR;
+  iTime1 = FreeRTOSRunTimeTicks;
+
+  /* 以递增的方式写数据到SDRAM所有空间 */
+  for (j = 0, i = 0; i < Bank5_SDRAM_SIZE / (65536 * 2);) // 2*(2^16) Byte = 2^17 Byte
+  {
+    *pBuf++ = j++; // 一行2Byte
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++; // 8行16Byte
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++; // 2*8*4 Byte = 64 Byte
+
+    *pBuf++ = j++; // 一行2Byte
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++; // 8行16Byte
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j++;
+    *pBuf++ = j; // 64*2 Byte = 128 Byte
+
+    if (j == 0XFFFF)
+    {
+      j = 0;
+      i++;
+    }
+
+    else
+    {
+      j++;
+    }
+  }
+
+  iTime2 = FreeRTOSRunTimeTicks;
+  if (iTime2 < iTime1)
+    iTime3 = iTime1 - iTime2;
+  else
+    iTime3 = iTime2 - iTime1;
+
+  /* 读取写入的是否出错 */
+  pBuf = (uint16_t *)Bank5_SDRAM_ADDR;
+  for (j = 0, i = 0; i < Bank5_SDRAM_SIZE / (65536 * 2);) // 2^17 Byte
+  {
+    if (*pBuf != j)
+    {
+      LOGE("Write err %u,%u", j, *pBuf);
+      break;
+    }
+    pBuf++;
+    if (j == 0XFFFF)
+    {
+      i++;
+      j = 0;
+    }
+    else
+    {
+      j++;
+    }
+  }
+
+  /* 打印速度 */
+  LOGI("16bit/32MB Write time %u ms, speed %u MB/s", (uint32_t)(iTime3 * 50 / 1000), (uint32_t)((Bank5_SDRAM_SIZE / 1024 / 1024 * 1000000) / (iTime3 * 50)));
 }
 
 /*
@@ -180,60 +417,59 @@ void SDRAM_WriteSpeedTest(void)
 */
 void SDRAM_ReadSpeedTest(void)
 {
+  volatile uint32_t i, ulTemp;
+  uint32_t iTime1, iTime2, iTime3;
+  volatile uint32_t *pBuf;
 
-  // uint32_t i;
-  // int32_t iTime1, iTime2;
-  // uint32_t *pBuf;
+  /* 设置初始化值并记下开始时间 */
+  pBuf = (uint32_t *)Bank5_SDRAM_ADDR;
+  iTime1 = FreeRTOSRunTimeTicks;
 
-  // /* 设置初始化值并记下开始时间 */
-  // pBuf = (uint32_t *)EXT_SDRAM_ADDR;
-  // iTime1 = bsp_GetRunTime();
-  // start = DWT_CYCCNT;
+  /* 读取SDRAM所有空间数据 */
+  for (i = 0; i < Bank5_SDRAM_SIZE / 128; i++)
+  {
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++; // 32Byte
 
-  // /* 读取SDRAM所有空间数据 */
-  // for (i = 1024 * 1024 / 8; i > 0; i--)
-  // {
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
 
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
 
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++;
+    ulTemp = *pBuf++; // 128Byte
+  }
+  iTime2 = FreeRTOSRunTimeTicks;
+  if (iTime2 < iTime1)
+    iTime3 = iTime1 - iTime2;
+  else
+    iTime3 = iTime2 - iTime1;
 
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  //   ulTemp = *pBuf++;
-  // }
-  // end = DWT_CYCCNT;
-  // cnt = end - start;
-  // iTime2 = bsp_GetRunTime(); /* 记下结束时间 */
-
-  // /* 打印速度 */
-  // printf("【32MB数据读耗时】: 方式一:%dms  方式二:%dms, 读速度: %dMB/s\r\n",
-  //        iTime2 - iTime1, cnt / 168000, (16 * 1000) / (iTime2 - iTime1));
+  /* 打印速度 */
+  LOGI("32bit/32MB Read time %u ms, speed %u MB/s", (uint32_t)(iTime3 * 50 / 1000), (uint32_t)((Bank5_SDRAM_SIZE / 1024 / 1024 * 1000000) / (iTime3 * 50)));
 }
