@@ -70,19 +70,13 @@ void test_task()
   xLastWakeTime = xTaskGetTickCount();
   while (1)
   {
+    flag = !flag;
     LED1_Reverse();
     taskENTER_CRITICAL(); // 进入临界区
-    if (flag == 0)
+    if (flag)
       SDRAM_WriteSpeedTest_32bits();
-    else if (flag == 1)
-      SDRAM_WriteSpeedTest_16bits();
-    else if (flag == 2)
+    else
       SDRAM_ReadSpeedTest();
-
-    flag++;
-    if (flag == 3)
-      flag = 0;
-
     taskEXIT_CRITICAL(); // 退出临界区
     vTaskDelayUntil(&xLastWakeTime, 1000);
   }
