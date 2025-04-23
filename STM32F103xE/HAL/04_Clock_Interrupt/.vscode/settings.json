@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "sys.h": "c",
-        "stm32f1xx.h": "c",
-        "stm32f1xx_hal.h": "c",
-        "stm32f1xx_hal_conf.h": "c",
-        "STM32F103XE.H": "c"
-    }
-}
