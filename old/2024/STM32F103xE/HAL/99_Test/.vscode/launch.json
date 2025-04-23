@@ -1,0 +1,21 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug", // 配置名称，将会在启动配置的下拉菜单中显示
+            "cwd": "${workspaceFolder}", // 调试程序时的工作目录，此为工作区文件夹；改成${fileDirname}可变为文件所在目录
+            "executable": "${workspaceFolder}/build/Template.elf", // 编译出的二进制文件，也就是最终烧录到单片机中的，这里是elf文件。根据芯片的不同，可能产生不同的名称和后缀（例如TI的TM4C123芯片编译出来的名称是"main.axf"）
+            "request": "launch", // 请求配置类型，可以为launch（启动）或attach（附加）
+            "type": "cortex-debug", // 配置类型，是cortex-debug类型配置，其实也可以填cppdbg之类的，但是那样我们就得自己配置gdb了，配置起来将会非常麻烦。
+            "runToEntryPoint": "main",
+            "servertype": "jlink",
+            "device": "STM32F103ZE", // 使用J-link GDB Server时必须有；其他GBD Server时可选（有可能帮助自动选择SVD文件）。支持的设备见 https://www.segger.com/downloads/supported-devices.php
+            "svdFile": "./STM32F103xx.svd", // svd文件，有这个文件才能查看寄存器的值，每个单片机都不同。可以在以下地址找到 https://github.com/posborne/cmsis-svd
+            "preLaunchTask": "build", // 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应
+            "showDevDebugOutput": "raw",
+        }
+    ]
+}
