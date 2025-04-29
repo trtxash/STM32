@@ -1,0 +1,7 @@
+CompileFlags:
+  Add: 
+    - --target=arm-none-eabi
+    - -mcpu=cortex-m4
+    - -mthumb
+    - -mfloat-abi=hard
+  Compiler: arm-none-eabi-gcc
