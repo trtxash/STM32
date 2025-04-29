@@ -7,9 +7,6 @@
  */
 #include "main.h"
 
-//                "USE_HAL_DRIVER",
-//                "STM32F429xx"
-
 /**
  * @brief	对函数简要描述
  * @param 	参数说明，以’:’作为参数结束标志；

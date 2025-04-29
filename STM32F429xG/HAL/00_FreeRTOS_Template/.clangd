@@ -1,7 +1,12 @@
 CompileFlags:
   Add: 
-    - --target=arm-none-eabi
-    - -mcpu=cortex-m4
-    - -mthumb
-    - -mfloat-abi=hard
+    [
+        --target=arm-none-eabi,
+        -ID:/Works/Arm GNU Toolchain arm-none-eabi/arm-none-eabi/include,  # ARM-GCC头文件路径
+        -I/Works/Arm GNU Toolchain arm-none-eabi/lib/gcc/arm-none-eabi/14.2.1/include,  # GCC库头文件
+        -ferror-limit=500
+    ]
   Compiler: arm-none-eabi-gcc
+Diagnostics:
+  MissingIncludes: None
+  UnusedIncludes: None

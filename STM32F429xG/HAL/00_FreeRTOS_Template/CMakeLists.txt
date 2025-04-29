@@ -33,26 +33,6 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 # Enable CMake support for ASM and C languages
 enable_language(C ASM)
 
-# set(MCU_DEFS
-# -DSTM32F429xx
-# -DUSE_HAL_DRIVER
-# -DHSE_VALUE=8000000
-# )
-
-# target_compile_options(CMAKE_PROJECT_NAME PRIVATE
-# ${MCU_DEFS}
-# -mcpu=cortex-m4
-# -mthumb
-# -mfpu=fpv4-sp-d16
-# -mfloat-abi=hard
-# )
-
-# 添加多个宏
-add_compile_definitions(
-    USE_HAL_DRIVER
-    STM32F429xx
-)
-
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
 

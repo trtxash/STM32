@@ -1,0 +1,6 @@
+{
+    "clangd.arguments": [
+        "--query-driver=D:/Works/Arm GNU Toolchain arm-none-eabi/bin/arm-none-eabi-gcc.exe",
+        "--compile-commands-dir=${workspaceFolder}/build/Debug"
+    ]
+}
