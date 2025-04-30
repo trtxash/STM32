@@ -8,5 +8,5 @@ CompileFlags:
     ]
   Compiler: arm-none-eabi-gcc
 Diagnostics:
-  MissingIncludes: None
-  UnusedIncludes: None
+  MissingIncludes: None # 忽视错误
+  UnusedIncludes: None # 忽视错误

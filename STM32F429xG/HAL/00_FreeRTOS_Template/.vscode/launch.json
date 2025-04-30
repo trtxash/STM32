@@ -4,17 +4,6 @@
     // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        // {
-        //     "cwd": "${workspaceFolder}",
-        //     "executable": "./bin/executable.elf",
-        //     "name": "Debug with JLink",
-        //     "request": "launch",
-        //     "type": "cortex-debug",
-        //     "device": "",
-        //     "runToEntryPoint": "main",
-        //     "showDevDebugOutput": "none",
-        //     "servertype": "jlink"
-        // },
         {
             "name": "Cortex Debug-jlink", // 配置名称，将会在启动配置的下拉菜单中显示
             "cwd": "${workspaceFolder}", // 调试程序时的工作目录，此为工作区文件夹；改成${fileDirname}可变为文件所在目录
