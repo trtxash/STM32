@@ -1,9 +1,9 @@
 /**
- * @file	12_FreeRTOS_LVGL
+ * @file	00_FreeRTOS_Template
  * @brief
  * @author 	TRTX-gamer
  * @version 1.00
- * @date 	2024年6月2号23点15分
+ * @date 	2025年4月30号16点02分
  */
 #include "main.h"
 

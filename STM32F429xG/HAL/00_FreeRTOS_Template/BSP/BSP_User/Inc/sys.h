@@ -3,7 +3,7 @@
 #include "stm32f4xx.h"
 
 // 宏设置部分
-#define SYS_CLOCK 240       // 系统主频
+#define SYS_CLOCK 180       // 系统主频
 #define SYSTEM_SUPPORT_OS 1 // 定义系统文件夹是否支持OS,1,支持os,0,不支持os
 #define DEBUG_FLAG 1
 #define LOG_TYPE 1 // 0为printf，1为segeerrtt

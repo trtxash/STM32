@@ -2,6 +2,6 @@
 
 void bsp_init(void)
 {
-  SDRAM_Init();
-  LED_Init();
+    SDRAM_Init();
+    LED_Init();
 }

@@ -1,5 +1,5 @@
 BasedOnStyle: Microsoft
-# AccessModifierOffset: -4 # 访问修饰符（public/private/protected）相对类体的缩进偏移量为-4空格
+AccessModifierOffset: -4 # 访问修饰符（public/private/protected）相对类体的缩进偏移量为-4空格
 AlignConsecutiveMacros: true # 自动对齐连续的宏定义
 AlignTrailingComments: true # 自动对齐尾部注释
 AllowShortFunctionsOnASingleLine: Inline # 允许内联短函数单行显示
