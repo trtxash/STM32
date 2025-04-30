@@ -23,8 +23,8 @@
     ```json
     {
         "clangd.arguments": [
-            "--query-driver=D:/Works/Arm GNU Toolchain arm-none-eabi/bin/arm-none-eabi-gcc.exe", # 指定编译器
-            "--compile-commands-dir=${workspaceFolder}/build/Debug" # 指定cmake编译辅助文件输出目录，给clangd用
+            "--query-driver=D:/Works/Arm GNU Toolchain arm-none-eabi/bin/arm-none-eabi-gcc.exe", // 指定编译器
+            "--compile-commands-dir=${workspaceFolder}/build/Debug" // 指定cmake编译辅助文件输出目录，给clangd用
         ]
     }
     ```
