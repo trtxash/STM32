@@ -6,6 +6,11 @@
  * @date 	2025年4月30号16点02分
  */
 #include "main.h"
+#include "bsp_app.h"
+#include "delay.h"
+#include "led.h"
+#include "log_rtt.h" // 使用RTT需要开启 JLinkRTTClient，插好jlink，按下Ctrl+P，输入task[空格]rtt，即可启动RTT Client
+#include "sys.h"
 
 /**
  * @brief	对函数简要描述
@@ -21,8 +26,17 @@ int main(void)
     {
         Error_Handler();
     }
-    Stm32_Clock_Init(SYS_CLOCK, 12, RCC_PLLP_DIV2, 8); // 设置时钟
-    delay_init(SYS_CLOCK);                             // 延时初始化
-    bsp_init();                                        // 板级初始化
-    freertos_main();                                   // 进入os
+    bsp_init(); // 板级初始化
+
+    while (1)
+    {
+        // freertos_main();                                   // 进入os
+        delay_ms(500);
+
+        LED0_Reverse();
+        LED1_Reverse();
+        LOGE("ERR");
+        LOGI("Inf");
+        LOGW("WAR");
+    }
 }

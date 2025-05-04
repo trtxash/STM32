@@ -28,8 +28,6 @@ extern "C"
 #endif
 
     /* Includes ------------------------------------------------------------------*/
-#include "bsp_app.h"
-// #include "bsp_freertos.h"
 #include "stm32f4xx_hal.h"
 
     /* Private includes ----------------------------------------------------------*/

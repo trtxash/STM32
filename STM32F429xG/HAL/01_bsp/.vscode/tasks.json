@@ -9,6 +9,13 @@
                 "CMake: build"
             ],
             "group": "build"
-        }
+        },
+        {
+            "label": "rtt",
+            "type": "shell",
+            "command": "JLinkRTTClient",
+            "args": [],
+            "problemMatcher": []
+        },
     ]
 }

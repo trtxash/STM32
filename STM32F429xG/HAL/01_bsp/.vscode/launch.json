@@ -16,6 +16,7 @@
             "svdFile": "./STM32F429.svd", // svd文件，有这个文件才能查看寄存器的值，每个单片机都不同。可以在以下地址找到 https://github.com/posborne/cmsis-svd
             "preLaunchTask": "CMake: config and build", // 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应
             "showDevDebugOutput": "raw",
+            "rtos":"FreeRTOS"
         },
         {
             "name": "Cortex Debug-openocd", // 配置名称，将会在启动配置的下拉菜单中显示
