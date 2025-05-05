@@ -1,5 +1,5 @@
 /**
- * @file	01_FreeRTOS_BSP
+ * @file	01_Review
  * @brief
  * @author 	TRTX-gamer
  * @version 1.00
@@ -7,6 +7,7 @@
  */
 #include "main.h"
 #include "bsp_app.h"
+#include "bsp_freertos.h"
 #include "delay.h"
 #include "led.h"
 #include "log_rtt.h" // 使用RTT需要开启 JLinkRTTClient，插好jlink，按下Ctrl+P，输入task[空格]rtt，即可启动RTT Client
@@ -30,13 +31,6 @@ int main(void)
 
     while (1)
     {
-        // freertos_main();                                   // 进入os
-        delay_ms(500);
-
-        LED0_Reverse();
-        LED1_Reverse();
-        LOGE("ERR");
-        LOGI("Inf");
-        LOGW("WAR");
+        freertos_main(); // 进入os
     }
 }

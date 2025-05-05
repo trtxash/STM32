@@ -4,8 +4,8 @@
 
 // 宏设置部分
 #define SYS_CLOCK         180 // 系统主频
-#define SYSTEM_SUPPORT_OS 0   // 定义系统文件夹是否支持OS,1,支持os,0,不支持os
-// #define DEBUG_FLAG        1
+#define SYSTEM_SUPPORT_OS 1   // 定义系统文件夹是否支持OS,1,支持os,0,不支持os
+#define DEBUG_FLAG        0
 // #define LOG_TYPE          0 // 0为printf，1为segeerrtt
 
 // #if SYSTEM_SUPPORT_OS

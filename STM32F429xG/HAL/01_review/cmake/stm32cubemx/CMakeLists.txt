@@ -19,8 +19,8 @@ target_include_directories(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
     ../../Drivers/CMSIS/Device/ST/STM32F4xx/Include
     ../../Drivers/CMSIS/Include
-    # ../../FreeRTOS/Inc
-    # ../../FreeRTOS/portable/GCC/ARM_CM4F
+    ../../FreeRTOS/Inc
+    ../../FreeRTOS/portable/GCC/ARM_CM4F
     ../../APP/Debug_Linker/RTT/Inc
     ../../Drivers_Hardware/LED/Inc
     # ../../Drivers_Hardware/SDRAM/Inc
@@ -53,16 +53,16 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_wwdg.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_fmc.c
-    # ../../FreeRTOS/Src/tasks.c
-    # ../../FreeRTOS/Src/list.c
-    # ../../FreeRTOS/Src/timers.c
-    # ../../FreeRTOS/Src/queue.c
-    # ../../FreeRTOS/portable/GCC/ARM_CM4F/port.c
-    # ../../FreeRTOS/portable/MemMang/heap_4.c
+    ../../FreeRTOS/Src/tasks.c
+    ../../FreeRTOS/Src/list.c
+    ../../FreeRTOS/Src/timers.c
+    ../../FreeRTOS/Src/queue.c
+    ../../FreeRTOS/portable/GCC/ARM_CM4F/port.c
+    ../../FreeRTOS/portable/MemMang/heap_4.c
     ../../BSP/BSP_User/Src/sys.c
     ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/bsp_app.c
-    # ../../BSP/BSP_User/Src/bsp_freertos.c
+    ../../BSP/BSP_User/Src/bsp_freertos.c
     # ../../BSP/BSP_Core/Src/fmc.c
     # ../../BSP/BSP_Core/Src/tim.c
     # ../../BSP/BSP_Core/Src/iwdg.c
