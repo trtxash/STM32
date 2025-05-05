@@ -46,7 +46,7 @@
 #include <stdint.h>
 
 // #include "sys.h"
-// #include "tim.h"
+#include "tim.h"
 
 extern uint32_t SystemCoreClock;
 extern volatile uint32_t FreeRTOSRunTimeTicks;
@@ -72,9 +72,9 @@ extern volatile uint32_t FreeRTOSRunTimeTicks;
 #define configUSE_APPLICATION_TASK_TAG 0                     // 为1则configUSE_APPLICATION_TASK_TAGF()和xTaskCallApplicationTaskHook()会被编译
 #define configUSE_COUNTING_SEMAPHORES  1                     // 为1启动计数型信号量，相关的API函数会被编译
 
-#define configGENERATE_RUN_TIME_STATS 0 // 为1开启时间统计功能，相应API函数会被编译，为1还要定义额外的宏，见开发手册
-// #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ConfigureTimerForTimeStats() // 定义定时器初始化函数以提供统计的“时基”
-// #define portGET_RUN_TIME_COUNTER_VALUE() FreeRTOSRunTimeTicks                 // 定义变量以读取统计定时器的值
+#define configGENERATE_RUN_TIME_STATS 1 // 为1开启时间统计功能，相应API函数会被编译，为1还要定义额外的宏，见开发手册
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ConfigureTimerForTimeStats() // 定义定时器初始化函数以提供统计的“时基”
+#define portGET_RUN_TIME_COUNTER_VALUE() FreeRTOSRunTimeTicks                 // 定义变量以读取统计定时器的值
 #define configRECORD_STACK_HIGH_ADDRESS 1 // 检查堆栈？
 
 /* Co-routine definitions. */

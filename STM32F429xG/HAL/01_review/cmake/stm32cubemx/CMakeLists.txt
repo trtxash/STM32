@@ -33,8 +33,8 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Src/system_stm32f4xx.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
-    # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
-    # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c
@@ -48,8 +48,8 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sdram.c
-    # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c
-    # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_wwdg.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_fmc.c
@@ -64,7 +64,7 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Src/bsp_app.c
     ../../BSP/BSP_User/Src/bsp_freertos.c
     # ../../BSP/BSP_Core/Src/fmc.c
-    # ../../BSP/BSP_Core/Src/tim.c
+    ../../BSP/BSP_Core/Src/tim.c
     # ../../BSP/BSP_Core/Src/iwdg.c
     # ../../BSP/BSP_Core/Src/wwdg.c
     ../../Drivers_Hardware/LED/Src/led.c
