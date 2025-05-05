@@ -1,11 +1,17 @@
+# https://zhuanlan.zhihu.com/p/871508940
+# clangd.llvm.org/config
+
 CompileFlags:
-  Add: 
-    [
-        --target=arm-none-eabi,
-        -ID:/Works/Arm GNU Toolchain arm-none-eabi/arm-none-eabi/include,  # ARM-GCC头文件路径
-        -I/Works/Arm GNU Toolchain arm-none-eabi/lib/gcc/arm-none-eabi/14.2.1/include,  # GCC库头文件
-    ]
-  Compiler: arm-none-eabi-gcc
+	Add: 
+		[
+			-Wall,           # 启用所有警告
+			-Wextra,         # 启用额外警告
+			--target=arm-none-eabi,
+			-mcpu=cortex-m4,  # 根据实际芯片架构添加
+			-ID:/Works/Arm GNU Toolchain arm-none-eabi/arm-none-eabi/include,  # ARM-GCC头文件路径
+			-ID:/Works/Arm GNU Toolchain arm-none-eabi/lib/gcc/arm-none-eabi/14.2.1/include,  # GCC库头文件
+		]
+	Compiler: arm-none-eabi-gcc
 Diagnostics:
-  MissingIncludes: None # 忽视错误
-  UnusedIncludes: None # 忽视错误
+# 	MissingIncludes: None # 忽视错误
+	UnusedIncludes: None # 忽视错误w background indexing of these files.

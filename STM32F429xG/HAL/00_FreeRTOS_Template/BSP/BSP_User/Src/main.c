@@ -1,11 +1,16 @@
 /**
- * @file	00_FreeRTOS_Template
+ * @file	00_FreeRTOS_Tempalte
  * @brief
  * @author 	TRTX-gamer
  * @version 1.00
- * @date 	2025年4月30号16点02分
+ * @date 	2025年5月5号20点46分
  */
+
+// 使用RTT需要开启 JLinkRTTClient，插好jlink，按下Ctrl+P，输入task[空格]rtt，即可启动RTT Client
+
 #include "main.h"
+#include "bsp_app.h"
+#include "bsp_freertos.h"
 
 /**
  * @brief	对函数简要描述
@@ -21,8 +26,10 @@ int main(void)
     {
         Error_Handler();
     }
-    Stm32_Clock_Init(SYS_CLOCK, 12, RCC_PLLP_DIV2, 8); // 设置时钟
-    delay_init(SYS_CLOCK);                             // 延时初始化
-    bsp_init();                                        // 板级初始化
-    freertos_main();                                   // 进入os
+    bsp_init(); // 板级初始化
+
+    while (1)
+    {
+        freertos_main(); // 进入os
+    }
 }

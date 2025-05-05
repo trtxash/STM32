@@ -3,6 +3,6 @@ AccessModifierOffset: -4 # 访问修饰符（public/private/protected）相对�
 AlignConsecutiveMacros: true # 自动对齐连续的宏定义
 AlignTrailingComments: true # 自动对齐尾部注释
 AllowShortFunctionsOnASingleLine: Inline # 允许内联短函数单行显示
-# AllowShortIfStatementsOnASingleLine: false # 禁止短if语句单行显示
-# BreakBeforeBraces: Allman # 大括号换行风格（Allman风格）
-# ColumnLimit: 0 # 禁用行宽限制（不自动换行）
+AllowShortIfStatementsOnASingleLine: false # 禁止短if语句单行显示
+BreakBeforeBraces: Allman # 大括号换行风格（Allman风格）
+ColumnLimit: 0 # 禁用行宽限制（不自动换行）

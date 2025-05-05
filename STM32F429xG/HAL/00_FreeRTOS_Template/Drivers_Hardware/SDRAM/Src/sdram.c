@@ -1,4 +1,7 @@
 #include "sdram.h"
+#include "delay.h"
+#include "log_rtt.h"
+#include "tim.h"
 
 // SDRAM初始化
 void SDRAM_Init(void)
@@ -419,7 +422,8 @@ void SDRAM_WriteSpeedTest_16bits(void)
 */
 void SDRAM_ReadSpeedTest(void)
 {
-    volatile uint32_t i, ulTemp;
+    volatile uint32_t i;
+    volatile uint32_t ulTemp;
     uint32_t iTime1, iTime2, iTime3;
     volatile uint32_t *pBuf;
 

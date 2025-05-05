@@ -1,5 +1,5 @@
 #include "stm32f4xx_it.h"
-#include "bsp_app.h"
+#include "tim.h"
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
@@ -9,10 +9,10 @@
  */
 void NMI_Handler(void)
 {
-  while (1)
-  {
-  }
-  /* USER CODE END NonMaskableInt_IRQn 1 */
+    while (1)
+    {
+    }
+    /* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
 /**
@@ -20,9 +20,9 @@ void NMI_Handler(void)
  */
 void HardFault_Handler(void)
 {
-  while (1)
-  {
-  }
+    while (1)
+    {
+    }
 }
 
 /**
@@ -30,9 +30,9 @@ void HardFault_Handler(void)
  */
 void MemManage_Handler(void)
 {
-  while (1)
-  {
-  }
+    while (1)
+    {
+    }
 }
 
 /**
@@ -40,9 +40,9 @@ void MemManage_Handler(void)
  */
 void BusFault_Handler(void)
 {
-  while (1)
-  {
-  }
+    while (1)
+    {
+    }
 }
 
 /**
@@ -50,15 +50,15 @@ void BusFault_Handler(void)
  */
 void UsageFault_Handler(void)
 {
-  while (1)
-  {
-  }
+    while (1)
+    {
+    }
 }
 
 /**
  * @brief This function handles System service call via SWI instruction.
  */
-__weak void SVC_Handler(void)
+__attribute__((weak)) void SVC_Handler(void)
 {
 }
 
@@ -72,16 +72,16 @@ void DebugMon_Handler(void)
 /**
  * @brief This function handles Pendable request for system service.
  */
-__weak void PendSV_Handler(void)
+__attribute__((weak)) void PendSV_Handler(void)
 {
 }
 
 /**
  * @brief This function handles System tick timer.
  */
-__weak void SysTick_Handler(void)
+__attribute__((weak)) void SysTick_Handler(void)
 {
-  HAL_IncTick();
+    // HAL_IncTick();
 }
 
 /******************************************************************************/
@@ -109,16 +109,18 @@ __weak void SysTick_Handler(void)
 
 void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
-  HAL_TIM_IRQHandler(&htim14);
+    HAL_TIM_IRQHandler(&htim14);
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if (htim == (&htim14))
-  {
-    if (FreeRTOSRunTimeTicks == 0XFFFFFFFF)
-      FreeRTOSRunTimeTicks = 0;
-    else
-      FreeRTOSRunTimeTicks++;
-  }
+    if (htim == (&htim14))
+    {
+        // if (FreeRTOSRunTimeTicks == 0XFFFFFFFF)
+        //     FreeRTOSRunTimeTicks = 0;
+        // else
+        //     FreeRTOSRunTimeTicks++;
+
+        FreeRTOSRunTimeTicks++;
+    }
 }
