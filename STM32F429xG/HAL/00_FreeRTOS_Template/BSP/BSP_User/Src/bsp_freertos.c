@@ -37,9 +37,9 @@ void start_task()
     xTaskCreate((TaskFunction_t)led_task, (const char *)"led_task", (uint16_t)LED_STK_SIZE, (void *)NULL,
                 (UBaseType_t)LED_TASK_PRIO, (TaskHandle_t *)&LEDTask_Handler);
 
-    // // 创建test任务
-    // xTaskCreate((TaskFunction_t)test_task, (const char *)"test_task", (uint16_t)TEST_STK_SIZE, (void *)NULL,
-    //             (UBaseType_t)TEST_TASK_PRIO, (TaskHandle_t *)&TESTTask_Handler);
+    // 创建test任务
+    xTaskCreate((TaskFunction_t)test_task, (const char *)"test_task", (uint16_t)TEST_STK_SIZE, (void *)NULL,
+                (UBaseType_t)TEST_TASK_PRIO, (TaskHandle_t *)&TESTTask_Handler);
 
     vTaskDelete(StartTask_Handler); // 删除开始任务
     taskEXIT_CRITICAL();            // 退出临界区
