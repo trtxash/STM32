@@ -5,13 +5,12 @@
  * @version 1.00
  * @date 	2025年4月30号16点02分
  */
+
+// 使用RTT需要开启 JLinkRTTClient，插好jlink，按下Ctrl+P，输入task[空格]rtt，即可启动RTT Client
+
 #include "main.h"
 #include "bsp_app.h"
 #include "bsp_freertos.h"
-#include "delay.h"
-#include "led.h"
-#include "log_rtt.h" // 使用RTT需要开启 JLinkRTTClient，插好jlink，按下Ctrl+P，输入task[空格]rtt，即可启动RTT Client
-#include "sys.h"
 
 /**
  * @brief	对函数简要描述
