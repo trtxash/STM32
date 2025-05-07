@@ -57,7 +57,7 @@ extern volatile uint32_t FreeRTOSRunTimeTicks;
 #define configUSE_TICK_HOOK            0                     // 为1使用时间片钩子函数，需要vApplicationTickHook(void)
 #define configCPU_CLOCK_HZ             (SystemCoreClock)     // cpu频率
 #define configTICK_RATE_HZ             ((TickType_t)1000)    // 设置FreeRTOS的系统时钟节拍频率Hz，1000为1ms
-#define configMAX_PRIORITIES           (32)                  // 设置任务优先级数量，0~num-1
+#define configMAX_PRIORITIES           (16)                  // 设置任务优先级数量，0~num-1
 #define configMINIMAL_STACK_SIZE       ((unsigned short)66)  // 设置空闲任务的最小任务堆栈大小，字为单位，(66-2)*4字节
 #define configTOTAL_HEAP_SIZE          ((size_t)(75 * 1024)) // 设置堆大小，然后使用了动态内存管理，FreeRTOS会使用heapX.c中的内存申请函数来申请内存，这些内存时从堆ucHeap[configTOTAL_HEAP_SIZE]中申请的，堆的大小由这项来定义
 #define configMAX_TASK_NAME_LEN        (10)                  // 设置任务名最大长度

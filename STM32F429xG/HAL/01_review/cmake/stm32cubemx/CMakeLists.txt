@@ -23,6 +23,7 @@ target_include_directories(stm32cubemx INTERFACE
     ../../FreeRTOS/portable/GCC/ARM_CM4F
     ../../APP/Debug_Linker/RTT/Inc
     ../../Drivers_Hardware/LED/Inc
+    ../../Drivers_Hardware/Key/Inc
     ../../Drivers_Hardware/SDRAM/Inc
 )
 
@@ -68,6 +69,7 @@ target_sources(stm32cubemx INTERFACE
     # ../../BSP/BSP_Core/Src/iwdg.c
     # ../../BSP/BSP_Core/Src/wwdg.c
     ../../Drivers_Hardware/LED/Src/led.c
+    ../../Drivers_Hardware/Key/Src/key.c
     ../../Drivers_Hardware/SDRAM/Src/sdram.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c
