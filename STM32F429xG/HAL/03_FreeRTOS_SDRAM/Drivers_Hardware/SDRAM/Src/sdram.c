@@ -12,7 +12,8 @@ void SDRAM_Init(void)
     // COUNT=SDRAM刷新周期/行数-20=SDRAM刷新周期(us)*SDCLK频率(Mhz)/行数
     // 我们使用的SDRAM刷新周期为64ms,SDCLK=240/2=120Mhz,行数为8192(2^13).
     // 所以,COUNT=64*1000*120/8192-20=683
-    HAL_SDRAM_ProgramRefreshRate(&hsdram1, 917); // 设置刷新频率
+    // HAL_SDRAM_ProgramRefreshRate(&hsdram1, 917); // 设置刷新频率
+    HAL_SDRAM_ProgramRefreshRate(&hsdram1, 683); // 设置刷新频率
 }
 
 // 发送SDRAM初始化序列

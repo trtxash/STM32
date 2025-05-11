@@ -136,12 +136,18 @@ void test_task(void)
     while (1)
     {
         flag = !flag;
-        LED1_Reverse();
+        // LED1_Reverse();
         // taskENTER_CRITICAL(); // 进入临界区
         if (flag)
+        {
+            LED1_Set();
             SDRAM_WriteSpeedTest_32bits();
+        }
         else
+        {
+            LED1_Clr();
             SDRAM_ReadSpeedTest();
+        }
         // taskEXIT_CRITICAL(); // 退出临界区
         vTaskDelayUntil(&xLastWakeTime, 1000);
     }

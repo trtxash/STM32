@@ -2,7 +2,6 @@
 #define GD32F450Z_LCD_H
 
 #include "sys.h"
-#include <stdint.h>
 
 /*******************************************************************************
  * Definitions

@@ -26,23 +26,23 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "sys.h"
 
-  /* USER CODE BEGIN Includes */
+    /* USER CODE BEGIN Includes */
 
-  /* USER CODE END Includes */
+    /* USER CODE END Includes */
 
-  extern SDRAM_HandleTypeDef hsdram1;
+    extern SDRAM_HandleTypeDef hsdram1;
 
-  /* USER CODE BEGIN Private defines */
+    /* USER CODE BEGIN Private defines */
 
-  /* USER CODE END Private defines */
+    /* USER CODE END Private defines */
 
-  void FMC_Init(void);
+    void FMC_Init(void);
 
-  /* USER CODE BEGIN Prototypes */
+    /* USER CODE BEGIN Prototypes */
 
-  /* USER CODE END Prototypes */
+    /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
