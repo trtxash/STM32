@@ -1,5 +1,5 @@
 /**
- * @file	03_FreeRTOS_LCD
+ * @file	03_FreeRTOS_SDRAM
  * @brief
  * @author 	TRTX-gamer
  * @version 1.00
