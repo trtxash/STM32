@@ -25,6 +25,7 @@ target_include_directories(stm32cubemx INTERFACE
     ../../Drivers_Hardware/LED/Inc
     ../../Drivers_Hardware/Key/Inc
     ../../Drivers_Hardware/SDRAM/Inc
+    # ../../Drivers_Hardware/LCD/Inc
 )
 
 target_sources(stm32cubemx INTERFACE
@@ -71,6 +72,7 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers_Hardware/LED/Src/led.c
     ../../Drivers_Hardware/Key/Src/key.c
     ../../Drivers_Hardware/SDRAM/Src/sdram.c
+    # ../../Drivers_Hardware/LCD/Src/lcd.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c
     ../../APP/Debug_Linker/RTT/SEGGER_RTT_ASM_ARMv7M.S
