@@ -27,7 +27,7 @@
 
 LTDC_HandleTypeDef hltdc;
 
-uint16_t *ltdc_lcd_framebuf0 = (uint16_t *)LCD_FRAME_BUF_ADDR;
+// uint16_t *ltdc_lcd_framebuf0 = (uint16_t *)LCD_FRAME_BUF_ADDR;
 
 // // 根据不同的颜色格式,定义帧缓存数组
 // #if LCD_PIXFORMAT == LCD_PIXFORMAT_ARGB8888 || LCD_PIXFORMAT == LCD_PIXFORMAT_RGB888
@@ -70,7 +70,7 @@ uint16_t *ltdc_lcd_framebuf0 = (uint16_t *)LCD_FRAME_BUF_ADDR;
 // }
 
 /* LTDC init function */
-void MX_LTDC_Init(void)
+void LTDC_Init(void)
 {
 
     /* USER CODE BEGIN LTDC_Init 0 */
@@ -81,6 +81,18 @@ void MX_LTDC_Init(void)
     // LTDC_LayerCfgTypeDef pLayerCfg1 = {0};
 
     /* USER CODE BEGIN LTDC_Init 1 */
+
+    lcdltdc.pwidth = ACTIVE_WIDTH;              // 面板宽度,单位:像素
+    lcdltdc.pheight = ACTIVE_HEIGHT;            // 面板高度,单位:像素
+    lcdltdc.hsw = HORIZONTAL_SYNCHRONOUS_PULSE; // 水平同步宽度
+    lcdltdc.vsw = VERTICAL_SYNCHRONOUS_PULSE;   // 垂直同步宽度
+    lcdltdc.hbp = HORIZONTAL_BACK_PORCH;        // 水平后廊
+    lcdltdc.vbp = VERTICAL_BACK_PORCH;          // 垂直后廊
+    lcdltdc.hfp = HORIZONTAL_FRONT_PORCH;       // 水平前廊
+    lcdltdc.vfp = VERTICAL_FRONT_PORCH;         // 垂直前廊
+
+    ltdc_framebuf[0] = (u32 *)ltdc_lcd_framebuf;
+    // ltdc_framebuf[1] = (u32 *)ltdc_lcd_framebuf;
 
     /* USER CODE END LTDC_Init 1 */
     hltdc.Instance = LTDC;
@@ -113,7 +125,7 @@ void MX_LTDC_Init(void)
     pLayerCfg.Alpha0 = 0;
     pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
     pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
-    pLayerCfg.FBStartAdress = (uint32_t)ltdc_lcd_framebuf0;
+    pLayerCfg.FBStartAdress = (uint32_t)ltdc_framebuf[0];
     pLayerCfg.ImageWidth = ACTIVE_WIDTH;
     pLayerCfg.ImageHeight = ACTIVE_HEIGHT;
     pLayerCfg.Backcolor.Blue = 0;

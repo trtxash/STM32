@@ -28,14 +28,10 @@ extern "C"
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "sdram.h"
-
-// LCD帧缓冲区首地址,这里定义在SDRAM里面.
-#define LCD_FRAME_BUF_ADDR Bank5_SDRAM_ADDR
 
     extern LTDC_HandleTypeDef hltdc;
 
-    void MX_LTDC_Init(void);
+    void LTDC_Init(void);
 
 #ifdef __cplusplus
 }

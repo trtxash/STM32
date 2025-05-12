@@ -142,13 +142,13 @@ void test_task(void)
         if (flag)
         {
             LED1_Set();
-            LCD_DISP_Set(); // 开背光
+            LCD_BLK_Set(); // 开背光
             // SDRAM_WriteSpeedTest_32bits();
         }
         else
         {
             LED1_Clr();
-            LCD_DISP_Clr();
+            LCD_BLK_Clr();
             // SDRAM_ReadSpeedTest();
         }
         // taskEXIT_CRITICAL(); // 退出临界区
