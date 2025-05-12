@@ -185,6 +185,10 @@ extern "C"
 #define GUI_DimGray              0x6B4D // 暗淡的灰色
 #define GUI_Black                0x0000 // 纯黑
 
+// LCD的画笔颜色和背景色
+#define POINT_COLOR GUI_Black // 画笔颜色
+#define BACK_COLOR  GUI_White // 背景色
+
 #endif
 
     // LCD LTDC重要参数集

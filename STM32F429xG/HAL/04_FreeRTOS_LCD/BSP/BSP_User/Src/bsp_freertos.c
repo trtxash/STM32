@@ -115,11 +115,11 @@ void key_task(void)
             {
                 LED2_Clr();
                 // vTaskSuspend(TESTTask_Handler);
-                LTDC_Fill(0, 0, 399, 239, GUI_White);
-                LTDC_Draw_Line(400, 240, 800, 480, GUI_White);
-                LTDC_Display_Dir(1);
-                LTDC_Fill(0, 0, 399, 239, GUI_Red);
-                LTDC_Draw_Line(400, 240, 800, 480, GUI_Green);
+                // LTDC_Clear(GUI_White);
+                // LTDC_Display_Dir(1);
+                // LTDC_Fill(0, 0, 399, 239, GUI_Red);
+                LTDC_Draw_Line(0, 0, 800 - 1, 480 - 1, GUI_Green);
+                LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Green);
                 flag = !flag;
             }
             else
@@ -128,11 +128,9 @@ void key_task(void)
                 // vTaskResume(TESTTask_Handler);
                 // LTDC_Fill(0, 0, 399, 239, GUI_White);
                 // LTDC_Draw_Line(400, 240, 800, 480, GUI_White);
-                LTDC_Fill(0, 0, 399, 239, GUI_White);
-                LTDC_Draw_Line(400, 240, 800, 480, GUI_White);
-                LTDC_Display_Dir(0);
-                LTDC_Fill(0, 0, 399, 239, GUI_Red);
-                LTDC_Draw_Line(400, 240, 800, 480, GUI_Green);
+                LTDC_Clear(GUI_White);
+                // LTDC_Display_Dir(0);
+                // LTDC_Fill(0, 0, 399, 239, GUI_Red);
                 flag = !flag;
             }
         }
@@ -164,6 +162,8 @@ void test_task(void)
             // SDRAM_ReadSpeedTest();
         }
         // taskEXIT_CRITICAL(); // 退出临界区
+        LTDC_Show_String(0, 0, ACTIVE_WIDTH, ACTIVE_HEIGHT, 32, "Hello World!", GUI_Black);
+        // LTDC_Show_Char(100, 100, 'H', 16, 0, GUI_Black);
         vTaskDelayUntil(&xLastWakeTime, 1000);
     }
 }

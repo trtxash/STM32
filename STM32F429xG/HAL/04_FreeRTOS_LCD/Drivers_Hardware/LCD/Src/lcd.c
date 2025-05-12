@@ -398,7 +398,7 @@ void LTDC_Draw_Circle(u16 x0, u16 y0, u8 r, u32 color)
 // 在指定位置显示一个字符
 // x,y:起始坐标
 // num:要显示的字符:" "--->"~"
-// size:字体大小 12/16/24/32
+// size:字体大小 8/12/16/24/32
 // mode:叠加方式(1)还是非叠加方式(0)
 void LTDC_Show_Char(u16 x, u16 y, u8 num, u8 size, u8 mode, u32 color)
 {
@@ -423,7 +423,7 @@ void LTDC_Show_Char(u16 x, u16 y, u8 num, u8 size, u8 mode, u32 color)
             if (temp & 0x80)
                 LTDC_Draw_Point(x, y, color);
             else if (mode == 0)
-                LTDC_Draw_Point(x, y, color);
+                LTDC_Draw_Point(x, y, BACK_COLOR);
             temp <<= 1;
             y++;
             if (y >= lcdltdc.height)
