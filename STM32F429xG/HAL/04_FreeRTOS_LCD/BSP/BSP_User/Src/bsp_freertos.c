@@ -23,6 +23,11 @@ void led_task(void);          // 任务函数
 TaskHandle_t KEYTask_Handler; // 任务句柄
 void key_task(void);          // 任务函数
 
+#define GUI_TASK_PRIO 13       // 任务优先级,越大越高优先级
+#define GUI_TSTK_SIZE 256 + 1  // 任务堆栈大小
+TaskHandle_t GUI_Task_Handler; // 任务句柄
+void gui_task(void);           // 任务函数
+
 #define TEST_TASK_PRIO 11      // 任务优先级,越大越高优先级
 #define TEST_TSTK_SIZE 256 + 1 // 任务堆栈大小
 TaskHandle_t TESTTask_Handler; // 任务句柄
@@ -66,6 +71,14 @@ void start_task(void)
                 (UBaseType_t)KEY_TASK_PRIO,
                 (TaskHandle_t *)&KEYTask_Handler);
 
+    // // 创建GUI任务
+    // xTaskCreate((TaskFunction_t)gui_task,
+    //             (const char *)"gui_task",
+    //             (uint16_t)GUI_TSTK_SIZE,
+    //             (void *)NULL,
+    //             (UBaseType_t)GUI_TASK_PRIO,
+    //             (TaskHandle_t *)&GUI_Task_Handler);
+
     // 创建test任务
     xTaskCreate((TaskFunction_t)test_task,
                 (const char *)"test_task",
@@ -93,19 +106,12 @@ void led_task(void)
 // key任务函数
 void key_task(void)
 {
-    // uint32_t i = 0;
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-
         KEY_Scan(&KEY_UP_DATA, KEY_UP_READ());
-        // if (KEY_UP_DATA.K_value)
-        // {
-        //     i++;
-        //     KEY_UP_DATA.K_value = 0;
-        //     LOGI("KEY_UP,i=%u", i);
-        // }
+
         if (KEY_UP_DATA.K_value)
         {
             static uint8_t flag = 1;
@@ -114,29 +120,33 @@ void key_task(void)
             if (flag)
             {
                 LED2_Clr();
-                // vTaskSuspend(TESTTask_Handler);
-                // LTDC_Clear(GUI_White);
-                // LTDC_Display_Dir(1);
-                // LTDC_Fill(0, 0, 399, 239, GUI_Red);
+                flag = !flag;
                 LTDC_Draw_Line(0, 0, 800 - 1, 480 - 1, GUI_Green);
                 LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Green);
-                flag = !flag;
             }
             else
             {
                 LED2_Set();
-                // vTaskResume(TESTTask_Handler);
-                // LTDC_Fill(0, 0, 399, 239, GUI_White);
-                // LTDC_Draw_Line(400, 240, 800, 480, GUI_White);
-                LTDC_Clear(GUI_White);
-                // LTDC_Display_Dir(0);
-                // LTDC_Fill(0, 0, 399, 239, GUI_Red);
                 flag = !flag;
+                LTDC_Clear(GUI_White);
             }
         }
         vTaskDelayUntil(&xLastWakeTime, 50);
     }
 }
+
+// // gui任务函数
+// void gui_task(void)
+// {
+//     TickType_t xLastWakeTime;
+//     xLastWakeTime = xTaskGetTickCount();
+//     while (1)
+//     {
+//         LTDC_Draw_Line(0, 0, 800 - 1, 480 - 1, GUI_Green);
+//         LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Green);
+//         vTaskDelayUntil(&xLastWakeTime, 500);
+//     }
+// }
 
 // 测试任务函数
 void test_task(void)
@@ -147,23 +157,14 @@ void test_task(void)
     while (1)
     {
         flag = !flag;
-        // LED1_Reverse();
-        // taskENTER_CRITICAL(); // 进入临界区
         if (flag)
         {
             LED1_Set();
-            // LCD_BLK_Set(); // 开背光
-            // SDRAM_WriteSpeedTest_32bits();
         }
         else
         {
             LED1_Clr();
-            // LCD_BLK_Clr();
-            // SDRAM_ReadSpeedTest();
         }
-        // taskEXIT_CRITICAL(); // 退出临界区
-        LTDC_Show_String(0, 0, ACTIVE_WIDTH, ACTIVE_HEIGHT, 32, "Hello World!", GUI_Black);
-        // LTDC_Show_Char(100, 100, 'H', 16, 0, GUI_Black);
         vTaskDelayUntil(&xLastWakeTime, 1000);
     }
 }
