@@ -1,5 +1,6 @@
 #include "bsp_freertos.h"
 #include "key.h"
+#include "lcd.h"
 #include "led.h"
 #include "log_rtt.h"
 #include "sdram.h"
@@ -141,12 +142,14 @@ void test_task(void)
         if (flag)
         {
             LED1_Set();
-            SDRAM_WriteSpeedTest_32bits();
+            LCD_DISP_Set(); // 开背光
+            // SDRAM_WriteSpeedTest_32bits();
         }
         else
         {
             LED1_Clr();
-            SDRAM_ReadSpeedTest();
+            LCD_DISP_Clr();
+            // SDRAM_ReadSpeedTest();
         }
         // taskEXIT_CRITICAL(); // 退出临界区
         vTaskDelayUntil(&xLastWakeTime, 1000);

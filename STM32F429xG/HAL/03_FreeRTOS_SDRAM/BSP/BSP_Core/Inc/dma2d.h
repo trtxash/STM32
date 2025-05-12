@@ -1,12 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file    stm32f4xx_it.h
- * @brief   This file contains the headers of the interrupt handlers.
+ * @file    dma2d.h
+ * @brief   This file contains all the function prototypes for
+ *          the dma2d.c file
  ******************************************************************************
  * @attention
  *
- * Copyright (c) 2023 STMicroelectronics.
+ * Copyright (c) 2025 STMicroelectronics.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -16,31 +17,36 @@
  ******************************************************************************
  */
 /* USER CODE END Header */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F4xx_IT_H
-#define __STM32F4xx_IT_H
+#ifndef __DMA2D_H__
+#define __DMA2D_H__
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    void NMI_Handler(void);
-    void HardFault_Handler(void);
-    void MemManage_Handler(void);
-    void BusFault_Handler(void);
-    void UsageFault_Handler(void);
-    void SVC_Handler(void);
-    void DebugMon_Handler(void);
-    void PendSV_Handler(void);
-    void SysTick_Handler(void);
-    void TIM8_TRG_COM_TIM14_IRQHandler(void);
-    void DMA2D_IRQHandler(void);
-    // void WWDG_IRQHandler(void);
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+    /* USER CODE BEGIN Includes */
+
+    /* USER CODE END Includes */
+
+    extern DMA2D_HandleTypeDef hdma2d;
+
+    /* USER CODE BEGIN Private defines */
+
+    /* USER CODE END Private defines */
+
+    void MX_DMA2D_Init(void);
+
+    /* USER CODE BEGIN Prototypes */
+
+    /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __STM32F4xx_IT_H */
+#endif /* __DMA2D_H__ */

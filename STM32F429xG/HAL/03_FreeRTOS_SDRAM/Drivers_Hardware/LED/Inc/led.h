@@ -29,14 +29,14 @@
 #define LED3_PIN GPIO_PIN_5
 
 /* GPIO操作 */
-#define LED0_Clr() LED0_GPIO->BSRR = (uint32_t)LED0_PIN << 16U
-#define LED0_Set() LED0_GPIO->BSRR = LED0_PIN
-#define LED1_Clr() LED1_GPIO->BSRR = (uint32_t)LED1_PIN << 16U
-#define LED1_Set() LED1_GPIO->BSRR = LED1_PIN
-#define LED2_Clr() LED2_GPIO->BSRR = (uint32_t)LED2_PIN << 16U
-#define LED2_Set() LED2_GPIO->BSRR = LED2_PIN
-#define LED3_Clr() LED3_GPIO->BSRR = (uint32_t)LED3_PIN << 16U
-#define LED3_Set() LED3_GPIO->BSRR = LED3_PIN
+#define LED0_Clr() (LED0_GPIO->BSRR = (uint32_t)LED0_PIN << 16U)
+#define LED0_Set() (LED0_GPIO->BSRR = LED0_PIN)
+#define LED1_Clr() (LED1_GPIO->BSRR = (uint32_t)LED1_PIN << 16U)
+#define LED1_Set() (LED1_GPIO->BSRR = LED1_PIN)
+#define LED2_Clr() (LED2_GPIO->BSRR = (uint32_t)LED2_PIN << 16U)
+#define LED2_Set() (LED2_GPIO->BSRR = LED2_PIN)
+#define LED3_Clr() (LED3_GPIO->BSRR = (uint32_t)LED3_PIN << 16U)
+#define LED3_Set() (LED3_GPIO->BSRR = LED3_PIN)
 
 void LED_Init(void);
 void LED0_Init(void);
@@ -47,6 +47,5 @@ void LED0_Reverse(void);
 void LED1_Reverse(void);
 void LED2_Reverse(void);
 void LED3_Reverse(void);
-
 
 #endif

@@ -1,12 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file    stm32f4xx_it.h
- * @brief   This file contains the headers of the interrupt handlers.
+ * @file    ltdc.h
+ * @brief   This file contains all the function prototypes for
+ *          the ltdc.c file
  ******************************************************************************
  * @attention
  *
- * Copyright (c) 2023 STMicroelectronics.
+ * Copyright (c) 2025 STMicroelectronics.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -16,31 +17,28 @@
  ******************************************************************************
  */
 /* USER CODE END Header */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F4xx_IT_H
-#define __STM32F4xx_IT_H
+#ifndef __LTDC_H__
+#define __LTDC_H__
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    void NMI_Handler(void);
-    void HardFault_Handler(void);
-    void MemManage_Handler(void);
-    void BusFault_Handler(void);
-    void UsageFault_Handler(void);
-    void SVC_Handler(void);
-    void DebugMon_Handler(void);
-    void PendSV_Handler(void);
-    void SysTick_Handler(void);
-    void TIM8_TRG_COM_TIM14_IRQHandler(void);
-    void DMA2D_IRQHandler(void);
-    // void WWDG_IRQHandler(void);
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "sdram.h"
+
+// LCD帧缓冲区首地址,这里定义在SDRAM里面.
+#define LCD_FRAME_BUF_ADDR Bank5_SDRAM_ADDR
+
+    extern LTDC_HandleTypeDef hltdc;
+
+    void MX_LTDC_Init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __STM32F4xx_IT_H */
+#endif /* __LTDC_H__ */

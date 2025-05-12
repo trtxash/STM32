@@ -1,7 +1,9 @@
 #include "bsp_app.h"
 #include "key.h"
+#include "lcd.h"
 #include "led.h"
 #include "sdram.h"
+
 
 void bsp_init(void)
 {
@@ -11,4 +13,5 @@ void bsp_init(void)
     KEY_UP_Init();
     // KEY_BOOT_Init();
     SDRAM_Init();
+    lcd_disp_config();
 }
