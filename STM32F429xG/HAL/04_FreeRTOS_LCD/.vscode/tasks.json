@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: config and build",
+            "dependsOrder": "sequence", // 按顺序执行
+            "dependsOn": [
+                "CMake: configure",
+                "CMake: build"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "rtt",
+            "type": "shell",
+            "command": "JLinkRTTClient",
+            "args": [],
+            "problemMatcher": []
+        },
+    ]
+}
