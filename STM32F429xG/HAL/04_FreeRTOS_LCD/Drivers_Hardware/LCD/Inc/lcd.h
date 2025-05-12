@@ -213,6 +213,8 @@ extern "C"
     void LCD_BLK_Init(void);
     void LCD_Init(void);
 
+    void LTDC_Layer_Parameter_Config(u8 layerx, u32 bufaddr, u8 pixformat, u8 alpha, u8 alpha0, u8 bfac1, u8 bfac2, u32 bkcolor);
+    void LTDC_Layer_Window_Config(u8 layerx, u16 sx, u16 sy, u16 width, u16 height);
     void LTDC_Switch(u8 sw);
     void LTDC_Layer_Switch(u8 layerx, u8 sw);
     void LTDC_Select_Layer(u8 layerx);
@@ -222,8 +224,14 @@ extern "C"
     void LTDC_Fill(u16 sx, u16 sy, u16 ex, u16 ey, u32 color);
     void LTDC_Color_Fill(u16 sx, u16 sy, u16 ex, u16 ey, u16 *color);
     void LTDC_Clear(u32 color);
-    void LTDC_Layer_Parameter_Config(u8 layerx, u32 bufaddr, u8 pixformat, u8 alpha, u8 alpha0, u8 bfac1, u8 bfac2, u32 bkcolor);
-    void LTDC_Layer_Window_Config(u8 layerx, u16 sx, u16 sy, u16 width, u16 height);
+    void LTDC_Draw_Line(u16 x1, u16 y1, u16 x2, u16 y2, u32 color);
+    void LTDC_Draw_Rectangle(u16 x1, u16 y1, u16 x2, u16 y2, u32 color);
+    void LTDC_Draw_Circle(u16 x0, u16 y0, u8 r, u32 color);
+    void LTDC_Show_Char(u16 x, u16 y, u8 num, u8 size, u8 mode, u32 color);
+    u32 LCD_Pow(u8 m, u8 n);
+    void LTDC_Show_Num(u16 x, u16 y, u32 num, u8 len, u8 size, u32 color);
+    void LTDC_Show_xNum(u16 x, u16 y, u32 num, u8 len, u8 size, u8 mode, u32 color);
+    void LTDC_Show_String(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u32 color);
 
 #if defined(__cplusplus)
 }

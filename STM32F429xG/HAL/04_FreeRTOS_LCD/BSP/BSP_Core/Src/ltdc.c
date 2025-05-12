@@ -91,6 +91,12 @@ void LTDC_Init(void)
     lcdltdc.hfp = HORIZONTAL_FRONT_PORCH;       // 水平前廊
     lcdltdc.vfp = VERTICAL_FRONT_PORCH;         // 垂直前廊
 
+#if LCD_PIXFORMAT == LCD_PIXFORMAT_ARGB8888 || LCD_PIXFORMAT == LCD_PIXFORMAT_RGB888
+    lcdltdc.pixsize = 4; // 颜色字节数
+#else
+    lcdltdc.pixsize = 2; // 颜色字节数
+#endif
+
     ltdc_framebuf[0] = (u32 *)ltdc_lcd_framebuf;
     // ltdc_framebuf[1] = (u32 *)ltdc_lcd_framebuf;
 
