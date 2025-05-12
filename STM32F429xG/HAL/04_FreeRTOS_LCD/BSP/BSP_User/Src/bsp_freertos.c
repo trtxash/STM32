@@ -114,13 +114,15 @@ void key_task(void)
             if (flag)
             {
                 LED2_Clr();
-                vTaskSuspend(TESTTask_Handler);
+                // vTaskSuspend(TESTTask_Handler);
+                LTDC_Fill(0, 0, 399, 239, GUI_Red);
                 flag = !flag;
             }
             else
             {
                 LED2_Set();
-                vTaskResume(TESTTask_Handler);
+                // vTaskResume(TESTTask_Handler);
+                LTDC_Fill(0, 0, 399, 239, GUI_White);
                 flag = !flag;
             }
         }

@@ -77,7 +77,7 @@ void LTDC_Init(void)
 
     /* USER CODE END LTDC_Init 0 */
 
-    LTDC_LayerCfgTypeDef pLayerCfg = {0};
+    // LTDC_LayerCfgTypeDef pLayerCfg = {0};
     // LTDC_LayerCfgTypeDef pLayerCfg1 = {0};
 
     /* USER CODE BEGIN LTDC_Init 1 */
@@ -116,25 +116,35 @@ void LTDC_Init(void)
         Error_Handler();
     }
 
-    pLayerCfg.WindowX0 = 0;
-    pLayerCfg.WindowX1 = ACTIVE_WIDTH;
-    pLayerCfg.WindowY0 = 0;
-    pLayerCfg.WindowY1 = ACTIVE_HEIGHT;
-    pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_RGB565;
-    pLayerCfg.Alpha = 0;
-    pLayerCfg.Alpha0 = 0;
-    pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
-    pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
-    pLayerCfg.FBStartAdress = (uint32_t)ltdc_framebuf[0];
-    pLayerCfg.ImageWidth = ACTIVE_WIDTH;
-    pLayerCfg.ImageHeight = ACTIVE_HEIGHT;
-    pLayerCfg.Backcolor.Blue = 0;
-    pLayerCfg.Backcolor.Green = 0;
-    pLayerCfg.Backcolor.Red = 0;
-    if (HAL_LTDC_ConfigLayer(&hltdc, &pLayerCfg, 0) != HAL_OK)
-    {
-        Error_Handler();
-    }
+    // pLayerCfg.WindowX0 = 0;
+    // pLayerCfg.WindowX1 = ACTIVE_WIDTH;
+    // pLayerCfg.WindowY0 = 0;
+    // pLayerCfg.WindowY1 = ACTIVE_HEIGHT;
+    // pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_RGB565;
+    // pLayerCfg.Alpha = 0;
+    // pLayerCfg.Alpha0 = 0;
+    // pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
+    // pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
+    // pLayerCfg.FBStartAdress = (uint32_t)ltdc_framebuf[0];
+    // pLayerCfg.ImageWidth = ACTIVE_WIDTH;
+    // pLayerCfg.ImageHeight = ACTIVE_HEIGHT;
+    // pLayerCfg.Backcolor.Blue = 0;
+    // pLayerCfg.Backcolor.Green = 0;
+    // pLayerCfg.Backcolor.Red = 0;
+    // if (HAL_LTDC_ConfigLayer(&hltdc, &pLayerCfg, 0) != HAL_OK)
+    // {
+    //     Error_Handler();
+    // }
+
+    // 层配置
+    LTDC_Layer_Parameter_Config(0, (u32)ltdc_framebuf[0], LCD_PIXFORMAT, 255, 0, 6, 7, 0X000000); // 层参数配置
+    LTDC_Layer_Window_Config(0, 0, 0, lcdltdc.pwidth, lcdltdc.pheight);                           // 层窗口配置,以LCD面板坐标系为基准,不要随便修改!
+
+    LTDC_Display_Dir(1);
+    LTDC_Select_Layer(0);   // 选择第1层
+    LCD_BLK_Set();          // 点亮背光
+    LTDC_Clear(0XFFFFFFFF); // 清屏
+
     // pLayerCfg1.WindowX0 = 0;
     // pLayerCfg1.WindowX1 = 0;
     // pLayerCfg1.WindowY0 = 0;
