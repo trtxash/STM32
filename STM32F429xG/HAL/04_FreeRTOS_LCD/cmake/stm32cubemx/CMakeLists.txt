@@ -24,9 +24,9 @@ target_include_directories(stm32cubemx INTERFACE
     ../../APP/Debug_Linker/RTT/Inc
     ../../Drivers_Hardware/Key/Inc
     ../../Drivers_Hardware/LCD/Inc
+    ../../Drivers_Hardware/OLED/Inc
     ../../Drivers_Hardware/LED/Inc
     ../../Drivers_Hardware/SDRAM/Inc
-
 )
 
 target_sources(stm32cubemx INTERFACE
@@ -65,10 +65,11 @@ target_sources(stm32cubemx INTERFACE
     ../../FreeRTOS/Src/queue.c
     ../../FreeRTOS/portable/GCC/ARM_CM4F/port.c
     ../../FreeRTOS/portable/MemMang/heap_4.c
-    ../../BSP/BSP_User/Src/sys.c
-    ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/bsp_app.c
     ../../BSP/BSP_User/Src/bsp_freertos.c
+    ../../BSP/BSP_User/Src/delay.c
+    ../../BSP/BSP_User/Src/myiic.c
+    ../../BSP/BSP_User/Src/sys.c
     ../../BSP/BSP_Core/Src/dma2d.c
     ../../BSP/BSP_Core/Src/fmc.c
     # ../../BSP/BSP_Core/Src/iwdg.c
@@ -78,6 +79,8 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers_Hardware/LED/Src/led.c
     ../../Drivers_Hardware/Key/Src/key.c
     ../../Drivers_Hardware/SDRAM/Src/sdram.c
+    ../../Drivers_Hardware/OLED/Src/oledio.c
+    ../../Drivers_Hardware/OLED/Src/oled.c
     ../../Drivers_Hardware/LCD/Src/lcd.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c

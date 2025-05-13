@@ -2,6 +2,8 @@
 #include "key.h"
 #include "lcd.h"
 #include "led.h"
+#include "myiic.h"
+#include "oled.h"
 #include "sdram.h"
 
 /**
@@ -19,4 +21,5 @@ void bsp_init(void)
     KEY_UP_Init();
     SDRAM_Init();
     LCD_Init();
+    OLED_Init();
 }

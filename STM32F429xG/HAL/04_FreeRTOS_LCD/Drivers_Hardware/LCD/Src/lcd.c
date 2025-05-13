@@ -2,7 +2,7 @@
 #include "dma2d.h"
 #include "ltdc.h"
 #include "sys.h"
-#include "userfont.h"
+#include "lcdfont.h"
 
 #if SYSTEM_SUPPORT_OS
 #include "FreeRTOS.h" //FreeRTOS使用
@@ -53,8 +53,6 @@ void LCD_Init(void)
 {
     LCD_BLK_Init(); // 背光IO初始化
     LTDC_Init();    // LTDC初始化
-    // MX_DMA2D_Init(); // DMA2D初始化
-    // LCD_BLK_Set();   // 开背光
 }
 
 // LTDC,基本参数设置.
@@ -409,13 +407,13 @@ void LTDC_Show_Char(u16 x, u16 y, u8 num, u8 size, u8 mode, u32 color)
     for (t = 0; t < csize; t++)
     {
         if (size == 12)
-            temp = asc2_1206[num][t]; // 调用1206字体
+            temp = lcd_asc2_1206[num][t]; // 调用1206字体
         else if (size == 16)
-            temp = asc2_1608[num][t]; // 调用1608字体
+            temp = lcd_asc2_1608[num][t]; // 调用1608字体
         else if (size == 24)
-            temp = asc2_2412[num][t]; // 调用2412字体
+            temp = lcd_asc2_2412[num][t]; // 调用2412字体
         else if (size == 32)
-            temp = asc2_3216[num][t]; // 调用3216字体
+            temp = lcd_asc2_3216[num][t]; // 调用3216字体
         else
             return; // 没有的字库
         for (t1 = 0; t1 < 8; t1++)
@@ -534,45 +532,3 @@ void LTDC_Show_String(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u32 c
         p++;
     }
 }
-
-// void LCD_Refresh(void)
-// {
-//     u32 psx, psy, pex, pey; // 以LCD面板为基准的坐标系,不随横竖屏变化而变化
-//     u32 timeout = 0;
-//     u16 offline;
-//     u32 addr;
-//     // 坐标系转换
-//     if (lcdltdc.dir) // 横屏
-//     {
-//         psx = 0;
-//         psy = 0;
-//         pex = ex;
-//         pey = ey;
-//     }
-//     else // 竖屏
-//     {
-//         psx = 0;
-//         psy = lcdltdc.pheight - ex - 1;
-//         pex = ey;
-//         pey = lcdltdc.pheight - sx - 1;
-//     }
-//     offline = lcdltdc.pwidth - (pex - psx + 1);
-//     addr = ((u32)ltdc_framebuf[lcdltdc.activelayer] + lcdltdc.pixsize * (lcdltdc.pwidth * psy + psx));
-//     __HAL_RCC_DMA2D_CLK_ENABLE();   // 使能DM2D时钟
-//     DMA2D->CR &= ~(DMA2D_CR_START); // 先停止DMA2D
-//     DMA2D->CR = DMA2D_R2M;          // 寄存器到存储器模式
-//     DMA2D->OPFCCR = LCD_PIXFORMAT;  // 设置颜色格式
-//     DMA2D->OOR = offline;           // 设置行偏移
-
-//     DMA2D->OMAR = addr;                                     // 输出存储器地址
-//     DMA2D->NLR = (pey - psy + 1) | ((pex - psx + 1) << 16); // 设定行数寄存器
-//     DMA2D->OCOLR = color;                                   // 设定输出颜色寄存器
-//     DMA2D->CR |= DMA2D_CR_START;                            // 启动DMA2D
-//     while ((DMA2D->ISR & (DMA2D_FLAG_TC)) == 0)             // 等待传输完成
-//     {
-//         timeout++;
-//         if (timeout > 0X1FFFFF)
-//             break; // 超时退出
-//     }
-//     DMA2D->IFCR |= DMA2D_FLAG_TC; // 清除传输完成标志
-// }
