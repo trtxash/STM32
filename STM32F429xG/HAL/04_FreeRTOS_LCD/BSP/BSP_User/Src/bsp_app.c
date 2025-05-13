@@ -22,4 +22,7 @@ void bsp_init(void)
     SDRAM_Init();
     LCD_Init();
     OLED_Init();
+    OLED_DrawLine(0, 0, 128 - 1, 64 - 1, 1, 0);
+    OLED_DrawLine(128 - 1, 0, 0, 64 - 1, 1, 0);
+    OLED_Refresh();
 }

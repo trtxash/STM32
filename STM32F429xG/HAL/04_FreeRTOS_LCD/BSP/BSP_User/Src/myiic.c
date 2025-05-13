@@ -1,10 +1,10 @@
 #include "myiic.h"
 #include "delay.h"
-#include "stm32f4xx_hal_gpio.h"
 #include "oledio.h"
+#include "stm32f4xx_hal_gpio.h"
 
 birch_iic_bus_t birch_iic_bus[1] = {
-    [0] = {.RST_GPIOx = OLED_RST_Port, .RST_Pin = OLED_RST_Pin, .SCL_GPIOx = OLED_SCLK_Port, .SCL_Pin = OLED_SCLK_Pin, .SDA_GPIOx = OLED_SDIN_Port, .SDA_Pin = OLED_SDIN_Pin}, // 第一条IIC总线
+    [0] = {.RST_GPIOx = OLED_RST_Port, .RST_Pin = OLED_RST_Pin, .SCL_GPIOx = OLED_SCLK_Port, .SCL_Pin = OLED_SCLK_Pin, .SDA_GPIOx = OLED_SDIN_Port, .SDA_Pin = OLED_SDIN_Pin, .Drv_IICDelay_Time = 0}, // 第一条IIC总线
     // [1] = {.RST_GPIOx = GPIOA, .RST_Pin = GPIO_PIN_5, .SCL_GPIOx = GPIOB, .SCL_Pin = GPIO_PIN_5, .SDA_GPIOx = GPIOB, .SDA_Pin = GPIO_PIN_6}  // 第一条IIC总线
 };
 
@@ -43,15 +43,15 @@ void Drv_Init(birch_iic_bus_t *iic_bus)
     GPIO_InitTypeDef GPIO_InitStructure = {0};
 
     /* 统一处理GPIO时钟使能 */
-    enable_gpio_clk(iic_bus->RST_GPIOx);
+    // enable_gpio_clk(iic_bus->RST_GPIOx);
     enable_gpio_clk(iic_bus->SCL_GPIOx);
     enable_gpio_clk(iic_bus->SDA_GPIOx);
 
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStructure.Pull = GPIO_PULLUP;
+    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStructure.Pull = GPIO_NOPULL;
     GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-    GPIO_InitStructure.Pin = iic_bus->RST_Pin;
-    HAL_GPIO_Init(iic_bus->RST_GPIOx, &GPIO_InitStructure);
+    // GPIO_InitStructure.Pin = iic_bus->RST_Pin;
+    // HAL_GPIO_Init(iic_bus->RST_GPIOx, &GPIO_InitStructure);
     GPIO_InitStructure.Pin = iic_bus->SCL_Pin;
     HAL_GPIO_Init(iic_bus->SCL_GPIOx, &GPIO_InitStructure);
     GPIO_InitStructure.Pin = iic_bus->SDA_Pin;
@@ -59,9 +59,9 @@ void Drv_Init(birch_iic_bus_t *iic_bus)
 
     HAL_GPIO_WritePin(iic_bus->SCL_GPIOx, iic_bus->SCL_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(iic_bus->SDA_GPIOx, iic_bus->SDA_Pin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(iic_bus->RST_GPIOx, iic_bus->RST_Pin, GPIO_PIN_RESET);
-    delay_ms(200);
-    HAL_GPIO_WritePin(iic_bus->RST_GPIOx, iic_bus->RST_Pin, GPIO_PIN_SET);
+    // HAL_GPIO_WritePin(iic_bus->RST_GPIOx, iic_bus->RST_Pin, GPIO_PIN_RESET);
+    // delay_ms(200);
+    // HAL_GPIO_WritePin(iic_bus->RST_GPIOx, iic_bus->RST_Pin, GPIO_PIN_SET);
 }
 
 /**
@@ -82,14 +82,18 @@ void Drv_IICDelay(birch_iic_bus_t *iic_bus)
 
 static inline void SDIN_OUT(birch_iic_bus_t *iic_bus)
 {
-    iic_bus->SDA_GPIOx->MODER &= ~(3 << (7 * 2));
-    iic_bus->SDA_GPIOx->MODER |= 1 << 7 * 2;
+    uint32_t pin_pos = __builtin_ffs(iic_bus->SDA_Pin) - 1; // 获取引脚序号
+    iic_bus->SDA_GPIOx->MODER &= ~(3 << (pin_pos * 2));     // 动态计算偏移量
+    iic_bus->SDA_GPIOx->MODER |= 1 << (pin_pos * 2);        // 按实际引脚配置输出模式
+    // iic_bus->SDA_GPIOx->MODER &= ~(3 << (7 * 2));
+    // iic_bus->SDA_GPIOx->MODER |= 1 << 7 * 2;
 }
 
 static inline void SDIN_IN(birch_iic_bus_t *iic_bus)
 {
-    iic_bus->SDA_GPIOx->MODER &= ~(3 << (7 * 2));
-    iic_bus->SDA_GPIOx->MODER |= 0 << 7 * 2;
+    uint32_t pin_pos = __builtin_ffs(iic_bus->SDA_Pin) - 1; // 获取引脚序号
+    iic_bus->SDA_GPIOx->MODER &= ~(3 << (pin_pos * 2));     // 动态计算偏移量
+    iic_bus->SDA_GPIOx->MODER |= 0 << (pin_pos * 2);
 }
 
 static inline void SDIN_Set(birch_iic_bus_t *iic_bus)
@@ -99,7 +103,7 @@ static inline void SDIN_Set(birch_iic_bus_t *iic_bus)
 
 static inline void SDIN_Clr(birch_iic_bus_t *iic_bus)
 {
-    iic_bus->SDA_GPIOx->BSRR = (uint32_t)(iic_bus->SDA_GPIOx) << 16U;
+    iic_bus->SDA_GPIOx->BSRR = (uint32_t)(iic_bus->SDA_Pin) << 16U;
 }
 
 static inline void SCLK_Set(birch_iic_bus_t *iic_bus)
@@ -109,7 +113,7 @@ static inline void SCLK_Set(birch_iic_bus_t *iic_bus)
 
 static inline void SCLK_Clr(birch_iic_bus_t *iic_bus)
 {
-    iic_bus->SCL_GPIOx->BSRR = (uint32_t)(iic_bus->SCL_GPIOx) << 16U;
+    iic_bus->SCL_GPIOx->BSRR = (uint32_t)(iic_bus->SCL_Pin) << 16U;
 }
 
 static inline u8 SDIN_READ(birch_iic_bus_t *iic_bus)
@@ -161,7 +165,6 @@ u8 Drv_IICWaitAck(birch_iic_bus_t *iic_bus)
     u8 ucErrTime = 0;
 
     SDIN_IN(iic_bus); // SDA设置为输入
-    Drv_IICDelay(iic_bus);
     Drv_IICDelay(iic_bus);
     SCLK_Set(iic_bus);
     Drv_IICDelay(iic_bus);
@@ -227,7 +230,7 @@ void Drv_IICSendByte(uint8_t data, birch_iic_bus_t *iic_bus)
     for (t = 0; t < 8; t++)
     {
         Drv_IICDelay(iic_bus);
-        if ((data & 0x80) >> 7)
+        if (data & 0x80)
             SDIN_Set(iic_bus);
         else
             SDIN_Clr(iic_bus);

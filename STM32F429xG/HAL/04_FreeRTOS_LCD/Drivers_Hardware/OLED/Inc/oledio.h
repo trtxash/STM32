@@ -21,17 +21,17 @@
 
 #define OLED_BIRCH_IIC_BUS_POINTER &birch_iic_bus[0]
 
-#define OLED_SCLK_Port              GPIOB
+#define OLED_SCLK_Port GPIOB
 // #define OLED_SCLK_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define OLED_SCLK_Pin               GPIO_PIN_6
+#define OLED_SCLK_Pin GPIO_PIN_4
 
-#define OLED_SDIN_Port              GPIOB
+#define OLED_SDIN_Port GPIOB
 // #define OLED_SDIN_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define OLED_SDIN_Pin               GPIO_PIN_7
+#define OLED_SDIN_Pin GPIO_PIN_5
 
-#define OLED_RST_Port              GPIOB
+#define OLED_RST_Port GPIOB
 // #define OLED_RST_Port_Clk_Enable() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define OLED_RST_Pin               GPIO_PIN_0
+#define OLED_RST_Pin GPIO_PIN_0
 
 // // IO方向设置
 // #define OLED_SDA_IN()                             \

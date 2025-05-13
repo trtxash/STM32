@@ -124,17 +124,12 @@ void key_task(void)
                 flag = !flag;
                 LTDC_Draw_Line(0, 0, 800 - 1, 480 - 1, GUI_Green);
                 LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Green);
-                OLED_DrawLine(0, 0, 128 - 1, 64 - 1, 1, 0);
-                OLED_DrawLine(128 - 1, 0, 0, 64 - 1, 1, 0);
-                OLED_Refresh();
             }
             else
             {
                 LED2_Set();
                 flag = !flag;
                 LTDC_Clear(GUI_White);
-                OLED_Clear();
-                OLED_Refresh();
             }
         }
         vTaskDelayUntil(&xLastWakeTime, 50);
