@@ -22,9 +22,11 @@ target_include_directories(stm32cubemx INTERFACE
     ../../FreeRTOS/Inc
     ../../FreeRTOS/portable/GCC/ARM_CM4F
     ../../APP/Debug_Linker/RTT/Inc
+    ../../APP/Multi_Button/Inc
     ../../Drivers_Hardware/Key/Inc
     ../../Drivers_Hardware/LCD/Inc
-    ../../Drivers_Hardware/OLED/Inc
+    # ../../Drivers_Hardware/FT5206/Inc
+    # ../../Drivers_Hardware/OLED/Inc
     ../../Drivers_Hardware/LED/Inc
     ../../Drivers_Hardware/SDRAM/Inc
 )
@@ -79,12 +81,14 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers_Hardware/LED/Src/led.c
     ../../Drivers_Hardware/Key/Src/key.c
     ../../Drivers_Hardware/SDRAM/Src/sdram.c
-    ../../Drivers_Hardware/OLED/Src/oledio.c
-    ../../Drivers_Hardware/OLED/Src/oled.c
+    # ../../Drivers_Hardware/OLED/Src/oledio.c
+    # ../../Drivers_Hardware/OLED/Src/oled.c
     ../../Drivers_Hardware/LCD/Src/lcd.c
+    # ../../Drivers_Hardware/FT5206/Src/ft5206.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c
     ../../APP/Debug_Linker/RTT/SEGGER_RTT_ASM_ARMv7M.S
+    ../../APP/Multi_Button/Src/multi_button.c
     ../../startup_stm32f429xx.s
 )
 

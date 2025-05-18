@@ -3,10 +3,12 @@
 #include "lcd.h"
 #include "led.h"
 #include "log_rtt.h"
-#include "oled.h"
+#include "multi_button.h"
+#include "queue.h"
 #include "sdram.h"
+#include "stdlib.h"
 
-u8 keyval = 0;
+QueueHandle_t xQueue_KEY = NULL;
 
 #define START_TASK_PRIO 1       // 任务优先级,越大越高优先级
 #define START_STK_SIZE  128 + 1 // 任务堆栈大小
@@ -33,11 +35,6 @@ void gui_task(void);           // 任务函数
 #define TEST_TSTK_SIZE 256 + 1 // 任务堆栈大小
 TaskHandle_t TESTTask_Handler; // 任务句柄
 void test_task(void);          // 任务函数
-
-// #define TEST_TASK_PRIO 11      // 任务优先级,越大越高优先级
-// #define TEST_TSTK_SIZE 256 + 1 // 任务堆栈大小
-// TaskHandle_t TESTTask_Handler; // 任务句柄
-// void test_task(void);          // 任务函数
 
 void freertos_main(void)
 {
@@ -72,13 +69,13 @@ void start_task(void)
                 (UBaseType_t)KEY_TASK_PRIO,
                 (TaskHandle_t *)&KEYTask_Handler);
 
-    // // 创建GUI任务
-    // xTaskCreate((TaskFunction_t)gui_task,
-    //             (const char *)"gui_task",
-    //             (uint16_t)GUI_TSTK_SIZE,
-    //             (void *)NULL,
-    //             (UBaseType_t)GUI_TASK_PRIO,
-    //             (TaskHandle_t *)&GUI_Task_Handler);
+    // 创建GUI任务
+    xTaskCreate((TaskFunction_t)gui_task,
+                (const char *)"gui_task",
+                (uint16_t)GUI_TSTK_SIZE,
+                (void *)NULL,
+                (UBaseType_t)GUI_TASK_PRIO,
+                (TaskHandle_t *)&GUI_Task_Handler);
 
     // 创建test任务
     xTaskCreate((TaskFunction_t)test_task,
@@ -104,50 +101,74 @@ void led_task(void)
     }
 }
 
+static void Callback_Down_Click_Handler(void *btn)
+{
+    if (btn == &button_up)
+    {
+        LOGI("Down");
+    }
+}
+
+static void Callback_Single_Click_Handler(void *btn)
+{
+    if (btn == &button_up)
+    {
+        // static uint8_t flag = 1;
+
+        // if (flag)
+        // {
+        //     LED2_Clr();
+        //     flag = !flag;
+        //     LTDC_Draw_Line(0, 0, 800 - 1, 480 - 1, GUI_Green);
+        //     LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Green);
+        // }
+        // else
+        // {
+        //     LED2_Set();
+        //     flag = !flag;
+        //     LTDC_Clear(GUI_White);
+        // }
+        // xQueueSend(xQueue_KEY, (void *)SINGLE_CLICK, 10);
+        LOGI("Single");
+    }
+}
+
+static void Callback_Double_Click_Handler(void *btn)
+{
+    if (btn == &button_up)
+    {
+        LOGI("Double");
+    }
+}
+
 // key任务函数
 void key_task(void)
 {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
+
+    xQueue_KEY = xQueueCreate(16, sizeof(uint8_t));
+    // button_attach(&button_up, PRESS_DOWN, Callback_Down_Click_Handler);
+    button_attach(&button_up, SINGLE_CLICK, Callback_Single_Click_Handler);
+    button_attach(&button_up, DOUBLE_CLICK, Callback_Double_Click_Handler);
+    button_start(&button_up);
     while (1)
     {
-        KEY_Scan(&KEY_UP_DATA, KEY_UP_READ());
-
-        if (KEY_UP_DATA.K_value)
-        {
-            static uint8_t flag = 1;
-
-            KEY_UP_DATA.K_value = 0;
-            if (flag)
-            {
-                LED2_Clr();
-                flag = !flag;
-                LTDC_Draw_Line(0, 0, 800 - 1, 480 - 1, GUI_Green);
-                LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Green);
-            }
-            else
-            {
-                LED2_Set();
-                flag = !flag;
-                LTDC_Clear(GUI_White);
-            }
-        }
-        vTaskDelayUntil(&xLastWakeTime, 50);
+        button_ticks();
+        vTaskDelayUntil(&xLastWakeTime, 5);
     }
 }
 
-// // gui任务函数
-// void gui_task(void)
-// {
-//     TickType_t xLastWakeTime;
-//     xLastWakeTime = xTaskGetTickCount();
-//     while (1)
-//     {
-//         LTDC_Draw_Line(0, 0, 800 - 1, 480 - 1, GUI_Green);
-//         LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Green);
-//         vTaskDelayUntil(&xLastWakeTime, 500);
-//     }
-// }
+// gui任务函数
+void gui_task(void)
+{
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+    while (1)
+    {
+        vTaskDelayUntil(&xLastWakeTime, 10);
+    }
+}
 
 // 测试任务函数
 void test_task(void)

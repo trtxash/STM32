@@ -3,7 +3,6 @@
 #include "lcd.h"
 #include "led.h"
 #include "myiic.h"
-#include "oled.h"
 #include "sdram.h"
 
 /**
@@ -18,11 +17,7 @@ void bsp_init(void)
     Stm32_Clock_Init(SYS_CLOCK, 12, RCC_PLLP_DIV2, 8); // 设置时钟
     delay_init(SYS_CLOCK);                             // 延时初始化
     LED_Init();
-    KEY_UP_Init();
+    KEY_Init();
     SDRAM_Init();
     LCD_Init();
-    OLED_Init();
-    OLED_DrawLine(0, 0, 128 - 1, 64 - 1, 1, 0);
-    OLED_DrawLine(128 - 1, 0, 0, 64 - 1, 1, 0);
-    OLED_Refresh();
 }

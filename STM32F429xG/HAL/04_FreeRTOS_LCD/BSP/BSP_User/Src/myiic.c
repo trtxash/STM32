@@ -1,10 +1,10 @@
 #include "myiic.h"
 #include "delay.h"
-#include "oledio.h"
 #include "stm32f4xx_hal_gpio.h"
+// #include "ft5206.h"
 
 birch_iic_bus_t birch_iic_bus[1] = {
-    [0] = {.RST_GPIOx = OLED_RST_Port, .RST_Pin = OLED_RST_Pin, .SCL_GPIOx = OLED_SCLK_Port, .SCL_Pin = OLED_SCLK_Pin, .SDA_GPIOx = OLED_SDIN_Port, .SDA_Pin = OLED_SDIN_Pin, .Drv_IICDelay_Time = 0}, // 第一条IIC总线
+    [0] = {.RST_GPIOx = GPIOD, .RST_Pin = GPIO_PIN_12, .SCL_GPIOx = GPIOB, .SCL_Pin = GPIO_PIN_6, .SDA_GPIOx = GPIOB, .SDA_Pin = GPIO_PIN_7, .Drv_IICDelay_Time = 0}, // 第一条IIC总线
     // [1] = {.RST_GPIOx = GPIOA, .RST_Pin = GPIO_PIN_5, .SCL_GPIOx = GPIOB, .SCL_Pin = GPIO_PIN_5, .SDA_GPIOx = GPIOB, .SDA_Pin = GPIO_PIN_6}  // 第一条IIC总线
 };
 

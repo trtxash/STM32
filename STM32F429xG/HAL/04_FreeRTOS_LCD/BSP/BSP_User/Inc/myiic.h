@@ -3,21 +3,6 @@
 
 #include "sys.h"
 
-// // IO方向设置
-// #define OLED_SDA_IN()                             \
-//     {                                             \
-//         OLED_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-//         OLED_SDIN_Port->MODER |= 0 << 7 * 2;      \
-//     } // PB9输入模式，括号内数字为几号管脚
-// #define OLED_SDA_OUT()                            \
-//     {                                             \
-//         OLED_SDIN_Port->MODER &= ~(3 << (7 * 2)); \
-//         OLED_SDIN_Port->MODER |= 1 << 7 * 2;      \
-//     } // PB9输出模式，括号内数字为几号管脚
-
-// #define OLED_SCLK_Clr() (OLED_SCLK_Port->BSRR = (uint32_t)OLED_SCLK_Pin << 16U)
-// #define OLED_SCLK_Set() (OLED_SCLK_Port->BSRR = OLED_SCLK_Pin)
-
 typedef struct
 {
     GPIO_TypeDef *RST_GPIOx;
