@@ -1,8 +1,8 @@
 #include "lcd.h"
 #include "dma2d.h"
+#include "lcdfont.h"
 #include "ltdc.h"
 #include "sys.h"
-#include "lcdfont.h"
 
 #if SYSTEM_SUPPORT_OS
 #include "FreeRTOS.h" //FreeRTOS使用
@@ -396,7 +396,7 @@ void LTDC_Draw_Circle(u16 x0, u16 y0, u8 r, u32 color)
 // 在指定位置显示一个字符
 // x,y:起始坐标
 // num:要显示的字符:" "--->"~"
-// size:字体大小 8/12/16/24/32
+// size:字体大小 1206/1608/2412/3216
 // mode:叠加方式(1)还是非叠加方式(0)
 void LTDC_Show_Char(u16 x, u16 y, u8 num, u8 size, u8 mode, u32 color)
 {
@@ -416,22 +416,20 @@ void LTDC_Show_Char(u16 x, u16 y, u8 num, u8 size, u8 mode, u32 color)
             temp = lcd_asc2_3216[num][t]; // 调用3216字体
         else
             return; // 没有的字库
-        for (t1 = 0; t1 < 8; t1++)
+        for (t1 = 0; t1 < 8; t1++) // 一次画8个点
         {
+            if (y >= lcdltdc.height || x >= lcdltdc.width)
+                return; // 超区域了
             if (temp & 0x80)
                 LTDC_Draw_Point(x, y, color);
             else if (mode == 0)
                 LTDC_Draw_Point(x, y, BACK_COLOR);
             temp <<= 1;
             y++;
-            if (y >= lcdltdc.height)
-                return; // 超区域了
-            if ((y - y0) == size)
+            if ((y - y0) == size) // 一列画完,字符画点换列
             {
                 y = y0;
                 x++;
-                if (x >= lcdltdc.width)
-                    return; // 超区域了
                 break;
             }
         }
@@ -451,10 +449,10 @@ u32 LCD_Pow(u8 m, u8 n)
 // 显示数字,高位为0,则不显示
 // x,y :起点坐标
 // len :数字的位数
-// size:字体大小
+// size:字体大小 1206/1608/2412/3216
 // color:颜色
 // num:数值(0~4294967295);
-void LTDC_Show_Num(u16 x, u16 y, u32 num, u8 len, u8 size, u32 color)
+void LTDC_Show_Num(u16 x, u16 y, u32 num, u8 len, u8 size, u8 mode, u32 color)
 {
     u8 t, temp;
     u8 enshow = 0;
@@ -465,13 +463,13 @@ void LTDC_Show_Num(u16 x, u16 y, u32 num, u8 len, u8 size, u32 color)
         {
             if (temp == 0)
             {
-                LTDC_Show_Char(x + (size / 2) * t, y, ' ', size, 0, color);
+                LTDC_Show_Char(x + (size / 2) * t, y, ' ', size, mode, color);
                 continue;
             }
             else
                 enshow = 1;
         }
-        LTDC_Show_Char(x + (size / 2) * t, y, temp + '0', size, 0, color);
+        LTDC_Show_Char(x + (size / 2) * t, y, temp + '0', size, mode, color);
     }
 }
 
@@ -479,7 +477,7 @@ void LTDC_Show_Num(u16 x, u16 y, u32 num, u8 len, u8 size, u32 color)
 // x,y:起点坐标
 // num:数值(0~999999999);
 // len:长度(即要显示的位数)
-// size:字体大小
+// size:字体大小 1206/1608/2412/3216
 // mode:
 //[7]:0,不填充;1,填充0.
 //[6:1]:保留
@@ -509,11 +507,11 @@ void LTDC_Show_xNum(u16 x, u16 y, u32 num, u8 len, u8 size, u8 mode, u32 color)
 }
 
 // 显示字符串
-// x,y:起点坐标
-// width,height:区域大小
-// size:字体大小
+// x,y:起点坐标,含0
+// width,height:区域大小,不含0
+// size:字体大小 1206/1608/2412/3216
 //*p:字符串起始地址
-void LTDC_Show_String(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u32 color)
+void LTDC_Show_String(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u8 mode, u32 color)
 {
     u8 x0 = x;
     width += x;
@@ -527,7 +525,7 @@ void LTDC_Show_String(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u32 c
         }
         if (y >= height)
             break; // 退出
-        LTDC_Show_Char(x, y, *p, size, 0, color);
+        LTDC_Show_Char(x, y, *p, size, mode, color);
         x += size / 2;
         p++;
     }

@@ -233,9 +233,9 @@ extern "C"
     void LTDC_Draw_Circle(u16 x0, u16 y0, u8 r, u32 color);
     void LTDC_Show_Char(u16 x, u16 y, u8 num, u8 size, u8 mode, u32 color);
     u32 LCD_Pow(u8 m, u8 n);
-    void LTDC_Show_Num(u16 x, u16 y, u32 num, u8 len, u8 size, u32 color);
+    void LTDC_Show_Num(u16 x, u16 y, u32 num, u8 len, u8 size, u8 mode, u32 color);
     void LTDC_Show_xNum(u16 x, u16 y, u32 num, u8 len, u8 size, u8 mode, u32 color);
-    void LTDC_Show_String(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u32 color);
+    void LTDC_Show_String(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u8 mode, u32 color);
 
 #if defined(__cplusplus)
 }

@@ -6,35 +6,35 @@
 #include "multi_button.h"
 #include "queue.h"
 #include "sdram.h"
-#include "stdlib.h"
 
+#define KeyQueueLen 16
 QueueHandle_t xQueue_KEY = NULL;
 
 #define START_TASK_PRIO 1       // 任务优先级,越大越高优先级
 #define START_STK_SIZE  128 + 1 // 任务堆栈大小
 TaskHandle_t StartTask_Handler; // 任务句柄
 // void start_task(void *pvParameters); // 任务函数
-void start_task(void); // 任务函数
+void start_task(void *pvParameters); // 明确标记未使用参数; // 任务函数
 
-#define LED_TASK_PRIO 14      // 任务优先级,越大越高优先级
-#define LED_TSTK_SIZE 32 + 1  // 任务堆栈大小,实际为32word=32*4byte=128byte=128*8bit
-TaskHandle_t LEDTask_Handler; // 任务句柄
-void led_task(void);          // 任务函数
+#define LED_TASK_PRIO 14           // 任务优先级,越大越高优先级
+#define LED_TSTK_SIZE 32 + 1       // 任务堆栈大小,实际为32word=32*4byte=128byte=128*8bit
+TaskHandle_t LEDTask_Handler;      // 任务句柄
+void led_task(void *pvParameters); // 任务函数
 
-#define KEY_TASK_PRIO 15      // 任务优先级,越大越高优先级
-#define KEY_TSTK_SIZE 256 + 1 // 任务堆栈大小,实际为32word=32*4byte=128byte=128*8bit
-TaskHandle_t KEYTask_Handler; // 任务句柄
-void key_task(void);          // 任务函数
+#define KEY_TASK_PRIO 15           // 任务优先级,越大越高优先级
+#define KEY_TSTK_SIZE 256 + 1      // 任务堆栈大小,实际为32word=32*4byte=128byte=128*8bit
+TaskHandle_t KEYTask_Handler;      // 任务句柄
+void key_task(void *pvParameters); // 任务函数
 
-#define GUI_TASK_PRIO 13       // 任务优先级,越大越高优先级
-#define GUI_TSTK_SIZE 256 + 1  // 任务堆栈大小
-TaskHandle_t GUI_Task_Handler; // 任务句柄
-void gui_task(void);           // 任务函数
+#define GUI_TASK_PRIO 13           // 任务优先级,越大越高优先级
+#define GUI_TSTK_SIZE 256 + 1      // 任务堆栈大小
+TaskHandle_t GUI_Task_Handler;     // 任务句柄
+void gui_task(void *pvParameters); // 任务函数
 
-#define TEST_TASK_PRIO 11      // 任务优先级,越大越高优先级
-#define TEST_TSTK_SIZE 256 + 1 // 任务堆栈大小
-TaskHandle_t TESTTask_Handler; // 任务句柄
-void test_task(void);          // 任务函数
+#define TEST_TASK_PRIO 11           // 任务优先级,越大越高优先级
+#define TEST_TSTK_SIZE 256 + 1      // 任务堆栈大小
+TaskHandle_t TESTTask_Handler;      // 任务句柄
+void test_task(void *pvParameters); // 任务函数
 
 void freertos_main(void)
 {
@@ -49,8 +49,10 @@ void freertos_main(void)
 }
 
 // 开始任务任务函数
-void start_task(void)
+void start_task(void *pvParameters)
 {
+    (void)pvParameters; // 明确标记未使用参数
+
     taskENTER_CRITICAL(); // 进入临界区
 
     // 创建LED0任务
@@ -86,26 +88,23 @@ void start_task(void)
                 (TaskHandle_t *)&TESTTask_Handler);
 
     vTaskDelete(StartTask_Handler); // 删除开始任务
-    taskEXIT_CRITICAL();            // 退出临界区
+
+    taskEXIT_CRITICAL(); // 退出临界区
 }
 
 // led任务函数
-void led_task(void)
+void led_task(void *pvParameters)
 {
+    (void)pvParameters; // 明确标记未使用参数
+
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
         LED0_Reverse();
-        vTaskDelayUntil(&xLastWakeTime, 500);
-    }
-}
-
-static void Callback_Down_Click_Handler(void *btn)
-{
-    if (btn == &button_up)
-    {
-        LOGI("Down");
+        PressEvent event = DOUBLE_CLICK;
+        xQueueSend(xQueue_KEY, &event, 10);
+        vTaskDelayUntil(&xLastWakeTime, 250);
     }
 }
 
@@ -113,7 +112,8 @@ static void Callback_Single_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        LOGI("Single");
+        PressEvent event = SINGLE_CLICK;
+        xQueueSend(xQueue_KEY, &event, 10);
     }
 }
 
@@ -121,18 +121,20 @@ static void Callback_Double_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        LOGI("Double");
+        PressEvent event = DOUBLE_CLICK;
+        xQueueSend(xQueue_KEY, &event, 10);
     }
 }
 
 // key任务函数
-void key_task(void)
+void key_task(void *pvParameters)
 {
+    (void)pvParameters; // 明确标记未使用参数
+
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
 
-    xQueue_KEY = xQueueCreate(16, sizeof(uint8_t));
-    // button_attach(&button_up, PRESS_DOWN, Callback_Down_Click_Handler);
+    xQueue_KEY = xQueueCreate(KeyQueueLen, sizeof(PressEvent));
     button_attach(&button_up, SINGLE_CLICK, Callback_Single_Click_Handler);
     button_attach(&button_up, DOUBLE_CLICK, Callback_Double_Click_Handler);
     button_start(&button_up);
@@ -144,19 +146,54 @@ void key_task(void)
 }
 
 // gui任务函数
-void gui_task(void)
+void gui_task(void *pvParameters)
 {
+    (void)pvParameters; // 明确标记未使用参数
+
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
+    // LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Black);
+    // LTDC_Draw_Circle((800 - 1) / 2, (480 - 1) / 2, 100, GUI_Green);
+    // LTDC_Show_Char(0, (480 - 1) / 2, 'O', 12, 1, GUI_Black);
+    LTDC_Show_Char(0, 480 - 1 - 12, 'O', 12, 1, GUI_Red);
+    // LTDC_Fill(6, 480 - 1 - 12, 240, 480 - 1 - 1, GUI_Yellow); // y差11,x差5
+    // for (int i = 0; i < 20; i++)
+    // {
+    //     if (i < 10)
+    //         LTDC_Fill(6 + i * 6, 480 - 1 - 12, 240 + i * 12, 480 - 1, GUI_Black); // y差11,x差5
+    //     else
+    //         LTDC_Fill(6 + i * 6, 480 - 1 - 1, 240 + i * 12, 480 - 1 - 1, GUI_Yellow); // y差11,x差5
+    // }
     while (1)
     {
+        static uint32_t lineflag = 0;
+
+        PressEvent key_event;
+        if (xQueueReceive(xQueue_KEY, &key_event, 10) == pdPASS)
+        {
+            if (lineflag <= 468)
+            {
+                if (key_event == SINGLE_CLICK)
+                    LTDC_Show_String(0, lineflag, 240, 12, 12, (u8 *)"Single Click", 1, GUI_Black);
+                else if (key_event == DOUBLE_CLICK)
+                    LTDC_Show_String(0, lineflag, 240, 240, 12, (u8 *)"Double Click", 1, GUI_Black);
+                else
+                    LTDC_Show_String(0, lineflag, 240, 240, 12, (u8 *)"No Event", 1, GUI_Black);
+                LTDC_Show_String(14 * 6, lineflag, 240, 240, 12, (u8 *)",Line", 1, GUI_Black);
+                // LTDC_Show_Num(20 * 6, lineflag, lineflag, 3, 12, 1, GUI_Black);
+                LTDC_Show_Num(20 * 6, lineflag, lineflag, 3, 12, 1, GUI_Black);
+                lineflag += 12;
+            }
+        }
         vTaskDelayUntil(&xLastWakeTime, 10);
     }
 }
 
 // 测试任务函数
-void test_task(void)
+void test_task(void *pvParameters)
 {
+    (void)pvParameters; // 明确标记未使用参数
+
     static uint8_t flag = 0;
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
