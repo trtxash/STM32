@@ -113,22 +113,6 @@ static void Callback_Single_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        // static uint8_t flag = 1;
-
-        // if (flag)
-        // {
-        //     LED2_Clr();
-        //     flag = !flag;
-        //     LTDC_Draw_Line(0, 0, 800 - 1, 480 - 1, GUI_Green);
-        //     LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Green);
-        // }
-        // else
-        // {
-        //     LED2_Set();
-        //     flag = !flag;
-        //     LTDC_Clear(GUI_White);
-        // }
-        // xQueueSend(xQueue_KEY, (void *)SINGLE_CLICK, 10);
         LOGI("Single");
     }
 }
@@ -155,7 +139,7 @@ void key_task(void)
     while (1)
     {
         button_ticks();
-        vTaskDelayUntil(&xLastWakeTime, 5);
+        vTaskDelayUntil(&xLastWakeTime, 50);
     }
 }
 
