@@ -102,8 +102,6 @@ void led_task(void *pvParameters)
     while (1)
     {
         LED0_Reverse();
-        PressEvent event = DOUBLE_CLICK;
-        xQueueSend(xQueue_KEY, &event, 10);
         vTaskDelayUntil(&xLastWakeTime, 250);
     }
 }
@@ -152,18 +150,6 @@ void gui_task(void *pvParameters)
 
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
-    // LTDC_Draw_Line(800 - 1, 0, 0, 480 - 1, GUI_Black);
-    // LTDC_Draw_Circle((800 - 1) / 2, (480 - 1) / 2, 100, GUI_Green);
-    // LTDC_Show_Char(0, (480 - 1) / 2, 'O', 12, 1, GUI_Black);
-    LTDC_Show_Char(0, 480 - 1 - 12, 'O', 12, 1, GUI_Red);
-    // LTDC_Fill(6, 480 - 1 - 12, 240, 480 - 1 - 1, GUI_Yellow); // y差11,x差5
-    // for (int i = 0; i < 20; i++)
-    // {
-    //     if (i < 10)
-    //         LTDC_Fill(6 + i * 6, 480 - 1 - 12, 240 + i * 12, 480 - 1, GUI_Black); // y差11,x差5
-    //     else
-    //         LTDC_Fill(6 + i * 6, 480 - 1 - 1, 240 + i * 12, 480 - 1 - 1, GUI_Yellow); // y差11,x差5
-    // }
     while (1)
     {
         static uint32_t lineflag = 0;
@@ -180,7 +166,6 @@ void gui_task(void *pvParameters)
                 else
                     LTDC_Show_String(0, lineflag, 240, 240, 12, (u8 *)"No Event", 1, GUI_Black);
                 LTDC_Show_String(14 * 6, lineflag, 240, 240, 12, (u8 *)",Line", 1, GUI_Black);
-                // LTDC_Show_Num(20 * 6, lineflag, lineflag, 3, 12, 1, GUI_Black);
                 LTDC_Show_Num(20 * 6, lineflag, lineflag, 3, 12, 1, GUI_Black);
                 lineflag += 12;
             }
