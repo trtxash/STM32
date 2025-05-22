@@ -170,7 +170,7 @@ void gui_task(void *pvParameters)
                 lineflag += 12;
             }
         }
-        vTaskDelayUntil(&xLastWakeTime, 10);
+        vTaskDelayUntil(&xLastWakeTime, 5);
     }
 }
 
