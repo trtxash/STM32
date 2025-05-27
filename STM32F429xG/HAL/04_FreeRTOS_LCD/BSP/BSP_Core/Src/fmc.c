@@ -56,6 +56,15 @@ void FMC_Init(void)
     hsdram1.Init.ReadPipeDelay = FMC_SDRAM_RPIPE_DELAY_0;              // 读通道延时
 
     /* SdramTiming */
+
+    // SdramTiming.LoadToActiveDelay = 3;    // TMRD:加载模式寄存器到激活时间的延迟,min=
+    // SdramTiming.ExitSelfRefreshDelay = 10; // TXSR:退出自刷新延迟,min=72ns
+    // SdramTiming.SelfRefreshTime = 7;      // TRAS:自刷新时间为,min=42ns
+    // SdramTiming.RowCycleDelay = 9;        // TRC:行循环延迟为,min=60ns
+    // SdramTiming.WriteRecoveryTime = 3;    // TWR:恢复延迟,min=2*Tck,Tck为SDRAM时钟周期
+    // SdramTiming.RPDelay = 3;              // TRP:行预充电延迟,min=15ns
+    // SdramTiming.RCDDelay = 3;             // TRCD:行到列延迟,min=15ns
+
     SdramTiming.LoadToActiveDelay = 2;    // TMRD:加载模式寄存器到激活时间的延迟,min=
     SdramTiming.ExitSelfRefreshDelay = 9; // TXSR:退出自刷新延迟,min=72ns
     SdramTiming.SelfRefreshTime = 6;      // TRAS:自刷新时间为,min=42ns

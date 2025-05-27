@@ -10,31 +10,36 @@
 #define KeyQueueLen 16
 QueueHandle_t xQueue_KEY = NULL;
 
+/*
+中断管理组4,中断优先级0~15;os优先级0~15
+configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY为8,管理优先级数值8~15的中断
+*/
+
 #define START_TASK_PRIO 1       // 任务优先级,越大越高优先级
 #define START_STK_SIZE  128 + 1 // 任务堆栈大小
 TaskHandle_t StartTask_Handler; // 任务句柄
 // void start_task(void *pvParameters); // 任务函数
 void start_task(void *pvParameters); // 明确标记未使用参数; // 任务函数
 
-#define LED_TASK_PRIO 14           // 任务优先级,越大越高优先级
+#define LED_TASK_PRIO 1            // 任务优先级,越大越高优先级
 #define LED_TSTK_SIZE 32 + 1       // 任务堆栈大小,实际为32word=32*4byte=128byte=128*8bit
 TaskHandle_t LEDTask_Handler;      // 任务句柄
 void led_task(void *pvParameters); // 任务函数
 
-#define KEY_TASK_PRIO 15           // 任务优先级,越大越高优先级
+#define KEY_TASK_PRIO 3            // 任务优先级,越大越高优先级
 #define KEY_TSTK_SIZE 256 + 1      // 任务堆栈大小,实际为32word=32*4byte=128byte=128*8bit
 TaskHandle_t KEYTask_Handler;      // 任务句柄
 void key_task(void *pvParameters); // 任务函数
 
-#define GUI_TASK_PRIO 13           // 任务优先级,越大越高优先级
+#define GUI_TASK_PRIO 2            // 任务优先级,越大越高优先级
 #define GUI_TSTK_SIZE 256 + 1      // 任务堆栈大小
 TaskHandle_t GUI_Task_Handler;     // 任务句柄
 void gui_task(void *pvParameters); // 任务函数
 
-#define TEST_TASK_PRIO 11           // 任务优先级,越大越高优先级
-#define TEST_TSTK_SIZE 256 + 1      // 任务堆栈大小
-TaskHandle_t TESTTask_Handler;      // 任务句柄
-void test_task(void *pvParameters); // 任务函数
+#define ADC_TASK_PRIO 2            // 任务优先级,越大越高优先级
+#define ADC_TSTK_SIZE 256 + 1      // 任务堆栈大小
+TaskHandle_t ADCTask_Handler;      // 任务句柄
+void adc_task(void *pvParameters); // 任务函数
 
 void freertos_main(void)
 {
@@ -80,12 +85,12 @@ void start_task(void *pvParameters)
                 (TaskHandle_t *)&GUI_Task_Handler);
 
     // 创建test任务
-    xTaskCreate((TaskFunction_t)test_task,
-                (const char *)"test_task",
-                (uint16_t)TEST_TSTK_SIZE,
+    xTaskCreate((TaskFunction_t)adc_task,
+                (const char *)"adc_task",
+                (uint16_t)ADC_TSTK_SIZE,
                 (void *)NULL,
-                (UBaseType_t)TEST_TASK_PRIO,
-                (TaskHandle_t *)&TESTTask_Handler);
+                (UBaseType_t)ADC_TASK_PRIO,
+                (TaskHandle_t *)&ADCTask_Handler);
 
     vTaskDelete(StartTask_Handler); // 删除开始任务
 
@@ -175,7 +180,7 @@ void gui_task(void *pvParameters)
 }
 
 // 测试任务函数
-void test_task(void *pvParameters)
+void adc_task(void *pvParameters)
 {
     (void)pvParameters; // 明确标记未使用参数
 
@@ -184,15 +189,17 @@ void test_task(void *pvParameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        flag = !flag;
-        if (flag)
-        {
-            LED1_Set();
-        }
-        else
-        {
-            LED1_Clr();
-        }
+        // ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // 等待通知
+        // process_buffer(adcBuffer); // 处理数据
+        // flag = !flag;
+        // if (flag)
+        // {
+        //     LED1_Set();
+        // }
+        // else
+        // {
+        //     LED1_Clr();
+        // }
         vTaskDelayUntil(&xLastWakeTime, 1000);
     }
 }

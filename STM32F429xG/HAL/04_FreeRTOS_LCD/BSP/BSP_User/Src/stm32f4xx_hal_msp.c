@@ -1,4 +1,5 @@
 /* Includes ------------------------------------------------------------------*/
+#include "adc.h"
 #include "ltdc.h"
 #include "main.h"
 #include "sdram.h"
@@ -11,6 +12,75 @@ void HAL_MspInit(void)
 {
     __HAL_RCC_SYSCFG_CLK_ENABLE();
     __HAL_RCC_PWR_CLK_ENABLE();
+}
+
+void HAL_ADC_MspInit(ADC_HandleTypeDef *adcHandle)
+{
+    // GPIO_InitTypeDef GPIO_InitStruct = {0};
+    if (adcHandle->Instance == ADC1)
+    {
+        /* USER CODE BEGIN ADC1_MspInit 0 */
+
+        /* USER CODE END ADC1_MspInit 0 */
+        /* ADC1 clock enable */
+        __HAL_RCC_ADC1_CLK_ENABLE();
+
+        // __HAL_RCC_GPIOA_CLK_ENABLE();
+        // /**ADC1 GPIO Configuration
+        // PA1     ------> ADC1_IN1
+        // */
+        // GPIO_InitStruct.Pin = GPIO_PIN_1;
+        // GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+        // GPIO_InitStruct.Pull = GPIO_NOPULL;
+        // HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+        /* ADC1 DMA Init */
+        /* ADC1 Init */
+        hdma_adc1.Instance = DMA2_Stream0;                        // 数据流
+        hdma_adc1.Init.Channel = DMA_CHANNEL_0;                   // 通道
+        hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;          // 传输方向
+        hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;              // 外设是否递增
+        hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;                  // 内存是否递增
+        hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD; // 外设数据大小
+        hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;    // 内存数据大小
+        hdma_adc1.Init.Mode = DMA_CIRCULAR;                       // 模式选择
+        hdma_adc1.Init.Priority = DMA_PRIORITY_MEDIUM;            // 优先级
+        hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;           // FIFO
+        if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
+        {
+            Error_Handler();
+        }
+
+        __HAL_LINKDMA(adcHandle, DMA_Handle, hdma_adc1);
+
+        /* USER CODE BEGIN ADC1_MspInit 1 */
+
+        /* USER CODE END ADC1_MspInit 1 */
+    }
+}
+
+void HAL_ADC_MspDeInit(ADC_HandleTypeDef *adcHandle)
+{
+
+    if (adcHandle->Instance == ADC1)
+    {
+        /* USER CODE BEGIN ADC1_MspDeInit 0 */
+
+        /* USER CODE END ADC1_MspDeInit 0 */
+        /* Peripheral clock disable */
+        __HAL_RCC_ADC1_CLK_DISABLE();
+
+        /**ADC1 GPIO Configuration
+        PA1     ------> ADC1_IN1
+        */
+        // HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1);
+
+        /* ADC1 DMA DeInit */
+        HAL_DMA_DeInit(adcHandle->DMA_Handle);
+        /* USER CODE BEGIN ADC1_MspDeInit 1 */
+
+        /* USER CODE END ADC1_MspDeInit 1 */
+    }
 }
 
 /* HAL_FMC+HAL_SDRAM */

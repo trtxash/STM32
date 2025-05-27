@@ -57,7 +57,7 @@ extern volatile uint32_t FreeRTOSRunTimeTicks;
 #define configUSE_TICK_HOOK            0                     // 为1使用时间片钩子函数，需要vApplicationTickHook(void)
 #define configCPU_CLOCK_HZ             (SystemCoreClock)     // cpu频率
 #define configTICK_RATE_HZ             ((TickType_t)1000)    // 设置FreeRTOS的系统时钟节拍频率Hz，1000为1ms
-#define configMAX_PRIORITIES           (16)                  // 设置任务优先级数量，0~num-1
+#define configMAX_PRIORITIES           (4)                  // 设置任务优先级数量，0~num-1
 #define configMINIMAL_STACK_SIZE       ((unsigned short)66)  // 设置空闲任务的最小任务堆栈大小，字为单位，(66-2)*4字节
 #define configTOTAL_HEAP_SIZE          ((size_t)(75 * 1024)) // 设置堆大小，然后使用了动态内存管理，FreeRTOS会使用heapX.c中的内存申请函数来申请内存，这些内存时从堆ucHeap[configTOTAL_HEAP_SIZE]中申请的，堆的大小由这项来定义
 #define configMAX_TASK_NAME_LEN        (10)                  // 设置任务名最大长度
@@ -72,10 +72,10 @@ extern volatile uint32_t FreeRTOSRunTimeTicks;
 #define configUSE_APPLICATION_TASK_TAG 0                     // 为1则configUSE_APPLICATION_TASK_TAGF()和xTaskCallApplicationTaskHook()会被编译
 #define configUSE_COUNTING_SEMAPHORES  1                     // 为1启动计数型信号量，相关的API函数会被编译
 
-#define configGENERATE_RUN_TIME_STATS 1 // 为1开启时间统计功能，相应API函数会被编译，为1还要定义额外的宏，见开发手册
+#define configGENERATE_RUN_TIME_STATS            1                            // 为1开启时间统计功能，相应API函数会被编译，为1还要定义额外的宏，见开发手册
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ConfigureTimerForTimeStats() // 定义定时器初始化函数以提供统计的“时基”
-#define portGET_RUN_TIME_COUNTER_VALUE() FreeRTOSRunTimeTicks                 // 定义变量以读取统计定时器的值
-#define configRECORD_STACK_HIGH_ADDRESS 1 // 检查堆栈？
+#define portGET_RUN_TIME_COUNTER_VALUE()         FreeRTOSRunTimeTicks         // 定义变量以读取统计定时器的值
+#define configRECORD_STACK_HIGH_ADDRESS          1                            // 检查堆栈？
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES           0   // 为1启用协程，节省开销，但功能有限
@@ -120,7 +120,7 @@ PRIORITY THAN THIS! higher priorities are lower numeric values.
 任何调用了中断安全的FreeRTOS API函数的中断服务例程所能使用的最高中断优先级。
 请勿从优先级高于此值的任何中断中调用中断安全的FreeRTOS API函数！优先级较高的优先级数值较低。
 
-即当配置一个中断时，如果该中断处理程序会调用 FreeRTOS API 函数，那么它的优先级应该设置为小于或等于 configMAX_SYSCALL_INTERRUPT_PRIORITY,优先级较高的优先级数值较低。
+当配置一个中断时，如果该中断处理程序会调用 FreeRTOS API 函数，那么它的中断优先级应该在os管理范围之内
 */
 #define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY 8
 

@@ -95,6 +95,7 @@ float Kalman_Filter_x(float Accel, float Gyro)
     angle_dot = Gyro - Q_bias; // 输出值(后验估计)的微分=角速度
     return angle;
 }
+
 /**************************************************************************
 Function: First order complementary filtering
 Input   : acceleration、angular velocity
@@ -110,6 +111,7 @@ float Complementary_Filter_x(float angle_m, float gyro_m)
     angle = K1 * angle_m + (1 - K1) * (angle + gyro_m * dt);
     return angle;
 }
+
 /**************************************************************************
 Function: Simple Kalman filter
 Input   : acceleration、angular velocity
@@ -163,6 +165,7 @@ float Kalman_Filter_y(float Accel, float Gyro)
     angle_dot = Gyro - Q_bias; // 输出值(后验估计)的微分=角速度
     return angle;
 }
+
 /**************************************************************************
 Function: First order complementary filtering
 Input   : acceleration、angular velocity

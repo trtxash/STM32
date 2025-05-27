@@ -29,26 +29,23 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-#define ADC_Sec 128
-#define ADC_Ch 2
+#define ADC_Sec 2
+#define ADC_Ch  1
 
-  extern u32 adcx[ADC_Sec][2];
+    extern u32 adcx[ADC_Sec][ADC_Ch];
 
-  extern ADC_HandleTypeDef hadc1;
-  extern DMA_HandleTypeDef hdma_adc1;
+    extern ADC_HandleTypeDef hadc1;
+    extern DMA_HandleTypeDef hdma_adc1;
 
-  /* USER CODE BEGIN Private defines */
+    /* USER CODE BEGIN Private defines */
 
-  /* USER CODE END Private defines */
+    /* USER CODE END Private defines */
 
-  void MX_ADC1_Init(void);
+    void MX_ADC1_Init(void);
 
-  /* USER CODE BEGIN Prototypes */
+    /* USER CODE BEGIN Prototypes */
 
-  u16 Get_Adc(u32 ch);
-  u16 Get_Adc_Average(u32 ch, u8 times);
-
-  /* USER CODE END Prototypes */
+    /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }

@@ -38,6 +38,8 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Src/system_stm32f4xx.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma2d.c
@@ -72,6 +74,7 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/myiic.c
     ../../BSP/BSP_User/Src/sys.c
+    ../../BSP/BSP_Core/Src/adc.c
     ../../BSP/BSP_Core/Src/dma2d.c
     ../../BSP/BSP_Core/Src/fmc.c
     # ../../BSP/BSP_Core/Src/iwdg.c

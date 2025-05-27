@@ -1,7 +1,9 @@
 #include "stm32f4xx_it.h"
+#include "adc.h"
 #include "dma2d.h"
+#include "stm32f4xx_hal_adc.h"
+#include "stm32f4xx_hal_dma.h"
 #include "tim.h"
-
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
@@ -125,6 +127,39 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
         FreeRTOSRunTimeTicks++;
     }
+}
+
+/**
+ * @brief This function handles DMA2 stream0 global interrupt.
+ */
+void DMA2_Stream0_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
+
+    /* USER CODE END DMA2_Stream0_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_adc1);
+    /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
+
+    /* USER CODE END DMA2_Stream0_IRQn 1 */
+}
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+    if (hadc == (&hadc1))
+    {
+        
+    }
+    // printf("DMA transfer completern");
+}
+
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
+{
+    // printf("DMA Half transfer completern");
+}
+
+void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc)
+{
+    // printf("DMA transfer errorrn");
 }
 
 /**

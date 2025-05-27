@@ -1,4 +1,5 @@
 #include "lcd.h"
+#include "delay.h"
 #include "dma2d.h"
 #include "lcdfont.h"
 #include "ltdc.h"
@@ -40,6 +41,8 @@ void LCD_BLK_Init(void)
     GPIO_InitTure.Speed = GPIO_SPEED_FREQ_LOW; // 高速
     GPIO_InitTure.Pin = LCD_BLK_PIN;
     HAL_GPIO_Init(LCD_BLK_GPIO, &GPIO_InitTure); // 先在上面四行设置GPIO的模式，上下拉，速度，再对GPIOB管脚初始化
+
+    LCD_BLK_Clr(); // 关闭背光
 }
 
 /**
@@ -51,6 +54,12 @@ void LCD_BLK_Init(void)
  */
 void LCD_Init(void)
 {
+// 延时等待屏幕硬件上电完成,不然可能出现显示不全的情况
+#if SYSTEM_SUPPORT_OS
+    delay_xms(5);
+#else
+    delay_ms(5);
+#endif
     LCD_BLK_Init(); // 背光IO初始化
     LTDC_Init();    // LTDC初始化
 }
@@ -415,7 +424,7 @@ void LTDC_Show_Char(u16 x, u16 y, u8 num, u8 size, u8 mode, u32 color)
         else if (size == 32)
             temp = lcd_asc2_3216[num][t]; // 调用3216字体
         else
-            return; // 没有的字库
+            return;                // 没有的字库
         for (t1 = 0; t1 < 8; t1++) // 一次画8个点
         {
             if (y >= lcdltdc.height || x >= lcdltdc.width)
