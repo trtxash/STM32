@@ -56,9 +56,9 @@ void LCD_Init(void)
 {
 // 延时等待屏幕硬件上电完成,不然可能出现显示不全的情况
 #if SYSTEM_SUPPORT_OS
-    delay_xms(5);
+    delay_xms(10);
 #else
-    delay_ms(5);
+    delay_ms(10);
 #endif
     LCD_BLK_Init(); // 背光IO初始化
     LTDC_Init();    // LTDC初始化
