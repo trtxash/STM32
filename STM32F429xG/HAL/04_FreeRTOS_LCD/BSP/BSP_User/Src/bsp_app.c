@@ -1,10 +1,4 @@
 #include "bsp_app.h"
-#include "delay.h"
-#include "key.h"
-#include "lcd.h"
-#include "led.h"
-#include "myiic.h"
-#include "sdram.h"
 
 /**
  * @brief	板级初始化函数
@@ -20,5 +14,7 @@ void bsp_init(void)
     LED_Init();
     KEY_Init();
     SDRAM_Init();
-    LCD_Init();
+    ADC1_Init();
+    DMA_Init();
+    LCD_Init(); // 一般放在最后,等待LCD硬件上电完成
 }

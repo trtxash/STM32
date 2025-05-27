@@ -26,6 +26,8 @@ extern "C"
 {
 #endif
 
+#include "main.h"
+
     void NMI_Handler(void);
     void HardFault_Handler(void);
     void MemManage_Handler(void);
@@ -37,6 +39,7 @@ extern "C"
     void SysTick_Handler(void);
     void TIM8_TRG_COM_TIM14_IRQHandler(void);
     void DMA2_Stream0_IRQHandler(void);
+    void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc);
     void DMA2D_IRQHandler(void);
     // void WWDG_IRQHandler(void);
 

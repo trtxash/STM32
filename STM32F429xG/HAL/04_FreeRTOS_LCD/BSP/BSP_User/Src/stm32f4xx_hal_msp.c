@@ -36,16 +36,16 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *adcHandle)
 
         /* ADC1 DMA Init */
         /* ADC1 Init */
-        hdma_adc1.Instance = DMA2_Stream0;                        // 数据流
-        hdma_adc1.Init.Channel = DMA_CHANNEL_0;                   // 通道
-        hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;          // 传输方向
-        hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;              // 外设是否递增
-        hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;                  // 内存是否递增
-        hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD; // 外设数据大小
-        hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;    // 内存数据大小
-        hdma_adc1.Init.Mode = DMA_CIRCULAR;                       // 模式选择
-        hdma_adc1.Init.Priority = DMA_PRIORITY_MEDIUM;            // 优先级
-        hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;           // FIFO
+        hdma_adc1.Instance = DMA2_Stream0;                            // 数据流
+        hdma_adc1.Init.Channel = DMA_CHANNEL_0;                       // 通道
+        hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;              // 传输方向
+        hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;                  // 外设是否递增
+        hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;                      // 内存是否递增
+        hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD; // 外设数据大小
+        hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;        // 内存数据大小
+        hdma_adc1.Init.Mode = DMA_NORMAL;                             // 模式选择
+        hdma_adc1.Init.Priority = DMA_PRIORITY_MEDIUM;                // 优先级
+        hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;               // FIFO
         if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
         {
             Error_Handler();

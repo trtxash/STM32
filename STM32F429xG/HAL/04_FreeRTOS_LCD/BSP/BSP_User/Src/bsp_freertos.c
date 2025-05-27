@@ -1,14 +1,10 @@
 #include "bsp_freertos.h"
-#include "key.h"
-#include "lcd.h"
-#include "led.h"
-#include "log_rtt.h"
-#include "multi_button.h"
-#include "queue.h"
-#include "sdram.h"
+#include "adc.h"
+#include "stm32f4xx_hal_adc.h"
 
 #define KeyQueueLen 16
 QueueHandle_t xQueue_KEY = NULL;
+QueueHandle_t xSemaphore_ADC = NULL;
 
 /*
 中断管理组4,中断优先级0~15;os优先级0~15
@@ -59,7 +55,6 @@ void start_task(void *pvParameters)
     (void)pvParameters; // 明确标记未使用参数
 
     taskENTER_CRITICAL(); // 进入临界区
-
     // 创建LED0任务
     xTaskCreate((TaskFunction_t)led_task,
                 (const char *)"led_task",
@@ -91,10 +86,9 @@ void start_task(void *pvParameters)
                 (void *)NULL,
                 (UBaseType_t)ADC_TASK_PRIO,
                 (TaskHandle_t *)&ADCTask_Handler);
+    taskEXIT_CRITICAL(); // 退出临界区
 
     vTaskDelete(StartTask_Handler); // 删除开始任务
-
-    taskEXIT_CRITICAL(); // 退出临界区
 }
 
 // led任务函数
@@ -184,22 +178,19 @@ void adc_task(void *pvParameters)
 {
     (void)pvParameters; // 明确标记未使用参数
 
-    static uint8_t flag = 0;
-    TickType_t xLastWakeTime;
-    xLastWakeTime = xTaskGetTickCount();
+    xSemaphore_ADC = xSemaphoreCreateBinary(); // 创建二值信号量
+
+    // TickType_t xLastWakeTime;
+    // xLastWakeTime = xTaskGetTickCount();
+
     while (1)
     {
-        // ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // 等待通知
-        // process_buffer(adcBuffer); // 处理数据
-        // flag = !flag;
-        // if (flag)
-        // {
-        //     LED1_Set();
-        // }
-        // else
-        // {
-        //     LED1_Clr();
-        // }
-        vTaskDelayUntil(&xLastWakeTime, 1000);
+        HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx, ADC_Sec * ADC_Ch);
+        xSemaphoreTake(xSemaphore_ADC, 500); // 等待信号量,超时时间为500ms
+        // 处理数据
+        LTDC_Show_Num(400, 0, adcx[0], 4, 12, 0, GUI_Black);
+        LTDC_Show_Num(400, 12, adcx[1], 4, 12, 0, GUI_Black);
+
+        // vTaskDelayUntil(&xLastWakeTime, 500);
     }
 }

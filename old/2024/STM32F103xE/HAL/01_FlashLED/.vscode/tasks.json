@@ -1,0 +1,29 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "mingw32-make",
+            "args": [
+                "-j12" // -jx，用x进程编译，-g，可执行程序包含调试信息：加个-g 是为了gdb 用，不然gdb用不到
+            ]
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "mingw32-make",
+            "args": [
+                "clean"
+            ]
+        },
+        {
+            "label": "rtt",
+            "type": "shell",
+            "command": "JLinkRTTClient",
+            "args": []
+        }
+    ]
+}

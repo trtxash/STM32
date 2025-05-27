@@ -36,6 +36,7 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Src/stm32f4xx_it.c
     ../../BSP/BSP_User/Src/stm32f4xx_hal_msp.c
     ../../BSP/BSP_User/Src/system_stm32f4xx.c
+
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c
@@ -63,24 +64,29 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_wwdg.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_fmc.c
+
     ../../FreeRTOS/Src/tasks.c
     ../../FreeRTOS/Src/list.c
     ../../FreeRTOS/Src/timers.c
     ../../FreeRTOS/Src/queue.c
     ../../FreeRTOS/portable/GCC/ARM_CM4F/port.c
     ../../FreeRTOS/portable/MemMang/heap_4.c
+
     ../../BSP/BSP_User/Src/bsp_app.c
     ../../BSP/BSP_User/Src/bsp_freertos.c
     ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/myiic.c
     ../../BSP/BSP_User/Src/sys.c
+
     ../../BSP/BSP_Core/Src/adc.c
+    ../../BSP/BSP_Core/Src/dma.c
     ../../BSP/BSP_Core/Src/dma2d.c
     ../../BSP/BSP_Core/Src/fmc.c
     # ../../BSP/BSP_Core/Src/iwdg.c
     ../../BSP/BSP_Core/Src/ltdc.c
     ../../BSP/BSP_Core/Src/tim.c
     # ../../BSP/BSP_Core/Src/wwdg.c
+
     ../../Drivers_Hardware/LED/Src/led.c
     ../../Drivers_Hardware/Key/Src/key.c
     ../../Drivers_Hardware/SDRAM/Src/sdram.c
@@ -88,10 +94,12 @@ target_sources(stm32cubemx INTERFACE
     # ../../Drivers_Hardware/OLED/Src/oled.c
     ../../Drivers_Hardware/LCD/Src/lcd.c
     # ../../Drivers_Hardware/FT5206/Src/ft5206.c
+
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c
     ../../APP/Debug_Linker/RTT/SEGGER_RTT_ASM_ARMv7M.S
     ../../APP/Multi_Button/Src/multi_button.c
+
     ../../startup_stm32f429xx.s
 )
 

@@ -3,11 +3,10 @@
 
 // #include "bsp_app.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
+#include "bsp_app.h"
 
-// #include "led.h"
-// #include "sdram.h"
+extern QueueHandle_t xQueue_KEY;
+extern QueueHandle_t xSemaphore_ADC;
 
 void freertos_main(void);
 

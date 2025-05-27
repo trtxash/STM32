@@ -32,7 +32,7 @@ extern "C"
 #define ADC_Sec 2
 #define ADC_Ch  1
 
-    extern u32 adcx[ADC_Sec][ADC_Ch];
+    extern volatile u32 adcx[ADC_Sec];
 
     extern ADC_HandleTypeDef hadc1;
     extern DMA_HandleTypeDef hdma_adc1;
@@ -41,7 +41,7 @@ extern "C"
 
     /* USER CODE END Private defines */
 
-    void MX_ADC1_Init(void);
+    void ADC1_Init(void);
 
     /* USER CODE BEGIN Prototypes */
 

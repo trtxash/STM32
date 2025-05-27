@@ -19,11 +19,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "adc.h"
-#include "sys.h"
 
 /* USER CODE BEGIN 0 */
 
-u32 adcx[ADC_Sec][ADC_Ch];
+volatile u32 adcx[ADC_Sec];
 
 /* USER CODE END 0 */
 
@@ -31,7 +30,7 @@ ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
 /* ADC1 init function */
-void MX_ADC1_Init(void)
+void ADC1_Init(void)
 {
 
     /* USER CODE BEGIN ADC1_Init 0 */
@@ -48,34 +47,29 @@ void MX_ADC1_Init(void)
     hadc1.Instance = ADC1;
     hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV8;            // 8分频，ADCCLK=PCLK2/8=120/8=15MHZ
     hadc1.Init.Resolution = ADC_RESOLUTION_12B;                      // 12位模式
-    hadc1.Init.ScanConvMode = DISABLE;                               // 扫描模式
+    hadc1.Init.ScanConvMode = ENABLE;                                // 扫描模式
     hadc1.Init.ContinuousConvMode = ENABLE;                          // 连续转换
     hadc1.Init.DiscontinuousConvMode = DISABLE;                      // 禁止不连续采样模式
     hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE; // 使用软件触发
     hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;                // 软件触发
     hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;                      // 右对齐
-    hadc1.Init.NbrOfConversion = 1;                                  // 几个转换在规则序列中
+    hadc1.Init.NbrOfConversion = 2;                                  // 几个转换在规则序列中
     hadc1.Init.NbrOfDiscConversion = 1;                              // 不连续采样通道数为1
     hadc1.Init.DMAContinuousRequests = ENABLE;                       // DMA请求
-    hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;                      // 转换结束标志连续生成？关闭EOC中断？
+    hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;                   // 转换结束标志连续生成？关闭EOC中断？
     if (HAL_ADC_Init(&hadc1) != HAL_OK)
     {
         Error_Handler();
     }
 
-    // /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-    //  */
-    // sConfig.Channel = ADC_CHANNEL_15;                // 通道
-    // sConfig.Rank = 1;                                // 第1个序列，序列1
-    // sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES; // 采样时间
-    // if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-    // {
-    //     Error_Handler();
-    // }
-
     sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;        // 通道
     sConfig.Rank = 1;                                // 第1个序列，序列1
     sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES; // 采样时间
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sConfig.Rank = 2; // 第2个序列，序列2
     if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
     {
         Error_Handler();
