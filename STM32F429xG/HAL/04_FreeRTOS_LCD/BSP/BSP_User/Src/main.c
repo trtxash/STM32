@@ -7,6 +7,7 @@
  */
 
 // 使用RTT需要开启 JLinkRTTClient，插好jlink，按下Ctrl+P，输入task[空格]rtt，即可启动RTT Client
+// DMA初始化要在别的之前,不然出问题
 
 #include "main.h"
 #include "bsp_app.h"

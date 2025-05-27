@@ -32,7 +32,7 @@ extern "C"
 #define ADC_Sec 2
 #define ADC_Ch  1
 
-    extern volatile u32 adcx[ADC_Sec];
+    extern volatile u32 adcx[ADC_Sec][ADC_Ch];
 
     extern ADC_HandleTypeDef hadc1;
     extern DMA_HandleTypeDef hdma_adc1;

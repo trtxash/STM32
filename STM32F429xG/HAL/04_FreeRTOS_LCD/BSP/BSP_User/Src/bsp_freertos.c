@@ -180,17 +180,17 @@ void adc_task(void *pvParameters)
 
     xSemaphore_ADC = xSemaphoreCreateBinary(); // 创建二值信号量
 
-    // TickType_t xLastWakeTime;
-    // xLastWakeTime = xTaskGetTickCount();
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
 
     while (1)
     {
         HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx, ADC_Sec * ADC_Ch);
         xSemaphoreTake(xSemaphore_ADC, 500); // 等待信号量,超时时间为500ms
         // 处理数据
-        LTDC_Show_Num(400, 0, adcx[0], 4, 12, 0, GUI_Black);
-        LTDC_Show_Num(400, 12, adcx[1], 4, 12, 0, GUI_Black);
+        LTDC_Show_Num(400, 0, adcx[0][0], 4, 12, 0, GUI_Black);
+        LTDC_Show_Num(400, 12, adcx[1][0], 4, 12, 0, GUI_Black);
 
-        // vTaskDelayUntil(&xLastWakeTime, 500);
+        vTaskDelayUntil(&xLastWakeTime, 100);
     }
 }

@@ -15,14 +15,19 @@ target_compile_definitions(stm32cubemx INTERFACE
 target_include_directories(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Inc
     ../../BSP/BSP_Core/Inc
+
     ../../Drivers/STM32F4xx_HAL_Driver/Inc
     ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
     ../../Drivers/CMSIS/Device/ST/STM32F4xx/Include
     ../../Drivers/CMSIS/Include
+
     ../../FreeRTOS/Inc
     ../../FreeRTOS/portable/GCC/ARM_CM4F
+
     ../../APP/Debug_Linker/RTT/Inc
     ../../APP/Multi_Button/Inc
+    ../../APP/Algorithm/KalmanFilter/Inc
+
     ../../Drivers_Hardware/Key/Inc
     ../../Drivers_Hardware/LCD/Inc
     # ../../Drivers_Hardware/FT5206/Inc
@@ -99,6 +104,7 @@ target_sources(stm32cubemx INTERFACE
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c
     ../../APP/Debug_Linker/RTT/SEGGER_RTT_ASM_ARMv7M.S
     ../../APP/Multi_Button/Src/multi_button.c
+    ../../APP/Algorithm/KalmanFilter/Src/filter.c
 
     ../../startup_stm32f429xx.s
 )

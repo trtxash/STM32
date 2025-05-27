@@ -146,7 +146,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
     if (hadc == (&hadc1))
     {
-        HAL_ADC_Stop_DMA(&hadc1);
         xSemaphoreGiveFromISR(xSemaphore_ADC, NULL); // 释放信号量
     }
 }

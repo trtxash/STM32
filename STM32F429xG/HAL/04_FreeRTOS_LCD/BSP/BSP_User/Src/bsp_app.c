@@ -14,7 +14,7 @@ void bsp_init(void)
     LED_Init();
     KEY_Init();
     SDRAM_Init();
+    DMA_Init(); // DMA初始化要在别的之前,不然出问题
     ADC1_Init();
-    DMA_Init();
     LCD_Init(); // 一般放在最后,等待LCD硬件上电完成
 }
