@@ -10,8 +10,32 @@
 // DMA初始化要在别的之前,不然出问题
 
 #include "main.h"
-#include "bsp_app.h"
-#include "bsp_freertos.h"
+#include "adc.h"
+#include "dma.h"
+#include "key.h"
+#include "lcd.h"
+#include "led.h"
+#include "sdram.h"
+#include "start_task.h"
+
+/**
+ * @brief	板级初始化函数
+ * @param 	无
+ * @arg
+ * @note  	争对板子的初始化，包括时钟配置，外设初始化，中断配置等。
+ * @retval	无
+ */
+static void bsp_init(void)
+{
+    Stm32_Clock_Init(SYS_CLOCK, 12, RCC_PLLP_DIV2, 8); // 设置时钟
+    delay_init(SYS_CLOCK);                             // 延时初始化
+    LED_Init();
+    KEY_Init();
+    SDRAM_Init();
+    DMA_Init(); // DMA初始化要在别的之前,不然出问题
+    ADC1_Init();
+    LCD_Init(); // 一般放在最后,等待LCD硬件上电完成
+}
 
 /**
  * @brief	对函数简要描述
@@ -31,6 +55,10 @@ int main(void)
 
     while (1)
     {
-        freertos_main(); // 进入os
+        /*
+        中断管理组4,中断优先级0~15;os优先级0~15
+        configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY为8,管理优先级数值8~15的中断
+        */
+        freertos_enter(); // 进入os
     }
 }

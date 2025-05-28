@@ -10,11 +10,21 @@
             <Scope>
                 <Options TimeResolutionUs="1000000" />
             </Scope>
+            <Trigger>
+                <Options Level="0" Symbol="4 Byte float RTT Data 0" On="0" Auto="0" Rise="0" Fall="0" />
+            </Trigger>
         </Configuration>
         <Windows>
             <Graph Show="1" />
             <Watch Show="1" />
         </Windows>
-        <SelectedSymbols />
+        <SelectedSymbols>
+            <Symbol>
+                <Options Name="4 Byte float RTT Data 0" Address="0x00000000" Type="" TypeID="1" Size="4" GraphColorRed="255" GraphColorGreen="0" GraphColorBlue="0" YMinSampled="-1.27998e+25" YMaxSampled="1339.8" YAvgSampled="1318.74" Offset="0" ShowInGraph="1" YOffset="-262" IsAutoConfig="0" YResolution="5" MaxValue="0" File="" DrawStyle="0" NameWithParents="4 Byte float RTT Data 0" />
+            </Symbol>
+            <Symbol>
+                <Options Name="4 Byte float RTT Data 1" Address="0x00000000" Type="" TypeID="1" Size="4" GraphColorRed="0" GraphColorGreen="0" GraphColorBlue="255" YMinSampled="-6.20363e+36" YMaxSampled="1324.72" YAvgSampled="1315.91" Offset="4" ShowInGraph="1" YOffset="-262" IsAutoConfig="0" YResolution="5" MaxValue="0" File="" DrawStyle="0" NameWithParents="4 Byte float RTT Data 1" />
+            </Symbol>
+        </SelectedSymbols>
     </Project>
 </JScopeProject>

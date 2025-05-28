@@ -15,6 +15,8 @@ target_compile_definitions(stm32cubemx INTERFACE
 target_include_directories(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Inc
     ../../BSP/BSP_Core/Inc
+    ../../BSP/BSP_Tasks/Inc
+    ../../BSP/BSP_Devices/Inc 
 
     ../../Drivers/STM32F4xx_HAL_Driver/Inc
     ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
@@ -77,8 +79,6 @@ target_sources(stm32cubemx INTERFACE
     ../../FreeRTOS/portable/GCC/ARM_CM4F/port.c
     ../../FreeRTOS/portable/MemMang/heap_4.c
 
-    ../../BSP/BSP_User/Src/bsp_app.c
-    ../../BSP/BSP_User/Src/bsp_freertos.c
     ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/myiic.c
     ../../BSP/BSP_User/Src/sys.c
@@ -93,6 +93,12 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_Core/Src/ltdc.c
     ../../BSP/BSP_Core/Src/tim.c
     # ../../BSP/BSP_Core/Src/wwdg.c
+
+    ../../BSP/BSP_Tasks/Src/start_task.c
+    ../../BSP/BSP_Tasks/Src/led_task.c
+    ../../BSP/BSP_Tasks/Src/key_task.c
+    ../../BSP/BSP_Tasks/Src/gui_task.c
+    ../../BSP/BSP_Tasks/Src/adc_task.c
 
     ../../Drivers_Hardware/LED/Src/led.c
     ../../Drivers_Hardware/Key/Src/key.c

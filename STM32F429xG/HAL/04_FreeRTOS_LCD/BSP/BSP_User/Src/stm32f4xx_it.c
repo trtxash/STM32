@@ -1,8 +1,9 @@
 #include "stm32f4xx_it.h"
-#include "bsp_app.h"
-#include "bsp_freertos.h"
-#include "stdlib.h"
-#include "stm32f4xx_hal_adc.h"
+#include "adc.h"
+#include "adc_task.h"
+#include "dma2d.h"
+#include "tasks_common.h"
+#include "tim.h"
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
@@ -119,11 +120,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&htim14))
     {
-        // if (FreeRTOSRunTimeTicks == 0XFFFFFFFF)
-        //     FreeRTOSRunTimeTicks = 0;
-        // else
-        //     FreeRTOSRunTimeTicks++;
-
         FreeRTOSRunTimeTicks++;
     }
 }
