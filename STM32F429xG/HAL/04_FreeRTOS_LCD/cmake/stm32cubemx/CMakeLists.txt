@@ -82,8 +82,8 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/myiic.c
     ../../BSP/BSP_User/Src/sys.c
-    ../../BSP/BSP_User/Src/syscalls.c
-    ../../BSP/BSP_User/Src/sysmem.c
+    # ../../BSP/BSP_User/Src/syscalls.c
+    # ../../BSP/BSP_User/Src/sysmem.c
 
     ../../BSP/BSP_Core/Src/adc.c
     ../../BSP/BSP_Core/Src/dma.c
