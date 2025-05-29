@@ -10,15 +10,15 @@ extern "C"
 #endif
 
 /* LCD参数 */
-#define HORIZONTAL_SYNCHRONOUS_PULSE 10 // 水平同步宽度,单位为相素时钟（CLK）个数
-#define HORIZONTAL_BACK_PORCH        150
+#define HORIZONTAL_SYNCHRONOUS_PULSE 4 // 水平同步宽度,单位为相素时钟（CLK）个数
+#define HORIZONTAL_BACK_PORCH        8
 #define ACTIVE_WIDTH                 800
-#define HORIZONTAL_FRONT_PORCH       15
+#define HORIZONTAL_FRONT_PORCH       4
 
-#define VERTICAL_SYNCHRONOUS_PULSE 10 // 垂直同步高度，单位为行周期个数
-#define VERTICAL_BACK_PORCH        140
+#define VERTICAL_SYNCHRONOUS_PULSE 4 // 垂直同步高度，单位为行周期个数
+#define VERTICAL_BACK_PORCH        8
 #define ACTIVE_HEIGHT              480
-#define VERTICAL_FRONT_PORCH       40
+#define VERTICAL_FRONT_PORCH       4
 
 /* LCD IO */
 #define LCD_BLK_GPIO              GPIOD

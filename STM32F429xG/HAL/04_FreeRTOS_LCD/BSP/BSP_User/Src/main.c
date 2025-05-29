@@ -40,7 +40,8 @@ static void bsp_init(void)
     ADC1_Init();
 
     // 一般放在最后,等待LCD硬件上电完成
-    // LTDC初始化,LTDC 25MHz时钟,分辨率为800*480,16bit;计算得到刷新率38.27fps,带宽29.39MB/s
+    // LTDC初始化,LTDC 25MHz时钟,分辨率为800*480,16bit;计算得到刷新率61.7686fps,带宽47.4383MB/s
+    // 同步宽度,前廊,后廊要设置好,不然出现部分显示问题
     LCD_Init();
 }
 

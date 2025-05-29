@@ -54,12 +54,6 @@ void LCD_BLK_Init(void)
  */
 void LCD_Init(void)
 {
-// 延时等待屏幕硬件上电完成,不然可能出现显示不全的情况
-#if SYSTEM_SUPPORT_OS
-    delay_xms(10);
-#else
-    delay_ms(10);
-#endif
     LCD_BLK_Init(); // 背光IO初始化
     LTDC_Init();    // LTDC初始化,LTDC 25MHz时钟,分辨率为800*480,16bit;计算得到刷新率38.27fps,带宽29.39MB/s
 }
