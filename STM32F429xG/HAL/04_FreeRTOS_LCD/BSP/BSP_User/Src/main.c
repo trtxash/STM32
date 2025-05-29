@@ -31,7 +31,9 @@ static void bsp_init(void)
     delay_init(SYS_CLOCK);                             // 延时初始化
     LED_Init();
     KEY_Init();
-    
+
+    // 32bit/32MB Write time 252 ms, speed 126 MB/s
+    // 32bit/32MB Read time 330 ms, speed 96 MB/s
     SDRAM_Init();
 
     DMA_Init(); // DMA初始化要在别的之前,不然出问题
