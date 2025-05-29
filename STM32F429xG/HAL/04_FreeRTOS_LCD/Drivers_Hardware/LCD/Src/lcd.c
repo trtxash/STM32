@@ -61,7 +61,7 @@ void LCD_Init(void)
     delay_ms(10);
 #endif
     LCD_BLK_Init(); // 背光IO初始化
-    LTDC_Init();    // LTDC初始化
+    LTDC_Init();    // LTDC初始化,LTDC 25MHz时钟,分辨率为800*480,16bit;计算得到刷新率38.27fps,带宽29.39MB/s
 }
 
 // LTDC,基本参数设置.

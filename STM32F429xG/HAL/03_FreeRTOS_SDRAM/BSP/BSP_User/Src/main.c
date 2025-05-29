@@ -7,6 +7,8 @@
  */
 
 // 使用RTT需要开启 JLinkRTTClient，插好jlink，按下Ctrl+P，输入task[空格]rtt，即可启动RTT Client
+// 32bit/32MB Write time 252 ms, speed 126 MB/s
+// 32bit/32MB Read time 330 ms, speed 96 MB/s
 
 #include "main.h"
 #include "bsp_app.h"

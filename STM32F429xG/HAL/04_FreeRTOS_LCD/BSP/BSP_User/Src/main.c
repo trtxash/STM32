@@ -31,10 +31,15 @@ static void bsp_init(void)
     delay_init(SYS_CLOCK);                             // 延时初始化
     LED_Init();
     KEY_Init();
+    
     SDRAM_Init();
+
     DMA_Init(); // DMA初始化要在别的之前,不然出问题
     ADC1_Init();
-    LCD_Init(); // 一般放在最后,等待LCD硬件上电完成
+
+    // 一般放在最后,等待LCD硬件上电完成
+    // LTDC初始化,LTDC 25MHz时钟,分辨率为800*480,16bit;计算得到刷新率38.27fps,带宽29.39MB/s
+    LCD_Init();
 }
 
 /**

@@ -5,7 +5,7 @@
 #include "lcd.h"
 
 QueueHandle_t xSemaphore_ADC = NULL;
-volatile float JS_RTT_UpBuffer[1024] = {0};
+volatile float JS_RTT_UpBuffer[2048] = {0};
 
 TaskHandle_t ADCTask_Handler; // 任务句柄
 
@@ -26,7 +26,7 @@ void vADCTask(void *pvParameters)
     xLastWakeTime = xTaskGetTickCount();
 
     uint32_t JS_RTT_Channel = 1;
-    SEGGER_RTT_ConfigUpBuffer(JS_RTT_Channel, "JScope_f4f4", (void *)JS_RTT_UpBuffer, sizeof(JS_RTT_UpBuffer), SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL); // 配置RTT输出
+    SEGGER_RTT_ConfigUpBuffer(JS_RTT_Channel, "JScope_f4f4", (void *)JS_RTT_UpBuffer, sizeof(JS_RTT_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP); // 配置RTT输出
 
     // 第一次传输,处理数据
     HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx, ADC_Sec);
