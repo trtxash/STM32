@@ -174,3 +174,9 @@ void LED3_Reverse(void)
     LED3_Set();
   i = !i;
 }
+
+/**
+ * @brief  background ticks, timer repeat invoking interval 5ms.
+ * @param  None.
+ * @retval None
+ */

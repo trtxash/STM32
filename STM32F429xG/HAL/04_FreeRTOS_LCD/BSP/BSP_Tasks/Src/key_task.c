@@ -1,5 +1,4 @@
 #include "key_task.h"
-#include "key.h"
 #include "tasks_sync.h"
 
 TaskHandle_t KEYTask_Handler; // 任务句柄

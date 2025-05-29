@@ -38,6 +38,22 @@
 #define LED3_Clr() (LED3_GPIO->BSRR = (uint32_t)LED3_PIN << 16U)
 #define LED3_Set() (LED3_GPIO->BSRR = LED3_PIN)
 
+// 定义控制数据结构
+typedef enum
+{
+    SOLID,  // 常亮
+    BLINK,  // 闪烁
+    BREATHE // 呼吸
+} LedMode;
+
+typedef struct
+{
+    LedMode mode;
+    uint16_t on_time; // 单位ms
+    uint16_t off_time;
+    uint8_t intensity; // 亮度0-255
+} LedCmd_t;
+
 void LED_Init(void);
 void LED0_Init(void);
 void LED1_Init(void);
