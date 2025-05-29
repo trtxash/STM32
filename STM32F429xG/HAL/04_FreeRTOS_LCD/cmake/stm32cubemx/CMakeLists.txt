@@ -94,6 +94,7 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_Core/Src/tim.c
     # ../../BSP/BSP_Core/Src/wwdg.c
 
+    ../../BSP/BSP_Tasks/Src/tasks_sync.c
     ../../BSP/BSP_Tasks/Src/start_task.c
     ../../BSP/BSP_Tasks/Src/led_task.c
     ../../BSP/BSP_Tasks/Src/key_task.c

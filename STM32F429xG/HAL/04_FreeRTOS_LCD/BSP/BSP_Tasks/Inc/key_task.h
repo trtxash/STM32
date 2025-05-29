@@ -8,7 +8,6 @@
 
 #define KeyQueueLen 16
 
-extern QueueHandle_t xQueue_KEY;
 extern TaskHandle_t KEYTask_Handler; // 任务句柄
 
 void vKeyTask(void *pvParameters);

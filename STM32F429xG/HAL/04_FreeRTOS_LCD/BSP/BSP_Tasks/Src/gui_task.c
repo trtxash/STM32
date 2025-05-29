@@ -2,6 +2,7 @@
 #include "key.h"
 #include "key_task.h"
 #include "lcd.h"
+#include "tasks_sync.h"
 
 TaskHandle_t GUITask_Handler; // 任务句柄
 
@@ -13,23 +14,47 @@ void vGUITask(void *pvParameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        static uint32_t lineflag = 0;
+        static int lineflag = 0;
 
         PressEvent key_event;
         if (xQueueReceive(xQueue_KEY, &key_event, 10) == pdPASS)
         {
-            if (lineflag <= 468)
+            // if (lineflag <= 468)
+            // {
+            switch (key_event)
             {
-                if (key_event == SINGLE_CLICK)
-                    LTDC_Show_String(0, lineflag, 240, 12, 12, (u8 *)"Single Click", 1, GUI_Black);
-                else if (key_event == DOUBLE_CLICK)
-                    LTDC_Show_String(0, lineflag, 240, 240, 12, (u8 *)"Double Click", 1, GUI_Black);
-                else
-                    LTDC_Show_String(0, lineflag, 240, 240, 12, (u8 *)"No Event", 1, GUI_Black);
-                LTDC_Show_String(14 * 6, lineflag, 240, 240, 12, (u8 *)",Line", 1, GUI_Black);
-                LTDC_Show_Num(20 * 6, lineflag, lineflag, 3, 12, 1, GUI_Black);
-                lineflag += 12;
+            case PRESS_DOWN:
+                LTDC_Show_String(0, lineflag % 480, 240, 240, 12, (u8 *)"Press Down", 0, GUI_Black);
+                break;
+            case PRESS_UP:
+                LTDC_Show_String(0, lineflag % 480, 240, 240, 12, (u8 *)"Press Up", 0, GUI_Black);
+                break;
+            case PRESS_REPEAT:
+                LTDC_Show_String(0, lineflag % 480, 240, 240, 12, (u8 *)"Press Repeat", 0, GUI_Black);
+                break;
+            case SINGLE_CLICK:
+                LTDC_Show_String(0, lineflag % 480, 240, 240, 12, (u8 *)"Single Click", 0, GUI_Black);
+                break;
+            case DOUBLE_CLICK:
+                LTDC_Show_String(0, lineflag % 480, 240, 240, 12, (u8 *)"Double Click", 0, GUI_Black);
+                break;
+            case LONG_PRESS_START:
+                LTDC_Show_String(0, lineflag % 480, 240, 240, 12, (u8 *)"Long Press Start", 0, GUI_Black);
+                break;
+            case LONG_PRESS_HOLD:
+                LTDC_Show_String(0, lineflag % 480, 240, 240, 12, (u8 *)"Long Press Hold", 0, GUI_Black);
+                break;
+            default:
+                LTDC_Show_String(0, lineflag % 480, 240, 240, 12, (u8 *)"None Press", 0, GUI_Black);
+                break;
             }
+            LTDC_Show_String(16 * 6, (lineflag - 12) % 480, 240, 240, 12, (u8 *)",Line", 0, GUI_Black);
+            LTDC_Show_Num(22 * 6, (lineflag - 12) % 480, lineflag, 9, 12, 0, GUI_Black);
+
+            LTDC_Show_String(16 * 6, lineflag % 480, 240, 240, 12, (u8 *)",Line", 0, GUI_Red);
+            LTDC_Show_Num(22 * 6, lineflag % 480, lineflag, 9, 12, 0, GUI_Red);
+            lineflag += 12;
+            // }
         }
         vTaskDelayUntil(&xLastWakeTime, 5);
     }

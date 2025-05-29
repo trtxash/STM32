@@ -1,8 +1,35 @@
 #include "key_task.h"
 #include "key.h"
+#include "tasks_sync.h"
 
-QueueHandle_t xQueue_KEY = NULL;
 TaskHandle_t KEYTask_Handler; // 任务句柄
+
+static void Callback_Down_Click_Handler(void *btn)
+{
+    if (btn == &button_up)
+    {
+        PressEvent event = PRESS_DOWN;
+        xQueueSend(xQueue_KEY, &event, 10);
+    }
+}
+
+static void Callback_Up_Click_Handler(void *btn)
+{
+    if (btn == &button_up)
+    {
+        PressEvent event = PRESS_UP;
+        xQueueSend(xQueue_KEY, &event, 10);
+    }
+}
+
+static void Callback_Repeat_Click_Handler(void *btn)
+{
+    if (btn == &button_up)
+    {
+        PressEvent event = PRESS_REPEAT;
+        xQueueSend(xQueue_KEY, &event, 10);
+    }
+}
 
 static void Callback_Single_Click_Handler(void *btn)
 {
@@ -22,6 +49,24 @@ static void Callback_Double_Click_Handler(void *btn)
     }
 }
 
+static void Callback_Long_Press_Start_Handler(void *btn)
+{
+    if (btn == &button_up)
+    {
+        PressEvent event = LONG_PRESS_START;
+        xQueueSend(xQueue_KEY, &event, 10);
+    }
+}
+
+static void Callback_Long_Press_Hold_Handler(void *btn)
+{
+    if (btn == &button_up)
+    {
+        PressEvent event = LONG_PRESS_HOLD;
+        xQueueSend(xQueue_KEY, &event, 10);
+    }
+}
+
 void vKeyTask(void *pvParameters)
 {
     (void)pvParameters; // 明确标记未使用参数
@@ -29,9 +74,17 @@ void vKeyTask(void *pvParameters)
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
 
-    xQueue_KEY = xQueueCreate(KeyQueueLen, sizeof(PressEvent));
+    if (xQueue_KEY == NULL)
+    {
+        vSyncResources_Init();
+    }
+    button_attach(&button_up, PRESS_DOWN, Callback_Down_Click_Handler);
+    button_attach(&button_up, PRESS_UP, Callback_Up_Click_Handler);
+    button_attach(&button_up, PRESS_REPEAT, Callback_Repeat_Click_Handler);
     button_attach(&button_up, SINGLE_CLICK, Callback_Single_Click_Handler);
     button_attach(&button_up, DOUBLE_CLICK, Callback_Double_Click_Handler);
+    button_attach(&button_up, LONG_PRESS_START, Callback_Long_Press_Start_Handler);
+    button_attach(&button_up, LONG_PRESS_HOLD, Callback_Long_Press_Hold_Handler);
     button_start(&button_up);
     while (1)
     {
