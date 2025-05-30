@@ -59,6 +59,6 @@ void vGUITask(void *pvParameters)
             LTDC_Show_float(400, 0, adc_temp, 3, 2, 12, 0, GUI_Black);
         }
 
-        vTaskDelayUntil(&xLastWakeTime, 15);
+        vTaskDelayUntil(&xLastWakeTime, 15); // 大致66.6Hz
     }
 }
