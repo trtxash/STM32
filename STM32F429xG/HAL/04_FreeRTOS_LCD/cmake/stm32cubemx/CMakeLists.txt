@@ -28,6 +28,7 @@ target_include_directories(stm32cubemx INTERFACE
 
     ../../APP/Debug_Linker/RTT/Inc
     ../../APP/Multi_Button/Inc
+    ../../APP/Multi_Led/Inc
     ../../APP/Algorithm/KalmanFilter/Inc
 
     ../../Drivers_Hardware/Key/Inc

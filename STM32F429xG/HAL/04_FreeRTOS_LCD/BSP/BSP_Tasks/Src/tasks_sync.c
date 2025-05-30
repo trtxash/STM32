@@ -1,12 +1,15 @@
 #include "tasks_sync.h"
-#include "key_task.h"
-#include "led_task.h"
 
 QueueHandle_t xQueue_KEY = NULL;
-QueueHandle_t xQueue_Led = NULL;
+// QueueHandle_t xQueue_Led[LedNumber];
 
 void vSyncResources_Init(void)
 {
+    // Create Queues for KEYs
     xQueue_KEY = xQueueCreate(KeyQueueLen, sizeof(PressEvent));
-    xQueue_Led = xQueueCreate(LEDQueueLen, sizeof(LedCmd_t)); // 创建队列
+    // Create Queues for LEDs
+    // for (int i = 0; i < LedNumber; i++)
+    // {
+    //     xQueue_Led[i] = xQueueCreate(LEDQueueLen, sizeof(Led_t));
+    // }
 }

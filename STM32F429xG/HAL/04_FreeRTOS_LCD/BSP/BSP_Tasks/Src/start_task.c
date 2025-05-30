@@ -3,12 +3,16 @@
 #include "gui_task.h"
 #include "key_task.h"
 #include "led_task.h"
+#include "tasks_sync.h"
 
 TaskHandle_t StartTask_Handler;      // 任务句柄
 void vStartTask(void *pvParameters); // 任务函数
 
 void freertos_enter(void)
 {
+    // 同步资源初始化
+    vSyncResources_Init();
+
     // 创建开始任务
     xTaskCreate((TaskFunction_t)vStartTask,          // 任务函数
                 (const char *)"vStartTask",          // 任务名称
