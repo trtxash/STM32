@@ -9,7 +9,7 @@
 #define LEDQueueLen 16
 
 extern QueueHandle_t xQueue_KEY;
-// extern QueueHandle_t xQueue_Led[LedNumber];
+extern QueueHandle_t xQueue_Led;
 
 void vSyncResources_Init(void);
 

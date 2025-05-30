@@ -44,10 +44,10 @@ void vLedTask(void *pvParameters)
     led_init(&led2, set_led_GPIO, 1, 2, SOLID);
     led_init(&led3, set_led_GPIO, 1, 3, BLINK);
 
-    led_set(&led0, BLINK, 1, 1, 1);
-    led_set(&led1, BLINK, 2, 1, 1);
-    led_set(&led2, BLINK, 3, 1, 1);
-    led_set(&led3, BLINK, 4, 1, 1);
+    led_set(&led0, SOLID, 1, 1, 0);
+    led_set(&led1, SOLID, 2, 1, 0);
+    led_set(&led2, SOLID, 3, 1, 0);
+    led_set(&led3, BLINK, 10, 5, 1);
 
     led_start(&led0);
     led_start(&led1);
@@ -58,7 +58,30 @@ void vLedTask(void *pvParameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
+        // 刷新LED状态
         led_ticks();
-        vTaskDelayUntil(&xLastWakeTime, 500);
+        // 读取控制命令
+        Led_t led_temp;
+        if (xQueueReceive(xQueue_Led, &led_temp, 10) == pdPASS)
+        {
+            switch (led_temp.led_id)
+            {
+            case 0:
+                led_set(&led0, led_temp.mode, led_temp.cycle, led_temp.dutycycle, led_temp.led_level);
+                break;
+            case 1:
+                led_set(&led1, led_temp.mode, led_temp.cycle, led_temp.dutycycle, led_temp.led_level);
+                break;
+            case 2:
+                led_set(&led2, led_temp.mode, led_temp.cycle, led_temp.dutycycle, led_temp.led_level);
+                break;
+            case 3:
+                led_set(&led3, led_temp.mode, led_temp.cycle, led_temp.dutycycle, led_temp.led_level);
+                break;
+            default:
+                break;
+            };
+        }
+        vTaskDelayUntil(&xLastWakeTime, 100);
     }
 }
