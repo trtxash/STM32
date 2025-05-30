@@ -3,7 +3,9 @@
 #include "adc_task.h"
 #include "dma2d.h"
 #include "tasks_common.h"
+#include "tasks_sync.h"
 #include "tim.h"
+
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */

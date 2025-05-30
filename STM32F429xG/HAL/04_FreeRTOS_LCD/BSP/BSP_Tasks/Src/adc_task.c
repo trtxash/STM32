@@ -3,8 +3,9 @@
 #include "adc.h"
 #include "filter.h"
 #include "lcd.h"
+#include "tasks_common.h"
+#include "tasks_sync.h"
 
-QueueHandle_t xSemaphore_ADC = NULL;
 volatile float JS_RTT_UpBuffer[2048] = {0};
 
 TaskHandle_t ADCTask_Handler; // 任务句柄
@@ -16,9 +17,7 @@ void vADCTask(void *pvParameters)
     Kalman adcx_kalman;
     Kalman_Init(0.001, 0.1, 1000, &adcx_kalman); // 初始化卡尔曼滤波器
 
-    xSemaphore_ADC = xSemaphoreCreateBinary(); // 创建二值信号量
-
-    int temperate_result;
+    // int temperate_result;
     float temperate = 0;
     float adc_temp[2] = {0};
 
@@ -43,16 +42,17 @@ void vADCTask(void *pvParameters)
         // 电压转换
         temperate = adc_temp[1] * (2.5 / 4096.0);     // 电压值
         temperate = (temperate - 0.76) / 0.0025 + 25; // 转换为温度值
-        temperate_result = temperate *= 100;          // 扩大100倍.
-        // 显示数据
-        LTDC_Show_Num(400, 0, adc_temp[0], 4, 12, 0, GUI_Black);
-        LTDC_Show_Num(400, 12, adc_temp[1], 4, 12, 0, GUI_Black);
-        LTDC_Show_Num(400, 24, temperate_result, 4, 12, 0, GUI_Black);
+        // temperate_result = temperate *= 100;          // 扩大100倍.
+
         // 传输数据到RTT
         SEGGER_RTT_Write(JS_RTT_Channel, &adc_temp[0], sizeof(adc_temp));
+        // 传输数据到GUI任务
+        xQueueSend(xQueue_ADC, &temperate, 10);
+
+        vTaskDelayUntil(&xLastWakeTime, 100);
+
         // 循环传输数据
         HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx, ADC_Sec);
-        vTaskDelayUntil(&xLastWakeTime, 100);
         xSemaphoreTake(xSemaphore_ADC, 10); // 等待信号量,超时时间为500ms
         adc_temp[0] = 0;
         for (int i = 0; i < ADC_Sec; i++) // 处理数据

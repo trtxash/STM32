@@ -509,6 +509,16 @@ void LTDC_Show_xNum(u16 x, u16 y, u32 num, u8 len, u8 size, u8 mode, u32 color)
     }
 }
 
+// 显示浮点数
+void LTDC_Show_float(u16 x, u16 y, float num, u8 intlen, u8 floatlen, u8 size, u8 mode, u32 color)
+{
+    int N = LCD_Pow(10, floatlen);
+    int num_int = (int)(num * N); // 放大
+    LTDC_Show_Num(x, y, num_int / N, intlen, size, mode, color);
+    LTDC_Show_Char(x + intlen * size / 2, y, '.', size, mode, color);
+    LTDC_Show_xNum(x + (intlen + 1) * size / 2, y, num_int % N, floatlen, size, 0X80 | mode, color);
+}
+
 // 显示字符串
 // x,y:起点坐标,含0
 // width,height:区域大小,不含0
