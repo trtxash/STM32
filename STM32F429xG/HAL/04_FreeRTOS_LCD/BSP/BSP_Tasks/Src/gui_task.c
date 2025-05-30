@@ -19,8 +19,6 @@ void vGUITask(void *pvParameters)
         Button key_temp;
         if (xQueueReceive(xQueue_KEY, &key_temp, 10) == pdPASS)
         {
-            // if (lineflag <= 468)
-            // {
             switch (key_temp.event)
             {
             case PRESS_DOWN:
@@ -54,7 +52,6 @@ void vGUITask(void *pvParameters)
             LTDC_Show_String(16 * 6, lineflag % 480, 240, 240, 12, (u8 *)",Line", 0, GUI_Red);
             LTDC_Show_Num(22 * 6, lineflag % 480, lineflag, 9, 12, 0, GUI_Red);
             lineflag += 12;
-            // }
         }
         vTaskDelayUntil(&xLastWakeTime, 5);
     }
