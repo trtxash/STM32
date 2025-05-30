@@ -2,6 +2,7 @@
 
 #if SYSTEM_SUPPORT_OS
 #include "FreeRTOS.h" //os 使用
+#include <string.h>
 #endif
 
 // 时钟系统配置函数
@@ -82,18 +83,56 @@ void Error_Handler(void)
     /* USER CODE END Error_Handler_Debug */
 }
 
-// 重载标准库内存函数
-void *malloc(size_t size)
-{
-    return pvPortMalloc(size);
-}
+// // 重载标准库内存函数
+// void *malloc(size_t size)
+// {
+//     return pvPortMalloc(size);
+// }
 
-void free(void *ptr)
-{
-    vPortFree(ptr);
-}
+// void free(void *ptr)
+// {
+//     vPortFree(ptr);
+// }
 
-// 此时不需要实现 _sbrk
+// // 覆盖所有可重入版本的内存函数
+// void *_malloc_r(struct _reent *reent, size_t size)
+// {
+//     (void)reent;
+//     return pvPortMalloc(size);
+// }
+
+// void _free_r(struct _reent *reent, void *ptr)
+// {
+//     (void)reent;
+//     vPortFree(ptr);
+// }
+
+// void *_calloc_r(struct _reent *reent, size_t nmemb, size_t size)
+// {
+//     void *ptr = pvPortMalloc(nmemb * size);
+//     if (ptr)
+//         memset(ptr, 0, nmemb * size);
+//     return ptr;
+// }
+
+// void *_realloc_r(struct _reent *reent, void *ptr, size_t new_size)
+// {
+//     (void)reent;
+//     if (new_size == 0)
+//     {
+//         vPortFree(ptr);
+//         return NULL;
+//     }
+
+//     void *new_ptr = pvPortMalloc(new_size);
+//     if (ptr && new_ptr)
+//     {
+//         size_t old_size = xPortGetSizeOfBlock(ptr);
+//         memcpy(new_ptr, ptr, old_size < new_size ? old_size : new_size);
+//         vPortFree(ptr);
+//     }
+//     return new_ptr;
+// }
 
 #ifdef USE_FULL_ASSERT
 // 当编译提示出错的时候此函数用来报告错误的文件和所在行

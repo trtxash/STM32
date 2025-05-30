@@ -78,6 +78,9 @@ extern volatile uint32_t FreeRTOSRunTimeTicks;
 #define portGET_RUN_TIME_COUNTER_VALUE()         FreeRTOSRunTimeTicks         // 定义变量以读取统计定时器的值
 #define configRECORD_STACK_HIGH_ADDRESS          1                            // 检查堆栈？
 
+#define configUSE_NEWLIB_REENTRANT       1 // 启用Newlib可重入支持
+#define configSUPPORT_DYNAMIC_ALLOCATION 1 // 必须启用动态内存
+
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES           0   // 为1启用协程，节省开销，但功能有限
 #define configMAX_CO_ROUTINE_PRIORITIES (2) // 设置分配给协程的最大优先级，0~num-1

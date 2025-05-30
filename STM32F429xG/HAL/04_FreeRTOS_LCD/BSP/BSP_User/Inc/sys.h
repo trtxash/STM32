@@ -112,6 +112,8 @@ typedef __I uint8_t vuc8;
 
 void Stm32_Clock_Init(u32 plln, u32 pllm, u32 pllp, u32 pllq); // 时钟系统配置
 void Error_Handler(void);                                      // 异常处理函数
+// void *malloc(size_t size);
+// void free(void *ptr);
 // 以下为汇编函数
 // void WFI_SET(void);      // 执行WFI指令
 // void INTX_DISABLE(void); // 关闭所有中断
