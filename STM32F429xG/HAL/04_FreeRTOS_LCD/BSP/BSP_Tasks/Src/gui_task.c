@@ -1,7 +1,6 @@
 #include "gui_task.h"
 #include "key_task.h"
 #include "lcd.h"
-#include "multi_button.h"
 #include "tasks_sync.h"
 
 TaskHandle_t GUITask_Handler; // 任务句柄
@@ -60,6 +59,6 @@ void vGUITask(void *pvParameters)
             LTDC_Show_float(400, 0, adc_temp, 3, 2, 12, 0, GUI_Black);
         }
 
-        vTaskDelayUntil(&xLastWakeTime, 5);
+        vTaskDelayUntil(&xLastWakeTime, 15);
     }
 }

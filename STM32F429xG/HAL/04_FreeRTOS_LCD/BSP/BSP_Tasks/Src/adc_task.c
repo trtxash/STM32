@@ -6,7 +6,7 @@
 #include "tasks_common.h"
 #include "tasks_sync.h"
 
-volatile float JS_RTT_UpBuffer[2048] = {0};
+// volatile float JS_RTT_UpBuffer[2048] = {0};
 
 TaskHandle_t ADCTask_Handler; // 任务句柄
 
@@ -24,8 +24,8 @@ void vADCTask(void *pvParameters)
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
 
-    uint32_t JS_RTT_Channel = 1;
-    SEGGER_RTT_ConfigUpBuffer(JS_RTT_Channel, "JScope_f4f4", (void *)JS_RTT_UpBuffer, sizeof(JS_RTT_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP); // 配置RTT输出
+    // uint32_t JS_RTT_Channel = 1;
+    // SEGGER_RTT_ConfigUpBuffer(JS_RTT_Channel, "JScope_f4f4", (void *)JS_RTT_UpBuffer, sizeof(JS_RTT_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP); // 配置RTT输出
 
     // 第一次传输,处理数据
     HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx, ADC_Sec);
@@ -44,8 +44,8 @@ void vADCTask(void *pvParameters)
         temperate = (temperate - 0.76) / 0.0025 + 25; // 转换为温度值
         // temperate_result = temperate *= 100;          // 扩大100倍.
 
-        // 传输数据到RTT
-        SEGGER_RTT_Write(JS_RTT_Channel, &adc_temp[0], sizeof(adc_temp));
+        // // 传输数据到RTT
+        // SEGGER_RTT_Write(JS_RTT_Channel, &adc_temp[0], sizeof(adc_temp));
         // 传输数据到GUI任务
         xQueueSend(xQueue_ADC, &temperate, 10);
 
