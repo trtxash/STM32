@@ -104,6 +104,9 @@ static void led_handler(struct Led_t *handle)
         if (handle->dutycycle > handle->cycle)
             handle->dutycycle = handle->cycle;
 
+        if (handle->dutycycle == handle->cycle)
+            break;
+
         switch (handle->state)
         {
         case 0:

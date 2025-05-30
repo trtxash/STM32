@@ -44,10 +44,10 @@ void vLedTask(void *pvParameters)
     led_init(&led2, set_led_GPIO, 1, 2, SOLID);
     led_init(&led3, set_led_GPIO, 1, 3, BLINK);
 
-    led_set(&led0, SOLID, 2, 1, 1);
+    led_set(&led0, BLINK, 1, 1, 1);
     led_set(&led1, BLINK, 2, 1, 1);
-    led_set(&led2, SOLID, 4, 2, 0);
-    led_set(&led3, BLINK, 4, 2, 1);
+    led_set(&led2, BLINK, 3, 1, 1);
+    led_set(&led3, BLINK, 4, 1, 1);
 
     led_start(&led0);
     led_start(&led1);
@@ -59,6 +59,6 @@ void vLedTask(void *pvParameters)
     while (1)
     {
         led_ticks();
-        vTaskDelayUntil(&xLastWakeTime, 10);
+        vTaskDelayUntil(&xLastWakeTime, 500);
     }
 }
