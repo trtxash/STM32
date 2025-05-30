@@ -114,6 +114,7 @@ target_sources(stm32cubemx INTERFACE
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c
     ../../APP/Debug_Linker/RTT/SEGGER_RTT_ASM_ARMv7M.S
     ../../APP/Multi_Button/Src/multi_button.c
+    ../../APP/Multi_Led/Src/multi_led.c
     ../../APP/Algorithm/KalmanFilter/Src/filter.c
 
     ../../startup_stm32f429xx.s

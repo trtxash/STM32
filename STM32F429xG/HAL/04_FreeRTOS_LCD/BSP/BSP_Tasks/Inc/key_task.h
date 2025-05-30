@@ -3,17 +3,13 @@
 
 #include "key.h"
 #include "tasks_common.h"
+#include "multi_button.h"
 
 #define TASK_PRIO_KEY TASK_PRIO_HIGH
 #define KEY_STK_SIZE  STACK_SIZE_LEVEL1
 
 extern TaskHandle_t KEYTask_Handler; // 任务句柄
 extern Button button_up;
-
-typedef enum
-{
-    KEY_ID_UP = 0,
-} KEY_ID;
 
 void vKeyTask(void *pvParameters);
 

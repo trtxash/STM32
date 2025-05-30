@@ -2,7 +2,6 @@
 #define _KEY_H
 
 #include "main.h"
-#include "multi_button.h"
 
 /* KEY GPIO */
 #define KEY_UP_Port GPIOA

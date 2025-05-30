@@ -1,5 +1,4 @@
 #include "gui_task.h"
-#include "key.h"
 #include "key_task.h"
 #include "lcd.h"
 #include "tasks_sync.h"
