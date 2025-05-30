@@ -57,15 +57,7 @@ void vGUITask(void *pvParameters)
         float adc_temp;
         if (xQueueReceive(xQueue_ADC, &adc_temp, 10) == pdPASS)
         {
-            // int adc_int = (int)(adc_temp * 100); // 保留两位小数
-            // LTDC_Show_Num(400, 0, adc_int / 100, 3, 12, 0, GUI_Black);
-            // LTDC_Show_Char(400 + 3 * 6, 0, '.', 12, 0, GUI_Black);
-            // LTDC_Show_xNum(400 + 4 * 6, 0, adc_int % 100, 2, 12, 0X80, GUI_Black);
-            // if (adc_int % 100 < 10)
-            // {
-            //     LTDC_Show_Char(400 + 4 * 6, 0, '0', 12, 0, GUI_Black);
-            // }
-            LTDC_Show_float(400, 0, adc_temp, 3, 6, 12, 0, GUI_Black);
+            LTDC_Show_float(400, 0, adc_temp, 3, 2, 12, 0, GUI_Black);
         }
 
         vTaskDelayUntil(&xLastWakeTime, 5);
