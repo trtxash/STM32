@@ -23,8 +23,7 @@ static void Callback_Down_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        PressEvent event = PRESS_DOWN;
-        xQueueSend(xQueue_KEY, &event, 10);
+        xQueueSend(xQueue_KEY, &button_up, 10);
     }
 }
 
@@ -32,8 +31,7 @@ static void Callback_Up_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        PressEvent event = PRESS_UP;
-        xQueueSend(xQueue_KEY, &event, 10);
+        xQueueSend(xQueue_KEY, &button_up, 10);
     }
 }
 
@@ -41,8 +39,7 @@ static void Callback_Repeat_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        PressEvent event = PRESS_REPEAT;
-        xQueueSend(xQueue_KEY, &event, 10);
+        xQueueSend(xQueue_KEY, &button_up, 10);
     }
 }
 
@@ -50,8 +47,7 @@ static void Callback_Single_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        PressEvent event = SINGLE_CLICK;
-        xQueueSend(xQueue_KEY, &event, 10);
+        xQueueSend(xQueue_KEY, &button_up, 10);
     }
 }
 
@@ -59,8 +55,7 @@ static void Callback_Double_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        PressEvent event = DOUBLE_CLICK;
-        xQueueSend(xQueue_KEY, &event, 10);
+        xQueueSend(xQueue_KEY, &button_up, 10);
     }
 }
 
@@ -68,8 +63,7 @@ static void Callback_Long_Press_Start_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        PressEvent event = LONG_PRESS_START;
-        xQueueSend(xQueue_KEY, &event, 10);
+        xQueueSend(xQueue_KEY, &button_up, 10);
     }
 }
 
@@ -77,8 +71,7 @@ static void Callback_Long_Press_Hold_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        PressEvent event = LONG_PRESS_HOLD;
-        xQueueSend(xQueue_KEY, &event, 10);
+        xQueueSend(xQueue_KEY, &button_up, 10);
     }
 }
 
