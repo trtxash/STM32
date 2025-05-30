@@ -11,7 +11,7 @@
 
 // According to your need to modify the constants.
 #define TICKS_INTERVAL 50 // ms
-#define DEBOUNCE_TICKS 0 // MAX 7 (0 ~ 7)
+#define DEBOUNCE_TICKS 0  // MAX 7 (0 ~ 7)
 #define SHORT_TICKS    (200 / TICKS_INTERVAL)
 #define LONG_TICKS     (500 / TICKS_INTERVAL)
 
@@ -39,7 +39,7 @@ typedef struct Button
     uint8_t debounce_cnt : 3;
     uint8_t active_level : 1;
     uint8_t button_level : 1;
-    uint8_t button_id;
+    uint8_t button_id; // 编号,传入HAL 层 GPIO操作函数
     uint8_t (*hal_button_Level)(uint8_t button_id_);
     BtnCallback cb[number_of_event];
     struct Button *next;
@@ -62,6 +62,5 @@ extern "C"
 #endif
 
 /* user defined */
-
 
 #endif

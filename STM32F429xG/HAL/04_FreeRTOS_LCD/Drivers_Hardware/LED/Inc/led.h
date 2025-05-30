@@ -57,9 +57,6 @@
 
 #define LedNumber 4
 
-
-
-void LED_Init(void);
 void LED0_Init(void);
 void LED1_Init(void);
 void LED2_Init(void);

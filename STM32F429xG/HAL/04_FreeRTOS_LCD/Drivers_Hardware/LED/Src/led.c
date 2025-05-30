@@ -1,21 +1,6 @@
 #include "led.h"
 
 /**
- * @brief	全部LED初始化
- * @param 	none
- * @arg		none
- * @note
- * @retval	none
- */
-void LED_Init(void)
-{
-  LED0_Init();
-  LED1_Init();
-  LED2_Init();
-  LED3_Init();
-}
-
-/**
  * @brief	利用HAL库函数进行LED初始化
  * @param 	none
  * @arg		none

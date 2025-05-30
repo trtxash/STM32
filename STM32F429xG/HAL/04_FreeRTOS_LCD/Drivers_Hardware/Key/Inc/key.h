@@ -13,15 +13,6 @@
 /* KEY 操作 */
 #define KEY_UP_READ() (KEY_UP_Port->IDR & KEY_UP_PIN) // 0 or 1
 
-// typedef enum
-// {
-//     KEY_ID_UP = 0,
-// } KEY_ID;
-
-// #if SYSTEM_SUPPORT_OS == 1
-// extern Button button_up;
-// #endif
-
 void KEY_Init(void);
 
 #endif

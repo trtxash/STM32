@@ -29,7 +29,10 @@ static void bsp_init(void)
 {
     Stm32_Clock_Init(SYS_CLOCK, 12, RCC_PLLP_DIV2, 8); // 设置时钟
     delay_init(SYS_CLOCK);                             // 延时初始化
-    LED_Init();
+    LED0_Init();
+    LED1_Init();
+    LED2_Init();
+    LED3_Init();
     KEY_Init();
 
     // 16bit * 4 BANK * 4M = 32MB SDRAM; FMC 120Mhz,
