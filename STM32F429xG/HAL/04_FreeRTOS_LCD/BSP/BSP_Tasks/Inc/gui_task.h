@@ -1,6 +1,7 @@
 #ifndef _GUI_TASK_H
 #define _GUI_TASK_H
 
+#include "lcd.h"
 #include "tasks_common.h"
 
 #define TASK_PRIO_GUI TASK_PRIO_HIGH

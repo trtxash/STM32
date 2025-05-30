@@ -1,6 +1,5 @@
 #include "gui_task.h"
 #include "key_task.h"
-#include "lcd.h"
 #include "tasks_sync.h"
 
 TaskHandle_t GUITask_Handler; // 任务句柄
@@ -58,6 +57,8 @@ void vGUITask(void *pvParameters)
         {
             LTDC_Show_float(400, 0, adc_temp, 3, 2, 12, 0, GUI_Black);
         }
+
+        // vTaskGetRunTimeStats(cpu_buff); // 显示任务运行时间
 
         vTaskDelayUntil(&xLastWakeTime, 15); // 大致66.6Hz
     }

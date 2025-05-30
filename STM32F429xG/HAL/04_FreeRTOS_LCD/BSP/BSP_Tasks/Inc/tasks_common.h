@@ -6,6 +6,8 @@
 #include "semphr.h"
 #include "task.h"
 
+#include "SEGGER_RTT.h"
+
 // 任务优先级宏
 #define TASK_PRIO_LOW    (tskIDLE_PRIORITY + 1)
 #define TASK_PRIO_NORMAL (tskIDLE_PRIORITY + 2)

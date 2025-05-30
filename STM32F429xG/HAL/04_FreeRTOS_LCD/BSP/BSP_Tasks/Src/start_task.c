@@ -1,5 +1,6 @@
 #include "start_task.h"
 #include "adc_task.h"
+#include "cpu_task.h"
 #include "gui_task.h"
 #include "key_task.h"
 #include "led_task.h"
@@ -53,13 +54,13 @@ void vStartTask(void *pvParameters)
                 (UBaseType_t)TASK_PRIO_GUI,
                 (TaskHandle_t *)&GUITask_Handler);
 
-    // // 创建CPU任务
-    // xTaskCreate((TaskFunction_t)cpu_task,
-    //             (const char *)"cpu_task",
-    //             (uint16_t)CPU_TSTK_SIZE,
-    //             (void *)NULL,
-    //             (UBaseType_t)CPU_TASK_PRIO,
-    //             (TaskHandle_t *)&CPU_Task_Handler);
+    // 创建CPU任务
+    xTaskCreate((TaskFunction_t)vCPUTask,
+                (const char *)"vCPUTask",
+                (uint16_t)CPU_STK_SIZE,
+                (void *)NULL,
+                (UBaseType_t)TASK_PRIO_CPU,
+                (TaskHandle_t *)&CPUTask_Handler);
 
     // 创建adc任务
     xTaskCreate((TaskFunction_t)vADCTask,
@@ -73,27 +74,3 @@ void vStartTask(void *pvParameters)
     vTaskDelete(StartTask_Handler); // 删除开始任务
 }
 
-// void cpu_task(void *pvParameters)
-// {
-//     (void)pvParameters; // 明确标记未使用参数
-
-//     // uint8_t CPU_RunInfo[400]; // 保存任务运行时间信息
-//     TickType_t xLastWakeTime;
-//     xLastWakeTime = xTaskGetTickCount();
-//     while (1)
-//     {
-//         // printf("---------------------------------------------\r\n");
-//         // printf("任务名      任务状态 优先级   剩余栈 任务序号\r\n");
-//         // printf("%s", CPU_RunInfo);
-//         // printf("---------------------------------------------\r\n");
-
-//         // memset(CPU_RunInfo, 0, 400); // 信息缓冲区清零
-
-//         // vTaskGetRunTimeStats((char *)&CPU_RunInfo);
-
-//         // printf("任务名       运行计数         利用率\r\n");
-//         // printf("%s", CPU_RunInfo);
-//         // printf("---------------------------------------------\r\n\n");
-//         vTaskDelayUntil(&xLastWakeTime, 500);
-//     }
-// }

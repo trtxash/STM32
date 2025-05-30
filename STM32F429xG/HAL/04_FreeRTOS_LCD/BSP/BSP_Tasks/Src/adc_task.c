@@ -1,9 +1,4 @@
 #include "adc_task.h"
-#include "SEGGER_RTT.h"
-#include "adc.h"
-#include "filter.h"
-#include "lcd.h"
-#include "tasks_common.h"
 #include "tasks_sync.h"
 
 // volatile float JS_RTT_UpBuffer[2048] = {0};

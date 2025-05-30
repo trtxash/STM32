@@ -101,6 +101,7 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_Tasks/Src/key_task.c
     ../../BSP/BSP_Tasks/Src/gui_task.c
     ../../BSP/BSP_Tasks/Src/adc_task.c
+    ../../BSP/BSP_Tasks/Src/cpu_task.c
 
     ../../Drivers_Hardware/LED/Src/led.c
     ../../Drivers_Hardware/Key/Src/key.c

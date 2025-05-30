@@ -1,6 +1,8 @@
 #ifndef _ADC_TASK_H
 #define _ADC_TASK_H
 
+#include "adc.h"
+#include "filter.h"
 #include "tasks_common.h"
 
 #define TASK_PRIO_ADC TASK_PRIO_NORMAL
