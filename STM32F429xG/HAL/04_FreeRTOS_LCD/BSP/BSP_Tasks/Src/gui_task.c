@@ -1,4 +1,5 @@
 #include "gui_task.h"
+#include "cpu_task.h"
 #include "key_task.h"
 #include "tasks_sync.h"
 
@@ -55,10 +56,14 @@ void vGUITask(void *pvParameters)
         float adc_temp;
         if (xQueueReceive(xQueue_ADC, &adc_temp, 10) == pdPASS)
         {
-            LTDC_Show_float(400, 0, adc_temp, 3, 2, 12, 0, GUI_Black);
+            LTDC_Show_float(799 - 6 * 6, 0, adc_temp, 3, 2, 12, 0, GUI_Black);
         }
 
-        // vTaskGetRunTimeStats(cpu_buff); // 显示任务运行时间
+        char cpu_temp[CPU_RUNINFO_SIZE];
+        if (xQueueReceive(xQueue_CPU, &cpu_temp, 10) == pdPASS)
+        {
+            LTDC_Show_String_sprintf(400, 0, 400, 240, 12, (u8 *)CPU_RunInfo, 0, GUI_Black);
+        }
 
         vTaskDelayUntil(&xLastWakeTime, 15); // 大致66.6Hz
     }

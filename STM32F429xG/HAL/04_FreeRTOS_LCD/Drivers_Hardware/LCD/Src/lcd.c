@@ -523,10 +523,11 @@ void LTDC_Show_float(u16 x, u16 y, float num, u8 intlen, u8 floatlen, u8 size, u
 // x,y:起点坐标,含0
 // width,height:区域大小,不含0
 // size:字体大小 1206/1608/2412/3216
-//*p:字符串起始地址
+// *p:字符串起始地址
+// mode:叠加方式(1)还是非叠加方式(0)
 void LTDC_Show_String(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u8 mode, u32 color)
 {
-    u8 x0 = x;
+    u16 x0 = x;
     width += x;
     height += y;
     while ((*p <= '~') && (*p >= ' ')) // 判断是不是非法字符!
@@ -538,6 +539,60 @@ void LTDC_Show_String(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u8 mo
         }
         if (y >= height)
             break; // 退出
+        LTDC_Show_Char(x, y, *p, size, mode, color);
+        x += size / 2;
+        p++;
+    }
+}
+
+// 显示sprintf换行字符串
+// x,y:起点坐标,含0
+// width,height:区域大小,不含0
+// size:字体大小 1206/1608/2412/3216
+// *p:字符串起始地址
+// mode:叠加方式(1)还是非叠加方式(0)
+void LTDC_Show_String_sprintf(u16 x, u16 y, u16 width, u16 height, u8 size, u8 *p, u8 mode, u32 color)
+{
+    u16 x0 = x;
+    width += x;
+    height += y;
+    while (*p != '\000') // 判断是不是非法字符!
+    {
+        if (*p == '\r' && *(p + 1) == '\n')
+        {
+            x = x0;
+            y += size;
+            p += 2;
+            continue;
+        }
+        else if (*p == '\t')
+        {
+            for (u8 i = 0; i < 4; i++)
+            {
+                if (x >= width)
+                {
+                    x = x0;
+                    y += size;
+                }
+                if (y >= height)
+                    break; // 退出
+                LTDC_Show_Char(x, y, ' ', size, mode, color);
+                x += size / 2;
+            }
+            p += 1;
+            continue;
+        }
+        else
+        {
+            if (x >= width)
+            {
+                x = x0;
+                y += size;
+            }
+            if (y >= height)
+                break; // 退出
+        }
+
         LTDC_Show_Char(x, y, *p, size, mode, color);
         x += size / 2;
         p++;
