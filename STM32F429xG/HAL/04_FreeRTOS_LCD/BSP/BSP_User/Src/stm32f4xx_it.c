@@ -86,7 +86,7 @@ __attribute__((weak)) void PendSV_Handler(void)
  */
 __attribute__((weak)) void SysTick_Handler(void)
 {
-    // HAL_IncTick();
+    HAL_IncTick();
 }
 
 /******************************************************************************/
@@ -112,6 +112,7 @@ __attribute__((weak)) void SysTick_Handler(void)
 //   FreeRTOSRunTimeTicksold = FreeRTOSRunTimeTicks;
 // }
 
+#if SYSTEM_SUPPORT_OS
 /**
  * @brief This function handles TIM7 global interrupt.
  */
@@ -125,6 +126,7 @@ void TIM7_IRQHandler(void)
 
     /* USER CODE END TIM7_IRQn 1 */
 }
+#endif
 
 void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
@@ -141,13 +143,15 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
  */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    /* USER CODE BEGIN Callback 0 */
+/* USER CODE BEGIN Callback 0 */
 
-    /* USER CODE END Callback 0 */
+/* USER CODE END Callback 0 */
+#if SYSTEM_SUPPORT_OS
     if (htim == (&htim7))
     {
         HAL_IncTick();
     }
+#endif
 
     if (htim == (&htim14))
     {
