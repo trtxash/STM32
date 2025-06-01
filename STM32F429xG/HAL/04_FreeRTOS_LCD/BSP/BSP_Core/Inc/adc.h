@@ -29,10 +29,10 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-#define ADC_Sec 1
-#define ADC_Ch  1
+#define ADC_Sec 16
+#define ADC_Ch  2
 
-    extern volatile u32 adcx[ADC_Sec][ADC_Ch];
+    extern volatile u32 adcx[ADC_Ch][ADC_Sec];
 
     extern ADC_HandleTypeDef hadc1;
     extern DMA_HandleTypeDef hdma_adc1;
@@ -42,6 +42,7 @@ extern "C"
     /* USER CODE END Private defines */
 
     void ADC1_Init(void);
+    void ADC_Change_Channel_SingleScan_DMA_NOMAL(ADC_HandleTypeDef *hadc, u8 ch, u16 SamplingTime);
 
     /* USER CODE BEGIN Prototypes */
 

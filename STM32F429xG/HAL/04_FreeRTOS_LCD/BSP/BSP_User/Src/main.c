@@ -35,12 +35,13 @@ static void bsp_init(void)
     LED3_Init();
     KEY_Init();
 
+    DMA_Init(); // DMA初始化要在别的之前,不然出问题
+
     // 16bit * 4 BANK * 4M = 32MB SDRAM; FMC 120Mhz,
     // 测试SDRAM读写速度,顺序写入32bit/32MB Write time 252 ms, speed 126 MB/s; 顺序读取32bit/32MB Read time 330 ms, speed 96 MB/s
     // 126 * 8 = 1008 Mbit/s, 相当于一个时钟周期写入 1008/120 = 8.4bit
     SDRAM_Init();
 
-    DMA_Init(); // DMA初始化要在别的之前,不然出问题
     ADC1_Init();
 
     // 一般放在最后,等待LCD硬件上电完成

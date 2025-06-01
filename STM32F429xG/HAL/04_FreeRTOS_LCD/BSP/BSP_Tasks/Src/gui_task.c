@@ -54,9 +54,14 @@ void vGUITask(void *pvParameters)
         }
 
         float adc_temp;
-        if (xQueueReceive(xQueue_ADC, &adc_temp, 10) == pdPASS)
+        if (xQueueReceive(xQueue_ADC_Temp, &adc_temp, 10) == pdPASS)
         {
             LTDC_Show_float(799 - 6 * 6, 0, adc_temp, 3, 2, 12, 0, GUI_Black);
+        }
+        float adc_bat;
+        if (xQueueReceive(xQueue_ADC_Bat, &adc_bat, 10) == pdPASS)
+        {
+            LTDC_Show_float(799 - 6 * 6, 12, adc_bat, 3, 2, 12, 0, GUI_Black);
         }
 
         char cpu_temp[CPU_RUNINFO_SIZE];
