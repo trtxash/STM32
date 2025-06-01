@@ -37,6 +37,7 @@ extern "C"
     void DebugMon_Handler(void);
     void PendSV_Handler(void);
     void SysTick_Handler(void);
+    void TIM7_IRQHandler(void);
     void TIM8_TRG_COM_TIM14_IRQHandler(void);
     void DMA2_Stream0_IRQHandler(void);
     void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc);

@@ -6,7 +6,6 @@
 #include "tasks_sync.h"
 #include "tim.h"
 
-
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
@@ -113,17 +112,50 @@ __attribute__((weak)) void SysTick_Handler(void)
 //   FreeRTOSRunTimeTicksold = FreeRTOSRunTimeTicks;
 // }
 
+/**
+ * @brief This function handles TIM7 global interrupt.
+ */
+void TIM7_IRQHandler(void)
+{
+    /* USER CODE BEGIN TIM7_IRQn 0 */
+
+    /* USER CODE END TIM7_IRQn 0 */
+    HAL_TIM_IRQHandler(&htim7);
+    /* USER CODE BEGIN TIM7_IRQn 1 */
+
+    /* USER CODE END TIM7_IRQn 1 */
+}
+
 void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim14);
 }
 
+/**
+ * @brief  Period elapsed callback in non blocking mode
+ * @note   This function is called  when TIM7 interrupt took place, inside
+ * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+ * a global variable "uwTick" used as application time base.
+ * @param  htim : TIM handle
+ * @retval None
+ */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+    /* USER CODE BEGIN Callback 0 */
+
+    /* USER CODE END Callback 0 */
+    if (htim == (&htim7))
+    {
+        HAL_IncTick();
+    }
+
     if (htim == (&htim14))
     {
         FreeRTOSRunTimeTicks++;
     }
+    /* USER CODE BEGIN Callback 1 */
+
+    /* USER CODE END Callback 1 */
 }
 
 /**

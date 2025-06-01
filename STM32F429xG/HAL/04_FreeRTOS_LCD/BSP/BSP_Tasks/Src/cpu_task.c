@@ -11,19 +11,8 @@ void vCPUTask(void *pvParameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-
-        // printf("---------------------------------------------\r\n");
-        // printf("任务名      任务状态 优先级   剩余栈 任务序号\r\n");
-        // printf("%s", CPU_RunInfo);
-        // printf("---------------------------------------------\r\n");
-
-        // memset(CPU_RunInfo, 0, 400); // 信息缓冲区清零
-
         // vTaskGetRunTimeStats(CPU_RunInfo);
 
-        // printf("任务名       运行计数         利用率\r\n");
-        // printf("%s", CPU_RunInfo);
-        // printf("---------------------------------------------\r\n\n");
         vTaskDelayUntil(&xLastWakeTime, 500);
     }
 }
