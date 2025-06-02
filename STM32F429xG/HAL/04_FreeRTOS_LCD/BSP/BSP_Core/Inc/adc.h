@@ -29,7 +29,7 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-#define ADC_Sec 8
+#define ADC_Sec 32
 #define ADC_Ch  2
 
     extern volatile u32 adcx[ADC_Ch][ADC_Sec];

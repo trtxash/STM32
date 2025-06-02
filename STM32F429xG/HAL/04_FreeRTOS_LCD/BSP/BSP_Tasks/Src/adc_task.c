@@ -5,7 +5,7 @@
 
 TaskHandle_t ADCTask_Handler; // 任务句柄;
 
-float battery_voltage_to_soc(float voltage, float temp)
+float battery_voltage_to_soc(float voltage)
 {
     // 电压安全校验
     if (voltage > 4.2f)
@@ -52,9 +52,9 @@ void vADCTask(void *pvParameters)
 {
     (void)pvParameters; // 明确标记未使用参数
 
-    Kalman adc1_kalman[ADC_Ch];
+    Kalman adc1_kalman[ADC_Ch + 1];
     float adc_temp[ADC_Ch] = {0};
-    float temperate = 0, V_Bat = 0;
+    float temperate = 0, V_Bat = 0, V_Bat_Volt = 0;
 
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
@@ -62,6 +62,9 @@ void vADCTask(void *pvParameters)
     // uint32_t JS_RTT_Channel = 1;
     // SEGGER_RTT_ConfigUpBuffer(JS_RTT_Channel, "JScope_f4f4", (void *)JS_RTT_UpBuffer, sizeof(JS_RTT_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP); // 配置RTT输出
 
+    Kalman_Init(0.001, 0.1, 10, &adc1_kalman[0]);     // 初始化卡尔曼滤波器
+    Kalman_Init(0.001, 0.1, 10, &adc1_kalman[1]);     // 初始化卡尔曼滤波器
+    Kalman_Init(0.001, 0.001, 1000, &adc1_kalman[2]); // 初始化卡尔曼滤波器
     // 第一次传输,处理数据
     for (u8 j = 0; j < ADC_Ch; j++)
     {
@@ -84,9 +87,13 @@ void vADCTask(void *pvParameters)
         {
             adc_temp[j] += adcx[j][i];
         }
-        Kalman_Init(0.001, 0.1, 100, &adc1_kalman[j]); // 初始化卡尔曼滤波器
-        adc1_kalman[j].out = adc_temp[j] /= ADC_Sec;   // 初始值
+        adc1_kalman[j].out = adc_temp[j] /= ADC_Sec; // 初始值
     }
+    // 电压转换
+    temperate = adc_temp[0] * (2.5 / 4096.0);           // 电压值
+    temperate = (temperate - 0.76) / 0.0025 + 25;       // 转换为温度值
+    V_Bat = adc_temp[1] * (2.5 / 4096.0) * 2 * 1.0064;  // 电压值
+    adc1_kalman[2].out = battery_voltage_to_soc(V_Bat); // 初始值
 
     while (1)
     {
@@ -119,14 +126,14 @@ void vADCTask(void *pvParameters)
         }
 
         // 电压转换
-        temperate = adc_temp[0] * (2.5 / 4096.0);        // 电压值
-        temperate = (temperate - 0.76) / 0.0025 + 25;    // 转换为温度值
+        temperate = adc_temp[0] * (2.5 / 4096.0);          // 电压值
+        temperate = (temperate - 0.76) / 0.0025 + 25;      // 转换为温度值
         V_Bat = adc_temp[1] * (2.5 / 4096.0) * 2 * 1.0064; // 电压值
 
-        // temperate = battery_voltage_to_soc(V_Bat, 0); // SOC计算
-
+        V_Bat_Volt = KalmanFilter(&adc1_kalman[2], battery_voltage_to_soc(V_Bat)); // 电量卡尔曼滤波
         // 传输数据到GUI任务
         xQueueSend(xQueue_ADC_Temp, &temperate, 10);
         xQueueSend(xQueue_ADC_Bat, &V_Bat, 10);
+        xQueueSend(xQueue_ADC_BatVolt, &V_Bat_Volt, 10);
     }
 }

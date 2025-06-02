@@ -10,6 +10,7 @@
 
 extern TaskHandle_t ADCTask_Handler; // 任务句柄
 
+float battery_voltage_to_soc(float voltage);
 void vADCTask(void *pvParameters);
 
 #endif

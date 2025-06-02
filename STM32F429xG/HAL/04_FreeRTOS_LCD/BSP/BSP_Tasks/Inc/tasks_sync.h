@@ -16,6 +16,7 @@ extern QueueHandle_t xQueue_KEY;
 extern QueueHandle_t xQueue_Led;
 extern QueueHandle_t xQueue_ADC_Temp;
 extern QueueHandle_t xQueue_ADC_Bat;
+extern QueueHandle_t xQueue_ADC_BatVolt;
 extern QueueHandle_t xQueue_CPU;
 
 extern QueueHandle_t xSemaphore_ADC;
