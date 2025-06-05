@@ -80,6 +80,8 @@ int main(void)
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
+    /* 栈溢出处理函数 */
+    LTDC_Show_Char(400, 480 - 12, '!', 12, 0, GUI_Red);
     while (1)
     {
     }
