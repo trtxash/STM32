@@ -3,10 +3,13 @@
 
 #include "sys.h"
 
+#define BRICH_IIC_BUS_NUM            1
+#define FT5xxx_BIRCH_IIC_BUS_POINTER &birch_iic_bus[0]
+
 typedef struct
 {
-    GPIO_TypeDef *RST_GPIOx;
-    uint16_t RST_Pin;
+    // GPIO_TypeDef *RST_GPIOx;
+    // uint16_t RST_Pin;
 
     GPIO_TypeDef *SCL_GPIOx;
     uint16_t SCL_Pin;
@@ -17,7 +20,7 @@ typedef struct
     uint8_t Drv_IICDelay_Time;
 } birch_iic_bus_t;
 
-extern birch_iic_bus_t birch_iic_bus[1];
+extern birch_iic_bus_t birch_iic_bus[BRICH_IIC_BUS_NUM];
 
 void Drv_Init(birch_iic_bus_t *iic_bus);
 void Drv_IICDelay(birch_iic_bus_t *iic_bus);

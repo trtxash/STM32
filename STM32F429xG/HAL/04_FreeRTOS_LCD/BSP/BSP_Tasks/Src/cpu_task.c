@@ -14,6 +14,6 @@ void vCPUTask(void *pvParameters)
     {
         vTaskGetRunTimeStats(CPU_RunInfo);
         xQueueSend(xQueue_CPU, CPU_RunInfo, 10);
-        vTaskDelayUntil(&xLastWakeTime, 500);
+        vTaskDelayUntil(&xLastWakeTime, 1000);
     }
 }

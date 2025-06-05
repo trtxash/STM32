@@ -1,7 +1,6 @@
 #ifndef _LCD_H
 #define _LCD_H
 
-#include "sdram.h"
 #include "sys.h"
 
 #ifdef __cplusplus

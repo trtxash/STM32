@@ -33,7 +33,7 @@ target_include_directories(stm32cubemx INTERFACE
 
     ../../Drivers_Hardware/Key/Inc
     ../../Drivers_Hardware/LCD/Inc
-    # ../../Drivers_Hardware/FT5206/Inc
+    ../../Drivers_Hardware/FT5446/Inc
     # ../../Drivers_Hardware/OLED/Inc
     ../../Drivers_Hardware/LED/Inc
     ../../Drivers_Hardware/SDRAM/Inc
@@ -109,7 +109,7 @@ target_sources(stm32cubemx INTERFACE
     # ../../Drivers_Hardware/OLED/Src/oledio.c
     # ../../Drivers_Hardware/OLED/Src/oled.c
     ../../Drivers_Hardware/LCD/Src/lcd.c
-    # ../../Drivers_Hardware/FT5206/Src/ft5206.c
+    ../../Drivers_Hardware/FT5446/Src/ft5446.c
 
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT.c
     ../../APP/Debug_Linker/RTT/Src/SEGGER_RTT_printf.c

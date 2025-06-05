@@ -1,11 +1,8 @@
 #include "myiic.h"
 #include "delay.h"
-#include "stm32f4xx_hal_gpio.h"
-// #include "ft5206.h"
 
-birch_iic_bus_t birch_iic_bus[1] = {
-    [0] = {.RST_GPIOx = GPIOD, .RST_Pin = GPIO_PIN_12, .SCL_GPIOx = GPIOB, .SCL_Pin = GPIO_PIN_6, .SDA_GPIOx = GPIOB, .SDA_Pin = GPIO_PIN_7, .Drv_IICDelay_Time = 0}, // 第一条IIC总线
-    // [1] = {.RST_GPIOx = GPIOA, .RST_Pin = GPIO_PIN_5, .SCL_GPIOx = GPIOB, .SCL_Pin = GPIO_PIN_5, .SDA_GPIOx = GPIOB, .SDA_Pin = GPIO_PIN_6}  // 第一条IIC总线
+birch_iic_bus_t birch_iic_bus[BRICH_IIC_BUS_NUM] = {
+    [0] = {.SCL_GPIOx = GPIOB, .SCL_Pin = GPIO_PIN_6, .SDA_GPIOx = GPIOB, .SDA_Pin = GPIO_PIN_7, .Drv_IICDelay_Time = 1}, // 第一条IIC总线
 };
 
 static void enable_gpio_clk(GPIO_TypeDef *GPIOx)
@@ -50,8 +47,6 @@ void Drv_Init(birch_iic_bus_t *iic_bus)
     GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;
     GPIO_InitStructure.Pull = GPIO_NOPULL;
     GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-    // GPIO_InitStructure.Pin = iic_bus->RST_Pin;
-    // HAL_GPIO_Init(iic_bus->RST_GPIOx, &GPIO_InitStructure);
     GPIO_InitStructure.Pin = iic_bus->SCL_Pin;
     HAL_GPIO_Init(iic_bus->SCL_GPIOx, &GPIO_InitStructure);
     GPIO_InitStructure.Pin = iic_bus->SDA_Pin;
@@ -59,9 +54,6 @@ void Drv_Init(birch_iic_bus_t *iic_bus)
 
     HAL_GPIO_WritePin(iic_bus->SCL_GPIOx, iic_bus->SCL_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(iic_bus->SDA_GPIOx, iic_bus->SDA_Pin, GPIO_PIN_SET);
-    // HAL_GPIO_WritePin(iic_bus->RST_GPIOx, iic_bus->RST_Pin, GPIO_PIN_RESET);
-    // delay_ms(200);
-    // HAL_GPIO_WritePin(iic_bus->RST_GPIOx, iic_bus->RST_Pin, GPIO_PIN_SET);
 }
 
 /**

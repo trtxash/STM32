@@ -45,7 +45,6 @@
 #include "stdio.h"
 #include <stdint.h>
 
-// #include "sys.h"
 #include "tim.h"
 
 extern uint32_t SystemCoreClock;
@@ -67,7 +66,7 @@ extern volatile uint32_t FreeRTOSRunTimeTicks;
 #define configIDLE_SHOULD_YIELD              1                     // 定义了与空闲任务(idle Task)处于同等优先级的其他用户任务行为，为1可以让出cpu使用权，减少空闲任务时间，但有副作用
 #define configUSE_MUTEXES                    1                     // 为1使用互斥信号量，相关API函数会被编译
 #define configQUEUE_REGISTRY_SIZE            8                     // 设置可以注册的队列和信号量的最大数量，使用内核调试器查看信号量和队列要设置，而且要先将消息队列和信号量进行注册
-#define configCHECK_FOR_STACK_OVERFLOW       0                     // 设置堆栈溢出检测，1或2两种模式，会调用vApplicationStackOverflowHook钩子函数
+#define configCHECK_FOR_STACK_OVERFLOW       1                     // 设置堆栈溢出检测，1或2两种模式，会调用vApplicationStackOverflowHook钩子函数
 #define configUSE_RECURSIVE_MUTEXES          1                     // 为1时使用递归互斥信号量，相关API会被编译
 #define configUSE_MALLOC_FAILED_HOOK         0                     // 为1时使用内存分配失败钩子函数，vApplicationMallocFailedHook(void)
 #define configUSE_APPLICATION_TASK_TAG       0                     // 为1则configUSE_APPLICATION_TASK_TAGF()和xTaskCallApplicationTaskHook()会被编译

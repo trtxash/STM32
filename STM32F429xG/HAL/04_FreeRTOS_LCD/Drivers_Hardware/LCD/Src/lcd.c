@@ -3,6 +3,7 @@
 #include "dma2d.h"
 #include "lcdfont.h"
 #include "ltdc.h"
+#include "sdram.h"
 #include "sys.h"
 
 #if SYSTEM_SUPPORT_OS

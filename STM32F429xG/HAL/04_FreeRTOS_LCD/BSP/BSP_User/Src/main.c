@@ -12,6 +12,7 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "ft5446.h"
 #include "key.h"
 #include "lcd.h"
 #include "led.h"
@@ -48,6 +49,7 @@ static void bsp_init(void)
     // LTDC初始化,LTDC 25MHz时钟,分辨率为800*480,16bit;计算得到刷新率61.7686fps,带宽47.4383MB/s
     // 同步宽度,前廊,后廊要设置好,不然出现部分显示问题
     LCD_Init();
+    FT5xxx_Init();
 }
 
 /**
@@ -73,5 +75,12 @@ int main(void)
         configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY为8,管理优先级数值8~15的中断
         */
         freertos_enter(); // 进入os
+    }
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
+    while (1)
+    {
     }
 }
