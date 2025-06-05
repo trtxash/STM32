@@ -2,6 +2,7 @@
 #include "adc.h"
 #include "adc_task.h"
 #include "dma2d.h"
+#include "i2c.h"
 #include "tasks_common.h"
 #include "tasks_sync.h"
 #include "tim.h"
@@ -134,32 +135,45 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 }
 
 /**
- * @brief  Period elapsed callback in non blocking mode
- * @note   This function is called  when TIM7 interrupt took place, inside
- * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
- * a global variable "uwTick" used as application time base.
- * @param  htim : TIM handle
- * @retval None
+ * @brief This function handles DMA1 stream0 global interrupt.
  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void DMA1_Stream0_IRQHandler(void)
 {
-/* USER CODE BEGIN Callback 0 */
+    /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
 
-/* USER CODE END Callback 0 */
-#if SYSTEM_SUPPORT_OS
-    if (htim == (&htim7))
-    {
-        HAL_IncTick();
-    }
-#endif
+    /* USER CODE END DMA1_Stream0_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_i2c1_rx);
+    /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
 
-    if (htim == (&htim14))
-    {
-        FreeRTOSRunTimeTicks++;
-    }
-    /* USER CODE BEGIN Callback 1 */
+    /* USER CODE END DMA1_Stream0_IRQn 1 */
+}
 
-    /* USER CODE END Callback 1 */
+/**
+ * @brief This function handles DMA1 stream6 global interrupt.
+ */
+void DMA1_Stream6_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA1_Stream6_IRQn 0 */
+
+    /* USER CODE END DMA1_Stream6_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_i2c1_tx);
+    /* USER CODE BEGIN DMA1_Stream6_IRQn 1 */
+
+    /* USER CODE END DMA1_Stream6_IRQn 1 */
+}
+
+/**
+ * @brief This function handles I2C1 event interrupt.
+ */
+void I2C1_EV_IRQHandler(void)
+{
+    /* USER CODE BEGIN I2C1_EV_IRQn 0 */
+
+    /* USER CODE END I2C1_EV_IRQn 0 */
+    HAL_I2C_EV_IRQHandler(&hi2c1);
+    /* USER CODE BEGIN I2C1_EV_IRQn 1 */
+
+    /* USER CODE END I2C1_EV_IRQn 1 */
 }
 
 /**
@@ -175,24 +189,6 @@ void DMA2_Stream0_IRQHandler(void)
 
     /* USER CODE END DMA2_Stream0_IRQn 1 */
 }
-
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
-{
-    if (hadc == (&hadc1))
-    {
-        xSemaphoreGiveFromISR(xSemaphore_ADC, NULL); // 释放信号量
-    }
-}
-
-// void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
-// {
-//     // printf("DMA Half transfer completern");
-// }
-
-// void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc)
-// {
-//     // printf("DMA transfer errorrn");
-// }
 
 /**
  * @brief This function handles DMA2D global interrupt.

@@ -1,54 +1,23 @@
 #ifndef __TOUCH_H__
 #define __TOUCH_H__
+
+#include "i2c.h"
 #include "sys.h"
 
-// // #define SCL_RCU    RCU_GPIOB
-// #define SCL_PORT GPIOB
-// #define SCL_PIN  GPIO_PIN_6
-// #define SCL_ON   (SCL_PORT->BSRR = SCL_PIN)
-// #define SCL_OFF  (SCL_PORT->BSRR = (uint32_t)SCL_PIN << 16U)
-// // #define SCL_TOGGLE gpio_bit_toggle(SCL_PORT, SCL_PIN)
+#define RST_PORT              GPIOD
+#define RST_GPIO_CLK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE();
+#define RST_PIN               GPIO_PIN_12
+#define RST_ON                (RST_PORT->BSRR = RST_PIN)
+#define RST_OFF               (RST_PORT->BSRR = (uint32_t)RST_PIN << 16U)
 
-// // #define SDA_RCU    RCU_GPIOB
-// #define SDA_PORT GPIOB
-// #define SDA_PIN  GPIO_PIN_7
-// #define SDA_ON   (SDA_PORT->BSRR = SDA_PIN)
-// #define SDA_OFF  (SDA_PORT->BSRR = (uint32_t)SDA_PIN << 16U)
-// // #define SDA_TOGGLE gpio_bit_toggle(SDA_PORT, SDA_PIN)
-
-// // IO方向设置
-// #define CT_SDA_IN()                                            \
-//     gpio_mode_set(SCL_PORT, GPIO_MODE_INPUT, GPIO_PUPD_PULLUP, \
-//                   SDA_PIN); //{GPIOF->MODER&=~(3<<(2*11));GPIOF->MODER|=0<<2*11;}
-//                             ////PF11输入模式
-// #define CT_SDA_OUT()                                            \
-//     gpio_mode_set(SCL_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, \
-//                   SDA_PIN); //{GPIOF->MODER&=~(3<<(2*11));GPIOF->MODER|=1<<2*11;}
-//                             ////PF11输出模式
-// // IO操作函数
-// #define CT_IIC_SCL                                            // PBout(0) 	//SCL
-// #define CT_IIC_SDA(val) ((val) == 1 ? SDA_ON : SDA_OFF)       // PFout(11) //SDA
-// #define CT_READ_SDA     gpio_input_bit_get(SDA_PORT, SDA_PIN) // PFin(11)  //输入SDA
-
-// #define RST_RCU    RCU_GPIOD
-// #define RST_PORT              GPIOD
-// #define RST_GPIO_CLK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE();
-// #define RST_PIN               GPIO_PIN_12
-// #define RST_ON                gpio_bit_set(RST_PORT, RST_PIN);
-// #define RST_OFF               gpio_bit_reset(RST_PORT, RST_PIN);
-// #define RST_TOGGLE            gpio_bit_toggle(RST_PORT, RST_PIN);
-
-// #define INT_RCU    RCU_GPIOD
 #define INT_PORT              GPIOD
 #define INT_GPIO_CLK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE();
 #define INT_PIN               GPIO_PIN_11
-// #define INT_ON                gpio_bit_set(INT_PORT, INT_PIN);
-// #define INT_OFF               gpio_bit_reset(INT_PORT, INT_PIN);
-// #define INT_TOGGLE            gpio_bit_toggle(INT_PORT, INT_PIN);
 
 // I2C读写命令
-#define FT_CMD_WR 0X70 // 写命令
-#define FT_CMD_RD 0X71 // 读命令
+#define FT_ADDRESS 0x38                       // I2C 7位地址
+#define FT_CMD_WR  (FT_ADDRESS << 1U)         // 写命令
+#define FT_CMD_RD  (FT_ADDRESS << 1U | 0x01U) // 读命令
 // FT5xxx 部分寄存器定义
 #define FT_DEVIDE_MODE    0x00 // FT5xxx模式控制寄存器
 #define FT_REG_NUM_FINGER 0x02 // 触摸状态寄存器
@@ -84,20 +53,11 @@ typedef struct
 } _m_tp_dev;
 extern _m_tp_dev tp_dev; // 触屏控制器在touch.c里面定义
 
-// // IIC所有操作函数
-// void CT_IIC_Init(void);                      // 初始化IIC的IO口
-// void CT_IIC_Start(void);                     // 发送IIC开始信号
-// void CT_IIC_Stop(void);                      // 发送IIC停止信号
-// void CT_IIC_Send_Byte(uint8_t txd);          // IIC发送一个字节
-// uint8_t CT_IIC_Read_Byte(unsigned char ack); // IIC读取一个字节
-// uint8_t CT_IIC_Wait_Ack(void);               // IIC等待ACK信号
-// void CT_IIC_Ack(void);                       // IIC发送ACK信号
-// void CT_IIC_NAck(void);                      // IIC不发送ACK信号
-
 // 触摸屏操作函数
 uint8_t FT5xxx_WR_Reg(uint16_t reg, uint8_t *buf, uint8_t len);
 void FT5xxx_RD_Reg(uint16_t reg, uint8_t *buf, uint8_t len);
-uint8_t FT5xxx_Init(void);
+uint8_t FT5xxx_Init_Soft(void);
+uint8_t FT5xxx_Init_Hard(void);
 uint8_t FT5xxx_Scan(uint8_t mode);
 
 #endif

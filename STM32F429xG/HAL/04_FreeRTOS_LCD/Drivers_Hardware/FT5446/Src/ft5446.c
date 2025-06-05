@@ -13,51 +13,22 @@ uint8_t g_gt_tnum = 5; // 默认支持的触摸屏点数(5点触摸)
 #define ACTIVE_WIDTH  800
 #define ACTIVE_HEIGHT 480
 
-// // 控制I2C速度的延时
-// void CT_Delay(void)
-// {
-//     delay_us(2);
-// }
-
 // 电容触摸芯片IIC接口初始化
 static void CT_IIC_Init(void)
 {
     Drv_Init(FT5xxx_BIRCH_IIC_BUS_POINTER);
-
-    // /* enable the led clock */
-    // rcu_periph_clock_enable(SCL_RCU);
-    // /* configure led GPIO port */
-    // gpio_mode_set(SCL_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, SCL_PIN);
-    // gpio_output_options_set(SCL_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, SCL_PIN);
-
-    // rcu_periph_clock_enable(SDA_RCU);
-    // gpio_mode_set(SDA_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, SDA_PIN);
-    // gpio_output_options_set(SDA_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, SDA_PIN);
 }
 
 // 产生IIC起始信号
 static void CT_IIC_Start(void)
 {
     Drv_IICStart(FT5xxx_BIRCH_IIC_BUS_POINTER);
-    // CT_SDA_OUT(); // sda线输出
-    // SDA_ON;
-    // SCL_ON; // SCL=1时，SDA由1到0跳变
-    // delay_us(30);
-    // SDA_OFF; // START:when CLK is high,DATA change form high to low
-    // CT_Delay();
-    // SCL_OFF; // 钳住I2C总线，准备发送或接收数据
 }
 
 // 产生IIC停止信号
 static void CT_IIC_Stop(void)
 {
     Drv_IICStop(FT5xxx_BIRCH_IIC_BUS_POINTER);
-    // CT_SDA_OUT(); // sda线输出
-    // SCL_ON;       // SCL=1时，SDA由0到1跳变
-    // delay_us(30);
-    // SDA_OFF; // STOP:when CLK is high DATA change form low to high
-    // CT_Delay();
-    // SDA_ON; // 发送I2C总线结束信号
 }
 
 // 等待应答信号到来
@@ -66,52 +37,19 @@ static void CT_IIC_Stop(void)
 static uint8_t CT_IIC_Wait_Ack(void)
 {
     return Drv_IICWaitAck(FT5xxx_BIRCH_IIC_BUS_POINTER);
-    // uint8_t ucErrTime = 0;
-    // CT_SDA_IN(); // SDA设置为输入
-    // SDA_ON;
-    // SCL_ON;
-    // CT_Delay();
-    // while (CT_READ_SDA)
-    // {
-    //     ucErrTime++;
-    //     if (ucErrTime > 250)
-    //     {
-    //         CT_IIC_Stop();
-    //         return 1;
-    //     }
-    //     CT_Delay();
-    // }
-    // SCL_OFF; // 时钟输出0
-    // return 0;
 }
 
-// // 产生ACK应答
-// static void CT_IIC_Ack(void)
-// {
-//     Drv_IICAck(FT5xxx_BIRCH_IIC_BUS_POINTER);
-//     // SCL_OFF;
-//     // CT_SDA_OUT();
-//     // CT_Delay();
-//     // SDA_OFF;
-//     // CT_Delay();
-//     // SCL_ON;
-//     // CT_Delay();
-//     // SCL_OFF;
-// }
+// 产生ACK应答
+static void CT_IIC_Ack(void)
+{
+    Drv_IICAck(FT5xxx_BIRCH_IIC_BUS_POINTER);
+}
 
-// // 不产生ACK应答
-// static void CT_IIC_NAck(void)
-// {
-//     Drv_IICNAck(FT5xxx_BIRCH_IIC_BUS_POINTER);
-//     // SCL_OFF;
-//     // CT_SDA_OUT();
-//     // CT_Delay();
-//     // SDA_ON;
-//     // CT_Delay();
-//     // SCL_ON;
-//     // CT_Delay();
-//     // SCL_OFF;
-// }
+// 不产生ACK应答
+static void CT_IIC_NAck(void)
+{
+    Drv_IICNAck(FT5xxx_BIRCH_IIC_BUS_POINTER);
+}
 
 // IIC发送一个字节
 // 返回从机有无应答
@@ -120,55 +58,12 @@ static uint8_t CT_IIC_Wait_Ack(void)
 static void CT_IIC_Send_Byte(uint8_t txd)
 {
     Drv_IICSendByte(txd, FT5xxx_BIRCH_IIC_BUS_POINTER);
-    // uint8_t t;
-    // CT_SDA_OUT();
-    // SCL_OFF; // 拉低时钟开始数据传输
-    // CT_Delay();
-    // for (t = 0; t < 8; t++)
-    // {
-    //     // CT_IIC_SDA=(txd&0x80)>>7;
-    //     // CT_IIC_SDA((txd&0x80)>>7);
-    //     if ((txd & 0x80) >> 7)
-    //     {
-    //         gpio_bit_set(SDA_PORT, SDA_PIN);
-    //     }
-    //     else
-    //     {
-    //         gpio_bit_reset(SDA_PORT, SDA_PIN);
-    //     }
-
-    //     txd <<= 1;
-    //     SCL_ON;
-    //     CT_Delay();
-    //     SCL_OFF;
-    //     CT_Delay();
-    // }
 }
+
 // 读1个字节，ack=1时，发送ACK，ack=0，发送nACK
 static uint8_t CT_IIC_Read_Byte(unsigned char ack)
 {
     return Drv_IICReadByte(ack, FT5xxx_BIRCH_IIC_BUS_POINTER);
-    // volatile uint8_t i, receive = 0;
-    // CT_SDA_IN(); // SDA设置为输入
-    // delay_us(30);
-    // for (i = 0; i < 8; i++)
-    // {
-    //     SCL_OFF;
-    //     CT_Delay();
-    //     SCL_ON;
-    //     receive <<= 1;
-
-    //     // printf("%d ",CT_READ_SDA);
-    //     if (CT_READ_SDA)
-    //         receive++;
-    // }
-    // // printf("\r\n receive:%0x \r\n",receive);
-
-    // if (!ack)
-    //     CT_IIC_NAck(); // 发送nACK
-    // else
-    //     CT_IIC_Ack(); // 发送ACK
-    // return receive;
 }
 
 // 向FT5xxx写入一次数据
@@ -211,79 +106,126 @@ void FT5xxx_RD_Reg(uint16_t reg, uint8_t *buf, uint8_t len)
     CT_IIC_Stop(); // 产生一个停止条件
 }
 
-// 初始化FT5xxx触摸屏
-uint8_t FT5xxx_Init(void)
+/**
+ * @brief	初始化FT5xxx触摸屏
+ * @param 	无
+ * @arg
+ * @note
+ * @retval	0; 初始化成功
+ * @retval	1; 初始化失败
+ */
+uint8_t FT5xxx_Init_Soft(void)
 {
-    // uint8_t temp[2];
-    // /*初始化INT,RST低电平*/
-    // GPIO_InitTypeDef GPIO_InitStruct = {0};
-    // HAL_GPIO_WritePin(TOUCH_INT_GPIO_Port, TOUCH_INT_Pin, GPIO_PIN_SET); // 拉高INT
-    // TOUCH_RST(0);                                                        // 复位
-    // HAL_Delay(20);
-    // TOUCH_RST(1); // 释放复位
-    // HAL_Delay(50);
+    uint8_t temp[2];
 
-    // /*配置完成后将INT设置为浮空输入模式*/
-    // GPIO_InitStruct.Pin = TOUCH_INT_Pin;
-    // GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    // GPIO_InitStruct.Pull = GPIO_NOPULL;
-    // GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    // HAL_GPIO_Init(TOUCH_INT_GPIO_Port, &GPIO_InitStruct);
-
-    // temp[0] = 0;
-    // FT5XXX_WR_Reg(FT5XXX_DEVIDE_MODE, temp, 1); /* 进入正常操作模式 */
-    // temp[0] = 1;
-    // FT5XXX_WR_Reg(FT5XXX_ID_G_MODE, temp, 1);    /* 查询模式 0启用对主机中断,1禁止对主机中断*/
-    // temp[0] = 22;                                /* 触摸有效值，22，越小越灵敏 */
-    // FT5XXX_WR_Reg(FT5XXX_ID_G_THGROUP, temp, 1); /* 设置触摸有效值 */
-    // temp[0] = 12;                                /* 激活周期，不能小于12，最大14 */
-    // FT5XXX_WR_Reg(FT5XXX_ID_G_PERIODACTIVE, temp, 1);
-
-    // FT5XXX_Reg(FT5XXX_ID_G_LIB_VERSION, &temp[0], 2);
-    // if ((temp[0] == 0X30 && temp[1] == 0X03) || temp[1] == 0X01 || temp[1] == 0X02 || (temp[0] == 0x0 && temp[1] == 0X0)) /* 版本:0X3003/0X0001/0X0002/CST340 */
-    // {
-    //     printf("CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
-    // }
-
-    GPIO_InitTypeDef GPIO_InitStructure = {0};
-
-    uint8_t temp[5];
-
-    // PD11设置为上拉输入(INT)
-    /* enable the led clock */
-    INT_GPIO_CLK_ENABLE();
-    // rcu_periph_clock_enable(INT_RCU);
-    /* configure led GPIO port */
-    GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStructure.Pull = GPIO_PULLUP;
-    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-    GPIO_InitStructure.Pin = INT_PIN;
-    HAL_GPIO_Init(INT_PORT, &GPIO_InitStructure);
-    // gpio_mode_set(INT_PORT, GPIO_MODE_INPUT, GPIO_PUPD_NONE, INT_PIN);
-
-    // 初始化电容屏的I2C总线
     CT_IIC_Init();
 
-    FT5xxx_WR_Reg(FT_DEVIDE_MODE, temp, 1);  // 进入正常操作模式
-    FT5xxx_WR_Reg(FT_ID_G_MODE, temp, 1);    // 查询模式
-    temp[0] = 22;                            // 触摸有效值，22，越小越灵敏
-    FT5xxx_WR_Reg(FT_ID_G_THGROUP, temp, 1); // 设置触摸有效值
-    temp[0] = 12;                            // 激活周期，不能小于12，最大14
-    FT5xxx_WR_Reg(FT_ID_G_PERIODACTIVE, temp, 1);
-    // 读取版本号，参考值：0x3003
-    FT5xxx_RD_Reg(FT_ID_G_LIB_VERSION, &temp[0], 2);
-    // if ((temp[0] == 0X30 && temp[1] == 0X03) || temp[1] == 0X01 || temp[1] == 0X02 || (temp[0] == 0x0 && temp[1] == 0X0)) /* 版本:0X3003/0X0001/0X0002/CST340 */
-    // {
-    //     char str[16];
-    //     sprintf(str, "CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
-    //     LTDC_Show_String_sprintf(400, 240, 400, 24, 12, (u8 *)str, 0, GUI_Black);
-    // }
-    char str[16];
-    sprintf(str, "CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
-    LTDC_Show_String_sprintf(400, 240, 400, 24, 12, (u8 *)str, 0, GUI_Black);
+    /*初始化INT,RST低电平*/
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-    // printf("CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
-    return 0;
+    INT_GPIO_CLK_ENABLE();
+    RST_GPIO_CLK_ENABLE();
+
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Pin = INT_PIN;
+    HAL_GPIO_Init(INT_PORT, &GPIO_InitStruct);
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Pin = RST_PIN;
+    HAL_GPIO_Init(RST_PORT, &GPIO_InitStruct);
+    RST_OFF; // 复位
+    HAL_Delay(20);
+    RST_ON; // 释放复位
+    HAL_Delay(50);
+
+    temp[0] = 0;
+    FT5xxx_WR_Reg(FT_DEVIDE_MODE, temp, 1); /* 进入正常操作模式 */
+    temp[0] = 1;
+    FT5xxx_WR_Reg(FT_ID_G_MODE, temp, 1);    /* 查询模式 0启用对主机中断,1禁止对主机中断*/
+    temp[0] = 22;                            /* 触摸有效值，22，越小越灵敏 */
+    FT5xxx_WR_Reg(FT_ID_G_THGROUP, temp, 1); /* 设置触摸有效值 */
+    temp[0] = 12;                            /* 激活周期，不能小于12，最大14 */
+    FT5xxx_WR_Reg(FT_ID_G_PERIODACTIVE, temp, 1);
+
+    FT5xxx_RD_Reg(FT_ID_G_LIB_VERSION, &temp[0], 2);
+    if ((temp[0] == 0X30 && temp[1] == 0X03) || temp[1] == 0X01 || temp[1] == 0X02 || (temp[0] == 0x0 && temp[1] == 0X0)) /* 版本:0X3003/0X0001/0X0002/CST340 */
+    {
+        char str[16];
+        sprintf(str, "CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
+        LTDC_Show_String_sprintf(400, 240, 400, 24, 12, (u8 *)str, 0, GUI_Black);
+        // printf("CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+uint8_t FT5xxx_Init_Hard(void)
+{
+    uint8_t temp[2];
+
+    I2C1_Init();
+
+    /*初始化INT,RST低电平*/
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    INT_GPIO_CLK_ENABLE();
+    RST_GPIO_CLK_ENABLE();
+
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Pin = INT_PIN;
+    HAL_GPIO_Init(INT_PORT, &GPIO_InitStruct);
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Pin = RST_PIN;
+    HAL_GPIO_Init(RST_PORT, &GPIO_InitStruct);
+    RST_OFF; // 复位
+    HAL_Delay(20);
+    RST_ON; // 释放复位
+    HAL_Delay(50);
+
+    temp[0] = 0;
+    HAL_I2C_Mem_Write(&hi2c1, FT_ADDRESS << 1U, FT_DEVIDE_MODE, I2C_MEMADD_SIZE_8BIT, temp, 1, HAL_MAX_DELAY); /* 进入正常操作模式 */
+    // while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
+    //     ;
+
+    temp[0] = 1;
+    HAL_I2C_Mem_Write(&hi2c1, FT_ADDRESS << 1U, FT_ID_G_MODE, I2C_MEMADD_SIZE_8BIT, temp, 1, HAL_MAX_DELAY); /* 查询模式 0启用对主机中断,1禁止对主机中断*/
+    // while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
+    //     ;
+
+    temp[0] = 22;
+    HAL_I2C_Mem_Write(&hi2c1, FT_ADDRESS << 1U, FT_ID_G_THGROUP, I2C_MEMADD_SIZE_8BIT, temp, 1, HAL_MAX_DELAY); /* 触摸有效值，22，越小越灵敏 */
+    // while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
+    //     ;
+
+    temp[0] = 12;
+    HAL_I2C_Mem_Write(&hi2c1, FT_ADDRESS << 1U, FT_ID_G_PERIODACTIVE, I2C_MEMADD_SIZE_8BIT, temp, 1, HAL_MAX_DELAY); /* 激活周期，不能小于12，最大14 */
+    // while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
+    //     ;
+
+    HAL_I2C_Mem_Read(&hi2c1, FT_ADDRESS << 1U, FT_ID_G_LIB_VERSION, 1, temp, 2, HAL_MAX_DELAY);
+    uint16_t version = (temp[0] << 8) | temp[1];
+    if (version == 0x3003 || version == 0x0001 || version == 0x0002 || version == 0x0000)
+    {
+        char str[16];
+        sprintf(str, "CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
+        LTDC_Show_String_sprintf(400, 240, 400, 24, 12, (u8 *)str, 0, GUI_Black);
+        // printf("CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 // 扫描触摸屏(采用查询方式)

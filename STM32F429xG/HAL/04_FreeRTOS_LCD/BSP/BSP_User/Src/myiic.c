@@ -2,7 +2,7 @@
 #include "delay.h"
 
 birch_iic_bus_t birch_iic_bus[BRICH_IIC_BUS_NUM] = {
-    [0] = {.SCL_GPIOx = GPIOB, .SCL_Pin = GPIO_PIN_6, .SDA_GPIOx = GPIOB, .SDA_Pin = GPIO_PIN_7, .Drv_IICDelay_Time = 1}, // 第一条IIC总线
+    [0] = {.SCL_GPIOx = GPIOB, .SCL_Pin = GPIO_PIN_6, .SDA_GPIOx = GPIOB, .SDA_Pin = GPIO_PIN_7, .Drv_IICDelay_Time = 0}, // 第一条IIC总线
 };
 
 static void enable_gpio_clk(GPIO_TypeDef *GPIOx)

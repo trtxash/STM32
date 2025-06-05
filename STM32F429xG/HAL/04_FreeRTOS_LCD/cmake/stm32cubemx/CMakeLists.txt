@@ -42,6 +42,7 @@ target_include_directories(stm32cubemx INTERFACE
 target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Src/main.c
     ../../BSP/BSP_User/Src/stm32f4xx_it.c
+    ../../BSP/BSP_User/Src/stm32f4xx_it_callback.c
     ../../BSP/BSP_User/Src/stm32f4xx_hal_msp.c
     ../../BSP/BSP_User/Src/system_stm32f4xx.c
 
@@ -57,7 +58,8 @@ target_sources(stm32cubemx INTERFACE
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
-    # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c
+    ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_ltdc.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_ltdc_ex.c
@@ -90,6 +92,7 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_Core/Src/dma.c
     ../../BSP/BSP_Core/Src/dma2d.c
     ../../BSP/BSP_Core/Src/fmc.c
+    ../../BSP/BSP_Core/Src/i2c.c
     # ../../BSP/BSP_Core/Src/iwdg.c
     ../../BSP/BSP_Core/Src/ltdc.c
     ../../BSP/BSP_Core/Src/tim.c

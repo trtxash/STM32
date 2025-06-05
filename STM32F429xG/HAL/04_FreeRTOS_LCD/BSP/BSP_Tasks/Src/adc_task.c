@@ -5,7 +5,7 @@
 
 TaskHandle_t ADCTask_Handler; // 任务句柄;
 
-float battery_voltage_to_soc(float voltage)
+static float battery_voltage_to_soc(float voltage)
 {
     // 电压安全校验
     if (voltage > 4.2f)
@@ -62,7 +62,7 @@ void vADCTask(void *pvParameters)
     // uint32_t JS_RTT_Channel = 1;
     // SEGGER_RTT_ConfigUpBuffer(JS_RTT_Channel, "JScope_f4f4", (void *)JS_RTT_UpBuffer, sizeof(JS_RTT_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP); // 配置RTT输出
 
-    Kalman_Init(0.001, 0.1, 10, &adc1_kalman[0]);     // 初始化卡尔曼滤波器
+    Kalman_Init(0.001, 0.1, 100, &adc1_kalman[0]);     // 初始化卡尔曼滤波器
     Kalman_Init(0.001, 0.1, 10, &adc1_kalman[1]);     // 初始化卡尔曼滤波器
     Kalman_Init(0.001, 0.001, 1000, &adc1_kalman[2]); // 初始化卡尔曼滤波器
     // 第一次传输,处理数据
