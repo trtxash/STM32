@@ -7,7 +7,10 @@
 #define TASK_PRIO_TOUCH TASK_PRIO_NORMAL
 #define TOUCH_STK_SIZE  STACK_SIZE_BASE
 
-extern TaskHandle_t TouchTask_Handler; // 任务句柄
+#define Touch_Data_Len 0X3F
+
+extern TaskHandle_t TouchTask_Handler;     // 任务句柄
+extern uint8_t Touch_Data[Touch_Data_Len]; // 触摸屏数据
 
 void vTouchTask(void *pvParameters);
 

@@ -74,7 +74,7 @@ void I2C1_Init(void)
     // 过滤数字信号抖动
     // 数字滤波器系数=1时，采样周期=1/(2*I2C_SPEED)
     // 400kHz时采样间隔1.25μs，可过滤<0.5μs的抖动
-    if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 1) != HAL_OK)
+    if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 2) != HAL_OK)
     {
         Error_Handler();
     }

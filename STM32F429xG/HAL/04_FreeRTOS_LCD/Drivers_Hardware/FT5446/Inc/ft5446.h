@@ -34,7 +34,7 @@
 
 #define TP_PRES_DOWN 0x80 // 触屏被按下
 #define TP_CATH_PRES 0x40 // 有按键按下了
-#define CT_MAX_TOUCH 5    // 电容屏支持的点数,固定为5点
+#define CT_MAX_TOUCH 10    // 电容屏支持的点数,固定为5点
 // 触摸屏控制器
 typedef struct
 {
@@ -42,9 +42,8 @@ typedef struct
     // uint8_t (*scan)(uint8_t); // 扫描触摸屏.0,屏幕扫描;1,物理坐标;
     // void (*adjust)(void);     // 触摸屏校准
     uint16_t x[CT_MAX_TOUCH]; // 当前坐标
-    uint16_t y
-        [CT_MAX_TOUCH]; // 电容屏有最多5组坐标,电阻屏则用x[0],y[0]代表:此次扫描时,触屏的坐标,用
-    uint8_t sta;        // 笔的状态
+    uint16_t y[CT_MAX_TOUCH]; // 电容屏有最多5组坐标,电阻屏则用x[0],y[0]代表:此次扫描时,触屏的坐标,用
+    uint8_t sta;              // 笔的状态
     float xfac;
     float yfac;
     short xoff;

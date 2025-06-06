@@ -539,12 +539,12 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *i2cHandle)
         hdma_i2c1_tx.Init.Channel = DMA_CHANNEL_1;                   // 通道
         hdma_i2c1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;          // 传输方向
         hdma_i2c1_tx.Init.PeriphInc = DMA_PINC_DISABLE;              // 外设是否递增
-        hdma_i2c1_tx.Init.MemInc = DMA_MINC_DISABLE;                 // 内存是否递增
+        hdma_i2c1_tx.Init.MemInc = DMA_MINC_ENABLE;                  // 内存是否递增
         hdma_i2c1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE; // 外设数据大小
         hdma_i2c1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;    // 内存数据大小
         hdma_i2c1_tx.Init.Mode = DMA_NORMAL;                         // 模式选择
         hdma_i2c1_tx.Init.Priority = DMA_PRIORITY_MEDIUM;            // 优先级
-        hdma_i2c1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;            // FIFO
+        hdma_i2c1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;           // FIFO
         hdma_i2c1_tx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;   // 触发阈值
         hdma_i2c1_tx.Init.MemBurst = DMA_MBURST_SINGLE;              // 内存突发
         hdma_i2c1_tx.Init.PeriphBurst = DMA_PBURST_SINGLE;           // 外设突发
@@ -577,7 +577,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *i2cHandle)
         __HAL_LINKDMA(i2cHandle, hdmarx, hdma_i2c1_rx);
 
         /* I2C1 interrupt Init */
-        HAL_NVIC_SetPriority(I2C1_EV_IRQn, 15, 0);
+        HAL_NVIC_SetPriority(I2C1_EV_IRQn, 3, 0);
         HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
         /* USER CODE BEGIN I2C1_MspInit 1 */
 
