@@ -4611,7 +4611,8 @@ void vTaskGetRunTimeStats(char *pcWriteBuffer)
                     {
                         /* sizeof( int ) == sizeof( long ) so a smaller
                          * printf() library can be used. */
-                        sprintf(pcWriteBuffer, "\t%u\t\t%u%%\r\n", (unsigned int)pxTaskStatusArray[x].ulRunTimeCounter, (unsigned int)ulStatsAsPercentage); /*lint !e586 sprintf() allowed as this is compiled with many compilers and this is a utility function only - not part of the core kernel implementation. */
+                        // sprintf(pcWriteBuffer, "\t%u\t\t%u%%\r\n", (unsigned int)pxTaskStatusArray[x].ulRunTimeCounter, (unsigned int)ulStatsAsPercentage); /*lint !e586 sprintf() allowed as this is compiled with many compilers and this is a utility function only - not part of the core kernel implementation. */
+                        sprintf(pcWriteBuffer, "%10u\t%2u%%\r\n", (unsigned int)pxTaskStatusArray[x].ulRunTimeCounter, (unsigned int)ulStatsAsPercentage); // 定长10
                     }
 #endif
                 }
@@ -4627,7 +4628,8 @@ void vTaskGetRunTimeStats(char *pcWriteBuffer)
                     {
                         /* sizeof( int ) == sizeof( long ) so a smaller
                          * printf() library can be used. */
-                        sprintf(pcWriteBuffer, "\t%u\t\t<1%%\r\n", (unsigned int)pxTaskStatusArray[x].ulRunTimeCounter); /*lint !e586 sprintf() allowed as this is compiled with many compilers and this is a utility function only - not part of the core kernel implementation. */
+                        // sprintf(pcWriteBuffer, "\t%u\t\t<1%%\r\n", (unsigned int)pxTaskStatusArray[x].ulRunTimeCounter); /*lint !e586 sprintf() allowed as this is compiled with many compilers and this is a utility function only - not part of the core kernel implementation. */
+                        sprintf(pcWriteBuffer, "%10u\t<1%%\r\n", (unsigned int)pxTaskStatusArray[x].ulRunTimeCounter); // 定长10
                     }
 #endif
                 }
