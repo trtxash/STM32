@@ -5,6 +5,7 @@
 #include "key_task.h"
 #include "led_task.h"
 #include "tasks_sync.h"
+#include "touch_task.h"
 
 TaskHandle_t StartTask_Handler;      // 任务句柄
 void vStartTask(void *pvParameters); // 任务函数
@@ -54,6 +55,14 @@ void vStartTask(void *pvParameters)
                 (UBaseType_t)TASK_PRIO_GUI,
                 (TaskHandle_t *)&GUITask_Handler);
 
+    // 创建Touch任务
+    xTaskCreate((TaskFunction_t)vTouchTask,
+                (const char *)"vTouchTask",
+                (uint16_t)TOUCH_STK_SIZE,
+                (void *)NULL,
+                (UBaseType_t)TASK_PRIO_TOUCH,
+                (TaskHandle_t *)&TouchTask_Handler);
+
     // 创建CPU任务
     xTaskCreate((TaskFunction_t)vCPUTask,
                 (const char *)"vCPUTask",
@@ -73,4 +82,3 @@ void vStartTask(void *pvParameters)
 
     vTaskDelete(StartTask_Handler); // 删除开始任务
 }
-

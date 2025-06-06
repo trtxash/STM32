@@ -228,6 +228,19 @@ uint8_t FT5xxx_Init_Hard(void)
     }
 }
 
+/**
+ * @brief	FT5xxx周期运行,运行间隔ms
+ * @param 	mode 0,正常扫描.
+ * @arg
+ * @note
+ * @retval	0,触屏无触摸
+ * @retval	1,触屏有触摸
+ */
+uint8_t FT5xxx_Scan_tick(uint8_t mode)
+{
+    // FT5xxx_RD_Reg(FT_REG_NUM_FINGER, &mode, 1); // 读取触摸点的状态
+}
+
 // 扫描触摸屏(采用查询方式)
 // mode:0,正常扫描.
 // 返回值:当前触屏状态.
