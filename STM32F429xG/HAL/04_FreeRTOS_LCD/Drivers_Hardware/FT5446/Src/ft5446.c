@@ -215,10 +215,10 @@ uint8_t FT5xxx_Init_Hard(void)
     uint16_t version = (temp[0] << 8) | temp[1];
     if (version == 0x3003 || version == 0x0001 || version == 0x0002 || version == 0x0000)
     {
-        char str[16];
-        sprintf(str, "CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
-        LTDC_Show_String_sprintf(400, 240, 400, 24, 12, (u8 *)str, 0, GUI_Black);
-        // printf("CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
+        // char str[16];
+        // sprintf(str, "CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
+        // LTDC_Show_String_sprintf(400, 240, 400, 24, 12, (u8 *)str, 0, GUI_Black);
+        // // printf("CTP ID:%x\r\n", ((uint16_t)temp[0] << 8) + temp[1]);
         return 0;
     }
     else

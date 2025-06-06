@@ -18,6 +18,7 @@
 #define FT_ADDRESS 0x38                       // I2C 7位地址
 #define FT_CMD_WR  (FT_ADDRESS << 1U)         // 写命令
 #define FT_CMD_RD  (FT_ADDRESS << 1U | 0x01U) // 读命令
+
 // FT5xxx 部分寄存器定义
 #define FT_DEVIDE_MODE    0x00 // FT5xxx模式控制寄存器
 #define FT_REG_NUM_FINGER 0x02 // 触摸状态寄存器

@@ -15,9 +15,10 @@ void vGUITask(void *pvParameters)
     while (1)
     {
         static int lineflag = 0;
+        // uint32_t taskEnterTime = FreeRTOSRunTimeTicks;
 
         Button key_temp;
-        if (xQueueReceive(xQueue_KEY, &key_temp, 10) == pdPASS)
+        if (xQueueReceive(xQueue_KEY, &key_temp, 0) == pdPASS)
         {
             switch (key_temp.event)
             {
@@ -55,34 +56,34 @@ void vGUITask(void *pvParameters)
         }
 
         float adc_temp;
-        if (xQueueReceive(xQueue_ADC_Temp, &adc_temp, 10) == pdPASS)
+        if (xQueueReceive(xQueue_ADC_Temp, &adc_temp, 0) == pdPASS)
         {
             LTDC_Show_float(799 - 6 * 6, 0, adc_temp, 3, 2, 12, 0, GUI_Black);
         }
         float adc_bat;
-        if (xQueueReceive(xQueue_ADC_Bat, &adc_bat, 10) == pdPASS)
+        if (xQueueReceive(xQueue_ADC_Bat, &adc_bat, 0) == pdPASS)
         {
             LTDC_Show_float(799 - 6 * 6, 12, adc_bat, 3, 2, 12, 0, GUI_Black);
         }
         float adc_bat_value;
-        if (xQueueReceive(xQueue_ADC_BatVolt, &adc_bat_value, 10) == pdPASS)
+        if (xQueueReceive(xQueue_ADC_BatVolt, &adc_bat_value, 0) == pdPASS)
         {
             LTDC_Show_float(799 - 6 * 6, 24, adc_bat_value, 3, 2, 12, 0, GUI_Black);
         }
 
         char cpu_temp[CPU_RUNINFO_SIZE];
-        if (xQueueReceive(xQueue_CPU, &cpu_temp, 10) == pdPASS)
+        if (xQueueReceive(xQueue_CPU, &cpu_temp, 0) == pdPASS)
         {
             LTDC_Show_String_sprintf(400, 0, 400, 240, 12, (u8 *)CPU_RunInfo, 0, GUI_Black);
         }
 
         char touch_temp[Touch_Data_Len];
-        if (xQueueReceive(xQueue_Touch, &touch_temp, 10) == pdPASS)
+        if (xQueueReceive(xQueue_Touch, &touch_temp, 0) == pdPASS)
         {
             uint16_t xp = 0;
             uint16_t yp = 0;
             uint16_t tp = 0;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < Touch_Other_Reg_Data_Len; i++)
             {
                 LTDC_Show_Num(400 + xp, 240, touch_temp[i], 3, 12, 0, GUI_Red);
                 xp += 6 * 3;
@@ -90,11 +91,11 @@ void vGUITask(void *pvParameters)
                 xp += 6;
             }
             xp = yp = tp = 0;
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < Touch_Finger_Set; j++)
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    LTDC_Show_Num(400 + xp, 240 + 12 + yp, touch_temp[3 + tp], 3, 12, 0, GUI_Black);
+                    LTDC_Show_Num(400 + xp, 240 + 12 + yp, touch_temp[Touch_Other_Reg_Data_Len + tp], 3, 12, 0, GUI_Black);
                     tp++;
                     xp += 6 * 3;
                     LTDC_Show_Char(400 + xp, 240 + 12 + yp, ',', 12, 0, GUI_Black);
@@ -105,6 +106,9 @@ void vGUITask(void *pvParameters)
             }
         }
 
+        // uint32_t taskExecuteCycles = FreeRTOSRunTimeTicks - taskEnterTime;
+        // float taskExecuteMs = taskExecuteCycles * (1.0 / 20000.0);
+        // LTDC_Show_float(0, 0, taskExecuteMs, 3, 3, 12, 0, GUI_Black); // 显示实际耗时ms
         vTaskDelayUntil(&xLastWakeTime, 15); // 大致66.6Hz
     }
 }
