@@ -1,19 +1,17 @@
 #include "touch_task.h"
-#include "lcd.h"
+// #include "lcd.h"
 #include "tasks_sync.h"
 
 TaskHandle_t TouchTask_Handler = NULL; // 任务句柄
-uint8_t Touch_Data[Touch_Data_Len];    // 触摸屏数据
+
+uint8_t Touch_Data[Touch_Data_Len]; // 触摸屏数据
 
 void vTouchTask(void *pvParameters)
 {
     (void)pvParameters;
-    uint16_t xp = 0;
-    uint16_t yp = 0;
-    uint16_t tp = 0;
-
-    if (HAL_I2C_GetState(&hi2c1) == HAL_I2C_STATE_READY)
-        HAL_I2C_Mem_Read_DMA(&hi2c1, FT_ADDRESS << 1U, FT_DEVIDE_MODE, I2C_MEMADD_SIZE_8BIT, Touch_Data, Touch_Data_Len);
+    // uint16_t xp = 0;
+    // uint16_t yp = 0;
+    // uint16_t tp = 0;
 
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
@@ -42,8 +40,10 @@ void vTouchTask(void *pvParameters)
         //     yp += 12;
         // }
 
+        // if (HAL_I2C_GetState(&hi2c1) == HAL_I2C_STATE_READY)
+        HAL_I2C_Mem_Read_DMA(&hi2c1, FT_ADDRESS << 1U, FT_DEVIDE_MODE, I2C_MEMADD_SIZE_8BIT, Touch_Data, Touch_Data_Len);
         vTaskDelayUntil(&xLastWakeTime, 5);
-        if (HAL_I2C_GetState(&hi2c1) == HAL_I2C_STATE_READY)
-            HAL_I2C_Mem_Read_DMA(&hi2c1, FT_ADDRESS << 1U, FT_DEVIDE_MODE, I2C_MEMADD_SIZE_8BIT, Touch_Data, Touch_Data_Len);
+        xSemaphoreTake(xSemaphore_Touch_i2c, 10); // 等待信号量
+        xQueueSend(xQueue_Touch, &Touch_Data, 10);
     }
 }

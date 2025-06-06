@@ -45,8 +45,8 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     if (hi2c->Instance == I2C1)
     {
-        // 触摸数据接收完成后触发LCD刷新
-        // xSemaphoreGiveFromISR(xSemaphore_Touch, pdFALSE);
+        // 触摸数据接收完成后触发
+        xSemaphoreGiveFromISR(xSemaphore_Touch_i2c, NULL);
     }
 }
 
