@@ -26,13 +26,99 @@ static char *prvWriteNameToBuffer(char *pcBuffer, const char *pcTaskName)
     return &(pcBuffer[x]);
 }
 
-static void vTaskGetRunTimeStats_Cycle(char *pcWriteBuffer, uint32_t CycleTime_ms, uint32_t TickFrequency)
+// 按ID升序
+static int sqrt_compare_id_up(const void *a, const void *b)
 {
-    TaskStatus_t *pxTaskStatusArray = NULL;            // 任务状态结构体
-    static TaskStatus_t *pxTaskStatusArrayLast = NULL; // 任务状态结构体
-    float ulStatsAsPercentage;                         // 运行时间百分比
-    UBaseType_t uxArraySize;                           // 任务数量
-    static UBaseType_t uxArraySizeLast;                // 任务数量
+    TaskStatus_t_CPU_task *s1 = (TaskStatus_t_CPU_task *)a;
+    TaskStatus_t_CPU_task *s2 = (TaskStatus_t_CPU_task *)b;
+
+    return s1->xTaskStatus.xTaskNumber - s2->xTaskStatus.xTaskNumber;
+}
+
+// 按ID降序
+static int sqrt_compare_id_down(const void *a, const void *b)
+{
+    TaskStatus_t_CPU_task *s1 = (TaskStatus_t_CPU_task *)a;
+    TaskStatus_t_CPU_task *s2 = (TaskStatus_t_CPU_task *)b;
+
+    return s2->xTaskStatus.xTaskNumber - s1->xTaskStatus.xTaskNumber;
+}
+
+// 按任务名称升序
+static int sqrt_compare_name_up(const void *a, const void *b)
+{
+    TaskStatus_t_CPU_task *s1 = (TaskStatus_t_CPU_task *)a;
+    TaskStatus_t_CPU_task *s2 = (TaskStatus_t_CPU_task *)b;
+
+    return strcmp(s1->xTaskStatus.pcTaskName, s2->xTaskStatus.pcTaskName);
+}
+
+// 按任务名称降序
+static int sqrt_compare_name_down(const void *a, const void *b)
+{
+    TaskStatus_t_CPU_task *s1 = (TaskStatus_t_CPU_task *)a;
+    TaskStatus_t_CPU_task *s2 = (TaskStatus_t_CPU_task *)b;
+
+    return strcmp(s2->xTaskStatus.pcTaskName, s1->xTaskStatus.pcTaskName);
+}
+
+// 按CPU占用降序
+static int sqrt_compare_cpu_down(const void *a, const void *b)
+{
+    TaskStatus_t_CPU_task *s1 = (TaskStatus_t_CPU_task *)a;
+    TaskStatus_t_CPU_task *s2 = (TaskStatus_t_CPU_task *)b;
+
+    if (s2->ulStatsAsPercentage != s1->ulStatsAsPercentage)
+        return (s2->ulStatsAsPercentage > s1->ulStatsAsPercentage) ? 1 : ((s2->ulStatsAsPercentage < s1->ulStatsAsPercentage) ? -1 : 0);
+    else
+        return s2->xTaskStatus.xTaskNumber - s1->xTaskStatus.xTaskNumber;
+}
+
+// 按CPU占用升序
+static int sqrt_compare_cpu_up(const void *a, const void *b)
+{
+    TaskStatus_t_CPU_task *s1 = (TaskStatus_t_CPU_task *)a;
+    TaskStatus_t_CPU_task *s2 = (TaskStatus_t_CPU_task *)b;
+
+    if (s2->ulStatsAsPercentage != s1->ulStatsAsPercentage)
+        return (s1->ulStatsAsPercentage > s2->ulStatsAsPercentage) ? 1 : ((s1->ulStatsAsPercentage < s2->ulStatsAsPercentage) ? -1 : 0);
+    else
+        return s1->xTaskStatus.xTaskNumber - s2->xTaskStatus.xTaskNumber;
+}
+
+// 按运行时间降序
+static int sqrt_compare_time_down(const void *a, const void *b)
+{
+    TaskStatus_t_CPU_task *s1 = (TaskStatus_t_CPU_task *)a;
+    TaskStatus_t_CPU_task *s2 = (TaskStatus_t_CPU_task *)b;
+
+    return s2->xTaskStatus.ulRunTimeCounter - s1->xTaskStatus.ulRunTimeCounter;
+}
+
+// 按运行时间升序
+static int sqrt_compare_time_up(const void *a, const void *b)
+{
+    TaskStatus_t_CPU_task *s1 = (TaskStatus_t_CPU_task *)a;
+    TaskStatus_t_CPU_task *s2 = (TaskStatus_t_CPU_task *)b;
+
+    return s1->xTaskStatus.ulRunTimeCounter - s2->xTaskStatus.ulRunTimeCounter;
+}
+
+// mode:
+// 0:按ID降序
+// 1:按ID升序
+// 2:按任务名称降序
+// 3:按任务名称升序
+// 4:按CPU占用降序
+// 5:按CPU占用升序
+// 6:按运行时间降序
+// 7:按运行时间升序
+static void vTaskGetRunTimeStats_Sort(char *pcWriteBuffer, uint8_t sortmode, uint32_t CycleTime_ms, uint32_t TickFrequency)
+{
+    TaskStatus_t *pxTaskStatusArray = NULL; // 任务状态结构体数组,用于uxTaskGetSystemState()函数
+    static TaskStatus_t *pxTaskStatusArrayLast = NULL;
+    UBaseType_t uxArraySize; // 任务数量
+    static UBaseType_t uxArraySizeLast;
 
     /* Make sure the write buffer does not contain a string. */
     *pcWriteBuffer = (char)0x00;
@@ -41,14 +127,15 @@ static void vTaskGetRunTimeStats_Cycle(char *pcWriteBuffer, uint32_t CycleTime_m
      * function is executing. */
     uxArraySize = uxTaskGetNumberOfTasks();
 
-    pxTaskStatusArray = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t)); // 分配当前任务状态结构体空间
+    pxTaskStatusArray = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t)); // 分配当前任务状态结构体数组空间
     if (pxTaskStatusArray != NULL)
     {
         if (pxTaskStatusArrayLast == NULL) // 第一次运行
         {
-            pxTaskStatusArrayLast = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t)); // 第一次运行时,分配上一次任务状态结构体空间
+            pxTaskStatusArrayLast = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t)); // 第一次运行时,分配上一次任务状态结构体数组空间
             if (pxTaskStatusArrayLast != NULL)
             {
+                // 进行下一次运行
             }
             else
             {
@@ -60,42 +147,92 @@ static void vTaskGetRunTimeStats_Cycle(char *pcWriteBuffer, uint32_t CycleTime_m
             /* Generate the (binary) data. */
             uxArraySize = uxTaskGetSystemState(pxTaskStatusArray, uxArraySize, NULL);
 
-            /* Create a human readable table from the binary data. */
-            for (UBaseType_t x = 0; x < uxArraySize; x++)
+            /* 生成顶层任务状态结构体数组 */
+            TaskStatus_t_CPU_task *pxTaskStatusArray_CPU_task = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t_CPU_task)); // 分配最上层任务状态结构体数组空间
+            if (pxTaskStatusArray_CPU_task != NULL)
             {
-                for (UBaseType_t y = 0; y < uxArraySizeLast; y++)
+                /* Calculate the percentage */
+                for (UBaseType_t x = 0; x < uxArraySize; x++)
                 {
-                    if (pxTaskStatusArray[x].pcTaskName == pxTaskStatusArrayLast[y].pcTaskName)
+                    for (UBaseType_t y = 0; y < uxArraySizeLast; y++)
                     {
-                        ulStatsAsPercentage = (float)(pxTaskStatusArray[x].ulRunTimeCounter - pxTaskStatusArrayLast[y].ulRunTimeCounter) / TickFrequency / ((float)CycleTime_ms / 1000) * 100.0f; // 运行时间百分比
-
-                        pcWriteBuffer = prvWriteNameToBuffer(pcWriteBuffer, pxTaskStatusArray[x].pcTaskName);
-                        sprintf(pcWriteBuffer, " %2u.%1u%%\r\n", (uint32_t)ulStatsAsPercentage, (uint32_t)(ulStatsAsPercentage * 10UL) % 10); // 定长
-
-                        pcWriteBuffer += strlen(pcWriteBuffer); /*lint !e9016 Pointer arithmetic ok on char pointers especially as in this case where it best denotes the intent of the code. */
+                        if (strcmp(pxTaskStatusArray[x].pcTaskName, pxTaskStatusArrayLast[y].pcTaskName) == 0)
+                        {
+                            pxTaskStatusArray_CPU_task[x].ulStatsAsPercentage = (float)(pxTaskStatusArray[x].ulRunTimeCounter - pxTaskStatusArrayLast[y].ulRunTimeCounter) / TickFrequency / ((float)CycleTime_ms / 1000) * 100.0f; // 运行时间百分比
+                        }
                     }
                 }
-            }
-        }
+                /* Copy the TaskStatus_t to TaskStatus_t_CPU_task */
+                for (UBaseType_t x = 0; x < uxArraySize; x++)
+                {
+                    pxTaskStatusArray_CPU_task[x].xTaskStatus = pxTaskStatusArray[x];
+                }
 
-        /* 保存当前任务信息到上一次任务信息 */
-        TaskStatus_t *pxTaskStatusArrayLast_temp = NULL;
-        pxTaskStatusArrayLast_temp = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t)); // 这里的uxArraySize是当前运行的任务数量
-        if (pxTaskStatusArrayLast_temp != NULL)
-        {
-            for (uint32_t i = 0; i < uxArraySize; i++) // 复制上一次到临时数组
-            {
-                pxTaskStatusArrayLast_temp[i] = pxTaskStatusArray[i];
+                /* Sort the array. */
+                switch (sortmode)
+                {
+                case 0: // 按ID降序
+                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_id_down);
+                    break;
+                case 1: // 按ID升序
+                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_id_up);
+                    break;
+                case 2: // 按任务名称降序
+                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_name_down);
+                    break;
+                case 3: // 按任务名称升序
+                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_name_up);
+                    break;
+                case 4: // 按CPU占用降序
+                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_cpu_down);
+                    break;
+                case 5: // 按CPU占用升序
+                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_cpu_up);
+                    break;
+                case 6: // 按运行时间降序
+                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_time_down);
+                    break;
+                case 7: // 按运行时间升序
+                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_time_up);
+                    break;
+                default:
+                    break;
+                }
+
+                /* Create a human readable table from the binary data. */
+                for (UBaseType_t x = 0; x < uxArraySize; x++)
+                {
+                    pcWriteBuffer = prvWriteNameToBuffer(pcWriteBuffer, pxTaskStatusArray_CPU_task[x].xTaskStatus.pcTaskName);
+                    sprintf(pcWriteBuffer, " %2u.%1u%%\r\n", (uint32_t)pxTaskStatusArray_CPU_task[x].ulStatsAsPercentage, (uint32_t)(pxTaskStatusArray_CPU_task[x].ulStatsAsPercentage * 10UL) % 10); // 定长
+                    pcWriteBuffer += strlen(pcWriteBuffer);                                                                                                                                           /*lint !e9016 Pointer arithmetic ok on char pointers especially as in this case where it best denotes the intent of the code. */
+                }
+
+                vPortFree(pxTaskStatusArray_CPU_task); // 释放最上层任务状态结构体数组空间
             }
-            // 交换指针
-            vPortFree(pxTaskStatusArrayLast);                   // 上次数据要更新,不要了
-            pxTaskStatusArrayLast = pxTaskStatusArrayLast_temp; // 换成复制的数据
+            else
+            {
+                mtCOVERAGE_TEST_MARKER();
+            }
+
+            /* 保存当前任务信息到上一次任务信息 */
+            TaskStatus_t *pxTaskStatusArrayLast_temp = NULL;
+            pxTaskStatusArrayLast_temp = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t)); // 这里的uxArraySize是当前运行的任务数量
+            if (pxTaskStatusArrayLast_temp != NULL)
+            {
+                for (uint32_t i = 0; i < uxArraySize; i++) // 复制上一次到临时数组
+                {
+                    pxTaskStatusArrayLast_temp[i] = pxTaskStatusArray[i];
+                }
+                // 交换指针
+                vPortFree(pxTaskStatusArrayLast);                   // 上次数据要更新,不要了
+                pxTaskStatusArrayLast = pxTaskStatusArrayLast_temp; // 换成复制的数据
+            }
+            else
+            {
+                mtCOVERAGE_TEST_MARKER(); // 错误处理
+            }
+            uxArraySizeLast = uxArraySize; // 保存当前任务数量
         }
-        else
-        {
-            mtCOVERAGE_TEST_MARKER(); // 错误处理
-        }
-        uxArraySizeLast = uxArraySize; // 保存当前任务数量
 
         /* 释放当前任务状态结构体空间 */
         vPortFree(pxTaskStatusArray);
@@ -106,34 +243,11 @@ static void vTaskGetRunTimeStats_Cycle(char *pcWriteBuffer, uint32_t CycleTime_m
     }
 }
 
-int sqrt_compare_(const void *a, const void *b)
-{
-    TaskStatus_t *s1 = (TaskStatus_t *)a;
-    TaskStatus_t *s2 = (TaskStatus_t *)b;
-
-    // 优先按分数降序，分数相同按ID升序
-    // if (s1->ulRunTimeCounter > s2->ulRunTimeCounter)
-    // {
-    //     return (s2->ulRunTimeCounter > s1->ulRunTimeCounter) ? 1 : -1;
-    // }
-    // else
-    // {
-    //     return s1->id - s2->id;
-    // }
-
-    // if (fabs(s1->score - s2->score) > 1e-6)
-    // {
-    //     return (s2->score > s1->score) ? 1 : -1;
-    // }
-    // else
-    // {
-    //     return s1->id - s2->id;
-    // }
-}
-
 void vCPUTask(void *pvParameters)
 {
     (void)pvParameters;
+    // uint8_t tickflag = 0; // 标志位
+    // uint8_t sortmode = 0; // 排序模式
 
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
@@ -141,8 +255,17 @@ void vCPUTask(void *pvParameters)
     {
         taskENTER_CRITICAL(); // 进入临界区
         // vTaskGetRunTimeStats(CPU_RunInfo);
-        vTaskGetRunTimeStats_Cycle(CPU_RunInfo, CPUTaskCycleTime_ms, 20000);
+        vTaskGetRunTimeStats_Sort(CPU_RunInfo, 3, CPUTaskCycleTime_ms, 20000);
         taskEXIT_CRITICAL(); // 退出临界区
+
+        // tickflag++;
+        // if (tickflag > 10) // 10个周期后,发送数据
+        // {
+        //     tickflag = 0;
+        //     sortmode++;
+        //     if (sortmode > 7) // 最大模式
+        //         sortmode = 0;
+        // }
         xQueueSend(xQueue_CPU, CPU_RunInfo, 0);
         vTaskDelayUntil(&xLastWakeTime, CPUTaskCycleTime_ms);
     }
