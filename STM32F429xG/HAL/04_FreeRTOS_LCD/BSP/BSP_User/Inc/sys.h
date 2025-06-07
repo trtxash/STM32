@@ -8,6 +8,11 @@
 #define DEBUG_FLAG        0
 // #define LOG_TYPE          0 // 0为printf，1为segeerrtt
 
+#if SYSTEM_SUPPORT_OS == 1
+#include "FreeRTOS.h"
+#include "task.h"
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////////
 // 定义一些常用的数据类型短关键字
 typedef int32_t s32;

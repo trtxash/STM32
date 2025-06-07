@@ -24,7 +24,7 @@ static void Callback_Down_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        xQueueSend(xQueue_KEY, &button_up, 10);
+        xQueueSend(xQueue_KEY, &button_up, 0);
     }
 }
 
@@ -32,7 +32,7 @@ static void Callback_Up_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        xQueueSend(xQueue_KEY, &button_up, 10);
+        xQueueSend(xQueue_KEY, &button_up, 0);
     }
 }
 
@@ -40,7 +40,7 @@ static void Callback_Repeat_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        xQueueSend(xQueue_KEY, &button_up, 10);
+        xQueueSend(xQueue_KEY, &button_up, 0);
     }
 }
 
@@ -48,13 +48,13 @@ static void Callback_Single_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        xQueueSend(xQueue_KEY, &button_up, 10);
+        xQueueSend(xQueue_KEY, &button_up, 0);
         Led_t temp_led;
         temp_led.led_id = 0;
         temp_led.mode = SOLID;
         temp_led.active_level = 1;
         temp_led.led_level = 1;
-        xQueueSend(xQueue_Led, &temp_led, 10);
+        xQueueSend(xQueue_Led, &temp_led, 0);
     }
 }
 
@@ -62,13 +62,13 @@ static void Callback_Double_Click_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        xQueueSend(xQueue_KEY, &button_up, 10);
+        xQueueSend(xQueue_KEY, &button_up, 0);
         Led_t temp_led;
         temp_led.led_id = 0;
         temp_led.mode = SOLID;
         temp_led.active_level = 1;
         temp_led.led_level = 0;
-        xQueueSend(xQueue_Led, &temp_led, 10);
+        xQueueSend(xQueue_Led, &temp_led, 0);
     }
 }
 
@@ -76,7 +76,7 @@ static void Callback_Long_Press_Start_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        xQueueSend(xQueue_KEY, &button_up, 10);
+        xQueueSend(xQueue_KEY, &button_up, 0);
     }
 }
 
@@ -84,7 +84,7 @@ static void Callback_Long_Press_Hold_Handler(void *btn)
 {
     if (btn == &button_up)
     {
-        xQueueSend(xQueue_KEY, &button_up, 10);
+        xQueueSend(xQueue_KEY, &button_up, 0);
     }
 }
 

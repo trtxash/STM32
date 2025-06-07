@@ -44,13 +44,13 @@
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
 #include "stdio.h"
 #include <stdint.h>
-
-#include "tim.h"
-
-extern uint32_t SystemCoreClock;
-extern volatile uint32_t FreeRTOSRunTimeTicks;
 #endif
 
+extern void ConfigureTimerForTimeStats(void);
+extern uint32_t SystemCoreClock;
+extern volatile uint32_t FreeRTOSRunTimeTicks;
+
+#define configIDLE_TASK_NAME                 "IDLE"                // 设置空闲任务名称
 #define configUSE_PREEMPTION                 1                     // 为1时使用抢占式调度器，为0时使用协程，抢断式调度器的话内核会在每个时钟节拍中断中进行任务切换，
 #define configUSE_IDLE_HOOK                  0                     // 为1时使用空闲任务钩子函数，vApplicationIdleHook(void)
 #define configUSE_TICK_HOOK                  0                     // 为1使用时间片钩子函数，需要vApplicationTickHook(void)
@@ -72,10 +72,10 @@ extern volatile uint32_t FreeRTOSRunTimeTicks;
 #define configUSE_APPLICATION_TASK_TAG       0                     // 为1则configUSE_APPLICATION_TASK_TAGF()和xTaskCallApplicationTaskHook()会被编译
 #define configUSE_COUNTING_SEMAPHORES        1                     // 为1启动计数型信号量，相关的API函数会被编译
 
-#define configGENERATE_RUN_TIME_STATS            1                            // 为1开启时间统计功能，相应API函数会被编译，为1还要定义额外的宏，见开发手册
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ConfigureTimerForTimeStats() // 定义定时器初始化函数以提供统计的“时基”
-#define portGET_RUN_TIME_COUNTER_VALUE()         FreeRTOSRunTimeTicks         // 定义变量以读取统计定时器的值
-#define configRECORD_STACK_HIGH_ADDRESS          1                            // 检查堆栈？
+#define configGENERATE_RUN_TIME_STATS            1                                 // 为1开启时间统计功能，相应API函数会被编译，为1还要定义额外的宏，见开发手册
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ConfigureTimerForTimeStats()      // 定义定时器初始化函数以提供统计的“时基”
+#define portGET_RUN_TIME_COUNTER_VALUE()         (TickType_t) FreeRTOSRunTimeTicks // 定义变量以读取统计定时器的值
+#define configRECORD_STACK_HIGH_ADDRESS          1                                 // 检查堆栈？
 
 #define configUSE_NEWLIB_REENTRANT       1 // 启用Newlib可重入支持
 #define configSUPPORT_DYNAMIC_ALLOCATION 1 // 必须启用动态内存

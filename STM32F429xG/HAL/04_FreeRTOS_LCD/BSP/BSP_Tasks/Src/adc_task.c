@@ -80,8 +80,10 @@ void vADCTask(void *pvParameters)
             break;
         }
         HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx + j * ADC_Sec, ADC_Sec);
+
         vTaskDelayUntil(&xLastWakeTime, 100);
-        xSemaphoreTake(xSemaphore_ADC, 10); // 等待信号量
+
+        xSemaphoreTake(xSemaphore_ADC, 0); // 等待信号量
 
         for (u32 i = 0; i < ADC_Sec; i++)
         {
@@ -115,8 +117,10 @@ void vADCTask(void *pvParameters)
                 break;
             }
             HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx + j * ADC_Sec, ADC_Sec);
+
             vTaskDelayUntil(&xLastWakeTime, 100);
-            xSemaphoreTake(xSemaphore_ADC, 10); // 等待信号量
+            
+            xSemaphoreTake(xSemaphore_ADC, 0); // 等待信号量
             adc_temp[j] = 0;
             for (u32 i = 0; i < ADC_Sec; i++) // 均值处理
             {
@@ -132,8 +136,8 @@ void vADCTask(void *pvParameters)
 
         V_Bat_Volt = KalmanFilter(&adc1_kalman[2], battery_voltage_to_soc(V_Bat)); // 电量卡尔曼滤波
         // 传输数据到GUI任务
-        xQueueSend(xQueue_ADC_Temp, &temperate, 10);
-        xQueueSend(xQueue_ADC_Bat, &V_Bat, 10);
-        xQueueSend(xQueue_ADC_BatVolt, &V_Bat_Volt, 10);
+        xQueueSend(xQueue_ADC_Temp, &temperate, 0);
+        xQueueSend(xQueue_ADC_Bat, &V_Bat, 0);
+        xQueueSend(xQueue_ADC_BatVolt, &V_Bat_Volt, 0);
     }
 }

@@ -28,8 +28,10 @@ static uint8_t set_led_GPIO(uint8_t led_id, uint8_t order)
         HAL_GPIO_WritePin(LED3_GPIO, LED3_PIN, order);
         break;
     default:
+        return 0;
         break;
     }
+    return 1;
 }
 
 // led任务函数
@@ -62,7 +64,7 @@ void vLedTask(void *pvParameters)
         led_ticks();
         // 读取控制命令
         Led_t led_temp;
-        if (xQueueReceive(xQueue_Led, &led_temp, 10) == pdPASS)
+        if (xQueueReceive(xQueue_Led, &led_temp, 0) == pdPASS)
         {
             switch (led_temp.led_id)
             {

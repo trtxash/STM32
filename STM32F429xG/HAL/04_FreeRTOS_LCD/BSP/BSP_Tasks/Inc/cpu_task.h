@@ -4,7 +4,7 @@
 #include "tasks_common.h"
 
 #define TASK_PRIO_CPU TASK_PRIO_LOW
-#define CPU_STK_SIZE  STACK_SIZE_BASE
+#define CPU_STK_SIZE  STACK_SIZE_LEVEL1
 
 #define CPU_RUNINFO_SIZE (512)
 
