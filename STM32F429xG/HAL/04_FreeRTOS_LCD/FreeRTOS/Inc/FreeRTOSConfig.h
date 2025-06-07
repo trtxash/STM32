@@ -59,7 +59,7 @@ extern volatile uint32_t FreeRTOSRunTimeTicks;
 #define configMAX_PRIORITIES                 (4)                   // 设置任务优先级数量，0~num-1
 #define configMINIMAL_STACK_SIZE             ((unsigned short)66)  // 设置空闲任务的最小任务堆栈大小，字为单位，(66-2)*4字节
 #define configTOTAL_HEAP_SIZE                ((size_t)(75 * 1024)) // 设置堆大小，然后使用了动态内存管理，FreeRTOS会使用heapX.c中的内存申请函数来申请内存，这些内存时从堆ucHeap[configTOTAL_HEAP_SIZE]中申请的，堆的大小由这项来定义
-#define configMAX_TASK_NAME_LEN              (10)                  // 设置任务名最大长度
+#define configMAX_TASK_NAME_LEN              (16)                  // 设置任务名最大长度
 #define configUSE_TRACE_FACILITY             1                     // 为1启用可视化跟踪调试，会增加一些结构体成员和API函数
 #define configUSE_STATS_FORMATTING_FUNCTIONS 1                     // 启用格式化统计函数
 #define configUSE_16_BIT_TICKS               0                     // 来设置事件标志的位数，0为32位，1为16位

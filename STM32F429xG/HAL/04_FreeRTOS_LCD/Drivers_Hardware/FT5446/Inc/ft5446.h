@@ -54,10 +54,10 @@ typedef struct
 extern _m_tp_dev tp_dev; // 触屏控制器在touch.c里面定义
 
 // 触摸屏操作函数
-uint8_t FT5xxx_WR_Reg(uint16_t reg, uint8_t *buf, uint8_t len);
-void FT5xxx_RD_Reg(uint16_t reg, uint8_t *buf, uint8_t len);
-uint8_t FT5xxx_Init_Soft(void);
+// uint8_t FT5xxx_WR_Reg(uint16_t reg, uint8_t *buf, uint8_t len);
+// void FT5xxx_RD_Reg(uint16_t reg, uint8_t *buf, uint8_t len);
+// uint8_t FT5xxx_Init_Soft(void);
 uint8_t FT5xxx_Init_Hard(void);
-uint8_t FT5xxx_Scan(uint8_t mode);
+// uint8_t FT5xxx_Scan(uint8_t mode);
 
 #endif
