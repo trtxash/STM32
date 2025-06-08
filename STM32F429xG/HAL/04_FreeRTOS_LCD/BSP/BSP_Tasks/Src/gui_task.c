@@ -109,6 +109,6 @@ void vGUITask(void *pvParameters)
         // uint32_t taskExecuteCycles = FreeRTOSRunTimeTicks - taskEnterTime;
         // float taskExecuteMs = taskExecuteCycles * (1.0 / 20000.0);
         // LTDC_Show_float(0, 0, taskExecuteMs, 3, 3, 12, 0, GUI_Black); // 显示实际耗时ms
-        vTaskDelayUntil(&xLastWakeTime, GUI_TaskCycleTime_ms); // 大致66.6Hz
+        vTaskDelayUntil(&xLastWakeTime, GUI_TaskCycleTime_ms); // 大致125Hz
     }
 }
