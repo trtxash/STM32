@@ -3,7 +3,7 @@
 
 #include "tasks_common.h"
 
-#define TASK_PRIO_START TASK_PRIO_LOW 
+#define TASK_PRIO_START TASK_PRIO_NORMAL 
 #define START_STK_SIZE  STACK_SIZE_BASE
 
 void freertos_enter(void);

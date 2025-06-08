@@ -62,9 +62,10 @@ void vADCTask(void *pvParameters)
     // uint32_t JS_RTT_Channel = 1;
     // SEGGER_RTT_ConfigUpBuffer(JS_RTT_Channel, "JScope_f4f4", (void *)JS_RTT_UpBuffer, sizeof(JS_RTT_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP); // 配置RTT输出
 
-    Kalman_Init(0.001, 0.1, 100, &adc1_kalman[0]);     // 初始化卡尔曼滤波器
+    Kalman_Init(0.001, 0.1, 100, &adc1_kalman[0]);    // 初始化卡尔曼滤波器
     Kalman_Init(0.001, 0.1, 10, &adc1_kalman[1]);     // 初始化卡尔曼滤波器
     Kalman_Init(0.001, 0.001, 1000, &adc1_kalman[2]); // 初始化卡尔曼滤波器
+
     // 第一次传输,处理数据
     for (u8 j = 0; j < ADC_Ch; j++)
     {
@@ -80,9 +81,7 @@ void vADCTask(void *pvParameters)
             break;
         }
         HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx + j * ADC_Sec, ADC_Sec);
-
-        vTaskDelayUntil(&xLastWakeTime, 100);
-
+        vTaskDelayUntil(&xLastWakeTime, ADC_TaskCycleTime_ms);
         xSemaphoreTake(xSemaphore_ADC, 0); // 等待信号量
 
         for (u32 i = 0; i < ADC_Sec; i++)
@@ -118,8 +117,8 @@ void vADCTask(void *pvParameters)
             }
             HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcx + j * ADC_Sec, ADC_Sec);
 
-            vTaskDelayUntil(&xLastWakeTime, 100);
-            
+            vTaskDelayUntil(&xLastWakeTime, ADC_TaskCycleTime_ms);
+
             xSemaphoreTake(xSemaphore_ADC, 0); // 等待信号量
             adc_temp[j] = 0;
             for (u32 i = 0; i < ADC_Sec; i++) // 均值处理

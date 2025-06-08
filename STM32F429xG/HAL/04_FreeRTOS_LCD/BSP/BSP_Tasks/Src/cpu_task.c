@@ -3,7 +3,6 @@
 
 TaskHandle_t CPUTask_Handler = NULL; // 任务句柄
 char CPU_RunInfo[CPU_RUNINFO_SIZE];  // 保存任务运行时间信息
-uint32_t CPUTaskCycleTime_ms = 500; // 任务运行时间间隔
 
 static char *prvWriteNameToBuffer(char *pcBuffer, const char *pcTaskName)
 {
@@ -246,27 +245,16 @@ static void vTaskGetRunTimeStats_Sort(char *pcWriteBuffer, uint8_t sortmode, uin
 void vCPUTask(void *pvParameters)
 {
     (void)pvParameters;
-    // uint8_t tickflag = 0; // 标志位
-    // uint8_t sortmode = 0; // 排序模式
 
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
         taskENTER_CRITICAL(); // 进入临界区
-        // vTaskGetRunTimeStats(CPU_RunInfo);
-        vTaskGetRunTimeStats_Sort(CPU_RunInfo, 4, CPUTaskCycleTime_ms, 20000);
+        vTaskGetRunTimeStats_Sort(CPU_RunInfo, 4, CPU_TaskCycleTime_ms, 20000);
         taskEXIT_CRITICAL(); // 退出临界区
 
-        // tickflag++;
-        // if (tickflag > 10) // 10个周期后,发送数据
-        // {
-        //     tickflag = 0;
-        //     sortmode++;
-        //     if (sortmode > 7) // 最大模式
-        //         sortmode = 0;
-        // }
         xQueueSend(xQueue_CPU, CPU_RunInfo, 0);
-        vTaskDelayUntil(&xLastWakeTime, CPUTaskCycleTime_ms);
+        vTaskDelayUntil(&xLastWakeTime, CPU_TaskCycleTime_ms);
     }
 }

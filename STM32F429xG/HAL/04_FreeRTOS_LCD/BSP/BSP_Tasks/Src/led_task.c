@@ -84,6 +84,6 @@ void vLedTask(void *pvParameters)
                 break;
             };
         }
-        vTaskDelayUntil(&xLastWakeTime, 100);
+        vTaskDelayUntil(&xLastWakeTime, LED_TaskCycleTime_ms);
     }
 }

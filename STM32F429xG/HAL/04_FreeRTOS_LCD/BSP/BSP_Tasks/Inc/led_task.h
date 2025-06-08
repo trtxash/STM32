@@ -5,8 +5,9 @@
 #include "multi_led.h"
 #include "tasks_common.h"
 
-#define TASK_PRIO_LED TASK_PRIO_NORMAL // 任务优先级,越大越高优先级
-#define LED_TSTK_SIZE STACK_SIZE_BASE  // 任务堆栈大小,实际为32word=32*4byte=128byte=128*8bit
+#define TASK_PRIO_LED       TASK_PRIO_NORMAL // 任务优先级,越大越高优先级
+#define LED_TSTK_SIZE       STACK_SIZE_BASE  // 任务堆栈大小,实际为32word=32*4byte=128byte=128*8bit
+#define LED_TaskCycleTime_ms 100              // 任务运行时间间隔
 
 extern TaskHandle_t LEDTask_Handler;
 

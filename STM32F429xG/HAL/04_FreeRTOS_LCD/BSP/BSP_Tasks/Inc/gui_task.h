@@ -4,8 +4,9 @@
 #include "lcd.h"
 #include "tasks_common.h"
 
-#define TASK_PRIO_GUI TASK_PRIO_LOW
-#define GUI_STK_SIZE  STACK_SIZE_LEVEL2
+#define TASK_PRIO_GUI       TASK_PRIO_NORMAL
+#define GUI_STK_SIZE        STACK_SIZE_LEVEL2
+#define GUI_TaskCycleTime_ms 15 // 任务运行时间间隔
 
 extern TaskHandle_t GUITask_Handler; // 任务句柄
 
