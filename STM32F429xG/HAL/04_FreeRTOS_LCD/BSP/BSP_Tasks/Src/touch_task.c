@@ -17,6 +17,6 @@ void vTouchTask(void *pvParameters)
             HAL_I2C_Mem_Read_DMA(&hi2c1, FT_ADDRESS << 1U, FT_REG_NUM_FINGER, I2C_MEMADD_SIZE_8BIT, Touch_Data, Touch_Data_Len);
         vTaskDelayUntil(&xLastWakeTime, TOUCH_TaskCycleTime_ms);
         xSemaphoreTake(xSemaphore_Touch_i2c, 0); // 等待信号量
-        xQueueSend(xQueue_Touch, &Touch_Data, 0);
+        xQueueOverwrite(xQueue_Touch, &Touch_Data);
     }
 }

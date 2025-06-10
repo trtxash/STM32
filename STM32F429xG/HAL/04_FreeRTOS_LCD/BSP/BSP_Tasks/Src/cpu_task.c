@@ -103,6 +103,13 @@ static int sqrt_compare_time_up(const void *a, const void *b)
     return s1->xTaskStatus.ulRunTimeCounter - s2->xTaskStatus.ulRunTimeCounter;
 }
 
+typedef int (*CompareFunc)(const void *, const void *);
+static const CompareFunc sortFuncs[] = {
+    sqrt_compare_id_down, sqrt_compare_id_up,
+    sqrt_compare_name_down, sqrt_compare_name_up,
+    sqrt_compare_cpu_down, sqrt_compare_cpu_up,
+    sqrt_compare_time_down, sqrt_compare_time_up};
+
 // mode:
 // 0:按ID降序
 // 1:按ID升序
@@ -134,7 +141,10 @@ static void vTaskGetRunTimeStats_Sort(char *pcWriteBuffer, uint8_t sortmode, uin
             pxTaskStatusArrayLast = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t)); // 第一次运行时,分配上一次任务状态结构体数组空间
             if (pxTaskStatusArrayLast != NULL)
             {
-                // 进行下一次运行
+                uxTaskGetSystemState(pxTaskStatusArrayLast, uxArraySize, NULL); // 初始化状态
+                uxArraySizeLast = uxArraySize;                                  // 保存当前任务数量
+
+                // 进行下一次运行...
             }
             else
             {
@@ -168,34 +178,9 @@ static void vTaskGetRunTimeStats_Sort(char *pcWriteBuffer, uint8_t sortmode, uin
                 }
 
                 /* Sort the array. */
-                switch (sortmode)
+                if (sortmode < sizeof(sortFuncs) / sizeof(sortFuncs[0]))
                 {
-                case 0: // 按ID降序
-                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_id_down);
-                    break;
-                case 1: // 按ID升序
-                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_id_up);
-                    break;
-                case 2: // 按任务名称降序
-                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_name_down);
-                    break;
-                case 3: // 按任务名称升序
-                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_name_up);
-                    break;
-                case 4: // 按CPU占用降序
-                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_cpu_down);
-                    break;
-                case 5: // 按CPU占用升序
-                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_cpu_up);
-                    break;
-                case 6: // 按运行时间降序
-                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_time_down);
-                    break;
-                case 7: // 按运行时间升序
-                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sqrt_compare_time_up);
-                    break;
-                default:
-                    break;
+                    qsort(pxTaskStatusArray_CPU_task, uxArraySize, sizeof(TaskStatus_t_CPU_task), sortFuncs[sortmode]);
                 }
 
                 /* Create a human readable table from the binary data. */
@@ -250,11 +235,9 @@ void vCPUTask(void *pvParameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        taskENTER_CRITICAL(); // 进入临界区
         vTaskGetRunTimeStats_Sort(CPU_RunInfo, 4, CPU_TaskCycleTime_ms, 20000);
-        taskEXIT_CRITICAL(); // 退出临界区
 
-        xQueueSend(xQueue_CPU, CPU_RunInfo, 0);
+        xQueueOverwrite(xQueue_CPU, CPU_RunInfo);
         vTaskDelayUntil(&xLastWakeTime, CPU_TaskCycleTime_ms);
     }
 }

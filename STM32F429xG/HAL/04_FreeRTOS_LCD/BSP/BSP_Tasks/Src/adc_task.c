@@ -62,7 +62,7 @@ void vADCTask(void *pvParameters)
     // uint32_t JS_RTT_Channel = 1;
     // SEGGER_RTT_ConfigUpBuffer(JS_RTT_Channel, "JScope_f4f4", (void *)JS_RTT_UpBuffer, sizeof(JS_RTT_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP); // 配置RTT输出
 
-    Kalman_Init(0.001, 0.1, 100, &adc1_kalman[0]);    // 初始化卡尔曼滤波器
+    Kalman_Init(0.001, 0.1, 100, &adc1_kalman[0]);      // 初始化卡尔曼滤波器
     Kalman_Init(0.001, 0.1, 10, &adc1_kalman[1]);     // 初始化卡尔曼滤波器
     Kalman_Init(0.001, 0.001, 1000, &adc1_kalman[2]); // 初始化卡尔曼滤波器
 
@@ -135,8 +135,8 @@ void vADCTask(void *pvParameters)
 
         V_Bat_Volt = KalmanFilter(&adc1_kalman[2], battery_voltage_to_soc(V_Bat)); // 电量卡尔曼滤波
         // 传输数据到GUI任务
-        xQueueSend(xQueue_ADC_Temp, &temperate, 0);
-        xQueueSend(xQueue_ADC_Bat, &V_Bat, 0);
-        xQueueSend(xQueue_ADC_BatVolt, &V_Bat_Volt, 0);
+        xQueueOverwrite(xQueue_ADC_Temp, &temperate);
+        xQueueOverwrite(xQueue_ADC_Bat, &V_Bat);
+        xQueueOverwrite(xQueue_ADC_BatVolt, &V_Bat_Volt);
     }
 }
