@@ -1,4 +1,5 @@
 #include "cpu_task.h"
+#include "gui_task.h"
 #include "tasks_sync.h"
 
 TaskHandle_t CPUTask_Handler = NULL; // 任务句柄
@@ -186,9 +187,18 @@ static void vTaskGetRunTimeStats_Sort(char *pcWriteBuffer, uint8_t sortmode, uin
                 /* Create a human readable table from the binary data. */
                 for (UBaseType_t x = 0; x < uxArraySize; x++)
                 {
+#if INCLUDE_uxTaskGetStackHighWaterMark == 1
+                    /* Print out the high water mark for each task. */
+                    pcWriteBuffer = prvWriteNameToBuffer(pcWriteBuffer, pxTaskStatusArray_CPU_task[x].xTaskStatus.pcTaskName);
+                    sprintf(pcWriteBuffer, " %2u.%1u%%", (uint32_t)pxTaskStatusArray_CPU_task[x].ulStatsAsPercentage, (uint32_t)(pxTaskStatusArray_CPU_task[x].ulStatsAsPercentage * 10UL) % 10); // 定长
+                    pcWriteBuffer += strlen(pcWriteBuffer);
+                    sprintf(pcWriteBuffer, "\t0X%08lX\r\n", uxTaskGetStackHighWaterMark(pxTaskStatusArray_CPU_task[x].xTaskStatus.xHandle));
+                    pcWriteBuffer += strlen(pcWriteBuffer);
+#else
                     pcWriteBuffer = prvWriteNameToBuffer(pcWriteBuffer, pxTaskStatusArray_CPU_task[x].xTaskStatus.pcTaskName);
                     sprintf(pcWriteBuffer, " %2u.%1u%%\r\n", (uint32_t)pxTaskStatusArray_CPU_task[x].ulStatsAsPercentage, (uint32_t)(pxTaskStatusArray_CPU_task[x].ulStatsAsPercentage * 10UL) % 10); // 定长
-                    pcWriteBuffer += strlen(pcWriteBuffer);                                                                                                                                           /*lint !e9016 Pointer arithmetic ok on char pointers especially as in this case where it best denotes the intent of the code. */
+                    pcWriteBuffer += strlen(pcWriteBuffer);
+#endif
                 }
 
                 vPortFree(pxTaskStatusArray_CPU_task); // 释放最上层任务状态结构体数组空间

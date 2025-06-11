@@ -76,6 +76,7 @@ extern volatile uint32_t FreeRTOSRunTimeTicks;
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ConfigureTimerForTimeStats()      // 定义定时器初始化函数以提供统计的“时基”
 #define portGET_RUN_TIME_COUNTER_VALUE()         (TickType_t) FreeRTOSRunTimeTicks // 定义变量以读取统计定时器的值
 #define configRECORD_STACK_HIGH_ADDRESS          1                                 // 检查堆栈？
+#define INCLUDE_uxTaskGetStackHighWaterMark      1                                 // 启用uxTaskGetStackHighWaterMark()函数，可以查看任务的堆栈使用情况
 
 #define configUSE_NEWLIB_REENTRANT       1 // 启用Newlib可重入支持
 #define configSUPPORT_DYNAMIC_ALLOCATION 1 // 必须启用动态内存

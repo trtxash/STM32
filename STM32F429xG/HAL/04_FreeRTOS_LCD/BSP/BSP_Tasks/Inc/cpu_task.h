@@ -4,7 +4,7 @@
 #include "tasks_common.h"
 
 #define TASK_PRIO_CPU        TASK_PRIO_LOW
-#define CPU_STK_SIZE         STACK_SIZE_LEVEL1
+#define CPU_STK_SIZE         STACK_SIZE_LEVEL2
 #define CPU_TaskCycleTime_ms 500 // 任务运行时间间隔
 
 #define CPU_RUNINFO_SIZE (512)
