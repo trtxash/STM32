@@ -51,9 +51,9 @@ file(GLOB_RECURSE FREERTOS_SOURCES
 )
 
 file(GLOB_RECURSE LVGL_SOURCES
-    ../../LVGL/lvgl-9.3.0/*.c
-    ../../LVGL/lvgl-9.3.0/src/*.c
-    ../../LVGL/lvgl-9.3.0/src/**/*.c
+    # ../../LVGL/lvgl-9.3.0/*.c
+    # ../../LVGL/lvgl-9.3.0/src/*.c
+    # ../../LVGL/lvgl-9.3.0/src/**/*.c
 )
 
 target_sources(stm32cubemx INTERFACE
@@ -110,7 +110,7 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_Core/Src/ltdc.c
     ../../BSP/BSP_Core/Src/tim.c
     # ../../BSP/BSP_Core/Src/wwdg.c
-    
+
     ../../BSP/BSP_Tasks/Src/tasks_sync.c
     ../../BSP/BSP_Tasks/Src/start_task.c
     ../../BSP/BSP_Tasks/Src/led_task.c
