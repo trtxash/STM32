@@ -26,6 +26,14 @@ target_include_directories(stm32cubemx INTERFACE
     ../../FreeRTOS/Inc
     ../../FreeRTOS/portable/GCC/ARM_CM4F
 
+    ../../lvgl-9.3.0/examples/porting
+    ../../lvgl-9.3.0/src/core
+    ../../lvgl-9.3.0/src/display
+    ../../lvgl-9.3.0/src/draw
+    ../../lvgl-9.3.0/src/font
+    ../../lvgl-9.3.0/src/indev
+    ../../lvgl-9.3.0/src/layout
+
     ../../APP/Debug_Linker/RTT/Inc
     ../../APP/Multi_Button/Inc
     ../../APP/Multi_Led/Inc
