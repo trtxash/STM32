@@ -12,35 +12,6 @@ target_compile_definitions(stm32cubemx INTERFACE
     $<$<CONFIG:Debug>:DEBUG>
 )
 
-target_include_directories(stm32cubemx INTERFACE
-    ../../BSP/BSP_User/Inc
-    ../../BSP/BSP_Core/Inc
-    ../../BSP/BSP_Tasks/Inc
-    ../../BSP/BSP_Devices/Inc
-
-    ../../Drivers/STM32F4xx_HAL_Driver/Inc
-    ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
-    ../../Drivers/CMSIS/Device/ST/STM32F4xx/Include
-    ../../Drivers/CMSIS/Include
-
-    ../../FreeRTOS/Inc
-    ../../FreeRTOS/portable/GCC/ARM_CM4F
-
-    ../../LVGL/lvgl-9.3.0/
-
-    ../../APP/Debug_Linker/RTT/Inc
-    ../../APP/Multi_Button/Inc
-    ../../APP/Multi_Led/Inc
-    ../../APP/Algorithm/KalmanFilter/Inc
-
-    ../../Drivers_Hardware/Key/Inc
-    ../../Drivers_Hardware/LCD/Inc
-    ../../Drivers_Hardware/FT5446/Inc
-    # ../../Drivers_Hardware/OLED/Inc
-    ../../Drivers_Hardware/LED/Inc
-    ../../Drivers_Hardware/SDRAM/Inc
-)
-
 file(GLOB FREERTOS_SOURCES
     ../../FreeRTOS/Src/tasks.c
     ../../FreeRTOS/Src/list.c
@@ -72,7 +43,67 @@ file(GLOB LVGL_SOURCES
     ../../LVGL/lvgl-9.3.0/src/stdlibs/**/*.c
     ../../LVGL/lvgl-9.3.0/src/themes/*.c
     ../../LVGL/lvgl-9.3.0/src/themes/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/tick/*.c
     ../../LVGL/lvgl-9.3.0/src/widgets/**/*.c
+
+    ../../LVGL/lvgl-9.3.0/demos/*.c
+    ../../LVGL/lvgl-9.3.0/demos/widgets/*.c
+    ../../LVGL/lvgl-9.3.0/demos/widgets/**/*.c
+)
+
+target_include_directories(stm32cubemx INTERFACE
+    ../../BSP/BSP_User/Inc
+    ../../BSP/BSP_Core/Inc
+    ../../BSP/BSP_Tasks/Inc
+    ../../BSP/BSP_Devices/Inc
+
+    ../../Drivers/STM32F4xx_HAL_Driver/Inc
+    ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
+    ../../Drivers/CMSIS/Device/ST/STM32F4xx/Include
+    ../../Drivers/CMSIS/Include
+
+    ../../FreeRTOS/Inc
+    ../../FreeRTOS/portable/GCC/ARM_CM4F
+
+    ../../LVGL/lvgl-9.3.0
+    ../../LVGL/lvgl-9.3.0/src
+    ../../LVGL/lvgl-9.3.0/src/core
+    ../../LVGL/lvgl-9.3.0/src/display
+    ../../LVGL/lvgl-9.3.0/src/draw
+    ../../LVGL/lvgl-9.3.0/src/draw/**
+    ../../LVGL/lvgl-9.3.0/src/font
+    ../../LVGL/lvgl-9.3.0/src/indev
+    ../../LVGL/lvgl-9.3.0/src/layout
+    ../../LVGL/lvgl-9.3.0/src/layout/**
+    ../../LVGL/lvgl-9.3.0/src/libs/**
+    ../../LVGL/lvgl-9.3.0/src/misc
+    ../../LVGL/lvgl-9.3.0/src/misc/**
+    ../../LVGL/lvgl-9.3.0/src/misc/**/**
+    ../../LVGL/lvgl-9.3.0/src/osal/
+    ../../LVGL/lvgl-9.3.0/src/others/**
+    ../../LVGL/lvgl-9.3.0/src/others/**
+    ../../LVGL/lvgl-9.3.0/src/stdlibs
+    ../../LVGL/lvgl-9.3.0/src/stdlibs/**
+    ../../LVGL/lvgl-9.3.0/src/themes
+    ../../LVGL/lvgl-9.3.0/src/themes/**
+    ../../LVGL/lvgl-9.3.0/src/tick
+    ../../LVGL/lvgl-9.3.0/src/widgets/**
+
+    ../../LVGL/lvgl-9.3.0/demos/**
+    ../../LVGL/lvgl-9.3.0/demos/widgets/**
+    # ../../LVGL/lvgl-9.3.0/demos/widgets/**/**
+
+    ../../APP/Debug_Linker/RTT/Inc
+    ../../APP/Multi_Button/Inc
+    ../../APP/Multi_Led/Inc
+    ../../APP/Algorithm/KalmanFilter/Inc
+
+    ../../Drivers_Hardware/Key/Inc
+    ../../Drivers_Hardware/LCD/Inc
+    ../../Drivers_Hardware/FT5446/Inc
+    # ../../Drivers_Hardware/OLED/Inc
+    ../../Drivers_Hardware/LED/Inc
+    ../../Drivers_Hardware/SDRAM/Inc
 )
 
 target_sources(stm32cubemx INTERFACE

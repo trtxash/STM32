@@ -1,4 +1,5 @@
 #include "delay.h"
+#include "lv_tick.h"
 
 static u32 fac_us = 0; // us延时倍乘数
 
@@ -12,6 +13,7 @@ void SysTick_Handler(void)
     if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) // 系统已经运行
     {
         xPortSysTickHandler();
+        lv_tick_inc(1);
     }
 }
 #endif
