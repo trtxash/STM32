@@ -41,7 +41,7 @@ target_include_directories(stm32cubemx INTERFACE
     ../../Drivers_Hardware/SDRAM/Inc
 )
 
-file(GLOB_RECURSE FREERTOS_SOURCES
+file(GLOB FREERTOS_SOURCES
     ../../FreeRTOS/Src/tasks.c
     ../../FreeRTOS/Src/list.c
     ../../FreeRTOS/Src/timers.c
@@ -50,10 +50,29 @@ file(GLOB_RECURSE FREERTOS_SOURCES
     ../../FreeRTOS/portable/MemMang/heap_4.c
 )
 
-file(GLOB_RECURSE LVGL_SOURCES
-    # ../../LVGL/lvgl-9.3.0/*.c
-    # ../../LVGL/lvgl-9.3.0/src/*.c
-    # ../../LVGL/lvgl-9.3.0/src/**/*.c
+file(GLOB LVGL_SOURCES
+    ../../LVGL/lvgl-9.3.0/*.c
+    ../../LVGL/lvgl-9.3.0/src/*.c
+    ../../LVGL/lvgl-9.3.0/src/core/*.c
+    ../../LVGL/lvgl-9.3.0/src/display/*.c
+    ../../LVGL/lvgl-9.3.0/src/draw/*.c
+    ../../LVGL/lvgl-9.3.0/src/draw/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/font/*.c
+    ../../LVGL/lvgl-9.3.0/src/indev/*.c
+    ../../LVGL/lvgl-9.3.0/src/layout/*.c
+    ../../LVGL/lvgl-9.3.0/src/layout/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/libs/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/misc/*.c
+    ../../LVGL/lvgl-9.3.0/src/misc/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/misc/**/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/osal/*.c
+    ../../LVGL/lvgl-9.3.0/src/others/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/others/**/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/stdlibs/*.c
+    ../../LVGL/lvgl-9.3.0/src/stdlibs/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/themes/*.c
+    ../../LVGL/lvgl-9.3.0/src/themes/**/*.c
+    ../../LVGL/lvgl-9.3.0/src/widgets/**/*.c
 )
 
 target_sources(stm32cubemx INTERFACE
