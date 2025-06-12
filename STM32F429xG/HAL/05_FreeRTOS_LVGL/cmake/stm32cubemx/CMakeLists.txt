@@ -16,7 +16,7 @@ target_include_directories(stm32cubemx INTERFACE
     ../../BSP/BSP_User/Inc
     ../../BSP/BSP_Core/Inc
     ../../BSP/BSP_Tasks/Inc
-    ../../BSP/BSP_Devices/Inc 
+    ../../BSP/BSP_Devices/Inc
 
     ../../Drivers/STM32F4xx_HAL_Driver/Inc
     ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
@@ -26,13 +26,7 @@ target_include_directories(stm32cubemx INTERFACE
     ../../FreeRTOS/Inc
     ../../FreeRTOS/portable/GCC/ARM_CM4F
 
-    ../../lvgl-9.3.0/examples/porting
-    ../../lvgl-9.3.0/src/core
-    ../../lvgl-9.3.0/src/display
-    ../../lvgl-9.3.0/src/draw
-    ../../lvgl-9.3.0/src/font
-    ../../lvgl-9.3.0/src/indev
-    ../../lvgl-9.3.0/src/layout
+    ../../LVGL/lvgl-9.3.0/
 
     ../../APP/Debug_Linker/RTT/Inc
     ../../APP/Multi_Button/Inc
@@ -47,7 +41,25 @@ target_include_directories(stm32cubemx INTERFACE
     ../../Drivers_Hardware/SDRAM/Inc
 )
 
+file(GLOB_RECURSE FREERTOS_SOURCES
+    ../../FreeRTOS/Src/tasks.c
+    ../../FreeRTOS/Src/list.c
+    ../../FreeRTOS/Src/timers.c
+    ../../FreeRTOS/Src/queue.c
+    ../../FreeRTOS/portable/GCC/ARM_CM4F/port.c
+    ../../FreeRTOS/portable/MemMang/heap_4.c
+)
+
+file(GLOB_RECURSE LVGL_SOURCES
+    ../../LVGL/lvgl-9.3.0/*.c
+    ../../LVGL/lvgl-9.3.0/src/*.c
+    ../../LVGL/lvgl-9.3.0/src/**/*.c
+)
+
 target_sources(stm32cubemx INTERFACE
+    ${LVGL_SOURCES}
+    ${FREERTOS_SOURCES}
+
     ../../BSP/BSP_User/Src/main.c
     ../../BSP/BSP_User/Src/stm32f4xx_it.c
     ../../BSP/BSP_User/Src/stm32f4xx_it_callback.c
@@ -83,13 +95,6 @@ target_sources(stm32cubemx INTERFACE
     # ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_wwdg.c
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_fmc.c
 
-    ../../FreeRTOS/Src/tasks.c
-    ../../FreeRTOS/Src/list.c
-    ../../FreeRTOS/Src/timers.c
-    ../../FreeRTOS/Src/queue.c
-    ../../FreeRTOS/portable/GCC/ARM_CM4F/port.c
-    ../../FreeRTOS/portable/MemMang/heap_4.c
-
     ../../BSP/BSP_User/Src/delay.c
     ../../BSP/BSP_User/Src/myiic.c
     ../../BSP/BSP_User/Src/sys.c
@@ -105,7 +110,7 @@ target_sources(stm32cubemx INTERFACE
     ../../BSP/BSP_Core/Src/ltdc.c
     ../../BSP/BSP_Core/Src/tim.c
     # ../../BSP/BSP_Core/Src/wwdg.c
-
+    
     ../../BSP/BSP_Tasks/Src/tasks_sync.c
     ../../BSP/BSP_Tasks/Src/start_task.c
     ../../BSP/BSP_Tasks/Src/led_task.c
