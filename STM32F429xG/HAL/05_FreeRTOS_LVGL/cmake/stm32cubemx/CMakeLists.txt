@@ -22,33 +22,37 @@ file(GLOB FREERTOS_SOURCES
 )
 
 file(GLOB LVGL_SOURCES
-    ../../LVGL/lvgl-9.3.0/*.c
-    ../../LVGL/lvgl-9.3.0/src/*.c
-    ../../LVGL/lvgl-9.3.0/src/core/*.c
-    ../../LVGL/lvgl-9.3.0/src/display/*.c
-    ../../LVGL/lvgl-9.3.0/src/draw/*.c
-    ../../LVGL/lvgl-9.3.0/src/draw/**/*.c
-    ../../LVGL/lvgl-9.3.0/src/font/*.c
-    ../../LVGL/lvgl-9.3.0/src/indev/*.c
-    ../../LVGL/lvgl-9.3.0/src/layout/*.c
-    ../../LVGL/lvgl-9.3.0/src/layout/**/*.c
-    ../../LVGL/lvgl-9.3.0/src/libs/**/*.c
-    ../../LVGL/lvgl-9.3.0/src/misc/*.c
-    ../../LVGL/lvgl-9.3.0/src/misc/**/*.c
-    ../../LVGL/lvgl-9.3.0/src/misc/**/**/*.c
-    ../../LVGL/lvgl-9.3.0/src/osal/*.c
-    ../../LVGL/lvgl-9.3.0/src/others/**/*.c
-    ../../LVGL/lvgl-9.3.0/src/others/**/**/*.c
-    ../../LVGL/lvgl-9.3.0/src/stdlibs/*.c
-    ../../LVGL/lvgl-9.3.0/src/stdlibs/**/*.c
-    ../../LVGL/lvgl-9.3.0/src/themes/*.c
-    ../../LVGL/lvgl-9.3.0/src/themes/**/*.c
-    ../../LVGL/lvgl-9.3.0/src/tick/*.c
-    ../../LVGL/lvgl-9.3.0/src/widgets/**/*.c
+    ../../LVGL/lvgl/*.c
+    ../../LVGL/lvgl/src/*.c
+    ../../LVGL/lvgl/src/core/*.c
+    ../../LVGL/lvgl/src/display/*.c
+    ../../LVGL/lvgl/src/draw/*.c
+    ../../LVGL/lvgl/src/draw/sw/*.c
+    ../../LVGL/lvgl/src/draw/sw/blend/*.c
+    # ../../LVGL/lvgl/src/draw/**/*.c
+    # ../../LVGL/lvgl/src/draw/**/**/*.c
+    # ../../LVGL/lvgl/src/draw/**/**/**/*.c
+    ../../LVGL/lvgl/src/font/*.c
+    ../../LVGL/lvgl/src/indev/*.c
+    ../../LVGL/lvgl/src/layouts/*.c
+    ../../LVGL/lvgl/src/layouts/**/*.c
+    ../../LVGL/lvgl/src/libs/**/*.c
+    ../../LVGL/lvgl/src/misc/*.c
+    ../../LVGL/lvgl/src/misc/**/*.c
+    ../../LVGL/lvgl/src/misc/**/**/*.c
+    ../../LVGL/lvgl/src/osal/*.c
+    ../../LVGL/lvgl/src/others/**/*.c
+    ../../LVGL/lvgl/src/others/**/**/*.c
+    ../../LVGL/lvgl/src/stdlib/*.c
+    ../../LVGL/lvgl/src/stdlib/**/*.c
+    ../../LVGL/lvgl/src/themes/*.c
+    ../../LVGL/lvgl/src/themes/**/*.c
+    ../../LVGL/lvgl/src/tick/*.c
+    ../../LVGL/lvgl/src/widgets/**/*.c
 
-    ../../LVGL/lvgl-9.3.0/demos/*.c
-    ../../LVGL/lvgl-9.3.0/demos/widgets/*.c
-    ../../LVGL/lvgl-9.3.0/demos/widgets/**/*.c
+    ../../LVGL/lvgl/demos/*.c
+    ../../LVGL/lvgl/demos/**/*.c
+    ../../LVGL/lvgl/demos/**/**/*.c
 )
 
 target_include_directories(stm32cubemx INTERFACE
@@ -65,33 +69,37 @@ target_include_directories(stm32cubemx INTERFACE
     ../../FreeRTOS/Inc
     ../../FreeRTOS/portable/GCC/ARM_CM4F
 
-    ../../LVGL/lvgl-9.3.0
-    ../../LVGL/lvgl-9.3.0/src
-    ../../LVGL/lvgl-9.3.0/src/core
-    ../../LVGL/lvgl-9.3.0/src/display
-    ../../LVGL/lvgl-9.3.0/src/draw
-    ../../LVGL/lvgl-9.3.0/src/draw/**
-    ../../LVGL/lvgl-9.3.0/src/font
-    ../../LVGL/lvgl-9.3.0/src/indev
-    ../../LVGL/lvgl-9.3.0/src/layout
-    ../../LVGL/lvgl-9.3.0/src/layout/**
-    ../../LVGL/lvgl-9.3.0/src/libs/**
-    ../../LVGL/lvgl-9.3.0/src/misc
-    ../../LVGL/lvgl-9.3.0/src/misc/**
-    ../../LVGL/lvgl-9.3.0/src/misc/**/**
-    ../../LVGL/lvgl-9.3.0/src/osal/
-    ../../LVGL/lvgl-9.3.0/src/others/**
-    ../../LVGL/lvgl-9.3.0/src/others/**
-    ../../LVGL/lvgl-9.3.0/src/stdlibs
-    ../../LVGL/lvgl-9.3.0/src/stdlibs/**
-    ../../LVGL/lvgl-9.3.0/src/themes
-    ../../LVGL/lvgl-9.3.0/src/themes/**
-    ../../LVGL/lvgl-9.3.0/src/tick
-    ../../LVGL/lvgl-9.3.0/src/widgets/**
+    ../../LVGL
+    ../../LVGL/lvgl
+    ../../LVGL/lvgl/src
+    ../../LVGL/lvgl/src/core
+    ../../LVGL/lvgl/src/display
+    ../../LVGL/lvgl/src/draw
+    ../../LVGL/lvgl/src/draw/sw
+    ../../LVGL/lvgl/src/draw/sw/blend
+    # ../../LVGL/lvgl/src/draw/**
+    # ../../LVGL/lvgl/src/draw/**/**
+    # ../../LVGL/lvgl/src/draw/**/**/**
+    ../../LVGL/lvgl/src/font
+    ../../LVGL/lvgl/src/indev
+    ../../LVGL/lvgl/src/layouts
+    ../../LVGL/lvgl/src/layouts/**
+    ../../LVGL/lvgl/src/libs/**
+    ../../LVGL/lvgl/src/misc
+    ../../LVGL/lvgl/src/misc/**
+    ../../LVGL/lvgl/src/misc/**/**
+    ../../LVGL/lvgl/src/osal/
+    ../../LVGL/lvgl/src/others/**
+    ../../LVGL/lvgl/src/others/**
+    ../../LVGL/lvgl/src/stdlib
+    ../../LVGL/lvgl/src/stdlib/**
+    ../../LVGL/lvgl/src/themes
+    ../../LVGL/lvgl/src/themes/**
+    ../../LVGL/lvgl/src/tick
+    ../../LVGL/lvgl/src/widgets/**
 
-    ../../LVGL/lvgl-9.3.0/demos/**
-    ../../LVGL/lvgl-9.3.0/demos/widgets/**
-    # ../../LVGL/lvgl-9.3.0/demos/widgets/**/**
+    ../../LVGL/lvgl/demos
+    ../../LVGL/lvgl/demos/**
 
     ../../APP/Debug_Linker/RTT/Inc
     ../../APP/Multi_Button/Inc

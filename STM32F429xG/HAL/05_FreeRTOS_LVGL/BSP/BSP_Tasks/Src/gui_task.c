@@ -4,18 +4,38 @@
 #include "tasks_sync.h"
 #include "touch_task.h"
 
+#include "lv_demos.h"
+#include "lv_port_disp.h"
+#include "lv_port_indev.h"
+#include "lvgl.h"
+
 TaskHandle_t GUITask_Handler; // 任务句柄
 
 void vGUITask(void *pvParameters)
 {
     (void)pvParameters; // 明确标记未使用参数
 
+    tp_dev.touchtype = 0; // 触摸屏 设为横屏
+
+    lv_demo_widgets();
+    // lv_demo_scroll();
+    // lv_demo_benchmark();
+    // lv_demo_music();
+
+    // lv_obj_t *switch_obj1 = lv_switch_create(lv_screen_active());
+    // lv_obj_set_size(switch_obj1, 120, 60);
+    // lv_obj_align(switch_obj1, LV_ALIGN_CENTER, 0, 0);
+
+    // lv_obj_t *switch_obj2 = lv_switch_create(lv_screen_active());
+    // lv_obj_set_size(switch_obj2, 120, 60);
+    // lv_obj_align(switch_obj2, LV_ALIGN_TOP_MID, 0, 0);
+
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
+#if 0
         static int lineflag = 0;
-        // uint32_t taskEnterTime = FreeRTOSRunTimeTicks;
 
         Button key_temp;
         if (xQueueReceive(xQueue_KEY, &key_temp, 0) == pdPASS)
@@ -77,38 +97,34 @@ void vGUITask(void *pvParameters)
             LTDC_Show_String_sprintf(400, 0, 400, 240, 12, (u8 *)CPU_RunInfo, 0, GUI_Black);
         }
 
-        char touch_temp[Touch_Data_Len];
+        _m_tp_dev touch_temp;
         if (xQueueReceive(xQueue_Touch, &touch_temp, 0) == pdPASS)
         {
             uint16_t xp = 0;
             uint16_t yp = 0;
-            uint16_t tp = 0;
-            for (int i = 0; i < Touch_Other_Reg_Data_Len; i++)
+            LTDC_Show_Num(400, 240, touch_temp.sta, 3, 12, 0, GUI_Red);
+            LTDC_Show_Num(400 + 6 + 6 * 3, 240, touch_temp.touchtype, 3, 12, 0, GUI_Red);
+            for (int j = 0; j < (CT_MAX_TOUCH / 5); j++)
             {
-                LTDC_Show_Num(400 + xp, 240, touch_temp[i], 3, 12, 0, GUI_Red);
-                xp += 6 * 3;
-                LTDC_Show_Char(400 + xp, 240, ',', 12, 0, GUI_Black);
-                xp += 6;
-            }
-            xp = yp = tp = 0;
-            for (int j = 0; j < Touch_Finger_Set; j++)
-            {
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < 5; i++)
                 {
-                    LTDC_Show_Num(400 + xp, 240 + 12 + yp, touch_temp[Touch_Other_Reg_Data_Len + tp], 3, 12, 0, GUI_Black);
-                    tp++;
+                    LTDC_Show_Num(400 + xp, 240 + 12 + yp, touch_temp.x[i + j * 5], 3, 12, 0, GUI_Black);
                     xp += 6 * 3;
                     LTDC_Show_Char(400 + xp, 240 + 12 + yp, ',', 12, 0, GUI_Black);
-                    xp += 6;
+                    xp += 6 * 1;
+                    LTDC_Show_Num(400 + xp, 240 + 12 + yp, touch_temp.y[i + j * 5], 3, 12, 0, GUI_Black);
+                    xp += 6 * 3;
+                    LTDC_Show_Char(400 + xp, 240 + 12 + yp, ' ', 12, 0, GUI_Black);
+                    xp += 6 * 1;
                 }
                 xp = 0;
                 yp += 12;
             }
         }
-
-        // uint32_t taskExecuteCycles = FreeRTOSRunTimeTicks - taskEnterTime;
-        // float taskExecuteMs = taskExecuteCycles * (1.0 / 20000.0);
-        // LTDC_Show_float(0, 0, taskExecuteMs, 3, 3, 12, 0, GUI_Black); // 显示实际耗时ms
         vTaskDelayUntil(&xLastWakeTime, GUI_TaskCycleTime_ms); // 大致125Hz
+#else
+        lv_timer_handler();
+        vTaskDelayUntil(&xLastWakeTime, 5);
+#endif
     }
 }

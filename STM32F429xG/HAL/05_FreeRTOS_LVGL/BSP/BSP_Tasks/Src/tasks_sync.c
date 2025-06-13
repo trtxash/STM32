@@ -20,7 +20,7 @@ void vSyncResources_Init(void)
     xQueue_ADC_Bat = xQueueCreate(ADCQueueLen, sizeof(float));
     xQueue_ADC_BatVolt = xQueueCreate(ADCQueueLen, sizeof(float));
     xQueue_CPU = xQueueCreate(CPUQueueLen, sizeof(CPU_RunInfo));
-    xQueue_Touch = xQueueCreate(TouchQueueLen, sizeof(Touch_Data));
+    xQueue_Touch = xQueueCreate(TouchQueueLen, sizeof(_m_tp_dev));
 
     xSemaphore_ADC = xSemaphoreCreateBinary();       
     xSemaphore_Touch_i2c = xSemaphoreCreateBinary(); 

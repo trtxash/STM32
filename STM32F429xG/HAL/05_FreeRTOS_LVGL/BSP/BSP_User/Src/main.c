@@ -19,6 +19,17 @@
 #include "sdram.h"
 #include "start_task.h"
 
+#include "lv_port_disp.h"
+#include "lv_port_indev.h"
+#include "lvgl.h"
+
+#include "log_rtt.h"
+
+static void my_log_cb(lv_log_level_t level, const char *buf)
+{
+    LOGW("%s", buf);
+}
+
 /**
  * @brief	板级初始化函数
  * @param 	无
@@ -51,6 +62,13 @@ static void bsp_init(void)
     LCD_Init();
     // FT5xxx_Init_Soft();
     FT5xxx_Init_Hard();
+
+    lv_init();
+    lv_port_disp_init();
+    lv_port_indev_init();
+    lv_tick_set_cb(HAL_GetTick); // 初始化系统时钟回调函数
+    lv_delay_set_cb(delay_ms);
+    lv_log_register_print_cb(my_log_cb);
 }
 
 /**

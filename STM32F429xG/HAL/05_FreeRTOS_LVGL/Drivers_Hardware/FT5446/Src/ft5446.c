@@ -227,85 +227,77 @@ uint8_t FT5xxx_Init_Hard(void)
     }
 }
 
-// // 扫描触摸屏(采用查询方式)
-// // mode:0,正常扫描.
-// // 返回值:当前触屏状态.
-// // 0,触屏无触摸;1,触屏有触摸
-// uint8_t FT5xxx_Scan(uint8_t mode)
-// {
-//     uint8_t buf[4];
-//     uint8_t i = 0;
-//     uint8_t res = 0;
-//     uint8_t temp;
-//     uint16_t tempsta;
-//     static uint8_t t = 0; // 控制查询间隔,从而降低CPU占用率
-//     t++;
-//     if ((t % 10) == 0 || t < 10) // 空闲时,每进入10次CTP_Scan函数才检测1次,从而节省CPU使用率
-//     {
-//         FT5xxx_RD_Reg(FT_REG_NUM_FINGER, &mode, 1); // 读取触摸点的状态
-//         if ((mode & 0XF) && ((mode & 0XF) <= CT_MAX_TOUCH))
-//         {
-//             temp = 0XFF << (mode & 0XF); // 将点的个数转换为1的位数,匹配tp_dev.sta定义
-//             tempsta = tp_dev.sta;        // 保存当前的tp_dev.sta值
-//             tp_dev.sta = (~temp) | TP_PRES_DOWN | TP_CATH_PRES;
-//             tp_dev.x[CT_MAX_TOUCH - 1] = tp_dev.x[0]; // 保存触点0的数据,保存在最后一个上
-//             tp_dev.y[CT_MAX_TOUCH - 1] = tp_dev.y[0];
-//             // delay_1ms(4);    //必要的延时，否则老是认为有按键按下
-//             for (i = 0; i < CT_MAX_TOUCH; i++)
-//             {
-//                 if (tp_dev.sta & (1 << i)) // 触摸有效?
-//                 {
-//                     FT5xxx_RD_Reg(FT5xxx_TPX_TBL[i], buf, 4); // 读取XY坐标值
-//                     if (tp_dev.touchtype & 0X01)              // 横屏
-//                     {
-//                         tp_dev.y[i] = ((uint16_t)(buf[0] & 0X0F) << 8) + buf[1];
-//                         tp_dev.x[i] = ((uint16_t)(buf[2] & 0X0F) << 8) + buf[3];
-//                     }
-//                     else
-//                     {
-//                         tp_dev.x[i] = (((uint16_t)(buf[0] & 0X0F) << 8) + buf[1]);
-//                         tp_dev.y[i] = ((uint16_t)(buf[2] & 0X0F) << 8) + buf[3];
-//                     }
-//                 }
-//             }
-//             res = 1;
-//             if (tp_dev.x[0] > ACTIVE_WIDTH || tp_dev.y[0] > ACTIVE_HEIGHT) // 非法数据(坐标超出了)
-//             {
-//                 if ((mode & 0XF) >
-//                     1) // 有其他点有数据,则复第二个触点的数据到第一个触点.
-//                 {
-//                     tp_dev.x[0] = tp_dev.x[1];
-//                     tp_dev.y[0] = tp_dev.y[1];
-//                     t = 0; // 触发一次,则会最少连续监测10次,从而提高命中率
-//                 }
-//                 else // 非法数据,则忽略此次数据(还原原来的)
-//                 {
-//                     tp_dev.x[0] = tp_dev.x[CT_MAX_TOUCH - 1];
-//                     tp_dev.y[0] = tp_dev.y[CT_MAX_TOUCH - 1];
-//                     mode = 0X80;
-//                     tp_dev.sta = tempsta; // 恢复tp_dev.sta
-//                 }
-//             }
-//             else
-//                 t = 0; // 触发一次,则会最少连续监测10次,从而提高命中率
-//         }
-//     }
+// 扫描触摸屏(采用查询方式)
+// buff ,读出的数据存放地址.
+// 返回值:当前触屏状态.
+// 0,触屏无触摸;1,触屏有触摸
+uint8_t FT5xxx_Scan(uint8_t *buff)
+{
+    uint8_t buf[4];
+    uint8_t res = 0;
+    uint8_t temp;
+    uint16_t tempsta;
 
-//     if ((mode & 0X1F) == 0) // 无触摸点按下
-//     {
-//         if (tp_dev.sta & TP_PRES_DOWN) // 之前是被按下的
-//         {
-//             tp_dev.sta &= ~TP_PRES_DOWN; // 标记按键松开
-//         }
-//         else // 之前就没有被按下
-//         {
-//             tp_dev.x[0] = 0xffff;
-//             tp_dev.y[0] = 0xffff;
-//             tp_dev.sta &= 0XE0; // 清除点有效标记
-//         }
-//     }
+    if ((*(buff + Touch_Other_Reg_Data_Len - 1) & 0XF) && ((*(buff + Touch_Other_Reg_Data_Len - 1) & 0XF) <= CT_MAX_TOUCH))
+    {
+        temp = 0XFF << (*(buff + Touch_Other_Reg_Data_Len - 1) & 0XF); // 将点的个数转换为1的位数,匹配tp_dev.sta定义
+        tempsta = tp_dev.sta;                                          // 保存当前的tp_dev.sta值
+        tp_dev.sta = (~temp) | TP_PRES_DOWN | TP_CATH_PRES;
+        tp_dev.x[CT_MAX_TOUCH - 1] = tp_dev.x[0]; // 保存触点0的数据,保存在最后一个上
+        tp_dev.y[CT_MAX_TOUCH - 1] = tp_dev.y[0];
 
-//     if (t > 240)
-//         t = 10; // 重新从10开始计数
-//     return res;
-// }
+        for (uint8_t i = 0; i < CT_MAX_TOUCH; i++)
+        {
+            if (tp_dev.sta & (1 << i)) // 触摸有效?
+            {
+                for (uint8_t j = 0; j < 4; j++) // 读取坐标值
+                {
+                    buf[j] = buff[Touch_Other_Reg_Data_Len + j + i * 6];
+                }
+                if (tp_dev.touchtype & 0X01) // 横屏
+                {
+                    tp_dev.y[i] = ((uint16_t)(buf[0] & 0X0F) << 8) + buf[1];
+                    tp_dev.x[i] = ((uint16_t)(buf[2] & 0X0F) << 8) + buf[3];
+                }
+                else
+                {
+                    tp_dev.x[i] = (((uint16_t)(buf[0] & 0X0F) << 8) + buf[1]);
+                    tp_dev.y[i] = ((uint16_t)(buf[2] & 0X0F) << 8) + buf[3];
+                }
+            }
+        }
+        res = 1;
+        if (tp_dev.x[0] > ACTIVE_WIDTH || tp_dev.y[0] > ACTIVE_HEIGHT) // 非法数据(坐标超出了)
+        {
+            if ((*buff & 0XF) > 1) // 有其他点有数据,则复第二个触点的数据到第一个触点.
+            {
+                tp_dev.x[0] = tp_dev.x[1];
+                tp_dev.y[0] = tp_dev.y[1];
+                // t = 0; // 触发一次,则会最少连续监测10次,从而提高命中率
+            }
+            else // 非法数据,则忽略此次数据(还原原来的)
+            {
+                tp_dev.x[0] = tp_dev.x[CT_MAX_TOUCH - 1];
+                tp_dev.y[0] = tp_dev.y[CT_MAX_TOUCH - 1];
+                *buff = 0X80;
+                tp_dev.sta = tempsta; // 恢复tp_dev.sta
+            }
+        }
+    }
+
+    if ((*buff & 0X1F) == 0) // 无触摸点按下
+    {
+        if (tp_dev.sta & TP_PRES_DOWN) // 之前是被按下的
+        {
+            tp_dev.sta &= ~TP_PRES_DOWN; // 标记按键松开
+        }
+        else // 之前就没有被按下
+        {
+            tp_dev.x[0] = 0xffff;
+            tp_dev.y[0] = 0xffff;
+            tp_dev.sta &= 0XE0; // 清除点有效标记
+        }
+    }
+
+    return res;
+}

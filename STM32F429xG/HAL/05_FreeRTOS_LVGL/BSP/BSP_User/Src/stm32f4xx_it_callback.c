@@ -7,6 +7,7 @@
 #include "tasks_sync.h"
 #include "tim.h"
 #include "touch_task.h"
+#include "lv_tick.h"
 
 #if SYSTEM_SUPPORT_OS
 

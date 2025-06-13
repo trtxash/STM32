@@ -43,7 +43,10 @@ extern "C"
 // 定义颜色像素格式,一般用RGB565
 #define LCD_PIXFORMAT LCD_PIXEL_FORMAT_RGB565
 // LCD帧缓冲区首地址,这里定义在SDRAM里面.
-#define LCD_FRAME_BUF_ADDR Bank5_SDRAM_ADDR
+#define LCD_FRAME_BUF_ADDR_1 Bank5_SDRAM_ADDR
+#if LCD_PIXEL_FORMAT_RGB565 == LCD_PIXEL_FORMAT_RGB565
+#define LCD_FRAME_BUF_ADDR_2 (LCD_FRAME_BUF_ADDR_1 + ACTIVE_WIDTH * ACTIVE_HEIGHT * 2)
+#endif
 
 #if LCD_PIXFORMAT == LCD_PIXEL_FORMAT_RGB565
 //---------------------颜色表--------------------
@@ -210,7 +213,6 @@ extern "C"
 
     extern _ltdc_dev lcdltdc; // 管理LCD LTDC参数
 
-    extern u16 *ltdc_lcd_framebuf; // LTDC LCD帧缓存数组指针,必须指向对应大小的内存区域
     extern u32 *ltdc_framebuf[2];
 
     void LCD_BLK_Init(void);

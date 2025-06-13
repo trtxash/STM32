@@ -19,6 +19,10 @@
 #define FT_CMD_WR  (FT_ADDRESS << 1U)         // 写命令
 #define FT_CMD_RD  (FT_ADDRESS << 1U | 0x01U) // 读命令
 
+// FT5xxx 寄存器缓冲区长度定义
+#define Touch_Other_Reg_Data_Len 3
+#define Touch_Data_Len           (Touch_Other_Reg_Data_Len + CT_MAX_TOUCH * 6)
+
 // FT5xxx 部分寄存器定义
 #define FT_DEVIDE_MODE    0x00 // FT5xxx模式控制寄存器
 #define FT_REG_NUM_FINGER 0x02 // 触摸状态寄存器
@@ -35,7 +39,8 @@
 
 #define TP_PRES_DOWN 0x80 // 触屏被按下
 #define TP_CATH_PRES 0x40 // 有按键按下了
-#define CT_MAX_TOUCH 10    // 电容屏支持的点数,固定为5点
+#define CT_MAX_TOUCH 5    // 电容屏支持的点数
+
 // 触摸屏控制器
 typedef struct
 {
@@ -44,11 +49,18 @@ typedef struct
     // void (*adjust)(void);     // 触摸屏校准
     uint16_t x[CT_MAX_TOUCH]; // 当前坐标
     uint16_t y[CT_MAX_TOUCH]; // 电容屏有最多5组坐标,电阻屏则用x[0],y[0]代表:此次扫描时,触屏的坐标,用
-    uint8_t sta;              // 笔的状态
-    float xfac;
-    float yfac;
-    short xoff;
-    short yoff;
+
+    // sta笔的状态
+    // b7:按下1/松开0;
+    // b6:0,没有按键按下;1,有按键按下.
+    // b5:保留
+    // b4~b0:电容触摸屏按下的点数(0,表示未按下,1表示按下)
+    uint8_t sta;
+
+    // float xfac;
+    // float yfac;
+    // short xoff;
+    // short yoff;
     uint8_t touchtype;
 } _m_tp_dev;
 extern _m_tp_dev tp_dev; // 触屏控制器在touch.c里面定义
@@ -58,6 +70,6 @@ extern _m_tp_dev tp_dev; // 触屏控制器在touch.c里面定义
 // void FT5xxx_RD_Reg(uint16_t reg, uint8_t *buf, uint8_t len);
 // uint8_t FT5xxx_Init_Soft(void);
 uint8_t FT5xxx_Init_Hard(void);
-// uint8_t FT5xxx_Scan(uint8_t mode);
+uint8_t FT5xxx_Scan(uint8_t *buff);
 
 #endif

@@ -40,7 +40,7 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
-#define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_MALLOC    LV_STDLIB_CLIB
 
 /** Possible values
  * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
@@ -49,7 +49,7 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
-#define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_STRING    LV_STDLIB_CLIB
 
 /** Possible values
  * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
@@ -58,7 +58,7 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
-#define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_SPRINTF   LV_STDLIB_CLIB
 
 #define LV_STDINT_INCLUDE       <stdint.h>
 #define LV_STDDEF_INCLUDE       <stddef.h>
@@ -107,7 +107,7 @@
  * - LV_OS_MQX
  * - LV_OS_SDL2
  * - LV_OS_CUSTOM */
-#define LV_USE_OS   LV_OS_NONE
+#define LV_USE_OS   LV_OS_FREERTOS
 
 #if LV_USE_OS == LV_OS_CUSTOM
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
@@ -174,16 +174,16 @@
      * - bitmaps with transparency may use ARGB8888
      */
     #define LV_DRAW_SW_SUPPORT_RGB565       1
-    #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED       1
-    #define LV_DRAW_SW_SUPPORT_RGB565A8     1
-    #define LV_DRAW_SW_SUPPORT_RGB888       1
-    #define LV_DRAW_SW_SUPPORT_XRGB8888     1
-    #define LV_DRAW_SW_SUPPORT_ARGB8888     1
-    #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 1
-    #define LV_DRAW_SW_SUPPORT_L8           1
-    #define LV_DRAW_SW_SUPPORT_AL88         1
-    #define LV_DRAW_SW_SUPPORT_A8           1
-    #define LV_DRAW_SW_SUPPORT_I1           1
+    #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED       0
+    #define LV_DRAW_SW_SUPPORT_RGB565A8     0
+    #define LV_DRAW_SW_SUPPORT_RGB888       0
+    #define LV_DRAW_SW_SUPPORT_XRGB8888     0
+    #define LV_DRAW_SW_SUPPORT_ARGB8888     0
+    #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 0
+    #define LV_DRAW_SW_SUPPORT_L8           0
+    #define LV_DRAW_SW_SUPPORT_AL88         0
+    #define LV_DRAW_SW_SUPPORT_A8           0
+    #define LV_DRAW_SW_SUPPORT_I1           0
 
     /* The threshold of the luminance to consider a pixel as
      * active in indexed color format */
@@ -366,7 +366,7 @@
  *-----------*/
 
 /** Enable log module */
-#define LV_USE_LOG 0
+#define LV_USE_LOG 1
 #if LV_USE_LOG
     /** Set value to one of the following levels of logging detail:
      *  - LV_LOG_LEVEL_TRACE    Log detailed information.

@@ -11,17 +11,9 @@
 #include "task.h"
 #endif
 
-// #include "lv_port_disp.h"
+u32 *ltdc_framebuf[2] = {(u32 *)LCD_FRAME_BUF_ADDR_1, (u32 *)LCD_FRAME_BUF_ADDR_2}; // 定义LTDC LCD帧缓存数组指针数组
 
-// 根据不同的颜色格式,定义帧缓存数组
-#if LCD_PIXFORMAT == LCD_PIXFORMAT_ARGB8888 || LCD_PIXFORMAT == LCD_PIXFORMAT_RGB888
-u32 *ltdc_lcd_framebuf = (u16 *)LCD_FRAME_BUF_ADDR; // LTDC LCD帧缓存数组指针,必须指向对应大小的内存区域
-#else
-u16 *ltdc_lcd_framebuf = (u16 *)LCD_FRAME_BUF_ADDR; // LTDC LCD帧缓存数组指针,必须指向对应大小的内存区域u16 ltdc_lcd_framebuf[1280][800] __attribute__((at(LCD_FRAME_BUF_ADDR))); // 定义最大屏分辨率时,LCD所需的帧缓存数组大小
-#endif
-
-u32 *ltdc_framebuf[2];
-_ltdc_dev lcdltdc; // 管理LCD LTDC的重要参数
+_ltdc_dev lcdltdc;                                                                  // 管理LCD LTDC的重要参数
 
 /**
  * @brief	LCD的blk背光IO初始化
