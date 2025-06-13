@@ -12,6 +12,8 @@
 #include "lv_port_indev.h"
 #include "touch_task.h"
 
+extern _m_tp_dev GUITask_TouchData;
+
 /*********************
  *      DEFINES
  *********************/
@@ -205,19 +207,18 @@ static void touchpad_read(lv_indev_t *indev_drv, lv_indev_data_t *data)
 static bool touchpad_is_pressed(void)
 {
     /*Your code comes here*/
-    if (Touch_Data[2] == 0 || Touch_Data[2] == 255)
-        return false;
-    else
+    if (GUITask_TouchData.sta) // 触屏被按下
         return true;
+    else
+        return false;
 }
 
 /*Get the x and y coordinates if the touchpad is pressed*/
 static void touchpad_get_xy(int32_t *x, int32_t *y)
 {
     /*Your code comes here*/
-
-    (*x) = tp_dev.x[0];
-    (*y) = tp_dev.y[0];
+    (*x) = GUITask_TouchData.x[0];
+    (*y) = GUITask_TouchData.y[0];
 }
 
 /*------------------

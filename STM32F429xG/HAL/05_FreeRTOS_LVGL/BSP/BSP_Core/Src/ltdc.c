@@ -77,7 +77,8 @@ void LTDC_Init(void)
     LTDC_Layer_Parameter_Config(0, (u32)ltdc_framebuf[0], LCD_PIXFORMAT, 255, 0, 6, 7, 0X000000); // 层参数配置
     LTDC_Layer_Window_Config(0, 0, 0, lcdltdc.pwidth, lcdltdc.pheight);                           // 层窗口配置,以LCD面板坐标系为基准,不要随便修改!
 
-    LTDC_Display_Dir(1);
+    LTDC_Display_Dir(1); // 设置显示方向为横屏
+
     LTDC_Select_Layer(0);   // 选择第1层
     LCD_BLK_Set();          // 点亮背光
     LTDC_Clear(0XFFFFFFFF); // 清屏

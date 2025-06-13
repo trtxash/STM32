@@ -37,9 +37,7 @@
 #define FT_ID_G_THGROUP      0x80 // 触摸有效值设置寄存器
 #define FT_ID_G_PERIODACTIVE 0x88 // 激活状态周期设置寄存器
 
-#define TP_PRES_DOWN 0x80 // 触屏被按下
-#define TP_CATH_PRES 0x40 // 有按键按下了
-#define CT_MAX_TOUCH 5    // 电容屏支持的点数
+#define CT_MAX_TOUCH 10     // 电容屏支持的点数
 
 // 触摸屏控制器
 typedef struct
@@ -51,11 +49,8 @@ typedef struct
     uint16_t y[CT_MAX_TOUCH]; // 电容屏有最多5组坐标,电阻屏则用x[0],y[0]代表:此次扫描时,触屏的坐标,用
 
     // sta笔的状态
-    // b7:按下1/松开0;
-    // b6:0,没有按键按下;1,有按键按下.
-    // b5:保留
-    // b4~b0:电容触摸屏按下的点数(0,表示未按下,1表示按下)
-    uint8_t sta;
+    // b15~b0:电容触摸屏按下的点数(0,表示未按下,1表示按下)
+    uint16_t sta;
 
     // float xfac;
     // float yfac;

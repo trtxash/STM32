@@ -1319,7 +1319,7 @@
 #define LV_BUILD_EXAMPLES 1
 
 /** Build the demos */
-#define LV_BUILD_DEMOS 1
+#define LV_BUILD_DEMOS 0
 
 /*===================
  * DEMO USAGE

@@ -4,31 +4,32 @@
 #include "tasks_sync.h"
 #include "touch_task.h"
 
-#include "lv_demos.h"
+// #include "lv_demos.h"
 #include "lv_port_disp.h"
 #include "lv_port_indev.h"
 #include "lvgl.h"
 
 TaskHandle_t GUITask_Handler; // 任务句柄
+_m_tp_dev GUITask_TouchData = {0};
 
 void vGUITask(void *pvParameters)
 {
     (void)pvParameters; // 明确标记未使用参数
 
-    tp_dev.touchtype = 0; // 触摸屏 设为横屏
+    tp_dev.touchtype = 1; // 触摸屏 设为横屏
 
-    lv_demo_widgets();
+    // lv_demo_widgets();
     // lv_demo_scroll();
     // lv_demo_benchmark();
     // lv_demo_music();
 
-    // lv_obj_t *switch_obj1 = lv_switch_create(lv_screen_active());
-    // lv_obj_set_size(switch_obj1, 120, 60);
-    // lv_obj_align(switch_obj1, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_t *switch_obj1 = lv_switch_create(lv_screen_active());
+    lv_obj_set_size(switch_obj1, 120, 60);
+    lv_obj_align(switch_obj1, LV_ALIGN_CENTER, 0, 0);
 
-    // lv_obj_t *switch_obj2 = lv_switch_create(lv_screen_active());
-    // lv_obj_set_size(switch_obj2, 120, 60);
-    // lv_obj_align(switch_obj2, LV_ALIGN_TOP_MID, 0, 0);
+    lv_obj_t *switch_obj2 = lv_switch_create(lv_screen_active());
+    lv_obj_set_size(switch_obj2, 120, 60);
+    lv_obj_align(switch_obj2, LV_ALIGN_TOP_MID, 0, 0);
 
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
@@ -123,6 +124,9 @@ void vGUITask(void *pvParameters)
         }
         vTaskDelayUntil(&xLastWakeTime, GUI_TaskCycleTime_ms); // 大致125Hz
 #else
+        if (xQueueReceive(xQueue_Touch, &GUITask_TouchData, 0) == pdPASS)
+        {
+        }
         lv_timer_handler();
         vTaskDelayUntil(&xLastWakeTime, 5);
 #endif
