@@ -7,6 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_benchmark.h"
+#include "lv_draw_private.h"
+#include "../others/sysmon/lv_sysmon_private.h"
+#include "lv_display_private.h"
 
 #if LV_USE_DEMO_BENCHMARK
 

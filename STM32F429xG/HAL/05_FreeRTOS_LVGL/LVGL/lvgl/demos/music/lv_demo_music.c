@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_music.h"
+#include "lv_display_private.h"
 
 #if LV_USE_DEMO_MUSIC
 

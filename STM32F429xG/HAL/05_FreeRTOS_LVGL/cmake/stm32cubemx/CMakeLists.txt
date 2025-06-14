@@ -9,6 +9,7 @@ enable_language(C ASM)
 target_compile_definitions(stm32cubemx INTERFACE
     USE_HAL_DRIVER
     STM32F429xx
+    STM32F4
     $<$<CONFIG:Debug>:DEBUG>
 )
 
@@ -42,7 +43,7 @@ file(GLOB LVGL_SOURCES
     ../../LVGL/lvgl/src/misc/**/**/*.c
     ../../LVGL/lvgl/src/osal/*.c
     ../../LVGL/lvgl/src/others/**/*.c
-    ../../LVGL/lvgl/src/others/**/**/*.c
+    # ../../LVGL/lvgl/src/others/**/**/*.c
     ../../LVGL/lvgl/src/stdlib/*.c
     ../../LVGL/lvgl/src/stdlib/**/*.c
     ../../LVGL/lvgl/src/themes/*.c
@@ -90,7 +91,7 @@ target_include_directories(stm32cubemx INTERFACE
     ../../LVGL/lvgl/src/misc/**/**
     ../../LVGL/lvgl/src/osal/
     ../../LVGL/lvgl/src/others/**
-    ../../LVGL/lvgl/src/others/**
+    # ../../LVGL/lvgl/src/others/**/**
     ../../LVGL/lvgl/src/stdlib
     ../../LVGL/lvgl/src/stdlib/**
     ../../LVGL/lvgl/src/themes

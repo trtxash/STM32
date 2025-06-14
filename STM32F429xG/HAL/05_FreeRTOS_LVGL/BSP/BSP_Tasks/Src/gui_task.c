@@ -4,7 +4,7 @@
 #include "tasks_sync.h"
 #include "touch_task.h"
 
-// #include "lv_demos.h"
+#include "lv_demos.h"
 #include "lv_port_disp.h"
 #include "lv_port_indev.h"
 #include "lvgl.h"
@@ -20,16 +20,16 @@ void vGUITask(void *pvParameters)
 
     // lv_demo_widgets();
     // lv_demo_scroll();
-    // lv_demo_benchmark();
+    lv_demo_benchmark();
     // lv_demo_music();
 
-    lv_obj_t *switch_obj1 = lv_switch_create(lv_screen_active());
-    lv_obj_set_size(switch_obj1, 120, 60);
-    lv_obj_align(switch_obj1, LV_ALIGN_CENTER, 0, 0);
+    // lv_obj_t *switch_obj1 = lv_switch_create(lv_screen_active());
+    // lv_obj_set_size(switch_obj1, 120, 60);
+    // lv_obj_align(switch_obj1, LV_ALIGN_CENTER, 0, 0);
 
-    lv_obj_t *switch_obj2 = lv_switch_create(lv_screen_active());
-    lv_obj_set_size(switch_obj2, 120, 60);
-    lv_obj_align(switch_obj2, LV_ALIGN_TOP_MID, 0, 0);
+    // lv_obj_t *switch_obj2 = lv_switch_create(lv_screen_active());
+    // lv_obj_set_size(switch_obj2, 120, 60);
+    // lv_obj_align(switch_obj2, LV_ALIGN_TOP_MID, 0, 0);
 
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();

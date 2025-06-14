@@ -13,7 +13,7 @@
 
 u32 *ltdc_framebuf[2] = {(u32 *)LCD_FRAME_BUF_ADDR_1, (u32 *)LCD_FRAME_BUF_ADDR_2}; // 定义LTDC LCD帧缓存数组指针数组
 
-_ltdc_dev lcdltdc;                                                                  // 管理LCD LTDC的重要参数
+_ltdc_dev lcdltdc; // 管理LCD LTDC的重要参数
 
 /**
  * @brief	LCD的blk背光IO初始化
@@ -48,7 +48,7 @@ void LCD_BLK_Init(void)
 void LCD_Init(void)
 {
     LCD_BLK_Init(); // 背光IO初始化
-    LTDC_Init();    // LTDC初始化,LTDC 25MHz时钟,分辨率为800*480,16bit;计算得到刷新率38.27fps,带宽29.39MB/s
+    LTDC_Init();
 }
 
 // LTDC,基本参数设置.

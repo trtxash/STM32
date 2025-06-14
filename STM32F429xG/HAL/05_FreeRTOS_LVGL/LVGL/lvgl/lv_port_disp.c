@@ -11,7 +11,8 @@
  *********************/
 #include "lv_port_disp.h"
 #include "lcd.h"
-#include <stdbool.h>
+#include "ltdc.h"
+#include <string.h>
 
 /*********************
  *      DEFINES
@@ -94,7 +95,7 @@ void lv_port_disp_init(void)
     static uint8_t buf_3_2[MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL];
     lv_display_set_buffers(disp, buf_3_1, buf_3_2, sizeof(buf_3_1), LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif
-    lv_display_set_buffers(disp, (uint8_t *)ltdc_framebuf[0], NULL, MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_buffers(disp, (uint8_t *)ltdc_framebuf[0], (uint8_t *)ltdc_framebuf[1], MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL, LV_DISPLAY_RENDER_MODE_FULL);
 }
 
 /**********************
@@ -132,8 +133,20 @@ static void disp_flush(lv_display_t *disp_drv, const lv_area_t *area, uint8_t *p
 {
     if (disp_flush_enabled)
     {
+#if 0
         /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
         LTDC_Color_Fill(area->x1, area->y1, area->x2, area->y2, (uint16_t *)px_map);
+#endif
+        // if (lv_display_flush_is_last(disp_drv))
+        // {
+        //     while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS))
+        //         ;
+        //     HAL_LTDC_SetAddress(&hltdc, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
+        // }
+
+        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS))
+            ;
+        HAL_LTDC_SetAddress(&hltdc, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
     }
 
     /*IMPORTANT!!!

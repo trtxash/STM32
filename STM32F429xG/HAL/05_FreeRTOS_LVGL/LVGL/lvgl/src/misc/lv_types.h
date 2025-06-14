@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "lv_conf.h"
 
 #ifndef __ASSEMBLY__
 #include LV_STDINT_INCLUDE
