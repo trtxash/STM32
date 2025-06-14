@@ -232,15 +232,7 @@ typedef void (*pDMA2D_CallbackTypeDef)(DMA2D_HandleTypeDef *hdma2d); /*!< Pointe
   */
 #define DMA2D_NO_MODIF_ALPHA        0x00000000U  /*!< No modification of the alpha channel value                     */
 #define DMA2D_REPLACE_ALPHA         0x00000001U  /*!< Replace original alpha channel value by programmed alpha value */
-#define DMA2D_COMBINE_ALPHA         0x00000002U  /*!< Replace original alpha channel value by programmed alpha value
-                                                      with original alpha channel value                              */
-/**
-  * @}
-  */
-
-
-
-
+#define DMA2D_COMBINE_ALPHA         0x00000002U  /*!< Replace original alpha channel value by programmed alpha valuewith original alpha channel value */
 
 
 /** @defgroup DMA2D_CLUT_CM DMA2D CLUT Color Mode

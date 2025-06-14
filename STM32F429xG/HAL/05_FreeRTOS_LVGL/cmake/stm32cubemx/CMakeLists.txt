@@ -27,12 +27,12 @@ file(GLOB LVGL_SOURCES
     ../../LVGL/lvgl/src/*.c
     ../../LVGL/lvgl/src/core/*.c
     ../../LVGL/lvgl/src/display/*.c
+    # ../../LVGL/lvgl/src/draw/*.c
+    # ../../LVGL/lvgl/src/draw/sw/*.c
+    # ../../LVGL/lvgl/src/draw/sw/blend/*.c
     ../../LVGL/lvgl/src/draw/*.c
-    ../../LVGL/lvgl/src/draw/sw/*.c
-    ../../LVGL/lvgl/src/draw/sw/blend/*.c
-    # ../../LVGL/lvgl/src/draw/**/*.c
-    # ../../LVGL/lvgl/src/draw/**/**/*.c
-    # ../../LVGL/lvgl/src/draw/**/**/**/*.c
+    ../../LVGL/lvgl/src/draw/**/*.c
+    ../../LVGL/lvgl/src/draw/**/**/*.c
     ../../LVGL/lvgl/src/font/*.c
     ../../LVGL/lvgl/src/indev/*.c
     ../../LVGL/lvgl/src/layouts/*.c
@@ -76,11 +76,9 @@ target_include_directories(stm32cubemx INTERFACE
     ../../LVGL/lvgl/src/core
     ../../LVGL/lvgl/src/display
     ../../LVGL/lvgl/src/draw
-    ../../LVGL/lvgl/src/draw/sw
-    ../../LVGL/lvgl/src/draw/sw/blend
-    # ../../LVGL/lvgl/src/draw/**
-    # ../../LVGL/lvgl/src/draw/**/**
-    # ../../LVGL/lvgl/src/draw/**/**/**
+    ../../LVGL/lvgl/src/draw/**
+    ../../LVGL/lvgl/src/draw/**/**
+    ../../LVGL/lvgl/src/draw/**/**/**
     ../../LVGL/lvgl/src/font
     ../../LVGL/lvgl/src/indev
     ../../LVGL/lvgl/src/layouts

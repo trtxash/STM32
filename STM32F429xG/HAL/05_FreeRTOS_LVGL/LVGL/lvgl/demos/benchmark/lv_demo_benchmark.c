@@ -37,7 +37,7 @@
     #warning "It's recommended to have at least 128kB RAM for the benchmark"
 #endif
 
-#include "../../lvgl_private.h"
+#include "../lvgl_private.h"
 
 /**********************
  *      DEFINES

@@ -26,8 +26,10 @@
 
 DMA2D_HandleTypeDef hdma2d;
 
+extern void HAL_DMA2D_TransferCpltCallback(DMA2D_HandleTypeDef *hdma2d);
+
 /* DMA2D init function */
-void MX_DMA2D_Init(void)
+void DMA2D_Init(void)
 {
 
     /* USER CODE BEGIN DMA2D_Init 0 */
@@ -45,11 +47,13 @@ void MX_DMA2D_Init(void)
     hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
     hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
     hdma2d.LayerCfg[1].InputAlpha = 0;
+    hdma2d.XferCpltCallback = HAL_DMA2D_TransferCpltCallback;
+
     if (HAL_DMA2D_Init(&hdma2d) != HAL_OK)
     {
         Error_Handler();
     }
-    if (HAL_DMA2D_ConfigLayer(&hdma2d, 1) != HAL_OK)
+    if (HAL_DMA2D_ConfigLayer(&hdma2d, 0) != HAL_OK)
     {
         Error_Handler();
     }

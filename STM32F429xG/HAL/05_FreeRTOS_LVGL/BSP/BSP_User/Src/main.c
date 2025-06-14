@@ -12,6 +12,7 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "dma2d.h"
 #include "ft5446.h"
 #include "key.h"
 #include "lcd.h"
@@ -60,7 +61,8 @@ static void bsp_init(void)
     // LTDC初始化,LTDC 25MHz时钟,分辨率为800*480,16bit;计算得到刷新率61.7686fps,带宽47.4383MB/s
     // 同步宽度,前廊,后廊要设置好,不然出现部分显示问题
     LCD_Init();
-    FT5xxx_Init_Hard(); 
+    DMA2D_Init(); // DMA2D初始化
+    FT5xxx_Init_Hard();
 
     lv_init();
     lv_port_disp_init();

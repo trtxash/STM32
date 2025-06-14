@@ -10,6 +10,7 @@
  *      INCLUDES
  *********************/
 #include "lv_port_disp.h"
+#include "dma2d.h"
 #include "lcd.h"
 #include "ltdc.h"
 #include <string.h>
@@ -31,6 +32,8 @@
 #endif
 
 #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
+
+volatile uint8_t g_gpu_state = 0;
 
 /**********************
  *      TYPEDEFS
@@ -95,7 +98,7 @@ void lv_port_disp_init(void)
     static uint8_t buf_3_2[MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL];
     lv_display_set_buffers(disp, buf_3_1, buf_3_2, sizeof(buf_3_1), LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif
-    lv_display_set_buffers(disp, (uint8_t *)ltdc_framebuf[0], (uint8_t *)ltdc_framebuf[1], MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_buffers(disp, (uint8_t *)ltdc_framebuf[1], (uint8_t *)ltdc_framebuf[0], MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL, LV_DISPLAY_RENDER_MODE_DIRECT);
 }
 
 /**********************
@@ -144,14 +147,25 @@ static void disp_flush(lv_display_t *disp_drv, const lv_area_t *area, uint8_t *p
         //     HAL_LTDC_SetAddress(&hltdc, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
         // }
 
-        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS))
-            ;
+        // while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) // 垂直同步信号通常用于指示显示器已经准备好接收新的一帧数据。
+        //     ;
+        // HAL_LTDC_SetAddress(&hltdc, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
+
+        // HAL_DMA2D_Start_IT(&hdma2d, (uint32_t)px_map, (uint32_t)hltdc.LayerCfg[0].FBStartAdress, area->x2 - area->x1 + 1, area->y2 - area->y1 + 1);
+
+        // if (hdma2d.State == HAL_DMA2D_STATE_READY)
+        //     HAL_DMA2D_Start_IT(&hdma2d, (uint32_t)px_map, (uint32_t)ltdc_framebuf[0], MY_DISP_HOR_RES, MY_DISP_VER_RES);
+
+        /* 强制即时更新 */
         HAL_LTDC_SetAddress(&hltdc, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
+        __HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&hltdc); // 强制即时更新
+        lv_display_flush_ready(disp_drv);
+
     }
 
     /*IMPORTANT!!!
      *Inform the graphics library that you are ready with the flushing*/
-    lv_display_flush_ready(disp_drv);
+    // lv_display_flush_ready(disp_drv);
 }
 
 #else /*Enable this file at the top*/

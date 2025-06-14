@@ -279,13 +279,13 @@ void LTDC_Color_Fill(u16 sx, u16 sy, u16 ex, u16 ey, u16 *color)
     DMA2D->OMAR = addr;                                     // 输出存储器地址
     DMA2D->NLR = (pey - psy + 1) | ((pex - psx + 1) << 16); // 设定行数寄存器
     DMA2D->CR |= DMA2D_CR_START;                            // 启动DMA2D
-    while ((DMA2D->ISR & (DMA2D_FLAG_TC)) == 0)             // 等待传输完成
-    {
-        timeout++;
-        if (timeout > 0X1FFFFF)
-            break; // 超时退出
-    }
-    DMA2D->IFCR |= DMA2D_FLAG_TC; // 清除传输完成标志
+    // while ((DMA2D->ISR & (DMA2D_FLAG_TC)) == 0)             // 等待传输完成
+    // {
+    //     timeout++;
+    //     if (timeout > 0X1FFFFF)
+    //         break; // 超时退出
+    // }
+    // DMA2D->IFCR |= DMA2D_FLAG_TC; // 清除传输完成标志
 }
 
 // LCD清屏

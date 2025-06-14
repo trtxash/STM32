@@ -28,6 +28,8 @@ extern "C"
 
 #include "main.h"
 
+    extern void HAL_DMA2D_TransferCpltCallback(DMA2D_HandleTypeDef *hdma2d);
+
 #if SYSTEM_SUPPORT_OS
 
 #endif
