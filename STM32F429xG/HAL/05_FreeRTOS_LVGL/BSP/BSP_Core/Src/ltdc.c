@@ -73,9 +73,8 @@ void LTDC_Init(void)
         Error_Handler();
     }
 
-    // __HAL_LTDC_ENABLE_IT(&hltdc1, LTDC_IT_RR);
-    // 设置在第480行触发中断（假设480p屏幕）
-    HAL_LTDC_ProgramLineEvent(&hltdc1, ACTIVE_HEIGHT);
+    //  在垂直消隐触发中断
+    HAL_LTDC_ProgramLineEvent(&hltdc1, hltdc1.Init.AccumulatedActiveH + 1);
 
     // 层配置
     LTDC_Layer_Parameter_Config(0, (u32)ltdc_framebuf[0], LCD_PIXFORMAT, 255, 0, 6, 7, 0X000000); // 层参数配置

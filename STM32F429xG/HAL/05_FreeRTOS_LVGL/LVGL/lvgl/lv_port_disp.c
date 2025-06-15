@@ -193,17 +193,11 @@ static void disp_flush(lv_display_t *disp_drv, const lv_area_t *area, uint8_t *p
 #if 1
         // /* 按消费者垂直同步更新 */
         // // 短板在SDRAM带宽和LTDC频率
-        // if ((uint32_t)lv_display_get_buf_active(lv_display_get_default())->data == (uint32_t)ltdc_framebuf[0]) // 检测画完了哪个buf
-        //     g_gpu_state = 0;
-        // else
-        //     g_gpu_state = 1;
-
         if (xSemaphoreTake(xSemaphore_VSync, portMAX_DELAY) == pdTRUE) // 等待垂直同步信号
         {
-            while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) // 垂直同步信号通常用于指示显示器已经准备好接收新的一帧数据。
-                ;
             HAL_LTDC_SetAddress(&hltdc1, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0); // 切换buf
-            // __HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&hltdc1);                                                          // 强制即时更新
+            while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS))                                                              // 垂直同步信号通常用于指示显示器已经准备好接收新的一帧数据。
+                ;
             lv_display_flush_ready(lv_display_get_default()); // 去算buf
         }
 
