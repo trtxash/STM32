@@ -86,4 +86,5 @@ void vLedTask(void *pvParameters)
         }
         vTaskDelayUntil(&xLastWakeTime, LED_TaskCycleTime_ms);
     }
+    vTaskDelete(NULL);
 }

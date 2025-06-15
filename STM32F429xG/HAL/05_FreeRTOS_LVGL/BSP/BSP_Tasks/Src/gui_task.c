@@ -20,7 +20,7 @@ void vGUITask(void *pvParameters)
 
     // lv_demo_widgets();
     // lv_demo_scroll();
-    lv_demo_benchmark();
+    // lv_demo_benchmark();
     // lv_demo_music();
 
     // lv_obj_t *switch_obj1 = lv_switch_create(lv_screen_active());
@@ -131,4 +131,5 @@ void vGUITask(void *pvParameters)
         vTaskDelayUntil(&xLastWakeTime, 5);
 #endif
     }
+    vTaskDelete(NULL);
 }

@@ -15,6 +15,9 @@
 #include "ltdc.h"
 #include <string.h>
 
+#include "tasks_common.h"
+#include "tasks_sync.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -33,7 +36,8 @@
 
 #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
 
-volatile uint8_t g_gpu_state = 0;
+volatile uint8_t g_gpu_state = 0XFF;
+volatile uint8_t g_gpu_state_temp = 0XFF;
 
 /**********************
  *      TYPEDEFS
@@ -98,7 +102,7 @@ void lv_port_disp_init(void)
     static uint8_t buf_3_2[MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL];
     lv_display_set_buffers(disp, buf_3_1, buf_3_2, sizeof(buf_3_1), LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif
-    lv_display_set_buffers(disp, (uint8_t *)ltdc_framebuf[1], (uint8_t *)ltdc_framebuf[0], MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_buffers(disp, (uint8_t *)ltdc_framebuf[1], (uint8_t *)ltdc_framebuf[0], MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL, LV_DISPLAY_RENDER_MODE_FULL);
 }
 
 /**********************
@@ -136,31 +140,74 @@ static void disp_flush(lv_display_t *disp_drv, const lv_area_t *area, uint8_t *p
 {
     if (disp_flush_enabled)
     {
-#if 0
-        /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
-        LTDC_Color_Fill(area->x1, area->y1, area->x2, area->y2, (uint16_t *)px_map);
-#endif
-        // if (lv_display_flush_is_last(disp_drv))
-        // {
-        //     while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS))
-        //         ;
-        //     HAL_LTDC_SetAddress(&hltdc, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
-        // }
-
         // while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) // 垂直同步信号通常用于指示显示器已经准备好接收新的一帧数据。
         //     ;
         // HAL_LTDC_SetAddress(&hltdc, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
 
-        // HAL_DMA2D_Start_IT(&hdma2d, (uint32_t)px_map, (uint32_t)hltdc.LayerCfg[0].FBStartAdress, area->x2 - area->x1 + 1, area->y2 - area->y1 + 1);
-
-        // if (hdma2d.State == HAL_DMA2D_STATE_READY)
-        //     HAL_DMA2D_Start_IT(&hdma2d, (uint32_t)px_map, (uint32_t)ltdc_framebuf[0], MY_DISP_HOR_RES, MY_DISP_VER_RES);
-
-        /* 强制即时更新 */
-        HAL_LTDC_SetAddress(&hltdc, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
-        __HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&hltdc); // 强制即时更新
+#if 0
+        /* 按生产者强制即时更新 */
+        // 40fps,短板在SDRAM带宽和LTDC频率
+        // 这里只有可能LTDC慢，导致没读完当前buff就到了另一个buff，产生闪屏
+        HAL_LTDC_SetAddress(&hltdc1, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
+        __HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&hltdc1); // 强制即时更新
         lv_display_flush_ready(disp_drv);
+#endif
 
+#if 0
+        /* 按消费者强制即时更新，大部分数据在中断处理 */
+        // 短板在SDRAM带宽和LTDC频率
+        // 这里只有可能LTDC慢，导致LVGL自动覆写了另一个buff，产生闪屏
+        if ((uint32_t)lv_display_get_buf_active(lv_display_get_default())->data == (uint32_t)ltdc_framebuf[0]) // 检测画完了哪个buf
+            g_gpu_state = 0;
+        else
+            g_gpu_state = 1;
+
+        if (g_gpu_state == 0 && g_gpu_state_temp == 0) // 算完buf0，且LTDC写完buf0
+        {
+            // lv_display_flush_ready(lv_display_get_default()); // 去算buf1
+        }
+        else if (g_gpu_state == 1 && g_gpu_state_temp == 0) // 算完buf1，且LTDC写完buf0
+        {
+            // HAL_LTDC_SetAddress(&hltdc1, (uint32_t)ltdc_framebuf[g_gpu_state], 0); // 切换buf1
+            // lv_display_flush_ready(lv_display_get_default()); // 去算buf0
+            // g_gpu_state_temp = g_gpu_state;                   // 保存LTDC状态
+        }
+        else if (g_gpu_state == 0 && g_gpu_state_temp == 1) // 算完buf0，且LTDC写完buf1
+        {
+            // HAL_LTDC_SetAddress(&hltdc1, (uint32_t)ltdc_framebuf[g_gpu_state], 0); // 切换buf0
+            // lv_display_flush_ready(lv_display_get_default()); // 去算buf1
+            // g_gpu_state_temp = g_gpu_state;                   // 保存LTDC状态
+        }
+        else if (g_gpu_state == 1 && g_gpu_state_temp == 1) // 算完buf1，且LTDC写完buf1
+        {
+            // lv_display_flush_ready(lv_display_get_default()); // 去算buf0
+        }
+        else if (g_gpu_state == 0)
+        {
+        }
+        else if (g_gpu_state == 1)
+        {
+        }
+#endif
+
+#if 1
+        // /* 按消费者垂直同步更新 */
+        // // 短板在SDRAM带宽和LTDC频率
+        // if ((uint32_t)lv_display_get_buf_active(lv_display_get_default())->data == (uint32_t)ltdc_framebuf[0]) // 检测画完了哪个buf
+        //     g_gpu_state = 0;
+        // else
+        //     g_gpu_state = 1;
+
+        if (xSemaphoreTake(xSemaphore_VSync, portMAX_DELAY) == pdTRUE) // 等待垂直同步信号
+        {
+            while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) // 垂直同步信号通常用于指示显示器已经准备好接收新的一帧数据。
+                ;
+            HAL_LTDC_SetAddress(&hltdc1, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0); // 切换buf
+            // __HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&hltdc1);                                                          // 强制即时更新
+            lv_display_flush_ready(lv_display_get_default()); // 去算buf
+        }
+
+#endif
     }
 
     /*IMPORTANT!!!

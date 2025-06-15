@@ -250,4 +250,5 @@ void vCPUTask(void *pvParameters)
         xQueueOverwrite(xQueue_CPU, CPU_RunInfo);
         vTaskDelayUntil(&xLastWakeTime, CPU_TaskCycleTime_ms);
     }
+    vTaskDelete(NULL);
 }

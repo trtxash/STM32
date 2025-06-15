@@ -46,6 +46,7 @@ extern "C"
     void I2C1_EV_IRQHandler(void);
     void DMA2_Stream0_IRQHandler(void);
     void DMA2D_IRQHandler(void);
+    void LTDC_IRQHandler(void);
     // void WWDG_IRQHandler(void);
 
 #ifdef __cplusplus

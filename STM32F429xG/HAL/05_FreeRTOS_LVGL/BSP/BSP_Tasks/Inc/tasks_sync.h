@@ -24,6 +24,8 @@ extern QueueHandle_t xQueue_Touch;
 
 extern QueueHandle_t xSemaphore_ADC;
 extern QueueHandle_t xSemaphore_Touch_i2c;
+extern QueueHandle_t xSemaphore_VSync;
+extern QueueHandle_t xSemaphore_VSync_Wait;
 
 void vSyncResources_Init(void);
 

@@ -3,6 +3,7 @@
 #include "adc_task.h"
 #include "dma2d.h"
 #include "i2c.h"
+#include "ltdc.h"
 #include "tasks_common.h"
 #include "tasks_sync.h"
 #include "tim.h"
@@ -202,4 +203,9 @@ void DMA2D_IRQHandler(void)
     /* USER CODE BEGIN DMA2D_IRQn 1 */
 
     /* USER CODE END DMA2D_IRQn 1 */
+}
+
+void LTDC_IRQHandler(void)
+{
+    HAL_LTDC_IRQHandler(&hltdc1);
 }

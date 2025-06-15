@@ -81,7 +81,7 @@ void LTDC_Layer_Parameter_Config(u8 layerx, u32 bufaddr, u8 pixformat, u8 alpha,
     pLayerCfg.Backcolor.Red = (u8)(bkcolor & 0X00FF0000) >> 16;  // 背景颜色红色部分
     pLayerCfg.Backcolor.Green = (u8)(bkcolor & 0X0000FF00) >> 8; // 背景颜色绿色部分
     pLayerCfg.Backcolor.Blue = (u8)bkcolor & 0X000000FF;         // 背景颜色蓝色部分
-    HAL_LTDC_ConfigLayer(&hltdc, &pLayerCfg, layerx);            // 设置所选中的层
+    HAL_LTDC_ConfigLayer(&hltdc1, &pLayerCfg, layerx);           // 设置所选中的层
 }
 
 // LTDC,层颜窗口设置,窗口以LCD面板坐标系为基准
@@ -91,8 +91,8 @@ void LTDC_Layer_Parameter_Config(u8 layerx, u32 bufaddr, u8 pixformat, u8 alpha,
 // width,height:宽度和高度
 void LTDC_Layer_Window_Config(u8 layerx, u16 sx, u16 sy, u16 width, u16 height)
 {
-    HAL_LTDC_SetWindowPosition(&hltdc, sx, sy, layerx);    // 设置窗口的位置
-    HAL_LTDC_SetWindowSize(&hltdc, width, height, layerx); // 设置窗口大小
+    HAL_LTDC_SetWindowPosition(&hltdc1, sx, sy, layerx);    // 设置窗口的位置
+    HAL_LTDC_SetWindowSize(&hltdc1, width, height, layerx); // 设置窗口大小
 }
 
 // 打开LCD开关
@@ -100,9 +100,9 @@ void LTDC_Layer_Window_Config(u8 layerx, u16 sx, u16 sy, u16 width, u16 height)
 void LTDC_Switch(u8 sw)
 {
     if (sw == 1)
-        __HAL_LTDC_ENABLE(&hltdc);
+        __HAL_LTDC_ENABLE(&hltdc1);
     else if (sw == 0)
-        __HAL_LTDC_DISABLE(&hltdc);
+        __HAL_LTDC_DISABLE(&hltdc1);
 }
 
 // 开关指定层
@@ -111,10 +111,10 @@ void LTDC_Switch(u8 sw)
 void LTDC_Layer_Switch(u8 layerx, u8 sw)
 {
     if (sw == 1)
-        __HAL_LTDC_LAYER_ENABLE(&hltdc, layerx);
+        __HAL_LTDC_LAYER_ENABLE(&hltdc1, layerx);
     else if (sw == 0)
-        __HAL_LTDC_LAYER_DISABLE(&hltdc, layerx);
-    __HAL_LTDC_RELOAD_CONFIG(&hltdc);
+        __HAL_LTDC_LAYER_DISABLE(&hltdc1, layerx);
+    __HAL_LTDC_RELOAD_CONFIG(&hltdc1);
 }
 
 // 选择层
@@ -279,13 +279,13 @@ void LTDC_Color_Fill(u16 sx, u16 sy, u16 ex, u16 ey, u16 *color)
     DMA2D->OMAR = addr;                                     // 输出存储器地址
     DMA2D->NLR = (pey - psy + 1) | ((pex - psx + 1) << 16); // 设定行数寄存器
     DMA2D->CR |= DMA2D_CR_START;                            // 启动DMA2D
-    // while ((DMA2D->ISR & (DMA2D_FLAG_TC)) == 0)             // 等待传输完成
-    // {
-    //     timeout++;
-    //     if (timeout > 0X1FFFFF)
-    //         break; // 超时退出
-    // }
-    // DMA2D->IFCR |= DMA2D_FLAG_TC; // 清除传输完成标志
+    while ((DMA2D->ISR & (DMA2D_FLAG_TC)) == 0)             // 等待传输完成
+    {
+        timeout++;
+        if (timeout > 0X1FFFFF)
+            break; // 超时退出
+    }
+    DMA2D->IFCR |= DMA2D_FLAG_TC; // 清除传输完成标志
 }
 
 // LCD清屏

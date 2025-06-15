@@ -12,9 +12,6 @@ void vStartTask(void *pvParameters); // 任务函数
 
 void freertos_enter(void)
 {
-    // 同步资源初始化
-    vSyncResources_Init();
-
     // 创建开始任务
     xTaskCreate((TaskFunction_t)vStartTask,          // 任务函数
                 (const char *)"vStartTask",          // 任务名称

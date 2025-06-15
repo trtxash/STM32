@@ -5,7 +5,7 @@
 #include "tasks_common.h"
 
 #define TASK_PRIO_GUI        TASK_PRIO_NORMAL
-#define GUI_STK_SIZE         STACK_SIZE_LEVEL5
+#define GUI_STK_SIZE         STACK_SIZE_LEVEL6
 // #define GUI_TaskCycleTime_ms 8 // 任务运行时间间隔,125Hz
 #define GUI_TaskCycleTime_ms 15 // 任务运行时间间隔,66.66Hz
 

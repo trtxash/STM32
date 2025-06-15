@@ -20,4 +20,5 @@ void vTouchTask(void *pvParameters)
         FT5xxx_Scan(Touch_Data);
         xQueueOverwrite(xQueue_Touch, &tp_dev);
     }
+    vTaskDelete(NULL);
 }

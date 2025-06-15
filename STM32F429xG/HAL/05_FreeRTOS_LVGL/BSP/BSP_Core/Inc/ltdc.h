@@ -29,7 +29,7 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-    extern LTDC_HandleTypeDef hltdc;
+    extern LTDC_HandleTypeDef hltdc1;
 
     void LTDC_Init(void);
 

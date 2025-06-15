@@ -18,6 +18,7 @@
 #endif
 
 extern volatile uint8_t g_gpu_state;
+extern volatile uint8_t g_gpu_state_temp;
 
 /**
  * @brief  Period elapsed callback in non blocking mode
@@ -91,6 +92,53 @@ void HAL_DMA2D_TransferCpltCallback(DMA2D_HandleTypeDef *hdma2d)
 {
     // HAL_LTDC_SetAddress(&hltdc, (uint32_t)lv_display_get_buf_active(lv_display_get_default())->data, 0);
     // lv_display_flush_ready(lv_display_get_default());
+}
+
+void HAL_LTDC_LineEventCallback(LTDC_HandleTypeDef *hltdc)
+{
+    if (hltdc == (&hltdc1))
+    {
+#if 0
+        /* 按消费者强制即时更新，大部分数据在中断处理 */
+        // 短板在SDRAM带宽和LTDC频率
+        // 这里只有可能LTDC慢，导致LVGL自动覆写了另一个buff，产生闪屏
+        if (hltdc1.LayerCfg[0].FBStartAdress == (uint32_t)ltdc_framebuf[0]) // 检测写完了哪个buf
+            g_gpu_state_temp = 0;
+        else
+            g_gpu_state_temp = 1;
+
+        if (g_gpu_state == 0 && g_gpu_state_temp == 0) // 算完buf0，且LTDC写完buf0
+        {
+            lv_display_flush_ready(lv_display_get_default()); // 去算buf1
+        }
+        else if (g_gpu_state == 1 && g_gpu_state_temp == 0) // 算完buf1，且LTDC写完buf0
+        {
+            HAL_LTDC_SetAddress(&hltdc1, (uint32_t)ltdc_framebuf[g_gpu_state], 0); // 切换buf1
+            lv_display_flush_ready(lv_display_get_default());                      // 去算buf0
+        }
+        else if (g_gpu_state == 0 && g_gpu_state_temp == 1) // 算完buf0，且LTDC写完buf1
+        {
+            HAL_LTDC_SetAddress(&hltdc1, (uint32_t)ltdc_framebuf[g_gpu_state], 0); // 切换buf0
+            lv_display_flush_ready(lv_display_get_default());                      // 去算buf1
+        }
+        else if (g_gpu_state == 1 && g_gpu_state_temp == 1) // 算完buf1，且LTDC写完buf1
+        {
+            lv_display_flush_ready(lv_display_get_default()); // 去算buf0
+        }
+#endif
+        xSemaphoreGiveFromISR(xSemaphore_VSync, NULL); // 释放信号量
+
+        __HAL_LTDC_ENABLE_IT(hltdc, LTDC_IT_LI);
+    }
+}
+
+void HAL_LTDC_ReloadEventCallback(LTDC_HandleTypeDef *hltdc)
+{
+    if (hltdc == (&hltdc1))
+    {
+        xSemaphoreGiveFromISR(xSemaphore_VSync, NULL);           // 释放信号量
+        HAL_LTDC_Reload(&hltdc1, LTDC_RELOAD_VERTICAL_BLANKING); // 请求重载
+    }
 }
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)

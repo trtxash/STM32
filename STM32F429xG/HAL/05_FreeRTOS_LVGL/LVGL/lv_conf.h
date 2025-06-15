@@ -40,7 +40,7 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
-#define LV_USE_STDLIB_MALLOC    LV_STDLIB_CLIB
+#define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN
 
 /** Possible values
  * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
@@ -49,7 +49,7 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
-#define LV_USE_STDLIB_STRING    LV_STDLIB_CLIB
+#define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
 
 /** Possible values
  * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
@@ -58,7 +58,7 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
-#define LV_USE_STDLIB_SPRINTF   LV_STDLIB_CLIB
+#define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
 
 #define LV_STDINT_INCLUDE       <stdint.h>
 #define LV_STDDEF_INCLUDE       <stddef.h>
@@ -88,11 +88,11 @@
  *====================*/
 
 /** Default display refresh, input device read and animation step period. */
-#define LV_DEF_REFR_PERIOD  33      /**< [ms] */
+#define LV_DEF_REFR_PERIOD  15      /**< [ms] */
 
 /** Default Dots Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  * (Not so important, you can adjust it to modify default sizes and spaces.) */
-#define LV_DPI_DEF 130              /**< [px/inch] */
+#define LV_DPI_DEF 266              /**< [px/inch] */
 
 /*=================
  * OPERATING SYSTEM
@@ -366,7 +366,7 @@
  *-----------*/
 
 /** Enable log module */
-#define LV_USE_LOG 1
+#define LV_USE_LOG 0
 #if LV_USE_LOG
     /** Set value to one of the following levels of logging detail:
      *  - LV_LOG_LEVEL_TRACE    Log detailed information.
@@ -414,7 +414,7 @@
  * If LV_USE_LOG is enabled, an error message will be printed on failure. */
 #define LV_USE_ASSERT_NULL          1   /**< Check if the parameter is NULL. (Very fast, recommended) */
 #define LV_USE_ASSERT_MALLOC        1   /**< Checks is the memory is successfully allocated or no. (Very fast, recommended) */
-#define LV_USE_ASSERT_STYLE         0   /**< Check if the styles are properly initialized. (Very fast, recommended) */
+#define LV_USE_ASSERT_STYLE         1   /**< Check if the styles are properly initialized. (Very fast, recommended) */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0   /**< Check the integrity of `lv_mem` after critical operations. (Slow) */
 #define LV_USE_ASSERT_OBJ           0   /**< Check the object's type and existence (e.g. not deleted). (Slow) */
 
@@ -1330,7 +1330,7 @@
     #define LV_USE_DEMO_WIDGETS 1
     
     /** Demonstrate usage of encoder and keyboard. */
-    #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
+    #define LV_USE_DEMO_KEYPAD_AND_ENCODER 1
     
     /** Benchmark your system */
     #define LV_USE_DEMO_BENCHMARK 1

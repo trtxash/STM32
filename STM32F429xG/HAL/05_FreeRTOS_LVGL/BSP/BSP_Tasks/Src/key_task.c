@@ -111,4 +111,5 @@ void vKeyTask(void *pvParameters)
         button_ticks();
         vTaskDelayUntil(&xLastWakeTime, KEY_TaskCycleTime_ms);
     }
+    vTaskDelete(NULL);
 }

@@ -10,6 +10,8 @@ QueueHandle_t xQueue_Touch = NULL;
 
 QueueHandle_t xSemaphore_ADC = NULL;
 QueueHandle_t xSemaphore_Touch_i2c = NULL;
+QueueHandle_t xSemaphore_VSync = NULL;
+QueueHandle_t xSemaphore_VSync_Wait = NULL;
 
 void vSyncResources_Init(void)
 {
@@ -22,6 +24,8 @@ void vSyncResources_Init(void)
     xQueue_CPU = xQueueCreate(CPUQueueLen, sizeof(CPU_RunInfo));
     xQueue_Touch = xQueueCreate(TouchQueueLen, sizeof(_m_tp_dev));
 
-    xSemaphore_ADC = xSemaphoreCreateBinary();       
-    xSemaphore_Touch_i2c = xSemaphoreCreateBinary(); 
+    xSemaphore_ADC = xSemaphoreCreateBinary();
+    xSemaphore_Touch_i2c = xSemaphoreCreateBinary();
+    xSemaphore_VSync = xSemaphoreCreateBinary();
+    xSemaphore_VSync_Wait = xSemaphoreCreateBinary();
 }
